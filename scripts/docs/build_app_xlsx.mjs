@@ -7,6 +7,7 @@ const fallbackRoot = path.resolve(path.dirname(scriptPath), "../..");
 const root = process.env.PROJECT_ROOT ? path.resolve(process.env.PROJECT_ROOT) : fallbackRoot;
 const csvPath = path.join(root, "docs/generated/app-test-cases.csv");
 const outputPath = path.join(root, "app.xlsx");
+const stableTimestamp = "2026-05-14T00:00:00.000Z";
 
 function parseCsv(text) {
   const rows = [];
@@ -163,13 +164,12 @@ function rootRels() {
 }
 
 function coreProps() {
-  const now = new Date().toISOString();
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <dc:title>100 Journeys Test Cases</dc:title>
   <dc:creator>100 Journeys docs generator</dc:creator>
-  <dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>
-  <dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${stableTimestamp}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${stableTimestamp}</dcterms:modified>
 </cp:coreProperties>`;
 }
 
@@ -195,7 +195,7 @@ function crc32(buffer) {
 }
 
 function dosTimestamp() {
-  const date = new Date();
+  const date = new Date(stableTimestamp);
   const time = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
   const day = ((date.getFullYear() - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate();
   return { time, day };
