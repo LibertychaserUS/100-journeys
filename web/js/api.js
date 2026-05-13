@@ -77,9 +77,20 @@ const API = (() => {
     mediaUrl: (path) => `${window.APP_CONFIG.mediaBase}/${path}`,
 
     // Auth state
-    isLoggedIn: () => !!localStorage.getItem('auth_token'),
-    getToken: () => localStorage.getItem('auth_token'),
-    setToken: (t) => localStorage.setItem('auth_token', t),
-    clearToken: () => localStorage.removeItem('auth_token'),
+    isLoggedIn: () => !!(localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+    getToken: () => localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'),
+    setToken: (t, remember = true) => {
+      if (remember) {
+        localStorage.setItem('auth_token', t);
+        sessionStorage.removeItem('auth_token');
+      } else {
+        sessionStorage.setItem('auth_token', t);
+        localStorage.removeItem('auth_token');
+      }
+    },
+    clearToken: () => {
+      localStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_token');
+    },
   };
 })();

@@ -105,6 +105,26 @@
   --z-toast:   300;
 }
 
+/* --- Light Theme Override --- */
+[data-theme="light"] {
+  --color-bg-primary:     #f7f5f0;
+  --color-bg-secondary:   #edeae3;
+  --color-bg-card:        #ffffff;
+  --color-bg-overlay:     rgba(255, 255, 255, 0.6);
+
+  --color-text-primary:   #1a1a1a;
+  --color-text-secondary: #4a4a4a;
+  --color-text-muted:     #8a8a8a;
+
+  --color-border:         rgba(0, 0, 0, 0.08);
+  --color-border-hover:   rgba(0, 0, 0, 0.16);
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 24px rgba(180, 150, 80, 0.15);
+}
+
 /* visual_style variant overrides */
 [data-visual-style="surreal"] {
   --card-title-weight:   300;

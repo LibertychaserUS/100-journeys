@@ -11,6 +11,11 @@ const Nav = {
   },
 
   render() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    this._themeIcon = currentTheme === 'dark' ? '☀' : '☾';
+
     this.el.innerHTML = `
       <div class="nav">
         <a href="#/" class="nav__logo">100种不可思议的旅行</a>
@@ -22,9 +27,23 @@ const Nav = {
           <a href="#/register" class="nav__link" id="nav-register">注册</a>
           <span class="nav__user" id="nav-user" style="display:none;"></span>
           <button class="nav__link" id="nav-logout" style="display:none;">退出</button>
+          <button class="nav__theme-toggle" id="nav-theme" title="切换主题">${this._themeIcon}</button>
         </div>
       </div>
     `;
+
+    // Theme toggle
+    const themeBtn = document.getElementById('nav-theme');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        const next = isDark ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        themeBtn.textContent = next === 'dark' ? '☀' : '☾';
+      });
+    }
 
     // Logout handler
     const logoutBtn = document.getElementById('nav-logout');

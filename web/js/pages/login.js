@@ -29,6 +29,10 @@ Pages.Login = {
               </div>
               <input type="hidden" id="login-captcha-id" />
             </div>
+            <label class="auth-remember">
+              <input type="checkbox" id="login-remember" checked />
+              <span>记住我，下次自动登录</span>
+            </label>
             <button type="submit" class="auth-submit">登录</button>
           </form>
 
@@ -75,7 +79,8 @@ Pages.Login = {
         const res = await API.login({ email, password, captcha_id: captchaId, captcha_answer: captchaAnswer });
         const data = res.data || res;
         if (data.token) {
-          API.setToken(data.token);
+          const remember = document.getElementById('login-remember').checked;
+          API.setToken(data.token, remember);
           // Update nav auth state
           if (window.App && window.App.updateNav) window.App.updateNav();
           Router.navigate('#/');

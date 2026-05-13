@@ -21,6 +21,28 @@ body {
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   min-height: 100vh;
+  position: relative;
+}
+
+/* Subtle ambient background animation */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(232, 213, 163, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.02) 0%, transparent 60%);
+  animation: ambient-drift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes ambient-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2%, -1%) scale(1.05); }
+  66% { transform: translate(-1%, 2%) scale(1.02); }
+  100% { transform: translate(1%, -2%) scale(1.04); }
 }
 
 a {

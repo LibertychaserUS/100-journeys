@@ -69,3 +69,27 @@
   cursor: pointer;
   font-family: inherit;
 }
+
+.nav__theme-toggle {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  transition: all var(--transition-fast);
+}
+
+.nav__theme-toggle:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+[data-theme="light"] #main-nav {
+  background: rgba(247, 245, 240, 0.85);
+}
