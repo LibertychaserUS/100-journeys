@@ -9,6 +9,7 @@ import (
 
 	"github.com/100-journeys/app/internal/ai"
 	"github.com/100-journeys/app/internal/handler"
+	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
@@ -51,26 +52,23 @@ func main() {
 
 	// Wire dependencies
 	repo := repository.NewJourneyRepository(db)
+	userRepo := repository.NewUserRepository(db)
 	media := &service.LocalProvider{BaseURL: mediaBase}
 	svc := service.NewJourneyService(repo, media)
 	aiProvider := ai.NewMockAI()
 	engine := ai.NewRecommendEngine(repo)
 	h := handler.NewJourneyHandler(svc, aiProvider, engine)
+	authH := handler.NewAuthHandler(userRepo)
 
 	// Setup Gin
-	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
 
-	// CORS middleware
-	r.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-		c.Next()
-	})
+	// Middleware stack (order matters)
+	r.Use(gin.Recovery())           // P1: panic recovery
+	r.Use(middleware.RequestID())   // P1: request tracing
+	r.Use(middleware.Logger())      // P1: structured request logging
+	r.Use(middleware.CORS())        // P1: whitelist CORS
 
 	// Static files
 	r.Static("/static", "./web")
@@ -85,6 +83,17 @@ func main() {
 		api.GET("/mbti", h.ListMBTITypes)
 		api.POST("/ai/chat", h.AIChat)
 		api.GET("/health", h.Health)
+
+		// Auth (public)
+		api.POST("/auth/register", authH.Register)
+		api.POST("/auth/login", authH.Login)
+
+		// Auth (protected)
+		auth := api.Group("/auth")
+		auth.Use(middleware.JWTAuth())
+		{
+			auth.GET("/me", authH.Me)
+		}
 	}
 
 	// SPA fallback: serve index.html for non-API, non-static routes

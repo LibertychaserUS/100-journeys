@@ -85,3 +85,42 @@ CREATE TRIGGER IF NOT EXISTS trg_journeys_updated_at
 BEGIN
     UPDATE journeys SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
 END;
+
+-- =============================================================
+-- User system (v1.1.0)
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    username        TEXT    NOT NULL UNIQUE,
+    email           TEXT    NOT NULL UNIQUE,
+    password_hash   TEXT    NOT NULL,
+    role            TEXT    NOT NULL DEFAULT 'user' CHECK(role IN ('user','admin')),
+    level           INTEGER NOT NULL DEFAULT 1 CHECK(level BETWEEN 1 AND 10),
+    points          INTEGER NOT NULL DEFAULT 0,
+    mbti_type       TEXT,
+    avatar_url      TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_points_history (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    action_type     TEXT    NOT NULL,   -- 'register','login','explore','save','share','review'
+    points_delta    INTEGER NOT NULL,
+    balance_after   INTEGER NOT NULL,
+    description     TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_saved_journeys (
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    journey_id  INTEGER NOT NULL REFERENCES journeys(id) ON DELETE CASCADE,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, journey_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email        ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_username     ON users(username);
+CREATE INDEX IF NOT EXISTS idx_points_history_user ON user_points_history(user_id);
