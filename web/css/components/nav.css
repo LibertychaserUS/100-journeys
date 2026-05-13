@@ -56,3 +56,16 @@
   background: var(--color-accent-primary);
   border-radius: 1px;
 }
+
+.nav__user {
+  font-size: var(--text-sm);
+  color: var(--color-accent-primary);
+  font-weight: var(--weight-medium);
+}
+
+#nav-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}

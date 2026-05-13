@@ -1,6 +1,6 @@
 /**
  * router.js — Hash-based SPA router
- * Routes: / | /explore | /journey/:slug | /about
+ * Routes: / | /explore | /journey/:slug | /login | /register
  */
 
 const Router = (() => {
@@ -40,3 +40,5 @@ const Router = (() => {
 Router.define('/',                Pages.Home.render,    Pages.Home);
 Router.define('/explore',         Pages.Explore.render, Pages.Explore);
 Router.define('/journey/:slug',   Pages.Detail.render,  Pages.Detail);
+Router.define('/login',           Pages.Login.render,   Pages.Login);
+Router.define('/register',        Pages.Register.render, Pages.Register);

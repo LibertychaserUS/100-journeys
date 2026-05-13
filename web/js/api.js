@@ -18,6 +18,16 @@ const API = (() => {
     return res.json();
   }
 
+  // Auth helpers
+  function authRequest(path, body) {
+    return request(path, { method: 'POST', body: JSON.stringify(body) });
+  }
+
+  function authHeader() {
+    const token = localStorage.getItem('auth_token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   return {
     // Journeys
     getJourneys: (params = {}) => {
@@ -29,7 +39,18 @@ const API = (() => {
     // Tags
     getTags: () => request('/tags'),
 
+    // Auth
+    register: (data) => authRequest('/auth/register', data),
+    login: (data) => authRequest('/auth/login', data),
+    me: () => request('/auth/me', { headers: authHeader() }),
+
     // Media URL helper — CDN-aware
     mediaUrl: (path) => `${window.APP_CONFIG.mediaBase}/${path}`,
+
+    // Auth state
+    isLoggedIn: () => !!localStorage.getItem('auth_token'),
+    getToken: () => localStorage.getItem('auth_token'),
+    setToken: (t) => localStorage.setItem('auth_token', t),
+    clearToken: () => localStorage.removeItem('auth_token'),
   };
 })();
