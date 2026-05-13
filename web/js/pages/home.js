@@ -143,9 +143,7 @@ Pages.Home = {
      Card Template
      ================================================================ */
   _renderCard(j) {
-    const imageUrl = j.image_url
-      ? API.mediaUrl(j.image_url)
-      : '/static/assets/images/placeholder.jpg';
+    const imageUrl = j.image_url || '/static/assets/images/placeholder.jpg';
 
     const typeTag = j.fantasy_type
       ? `<span class="home-card__tag home-card__tag--type">${this._escapeHtml(j.fantasy_type)}</span>`
@@ -154,8 +152,10 @@ Pages.Home = {
     const mbtiTags = (j.mbti_types || [])
       .slice(0, 2)
       .map(
-        (code) =>
-          `<span class="home-card__tag home-card__tag--mbti" data-mbti="${this._escapeHtml(code)}">${this._escapeHtml(code)}</span>`
+        (item) => {
+          const code = item.mbti_type?.code || item;
+          return `<span class="home-card__tag home-card__tag--mbti" data-mbti="${this._escapeHtml(code)}">${this._escapeHtml(code)}</span>`;
+        }
       )
       .join('');
 

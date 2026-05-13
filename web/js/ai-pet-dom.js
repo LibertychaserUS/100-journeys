@@ -276,7 +276,7 @@
     AIPet.saveProfile(profile);
 
     addPetMessage(
-      `🎉 测试完成！你的旅行人格是 <strong>${result.code}</strong>！\n\n` +
+      `🎉 测试完成！你的旅行人格是 ${result.code}！\n\n` +
       `让我为你推荐最适合 ${result.code} 型旅行者的不可思议体验~ ✨`,
       [{ type: 'recommend', label: '查看推荐' }]
     );

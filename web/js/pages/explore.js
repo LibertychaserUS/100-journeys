@@ -384,9 +384,7 @@ Pages.Explore = {
   },
 
   _renderCard(j) {
-    const imageUrl = j.cover_image
-      ? (j.cover_image.startsWith('http') ? j.cover_image : API.mediaUrl(j.cover_image))
-      : '/static/assets/images/placeholder.jpg';
+    const imageUrl = j.image_url || '/static/assets/images/placeholder.jpg';
 
     const aspectStyle = j.aspect_ratio
       ? `padding-bottom: ${(1 / j.aspect_ratio * 100).toFixed(2)}%;`
@@ -397,6 +395,8 @@ Pages.Explore = {
     const dots = Array.from({ length: 5 }, (_, i) =>
       `<span class="journey-card__adventure-dot ${i < filled ? 'journey-card__adventure-dot--filled' : ''}"></span>`
     ).join('');
+
+    const mbtiCode = (j.mbti_types || [])[0]?.mbti_type?.code || '';
 
     return `
       <article class="journey-card" data-slug="${this._escapeHtml(j.slug)}" role="link" tabindex="0">
@@ -411,7 +411,7 @@ Pages.Explore = {
         <div class="journey-card__body">
           <div class="journey-card__meta">
             <span class="journey-card__tag">${this._escapeHtml(j.tag_name || j.tag || '旅行')}</span>
-            ${j.mbti ? `<span class="journey-card__mbti">${this._escapeHtml(j.mbti)}</span>` : ''}
+            ${mbtiCode ? `<span class="journey-card__mbti">${this._escapeHtml(mbtiCode)}</span>` : ''}
           </div>
           <h3 class="journey-card__title">${this._escapeHtml(j.title)}</h3>
           ${j.hook || j.story_hook ? `<p class="journey-card__hook">${this._escapeHtml(j.hook || j.story_hook)}</p>` : ''}
