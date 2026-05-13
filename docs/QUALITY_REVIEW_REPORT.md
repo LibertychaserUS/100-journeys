@@ -1,456 +1,269 @@
-# Quality Review Report — 100 Journeys
+# 工程质量与生产压力审查报告
 
-**Date**: 2026-05-13  
-**Reviewer**: Engineering QA Review  
-**Scope**: Audit/report only. No production source code, test code, schema, or existing maintained project docs were modified in this pass.  
-**Readiness judgment**: **Not ready for submission** until E2E failures, stale documentation, product-model gaps, and deployment mismatch are fixed.
-
----
-
-## 1. Review Summary
-
-This repository is a Go + Gin + SQLite backend with a vanilla HTML/CSS/JS hash-routed SPA frontend. It has meaningful existing work from prior AI-assisted passes and handoff materials: seed data, image assets, a Go API, authentication, order/payment simulation, Playwright tests, and trace docs.
-
-However, the current project state does not match several submission claims:
-
-- README, `docs/HANDOFF.md`, and `docs/trace/CURRENT_STATE.md` claim E2E is fully green, but local verification shows **15 passed / 14 failed**.
-- Coverage numbers in README/current-state docs are higher than current `go test -cover ./...` output.
-- SDD/DDD/TDD docs are incomplete or stale relative to the implemented user/auth/order/admin scope.
-- The core product still reads partly like a travel-destination showcase, not a role-based fantasy journey / mission-board product.
-- Deployment workflow currently uploads only `./web` to GitHub Pages, which cannot run the Go API or SQLite backend.
-
-The codebase is usable as a base for targeted repair. It should not be rewritten blindly, but a significant frontend redesign is reasonable. The user has now allowed a React rewrite if needed; this conflicts with the current local project constraint that describes the frontend as vanilla HTML/CSS/JS, so that decision must be explicitly documented before implementation.
+**日期**: 2026-05-14  
+**范围**: 前端体验、后端 API、SQLite 数据一致性、后台统计、日志审计、压力测试与部署风险。  
+**结论**: 当前分支已从“演示原型”推进到“可验证 MVP 分支”，但还不是高并发生产系统。目标课堂/作业容量已通过本地压力验证；继续向真实生产推进时，静态资源、日志写入和 SQLite 单写模型仍是主要瓶颈。
 
 ---
 
-## 2. Commands Run
+## 1. 本轮关键改动
 
-| Command | Result |
-|---|---|
-| `git status --short` | Shows one untracked local instruction file before this report. It should not be included in the public submission unless intentionally approved. |
-| `go test ./...` | Passes. Packages with tests under `internal/ai`, `internal/handler`, `internal/middleware`, `internal/repository`, and `internal/service` pass. |
-| `go vet ./...` | Passes with no reported issues. |
-| `go test -cover ./...` | Passes, but coverage is lower than docs claim: `internal/ai` 84.0%, `internal/handler` 65.3%, `internal/middleware` 74.7%, `internal/repository` 71.0%, `internal/service` 32.5%. |
-| `go test -race ./...` | Failed at build/toolchain level with `package github.com/100-journeys/app/cmd/server: cannot find package` and package build failures. Needs separate environment/toolchain investigation. |
-| `npx playwright test` inside sandbox | Failed 29/29 because Chromium could not launch: `bootstrap_check_in ... Permission denied (1100)`. This was an environment false failure. |
-| `npx playwright test` outside sandbox | Ran real browser E2E. Result: **15 passed / 14 failed**. |
-| `coderabbit --version` | `0.4.1`. |
-| `coderabbit auth status --agent` | Authenticated successfully through the configured GitHub account. |
-| `coderabbit review --agent -t all` | Failed: `Review failed: No files to review`. |
-| `coderabbit review --agent --base-commit 705280ddb0de20879c902a9764ded274848c5721` | Failed: `Review failed: Unknown error`, `TRPCClientError`. |
-| Local visual screenshot via Playwright | Captured homepage screenshots to `/private/tmp/100-journeys-home.png` and `/private/tmp/100-journeys-home-skip-pet.png`; not committed. |
+- 首页改为更简洁的“桃源百旅”暗色视觉：大标题轮播、真实生成图、轻粒子、鼠标微光、搜索与情绪入口。
+- 修复图片路径与加载策略：生成图改用本地 JPG，首页先用内置 journey 数据即时渲染，再与 API 同步。
+- 修复卡片标题被遮挡问题：卡片标题常驻可见，简介仅在 hover 时从底部展开。
+- 登录态顶栏区分普通用户和管理员：普通用户显示头像、用户名、虚拟钱包、积分；管理员显示后台入口。
+- 注册页补充用户名、性别、头像上传；头像按用户唯一 ID 存放，用户名允许重复，邮箱仍唯一。
+- 后台 Dashboard 改为真实数据统计：用户数、旅程数、钱包余额、积分、订单、收入、审计日志、事件数、热门点击/购买、MBTI、性别分布。
+- 增加后台导出接口：`GET /api/admin/export?format=csv|json`。
+- 后台入口从普通导航拆出：`#/admin-login` 为隐藏入口，游客和普通用户在主页/导航看不到 Dashboard。
+- 管理员账号只能通过服务器侧 CLI 创建或提升；公开注册接口即使注入 `role=admin` 也只会生成普通用户。
+- 增加持久化审计日志：API 请求、错误、前端 `error/unhandledrejection` 写入 `audit_logs`。
+- 增加异步分析事件缓冲：点击、搜索、筛选、旅程浏览、宠物回复写入 `analytics_events`。
+- P0 订单/支付/钱包链路保持事务写入：订单、交易流水、余额扣减同事务完成，并通过 SQLite 单连接和 busy retry 避免写锁踩踏。
 
 ---
 
-## 3. CodeRabbit Result
+## 2. 系统设计真实现状
 
-CodeRabbit did not produce review findings.
+### 2.1 Nginx / 静态资源层
 
-1. Default all-scope review failed because there were no tracked files to review against the default diff scope:
+当前仓库没有运行中的 Nginx。实际运行方式是：
 
 ```text
-Review failed: No files to review
+Browser -> Gin 静态文件 / Gin API -> SQLite
 ```
 
-2. A root-to-current review attempt using the first commit as base failed in the service:
+这对本地演示足够，但不适合把 3 MB 级图片和 API 全部压在 Go 进程上长期承载。生产建议：
+
+- 静态图片放到 CDN 或 Nginx 静态目录，Go 只负责 API。
+- Nginx/CDN 开启 `Cache-Control: public, max-age=31536000, immutable`。
+- API 由 Nginx 反向代理到 Gin，并增加请求体大小、超时、限流配置。
+
+### 2.2 Middleware
+
+实际存在并有意义的中间件：
+
+- `RequestID`: 每个请求生成可追踪 ID。
+- `AuditRecovery`: 捕获 panic 并持久化审计日志。
+- `AuditLogger`: 持久化 API 请求、状态码、延迟和错误。
+- `CORS`: 本地/部署跨域控制。
+- `JWTAuth`: 登录态校验。
+- `RequireAdmin`: 管理员接口鉴权。
+
+注意：当前 `AuditLogger` 会对每个 API 请求写库。它满足“可审计”，但在更高并发下会增加 SQLite 写压力。若继续提升吞吐，应改为“错误同步写 + 普通请求批量异步写 + 本地文件轮转兜底”。
+
+### 2.3 Event Bus
+
+实际存在的是进程内异步事件总线，用于非关键通知：
 
 ```text
-Review failed: Unknown error
-TRPCClientError
+UserRegistered / OrderPaid -> in-memory event bus -> subscriber side effects
 ```
 
-No manual finding in this report should be represented as a CodeRabbit finding.
+它不是持久化消息队列，不应承载 P0 财务一致性。当前设计是正确的：P0 先落 SQLite 事务，事件只在提交成功后发布。
 
----
+### 2.4 Buffer / Queue
 
-## 4. Major Findings
+当前 buffer 只用于 P2 分析事件：
 
-### Critical: Documentation overstates verification status
-
-README, HANDOFF, and CURRENT_STATE report all E2E tests as passing. The current local result is **15/29 passing** after rerunning Playwright outside the sandbox. The failing cases include auth, order/payment, homepage assumptions, and load-more pagination.
-
-Impact:
-- Submission evidence would be misleading if left unchanged.
-- Future maintainers may trust false green status and skip necessary fixes.
-
-Required fix:
-- Update README, HANDOFF, CURRENT_STATE, DEVELOPMENT_LOG, and test report with exact current results.
-- Do not claim all green until `npx playwright test` passes in a real browser environment.
-
-### Critical: SDD/product schema is missing required fantasy-mission fields
-
-The current `Journey` model includes title, slug, story, region, fantasy type, visual style, risk/adventure fields, mood keywords, image URL, price, tags, and MBTI mappings. It does not include role identity, mission goal, clues, highlights, risks list, preparation list, target users, or structured persona/mood arrays.
-
-Evidence:
-- `internal/model/journey.go:5-27` has no `role`, `mission`, `clues`, `highlights`, `risks`, or `preparation`.
-- `db/schema.sql` also lacks those structured columns.
-
-Impact:
-- The detail page cannot fully satisfy the assignment requirement for script-killing / escape-room-like story missions.
-- Existing sample data is emotionally written but still mostly real-world destination travel.
-
-Required fix:
-- Extend SDD and schema first.
-- Add JSON-text columns for MVP: `role`, `mission`, `clues`, `highlights`, `risks`, `preparation`, `target_users`, and optionally `persona_tags`.
-- Update seed data so at least 5 entries read like role-based fantasy journeys, not generic destination listings.
-
-### Critical: Current deployment workflow cannot deploy the full app
-
-`.github/workflows/pages.yml:30-33` uploads only `./web` to GitHub Pages. The frontend depends on `/api` endpoints served by the Go process and SQLite-backed data.
-
-Impact:
-- A GitHub Pages deployment would be a static shell without backend API support.
-- The project is not actually deployable as a full-stack app through the current workflow.
-
-Required fix:
-- Document GitHub Pages as static-preview-only, or replace with a backend-capable deployment plan.
-- For full-stack deployment, use a VPS/container/Fly.io/Render/Railway-style Go service with persistent SQLite volume, or split static assets from API intentionally.
-- If using Vercel, this Go binary + SQLite architecture is not a natural fit without redesigning the backend deployment model.
-
-### Major: Auth/order E2E tests are stale after captcha was added
-
-The auth and order tests fill username/email/password but do not solve the math captcha. Failures then cascade into hidden nav controls and order/payment flows.
-
-Observed failures:
-- Register redirect expected `/#/`, received `/#/register`.
-- Login wrong-password expected visible error, but submit did not reach the intended backend path.
-- Logout/profile nav buttons remained hidden.
-- Order/recharge tests failed at helper registration.
-
-Required fix:
-- Add a shared Playwright helper that reads the displayed captcha expression or calls `/api/captcha`, fills the answer, and waits for nav state after login/register.
-- Re-run the full suite and update docs with the real result.
-
-### Major: Search/filter UI sends values the backend does not support
-
-Frontend Explore sends:
-- `q` from search input.
-- Chinese `visual_style` values such as `写实`, `动漫`, `油画`.
-- Chinese `fantasy_type` values such as `科幻`, `奇幻`, `武侠`.
-- Tag display names from `/api/tags`.
-
-Backend filter supports:
-- no `q` field in `JourneyFilter`.
-- `visual_style` DB enum values like `raw`, `surreal`, `minimal`, `dramatic`.
-- `fantasy_type` DB enum values like `extreme`, `solitude`, `visual`, `culture`, `spiritual`, `night`.
-- tag slug through SQL condition `t.slug = ?`.
-
-Evidence:
-- `web/js/pages/explore.js:40-52` emits `q`.
-- `web/js/pages/explore.js:69-70` defines Chinese visual/fantasy values.
-- `internal/model/journey.go:49-58` has no `q`.
-
-Impact:
-- Search may appear to update but is not truly implemented server-side.
-- Several filters can return empty or misleading results.
-- Current E2E only checks that UI text exists, not that filtering is semantically correct.
-
-Required fix:
-- Decide canonical filter values in SDD/API docs.
-- Either map frontend labels to backend enum slugs or migrate DB enums to user-facing taxonomy.
-- Add integration tests asserting actual filtered results.
-
-### Major: First-time modal blocks product understanding
-
-The first visit shows the AI pet adoption modal before the user can see the hero or core product proposition. Visual QA showed the modal obscuring the first viewport.
-
-Impact:
-- Fails the requirement that a first-time visitor should understand the fantasy travel concept within seconds.
-- The AI companion becomes a blocker instead of an enhancement.
-
-Required fix:
-- Defer AI pet onboarding until after the user scrolls/clicks, or make it a non-blocking corner prompt.
-- Ensure the homepage first viewport includes search/mood/personality discovery controls.
-
-### Major: Admin endpoints are placeholders
-
-Evidence:
-- `internal/handler/admin_handler.go:21-24` returns an empty user array.
-- `internal/handler/admin_handler.go:27-34` hardcodes `total_users: 0`, `total_journeys: 5`, `total_points: 0`.
-
-Impact:
-- Admin dashboard is not real and should not be claimed as complete.
-
-Required fix:
-- Either remove admin from submission claims, or implement repository-backed stats/users with tests.
-
-### Major: Save/favorite API is not implemented
-
-Evidence:
-- `internal/handler/auth_handler.go:160-164` returns HTTP 501 for `SaveJourney`.
-- Detail page save button currently toggles client CSS state only.
-
-Impact:
-- Favorite/wishlist should be documented as local-only or completed end-to-end.
-
-Required fix:
-- For MVP, either implement localStorage favorites with clear docs, or wire authenticated save/unsave/list endpoints.
-
-### Major: Session-storage auth token is ignored for API requests
-
-Evidence:
-- `web/js/api.js:80-88` can store tokens in `sessionStorage` when "remember me" is false.
-- `web/js/api.js:39-42` only reads `localStorage` for the Authorization header.
-
-Impact:
-- Non-remembered login sessions can appear logged in via `isLoggedIn()` but authenticated requests may fail.
-
-Required fix:
-- Make `authHeader()` use `API.getToken()` behavior or check both storage locations.
-- Add E2E coverage for remember-me disabled.
-
-### Major: Production/security hardening is incomplete
-
-Risks:
-- `JWT_SECRET` defaults to a hardcoded development value.
-- No API rate limiting.
-- Captcha is in-memory and single-process only.
-- Recharge amount is not capped beyond `min=1`.
-- No graceful shutdown or server timeouts.
-- Order number uses timestamp + nanosecond modulo; concurrency collision risk should be tested.
-
-Required fix:
-- Document deployment-only required env vars.
-- Add rate limiting, request size limits, amount caps, and concurrency tests before claiming production readiness.
-
----
-
-## 5. Product And Design Review
-
-The current design is polished in parts: it uses real images, a cinematic hero, card grids, dark/light theme support, and route-level pages. But it still misses the required product positioning:
-
-- Homepage does not show mood filters, MBTI filters, search, or discovery controls in the first viewport.
-- Detail content is story text, not yet a mission document with role, mission, clues, preparation, and risk reminders.
-- The product lacks the "What world do I want to enter?" framing.
-- Canvas particle/starfield motion is missing.
-- Current visual language is cinematic travel editorial, not yet a young-user fantasy mission-board / Xiaohongshu-inspired discovery product.
-
-Updated user direction:
-- A full visual redesign is allowed.
-- React may be used if a rewrite is justified.
-- Image-to-design generation is allowed for creating a design concept before implementation.
-
-Constraint note:
-- Current local project constraints describe the frontend as vanilla HTML/CSS/JS. If React is chosen, that must be treated as an explicit project-constraint change and recorded in the maintained trace docs before implementation.
-
-Recommended design workflow:
-1. Generate 2-3 image-based design concepts from the assignment screenshot and product requirements.
-2. Choose one direction: fantasy mission board, immersive travel notebook, or story-card feed.
-3. Update DDD before coding.
-4. Implement either targeted vanilla redesign or React rewrite depending on agreed scope.
-5. Validate desktop/mobile screenshots and console health.
-
-Frontend design skill direction:
-- Use the frontend design/build skill for the next visual pass, not ad hoc CSS patching.
-- Generate a consistent image-based design system before coding. Required concept surfaces should include the homepage first viewport, Explore feed, journey detail page, AI pet appearance, AI pet onboarding modal, filter chips, journey cards, empty state, loading state, recharge/order widgets if retained, and mobile layout.
-- Treat the AI pet as part of the product identity, not an unrelated floating toy. Its species, pixel/illustration style, colors, chat bubble, trigger badge, and recommendation cards should share the same visual language as the hero and journey cards.
-- Use image-to-design input from the assignment screenshot and existing product requirements to keep the redesign aligned with the required "100种不可思议旅行" brief.
-- Do not implement from generated images as static screenshots. Convert the chosen design into code-native UI: semantic HTML/components, real controls, real filters, real state, and responsive layouts.
-
----
-
-## 6. Database And API Review
-
-Current SQLite design is coherent for listing/detail/tag/MBTI/order/payment basics. It uses parameterized queries and `modernc.org/sqlite`.
-
-Gaps:
-- Missing mission/detail structured fields.
-- Search query is not implemented.
-- Tag filtering expects slug, while UI sends names.
-- Docs still describe older endpoints and only 5 journeys in places.
-- Admin and favorites are partially wired but not real.
-
-Recommended schema extension for MVP:
-
-```sql
-ALTER TABLE journeys ADD COLUMN role TEXT;
-ALTER TABLE journeys ADD COLUMN mission TEXT;
-ALTER TABLE journeys ADD COLUMN clues TEXT;        -- JSON array
-ALTER TABLE journeys ADD COLUMN highlights TEXT;   -- JSON array
-ALTER TABLE journeys ADD COLUMN risks TEXT;        -- JSON array
-ALTER TABLE journeys ADD COLUMN preparation TEXT;  -- JSON array
-ALTER TABLE journeys ADD COLUMN target_users TEXT; -- JSON array
-ALTER TABLE journeys ADD COLUMN persona_tags TEXT; -- JSON array
+```text
+frontend click/search/pet event -> analytics buffer -> batch insert -> analytics_events
 ```
 
-Before implementation, reflect this in:
-- `docs/schema/SDD-spec.md`
-- `docs/schema/api-contract.md`
-- `db/schema.sql`
-- `internal/model/journey.go`
-- repository scan/write paths
-- seed data
-- detail page renderer
-- integration/E2E tests
+默认容量为 32768，已通过 20000 个瞬时分析事件压测。超过容量时会拒收 P2 事件，不影响订单和钱包。
+
+P0 写入的“串行化”不是把压测脚本串行，而是在后端到 SQLite 边界执行：
+
+```text
+many concurrent HTTP requests
+-> repository transaction
+-> SQLite single-writer connection + busy retry
+-> durable orders / transactions / users
+```
+
+这符合 SQLite 的单写模型。若未来要承载真实生产规模，应升级为“持久化 job/outbox 表 + 后台 worker”或迁移到服务端数据库。
+
+### 2.5 Event Loop
+
+后端是 Go runtime，不是 Node.js event loop。并发模型是 goroutine + database/sql 连接池。前端仍是浏览器 event loop，粒子、滚动动画和 API 请求都运行在浏览器主线程上，因此动画必须轻量化。
 
 ---
 
-## 7. Documentation Review
+## 3. 数据库与审计设计
 
-Stale or incomplete docs:
-- `docs/schema/SDD-spec.md:13-14` still says user accounts, bookmarks, comments, and admin CMS are out of scope even though auth/order/admin code exists.
-- `docs/schema/SDD-spec.md` is marked DRAFT and does not cover current v1.2 features.
-- `docs/schema/api-contract.md` lacks current auth/order/payment/admin endpoints in full detail.
-- `docs/ui-components/DDD-spec.md` still says UIUXProMax output is pending.
-- `docs/testing/TDD-spec.md` references old 5-journey assumptions.
-- `docs/prompts/prompt-log.md` has placeholders for phases 1-4 and only records phase 5.
-- `docs/workflow/SYSTEM-DAG.md` documents cache and external AI adapters that are not implemented.
-- `README.md` and `docs/trace/CURRENT_STATE.md` should not claim all tests/coverage are green.
-- `app.xlsx` test spreadsheet appears missing.
+新增/调整表：
 
-Required documentation pass:
-- Replace false completion claims with verified results.
-- Add a transparent prompt reconstruction section instead of fabricated historical prompts.
-- Update SDD/DDD/TDD/API docs to match actual code and current assignment requirements.
-- Add deployment limitations and concrete deployment path.
-- Add this report to handoff materials.
+- `analytics_events`: 记录点击、搜索、筛选、浏览、宠物回复。
+- `audit_logs`: 记录 API 请求、错误、panic、前端错误。
+- `users.gender`: 用于用户性别分布和购买性别分布统计。
+- `users.username`: 允许重复，真实唯一身份由 `users.id` 保证。
+
+P0 持久化链路：
+
+```text
+orders
+-> order_items
+-> transactions
+-> users.balance
+```
+
+支付使用事务，余额不足、订单归属错误、订单非 pending 均会失败并回滚。订单号加入随机后缀并保留唯一约束，压力测试中未出现订单号碰撞。
+
+头像存储建议：
+
+- 当前实现：文件系统保存头像，DB 只保存 `avatar_url`。
+- 不建议把头像二进制直接塞进 SQLite。原因是会放大 DB 文件、拖慢备份和查询。
+- 更合理的演进：本地文件/CDN/Object Storage 存图片，DB 存 `user_id`、URL、mime、size、hash、created_at。当前 MVP 已按用户 ID 分目录：`/uploads/avatars/u_<id>/avatar.ext`。
 
 ---
 
-## 8. Test Plan Additions
+## 4. 压力测试结果
 
-### E2E repair/additions
+### 4.1 常规验证
 
-Add stable selectors where missing:
-- `data-testid="journey-card"`
-- `data-testid="search-input"`
-- `data-testid="mood-filter"`
-- `data-testid="persona-filter"`
-- `data-testid="journey-detail"`
-- `data-testid="empty-state"`
-- `data-testid="captcha-question"`
-
-Add/repair Playwright flows:
-
-| Area | Scenario |
+| 命令 | 结果 |
 |---|---|
-| Homepage | Hero explains fantasy travel concept without blocking modal. |
-| Homepage | Search/mood/persona filters are visible in first meaningful screen or immediately below hero. |
-| Explore | Search for known keyword narrows results to matching cards. |
-| Explore | Unmatched keyword shows product-flavored empty state. |
-| Explore | Mood/persona/fantasy filters use backend-supported values and produce correct results. |
-| Detail | Detail page shows role, mission, clues, highlights, risks, preparation. |
-| Auth | Captcha-aware register/login helpers. |
-| Auth | Remember-me false still authenticates requests with sessionStorage token. |
-| Orders | Recharge/order/pay happy path after captcha-aware login. |
-| Admin | Non-admin gets 403; admin sees real stats if implemented. |
-| Console | Main home/explore/detail flow has no relevant console errors. |
+| `gofmt` | 已执行 |
+| `go test ./...` | 通过 |
+| `go vet ./...` | 通过 |
+| `find web/js -name '*.js' -exec node --check {} \;` | 通过 |
+| `go test ./internal/handler -run TestAdmin_StatsAndExport_ReflectsFiftyVirtualUsersThroughHTTPBehavior -count=1` | 通过，50 个普通用户 + 3 个管理员账号，真实 HTTP 行为链路输入 |
+| `k6 ...` | 未执行，当前环境未安装 `k6` |
 
-### Go integration tests
+### 4.2 中型独立站组合压力测试
 
-Add tests for:
-- `GET /api/journeys?q=...` once implemented.
-- tag slug vs display-name behavior.
-- `fantasy_type` and `visual_style` canonical values.
-- MBTI filter returns compatible journeys.
-- pagination with 12 seed journeys.
-- detail response includes mission/clues/risks/preparation.
-- auth save/favorite endpoint if kept.
-- admin stats/users if claimed.
+命令：
 
-### Security tests
-
-Add tests for:
-- missing/weak `JWT_SECRET` policy in production mode.
-- recharge amount max cap.
-- order ownership enforcement.
-- duplicate payment/idempotency behavior.
-- invalid quantity/order payloads.
-- basic rate limit once middleware exists.
-
----
-
-## 9. Pressure-Test Plan
-
-The user requested both k6 and Go standard-library pressure tests.
-
-### k6 production-style scripts
-
-Recommended location after implementation:
-- `load/k6/public_content.js`
-- `load/k6/auth_order_flow.js`
-
-Public scenario:
-- `GET /api/health`
-- `GET /api/tags`
-- `GET /api/mbti`
-- `GET /api/journeys?limit=12`
-- `GET /api/journeys?mbti=INFP`
-- `GET /api/journeys?tag=extreme`
-- `GET /api/journeys/:slug`
-
-Authenticated scenario:
-- `GET /api/captcha`
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/payments/recharge`
-- `POST /api/orders`
-- `POST /api/orders/:id/pay`
-- `GET /api/orders`
-- `GET /api/payments/transactions`
-
-Suggested thresholds for local MVP:
-
-```js
-thresholds: {
-  http_req_failed: ['rate<0.01'],
-  http_req_duration: ['p(95)<250'],
-  checks: ['rate>0.99'],
-}
+```bash
+STRESS_PUBLIC_REQUESTS=3000 \
+STRESS_ANALYTICS_EVENTS=20000 \
+STRESS_USERS=100 \
+STRESS_ORDERS=500 \
+STRESS_ADMIN_REQUESTS=300 \
+STRESS_IMAGE_REQUESTS=2000 \
+go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
 ```
 
-For SQLite write contention, run a separate smaller authenticated scenario with controlled VUs before raising load. The goal is to discover locking/error behavior, not to pretend SQLite is horizontally scalable.
+结果：
 
-### Go stdlib benchmarks/load tests
+```text
+ok github.com/100-journeys/app/tests/stress 15.271s
+```
 
-Recommended tests:
-- `BenchmarkJourneyRepositoryList`
-- `BenchmarkJourneyRepositoryGetBySlug`
-- `TestConcurrentRegisterLogin`
-- `TestConcurrentRechargeAndPay`
-- `TestOrderNumberUniquenessUnderConcurrency`
+覆盖：
 
-Implementation notes:
-- Use temp DB files, not `data/app.db`.
-- Run schema/seed per test.
-- Use `httptest` for API-level concurrency.
-- Use `sync.WaitGroup` and channels to collect errors.
-- Include `go test -run TestConcurrent -count=1 ./internal/...` in docs.
+- 3000 次公共浏览/API 请求。
+- 20000 个分析事件进入 buffer 并落库。
+- 100 个用户基础数据。
+- 500 个订单创建 + 支付 + 交易流水审计。
+- 300 次管理员统计接口读取。
+- 2000 次本地静态图片请求。
+- 50 个普通虚拟用户通过 HTTP 注册、头像上传、充值、下单、支付、点击事件输入后台统计测试。
+
+### 4.3 Buffer 专项压力测试
+
+RED:
+
+```text
+STRESS_ANALYTICS_EVENTS=20000
+expected at least 20000 analytics events, got 8192
+```
+
+GREEN:
+
+```text
+ok github.com/100-journeys/app/tests/stress 3.513s
+```
+
+结论：旧 8192 buffer 容量不足；默认容量提升到 32768 后，20000 瞬时 P2 事件不丢。
+
+### 4.4 压爆测试
+
+命令：
+
+```bash
+STRESS_PUBLIC_REQUESTS=6000 \
+STRESS_ANALYTICS_EVENTS=10000 \
+STRESS_USERS=200 \
+STRESS_ORDERS=1000 \
+STRESS_ADMIN_REQUESTS=600 \
+STRESS_IMAGE_REQUESTS=6000 \
+go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=420s
+```
+
+结果：失败，约 21.5 秒出现爆点。
+
+主要失败类型：
+
+- `connect: operation timed out`: 本地 `httptest` + 操作系统 socket backlog 被极端并发连接打满。
+- 静态图片 6000 并发请求超时：Go 进程直出本地图片不是生产级静态资源方案。
+
+解释：
+
+这不是压测被串行化，而是并发足够大后暴露出的真实瓶颈。P0 订单目标档通过；爆点集中在本地网络连接和静态资源服务。Buffer 爆点已通过容量提升修复到 20000 事件档。
 
 ---
 
-## 10. Recommended Remediation Order
+## 5. 后台 Dashboard 统计口径
 
-1. Make docs honest immediately: test status, coverage, deployment limits, prompt log authenticity.
-2. Repair E2E helpers for captcha and update stale assertions.
-3. Fix filter/search contract end-to-end with backend integration tests first.
-4. Extend SDD/schema/model/seed/detail page for role/mission/clues/risks/preparation.
-5. Redesign homepage/Explore around fantasy discovery; defer or unblock AI pet modal.
-6. Decide whether to keep vanilla frontend or explicitly switch to React.
-7. Implement admin/favorites only if they remain in submission scope.
-8. Add k6 and Go pressure tests after correctness tests pass.
-9. Re-run CodeRabbit after there is a real reviewable diff or a PR branch.
+当前 Dashboard 数据来源：
+
+- 用户数、等级、余额、积分：`users`
+- 订单数、购买率、收入：`orders`
+- 商品购买排行：`order_items`
+- 点击排行、MBTI、事件数：`analytics_events`
+- 错误数、审计日志数：`audit_logs`
+- 用户性别分布：`users.gender`
+- 购买性别分布：`orders JOIN users`
+
+后台访问策略：
+
+- 游客和普通用户不在主页/导航看到 Dashboard 或后台登录入口。
+- `#/admin` 未登录时跳转 `#/admin-login`。
+- 普通账号登录后台入口会被拒绝并清除 token。
+- 管理员账号通过 `cmd/admin-user` CLI 在服务器侧创建或提升，不通过公开注册入口。
+
+展示原则：
+
+- 保持简洁，不做复杂 BI。
+- 每 5 秒刷新一次。
+- 支持 CSV/JSON 导出，便于 CLI 或 API 侧归档。
+- 未登录或非管理员不显示后台数据。
+
+仍需改进：
+
+- 历史用户没有性别时只能归入 `prefer_not_to_say`。
+- 购买率的定义目前是 `购买次数 / 点击次数` 的近似值，不是严格漏斗。
+- 未来可加入时间窗口：今日、7 日、30 日。
 
 ---
 
-## 11. Submission Readiness Checklist
+## 6. 仍然存在的风险
 
-| Item | Current Status |
-|---|---|
-| Go tests | Pass |
-| Go vet | Pass |
-| Playwright E2E | Fails: 15/29 passing |
-| Coverage claims | Not aligned with current output |
-| SQLite used | Yes |
-| At least 5 entries | Yes, 12 entries |
-| Story-driven product model | Partial |
-| Mission/role/clues detail model | Missing |
-| Search/filter correctness | Broken/incomplete |
-| Admin | Placeholder |
-| Favorites | Not implemented end-to-end |
-| Prompt log | Incomplete, needs transparent reconstruction |
-| Deployment readiness | Not full-stack ready |
-| app.xlsx | Missing |
-| CodeRabbit review | Attempted, blocked by service/diff errors |
+- SQLite 单写模型适合作业 MVP 和小流量演示，不适合长期高并发交易系统。
+- 20000 级瞬时分析事件已通过；超过 32768 默认容量时仍会按 P2 降级策略拒收。
+- 所有 API 请求都持久化审计会增加写入压力，生产应做异步批量和日志文件兜底。
+- 本地 Go 进程直出大图在高并发下会慢，生产应使用 CDN/Nginx。
+- 当前没有实际 Nginx 部署文件和真实线上压测环境。
+- `k6` 脚本已准备，但本机未安装 `k6`，因此本轮只执行了 Go 压力测试。
+- 中型独立站生产预案已补充：`docs/ops/PRODUCTION_READINESS.md`、`docs/ops/DISASTER_RECOVERY.md`。
 
-Final judgment: **Not ready for submission**. The project is a strong generated baseline, but it needs one focused repair pass for truthfulness, E2E correctness, product-model completion, and deployment documentation before it can be submitted safely.
+---
+
+## 7. 提交就绪判断
+
+**判断**: 几乎可提交作业演示，但还不是生产级系统。
+
+适合提交的部分：
+
+- 产品方向更接近“曲径通幽、桃花源、年轻用户幻想旅行”。
+- 搜索、筛选、卡片、详情、登录态、管理员统计、审计日志均有可运行实现。
+- SQLite 被真实使用，订单/钱包有持久化和审计链路。
+- 压力测试覆盖了公共浏览、分析事件、订单支付、后台统计和静态图片。
+
+提交前建议再做：
+
+- 用真实浏览器跑一次完整 E2E。
+- 安装并运行 `k6` 脚本，保留报告截图或终端输出。
+- 将静态图片部署到 CDN/Nginx 方案写进部署文档。
+- 不把本地指令文件、临时缓存、内部工具痕迹提交到公开仓库。

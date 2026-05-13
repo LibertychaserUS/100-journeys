@@ -1,13 +1,13 @@
 # 100 Journeys — 100种不可思议的旅行
 
-[![Go Tests](https://img.shields.io/badge/go%20tests-51%2F51-green)](https://github.com/LibertychaserUS/100-journeys/actions)
-[![E2E Tests](https://img.shields.io/badge/E2E%20tests-29%2F29-green)](https://github.com/LibertychaserUS/100-journeys/actions)
+[![Go Tests](https://img.shields.io/badge/go%20tests-passing-green)](https://github.com/LibertychaserUS/100-journeys/actions)
+[![E2E Tests](https://img.shields.io/badge/E2E%20tests-rerun%20required-yellow)](https://github.com/LibertychaserUS/100-journeys/actions)
 [![Go Version](https://img.shields.io/badge/go-1.26+-blue)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-> **EN** A lightweight MVP web app showcasing unconventional travel experiences, built with Go + Gin + SQLite. Features AI-powered travel recommendations, a virtual currency system (WonderCoin), user points/levels, and full order/payment flows with audit trails.
+> **EN** A lightweight MVP web app showcasing unconventional, story-driven travel experiences, built with Go + Gin + SQLite. Features AI-powered travel recommendations, a virtual currency system (WonderCoin), user points/levels, order/payment flows, analytics, and audit trails.
 >
-> **CN** 一款轻量级 MVP Web 应用，展示不可思议的旅行体验。基于 Go + Gin + SQLite 构建，支持 AI 旅行推荐、虚拟货币系统（不思议币）、用户积分/等级体系，以及完整的订单/支付流程与审计追踪。
+> **CN** 一款轻量级 MVP Web 应用，展示故事驱动的不可思议旅行体验。基于 Go + Gin + SQLite 构建，支持 AI 旅行推荐、虚拟货币系统（不思议币）、用户积分/等级体系、订单/支付流程、分析统计与审计追踪。
 
 ---
 
@@ -21,7 +21,7 @@
 | **Points & Levels** | 5,000 welcome points; Lv1–Lv6 with discounts 0%–15% | **积分与等级** | 注册送 5,000 积分；Lv1-Lv6 自动折扣 0%-15% |
 | **Order System** | Multi-item checkout, unique order numbers, atomic payment transactions | **订单系统** | 多商品结账、唯一订单号、原子级支付事务 |
 | **User Profile** | Balance, order history, transaction ledger with full audit trail | **用户中心** | 余额、订单历史、交易流水与完整审计追踪 |
-| **Admin Dashboard** | Content management for journeys, tags, and MBTI associations | **管理后台** | 旅程、标签、MBTI 关联的内容管理 |
+| **Admin Dashboard** | Real dashboard for users, orders, revenue, clicks, MBTI, gender, audit logs, and export | **管理后台** | 用户、订单、收入、点击、MBTI、性别、审计日志与导出 |
 
 ---
 
@@ -68,6 +68,19 @@ PORT=8090 go run cmd/server/main.go
 ```bash
 # Go unit & integration tests | Go 单元与集成测试
 go test ./...
+
+# Vet and JS syntax | Go 静态检查与 JS 语法检查
+go vet ./...
+find web/js -name '*.js' -exec node --check {} \;
+
+# Medium-site stress profile | 中型独立站本地压力档
+STRESS_PUBLIC_REQUESTS=3000 \
+STRESS_ANALYTICS_EVENTS=20000 \
+STRESS_USERS=100 \
+STRESS_ORDERS=500 \
+STRESS_ADMIN_REQUESTS=300 \
+STRESS_IMAGE_REQUESTS=2000 \
+go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
 
 # E2E tests (starts server automatically) | E2E 测试（自动启动后端）
 cd e2e && npx playwright test
@@ -136,7 +149,7 @@ erDiagram
 
     USERS {
         int id PK
-        string username UK
+        string username
         string email UK
         string password_hash
         string role
@@ -144,6 +157,7 @@ erDiagram
         int points
         int balance
         string mbti_type
+        string gender
     }
 
     ORDERS {
@@ -175,6 +189,29 @@ erDiagram
         int balance_after
         string description
     }
+
+    USERS ||--o{ ANALYTICS_EVENTS : may_generate
+    USERS ||--o{ AUDIT_LOGS : may_generate
+
+    ANALYTICS_EVENTS {
+        int id PK
+        string event_type
+        string journey_slug
+        int user_id FK
+        string mbti_type
+        string gender
+        datetime created_at
+    }
+
+    AUDIT_LOGS {
+        int id PK
+        string request_id
+        string level
+        string source
+        string path
+        int status_code
+        datetime created_at
+    }
 ```
 
 ---
@@ -198,6 +235,10 @@ All endpoints return a standard envelope: `{ data, error, total?, page?, limit? 
 | POST | `/api/orders/:id/pay` | JWT | Pay order (atomic) | 支付订单（原子事务） |
 | POST | `/api/payments/recharge` | JWT | Recharge WonderCoin | 充值不思议币 |
 | GET | `/api/payments/transactions` | JWT | Transaction ledger | 交易流水 |
+| GET | `/api/admin/stats` | Admin | Real dashboard stats | 真实后台统计 |
+| GET | `/api/admin/export` | Admin | Export stats as CSV/JSON | 导出统计 |
+| POST | `/api/analytics/events` | No/JWT | Track P2 analytics events | 记录 P2 分析事件 |
+| POST | `/api/audit/client-error` | No/JWT | Persist frontend errors | 持久化前端错误 |
 
 Full specification: [`docs/schema/api-contract.md`](docs/schema/api-contract.md)
 
@@ -207,10 +248,11 @@ Full specification: [`docs/schema/api-contract.md`](docs/schema/api-contract.md)
 
 | Suite | Count | Status | 测试套 | 数量 | 状态 |
 |-------|-------|--------|--------|------|------|
-| Go Unit/Integration | 51 | All green | Go 单元/集成测试 | 51 | 全部通过 |
-| E2E (Playwright) | 29 | All green | E2E 测试 | 29 | 全部通过 |
-| Coverage — Repository | 84.2% | Target >= 80% | 仓库层覆盖率 | 84.2% | 达标 |
-| Coverage — Handler | 78.6% | Target >= 70% | 处理器层覆盖率 | 78.6% | 达标 |
+| Go Unit/Integration | current suite | Passing | Go 单元/集成测试 | 当前套件 | 通过 |
+| Go Vet | current suite | Passing | Go 静态检查 | 当前套件 | 通过 |
+| JS Syntax | current frontend | Passing | JS 语法检查 | 当前前端 | 通过 |
+| Stress — medium profile | 6 surfaces | Passing | 中型独立站压力档 | 6 个面 | 通过 |
+| E2E (Playwright) | browser flows | Fresh rerun required | E2E 测试 | 浏览器流程 | 需重新跑 |
 
 ---
 
@@ -238,6 +280,18 @@ MEDIA_PROVIDER=cdn CDN_BASE_URL=https://cdn.example.com go run cmd/server/main.g
 ```
 
 The frontend reads `window.APP_CONFIG.mediaBase` injected by the server at startup.
+
+For production, move large images behind Nginx/CDN. Local Go static delivery passed 2000 concurrent image requests in stress tests, but 3000 local concurrent image requests exposed socket timeouts.
+
+生产建议把大图迁到 Nginx/CDN。Go 本地直出静态图在 2000 并发请求通过，但 3000 本地并发图片请求已暴露连接超时。
+
+---
+
+## Production Notes | 生产说明
+
+- Production readiness: [`docs/ops/PRODUCTION_READINESS.md`](docs/ops/PRODUCTION_READINESS.md)
+- Disaster recovery: [`docs/ops/DISASTER_RECOVERY.md`](docs/ops/DISASTER_RECOVERY.md)
+- SQLite backup script: `./scripts/backup-sqlite.sh ./data/app.db ./data/backups`
 
 前端通过服务端启动时注入的 `window.APP_CONFIG.mediaBase` 读取图片基地址。
 

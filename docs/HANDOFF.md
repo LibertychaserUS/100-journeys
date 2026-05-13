@@ -1,196 +1,161 @@
 # HANDOFF — 100种不可思议的旅行
 
-> 交接日期: 2026-05-13
-> 交接人: AI Agent (Claude)
-> 接收人: 后续开发者
-> Git: `main` @ `5655ec3`
+> 当前更新日期: 2026-05-14  
+> 当前分支: `codex/frontend-redesign`  
+> 说明: 本文件覆盖旧交接文档中的过时结论，尤其是 E2E 全绿、后台硬编码、粒子缺失等状态。
 
 ---
 
 ## 1. 项目概况
 
-**100种不可思议的旅行** — 轻量级 MVP Web 应用，展示奇幻旅行体验。
-- Go 1.26 + Gin + SQLite (pure Go, no CGO)
-- Vanilla HTML/CSS/JS 前端，Hash-based SPA
-- 8 个前端路由，完整的用户系统 + 订单支付流程
+这是一个“桃源百旅 / 100种不可思议的旅行”轻量级内容展示 Web App MVP。
 
----
+定位不是普通旅行列表，而是面向 95 后 / 00 后、非典型生活方式用户、沉浸式内容用户的幻想旅行发现平台。核心体验是：
 
-## 2. 已完成的功能（可正常工作）
-
-### 前端
-| 页面 | 状态 | 说明 |
-|------|------|------|
-| 首页 (`/`) | 完成 | Hero + 统计栏 + 精选旅程卡片网格 |
-| 探索 (`/explore`) | 完成 | 搜索 + 5维筛选 + Masonry 卡片 + 无限滚动 |
-| 详情 (`/journey/:slug`) | 完成 | 故事阅读 + 元信息 + 视觉风格主题切换 |
-| 登录 (`/login`) | 完成 | 邮箱+密码+数学题验证码 + JWT |
-| 注册 (`/register`) | 完成 | 同上 + 自动登录 |
-| 个人中心 (`/profile`) | 完成 | 资料 + 订单历史 + 交易流水 + MBTI 展示 |
-| 充值 (`/recharge`) | 完成 | 7档游戏风充值 + 自定义金额 |
-| 管理后台 (`/admin`) | **部分** | 仅3个统计卡片，数据硬编码 |
-| AI 宠物 | 完成 | 领养引导 + MBTI 测试 + 聊天推荐 + 触发器 |
-| 深色/浅色模式 | 完成 | localStorage 持久化 |
-
-### 后端
-| 接口 | 状态 |
-|------|------|
-| `GET /api/journeys` | 完成，支持分页+筛选 |
-| `GET /api/journeys/:slug` | 完成 |
-| `GET /api/tags` | 完成 |
-| `GET /api/mbti` | 完成 |
-| `POST /api/auth/register` | 完成 |
-| `POST /api/auth/login` | 完成 |
-| `GET /api/auth/me` | 完成 |
-| `POST /api/orders` | 完成 |
-| `GET /api/orders` | 完成 |
-| `POST /api/orders/:id/pay` | 完成 |
-| `POST /api/payments/recharge` | 完成 |
-| `GET /api/payments/transactions` | 完成 |
-| `GET /api/admin/stats` | **硬编码** 返回 0 |
-| `GET /api/admin/users` | **空数组** |
-| `POST /api/ai/chat` | 完成，规则引擎 |
-
-### 测试
-- Go 单元/集成测试: **51/51 通过**
-- Playwright E2E 测试: **29/29 通过**
-
----
-
-## 3. 已知 Bug（已修复 & 未修复）
-
-### 已修复 ✅
-| 问题 | 修复方式 |
-|------|----------|
-| 图片 404 | `web/static/assets/images/` → `web/assets/images/` 移动了 14 张图片 |
-| 首页/探索页图片双前缀 | 前端代码里删掉了 `API.mediaUrl()` 双重包装 |
-| MBTI 标签显示 `[object Object]` | 改为读取 `item.mbti_type.code` |
-| AI 宠物 quiz 显示 `<strong>ESFJ</strong>` | 去掉 HTML 标签，使用纯文本 |
-| AI 宠物推荐无链接 | 推荐结果改为可点击的 `<a>` 标签，跳转详情页 |
-
-### 未修复 ❌
-| 问题 | 严重度 | 说明 |
-|------|--------|------|
-| **粒子动效缺失** | P1 | 预期首页 Hero 区域有 Canvas 粒子/星空动效，目前只有 CSS `ambient-drift` 渐变漂移 |
-| **AI 宠物 localStorage Key 不一致** | P2 | `ai-pet-dom.js` 使用 `AIPet.getProfile()`，但实际存储 key 是 `ai_pet_profile`，需确认多端一致性 |
-| **Admin 统计硬编码** | P2 | `/api/admin/stats` 返回 `total_users: 0, total_points: 0`，未查询真实数据 |
-| **Admin 用户列表为空** | P2 | `/api/admin/users` 直接返回 `[]model.User{}` |
-| **收藏旅程未实现** | P3 | `auth_handler.go:162` 有 TODO: `resolve slug to journey_id` |
-| **AI 宠物触发器计数 bug** | P3 | `pageViewCount` 在每次 hashchange 时累加，但刷新页面会重置 |
-| **Admin 分页缺失** | P3 | `admin_handler.go:23` 有 TODO |
-
----
-
-## 4. 缺失的功能清单（完整）
-
-### 视觉 & 交互
-- [ ] **Canvas 粒子/星空动效** — 首页 Hero 背景预期有动态粒子效果
-- [ ] **页面过渡动画** — 路由切换无过渡动画
-- [ ] **加载骨架屏优化** — 部分页面骨架屏样式简陋
-- [ ] **图片懒加载占位符** — 无模糊渐进加载效果
-
-### 管理后台
-- [ ] **用户列表** — 表格展示、分页、搜索
-- [ ] **旅程 CRUD** — 创建/编辑/删除旅程
-- [ ] **标签管理** — 增删改查
-- [ ] **MBTI 关联管理** — 批量绑定
-- [ ] **真实统计数据** — 从数据库聚合
-
-### 用户功能
-- [ ] **收藏/心愿单** — 保存旅程到个人资料
-- [ ] **密码重置** — 忘记密码流程
-- [ ] **邮箱验证** — 注册后验证
-- [ ] **用户头像上传** — 默认无头像系统
-- [ ] **通知系统** — 订单状态变更通知
-
-### 性能 & 工程
-- [ ] **缓存层** — `docs/trace/checkpoints/CP-DDD-001.md` 提到 sync.Map LRU 缓存未实现
-- [ ] **图片 CDN 切换验证** — 代码支持但未完整测试
-- [ ] **数据库索引优化** — 大规模数据下可能慢
-- [ ] **API 限流** — 无 Rate Limiting
-
-### 测试
-- [ ] **Admin 接口测试** — 无覆盖
-- [ ] **支付流程 E2E** — 充值/下单/支付链路需更多场景
-- [ ] **性能测试** — 无压力测试
-
----
-
-## 5. 关键文件位置
-
-```
-100-journeys/
-├── cmd/server/main.go          # 入口
-├── internal/
-│   ├── handler/                # HTTP 处理器
-│   ├── service/                # 业务逻辑 + MediaProvider
-│   ├── repository/             # SQLite 数据访问
-│   ├── model/                  # 数据结构
-│   ├── middleware/             # JWT, CORS, Logger
-│   └── ai/                     # Mock AI + 推荐引擎
-├── db/
-│   ├── schema.sql              # DDL
-│   └── seed.sql                # 5 条旅程 + 16 MBTI 类型
-├── web/
-│   ├── index.html              # SPA 壳
-│   ├── css/                    # tokens → global → layout → components → pages
-│   ├── js/
-│   │   ├── api.js              # HTTP 客户端
-│   │   ├── router.js           # Hash 路由
-│   │   ├── ai-pet.js           # AI 引擎
-│   │   ├── ai-pet-dom.js       # AI 宠物 DOM 控制器
-│   │   └── pages/              # 8 个页面控制器
-│   └── assets/images/          # 14 张本地图片
-├── tests/                      # Go 单元/集成测试
-├── e2e/                        # Playwright 测试
-└── docs/                       # 设计文档、追踪日志
+```text
+心情 / MBTI / 幻想身份
+-> 卡片式旅行灵感
+-> 角色、任务、线索、风险、准备
+-> 可购买/收藏/分享的演示型旅程
 ```
 
+技术栈保持为：
+
+- Go + Gin
+- SQLite (`modernc.org/sqlite`, no CGO)
+- Vanilla HTML/CSS/JS
+- Hash-based SPA
+- 本地静态图片，后续可接 CDN/Nginx
+
 ---
 
-## 6. 启动命令
+## 2. 当前已完成
+
+### 前端体验
+
+- 首页视觉重构为暗色、留白、神秘感路线。
+- 首页加入粒子 canvas、鼠标微光、场景轮播、搜索框、情绪入口、MBTI/persona 快捷入口。
+- 首页卡片使用生成图 JPG，并先用内置数据即时渲染，降低 API 等待造成的空白感。
+- 卡片 hover 时底部展开简介；标题不再被遮挡。
+- 探索页筛选值对齐后端枚举，避免中文显示值直接发给 API。
+- 详情页加入滚动式故事场景，强化“角色/任务/线索”而不是单薄的图片和价格。
+- About 页面与页脚演示用途说明已补充。
+- 登录态顶栏区分普通用户和管理员。
+- 后台登录入口拆为隐藏路由 `#/admin-login`，不在首页或普通导航展示。
+
+### 后端与数据
+
+- SQLite schema 增加 `analytics_events` 和 `audit_logs`。
+- `users.gender` 已加入；用户名允许重复，唯一身份由 `users.id` 保证。
+- 注册密码使用 bcrypt 哈希。
+- 头像上传限制 512 KB，仅允许 jpeg/png/webp，按用户 ID 目录保存。
+- 管理后台统计改为真实聚合。
+- 管理后台支持 CSV/JSON 导出。
+- 管理员账号只能通过服务器侧 CLI 创建或提升，公开注册接口不会接受管理员角色。
+- API 请求、错误、panic、前端错误持久化到审计日志。
+- 分析事件通过异步 buffer 批量写入。
+- 订单创建、支付、余额扣减、交易流水保持事务一致性。
+- SQLite 使用单连接与 busy retry，写入串行化发生在后端到 DB 边界，压测请求仍然并发。
+
+### 测试与压力
+
+- 新增 Go stress 测试：公共浏览、分析 buffer、订单支付、后台统计、静态图。
+- 新增 50 个虚拟用户 HTTP 行为测试：注册、头像上传、充值、下单、支付、点击事件、后台统计和导出。
+- 新增 k6 脚本：公共内容、注册登录、订单支付、后台统计、宠物回复、图片缓存。
+- 中型独立站本地组合压测已通过：
+
+```text
+3000 浏览/API + 20000 分析事件 + 100 用户 + 500 下单支付 + 300 后台统计 + 2000 图片请求
+```
+
+- 压爆档已执行并失败，失败点集中在 Go 直出静态图片和本地 socket 连接，记录在 `docs/QUALITY_REVIEW_REPORT.md`。
+
+---
+
+## 3. 当前未完成 / 风险
+
+| 优先级 | 项目 | 状态 |
+|---|---|---|
+| P0 | 订单/支付/钱包持久化 | 已实现事务与审计链路，仍建议继续做幂等支付测试。 |
+| P1 | 后台统计 | 已真实化，仍需时间窗口和更严格漏斗定义。 |
+| P1 | 日志审计 | 已持久化，后续应改成错误同步写、普通请求异步批量写。 |
+| P1 | E2E 全量验证 | 本轮尚未重新跑完整 Playwright。旧文档“29/29 全绿”不可引用。 |
+| P2 | 收藏功能 | 后端 save endpoint 仍未完成 slug 解析。 |
+| P2 | 静态资源生产承载 | 目前 Gin 直出图片，高并发应接 Nginx/CDN。 |
+| P2 | k6 实测 | 脚本已写，本机未安装 k6。 |
+| P2 | 20000 级瞬时分析事件 | 当前默认 buffer 32768，20000 事件压测通过。 |
+| P2 | 3000 图片并发 | Gin/httptest 本地直出会超时，生产需 Nginx/CDN。 |
+
+---
+
+## 4. 启动与验证
+
+开发运行：
 
 ```bash
-# 开发模式（默认 8090）
-./start.sh
+PORT=8091 DB_PATH=./data/frontend-redesign.db go run ./cmd/server
+```
 
-# 指定端口
-./start.sh 8080
+常规验证：
 
-# 编译后运行（更快）
-./start.sh -b
+```bash
+go test ./...
+go vet ./...
+find web/js -name '*.js' -exec node --check {} \;
+```
 
-# 重置数据库
-./start.sh -r
+目标容量压力测试：
+
+```bash
+STRESS_PUBLIC_REQUESTS=3000 \
+STRESS_ANALYTICS_EVENTS=20000 \
+STRESS_USERS=100 \
+STRESS_ORDERS=500 \
+STRESS_ADMIN_REQUESTS=300 \
+STRESS_IMAGE_REQUESTS=2000 \
+go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
+```
+
+压爆测试：
+
+```bash
+STRESS_PUBLIC_REQUESTS=6000 \
+STRESS_ANALYTICS_EVENTS=10000 \
+STRESS_USERS=200 \
+STRESS_ORDERS=1000 \
+STRESS_ADMIN_REQUESTS=600 \
+STRESS_IMAGE_REQUESTS=6000 \
+go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=420s
 ```
 
 ---
 
-## 7. 环境要求
+## 5. 关键文件
 
-- Go 1.26.3+
-- Node.js（仅 E2E 测试需要）
-- 端口 8090（默认）
-
----
-
-## 8. 数据库
-
-- SQLite 文件: `./data/app.db`
-- 每次启动自动 migrate + seed（幂等，`INSERT OR IGNORE`）
-- 重置: 删 `data/app.db` 或 `./start.sh -r`
-
----
-
-## 9. 下一步建议（优先级排序）
-
-1. **P0: Canvas 粒子动效** — 用户明确要求的视觉亮点
-2. **P1: Admin 统计真实化** — 查询真实聚合数据
-3. **P1: Admin 用户列表** — 基础表格 + 分页
-4. **P2: 收藏旅程** — 补全 TODO
-5. **P2: 缓存层** — 提升列表页性能
-6. **P3: 密码重置** — 完整用户闭环
+```text
+cmd/server/main.go                  # Gin 入口、静态资源、API、中间件
+db/schema.sql                       # SQLite DDL
+internal/repository/db.go           # SQLite 配置、迁移兼容
+internal/repository/order_repo.go   # P0 订单与支付事务
+internal/repository/user_repo.go    # 用户、钱包、头像、积分
+internal/repository/admin_repo.go   # 后台统计聚合
+internal/analytics/buffer.go        # P2 分析事件 buffer
+internal/middleware/audit.go        # 持久化审计日志
+web/js/pages/home.js                # 首页体验
+web/css/pages/home.css              # 首页视觉、粒子、卡片
+web/js/pages/admin.js               # Dashboard
+tests/stress/stress_test.go         # Go 压力测试
+tests/load/*.k6.js                  # k6 压力脚本
+docs/QUALITY_REVIEW_REPORT.md       # 当前工程质量与压测报告
+```
 
 ---
 
-> 如有疑问，检查 `docs/trace/` 目录下的 checkpoint 文件和 `DEVELOPMENT_LOG.md`。
+## 6. 后续建议
+
+1. 补完整 Playwright E2E，特别是 captcha-aware 注册登录、下单支付、后台权限。
+2. 安装 k6 并执行 6 份脚本，保存终端输出到测试报告。
+3. 收藏功能要么实现 API，要么明确降级为 localStorage。
+4. 增加 Nginx/CDN 部署说明和静态图缓存验证。
+5. 如果目标变成真实生产交易系统，SQLite 应升级为持久化队列/outbox + worker 或服务端数据库。
+6. 生产预案见 `docs/ops/PRODUCTION_READINESS.md` 与 `docs/ops/DISASTER_RECOVERY.md`。

@@ -1,8 +1,8 @@
 # Test-Driven Development Specification — TDD
 **Standard**: ISO/IEC/IEEE 29119-3 — Test Documentation
 **Project**: 100 Journeys Web App MVP
-**Phase**: TDD + E2E
-**Status**: DRAFT — test specs written before implementation (strict TDD)
+**Phase**: TDD + E2E + Stress
+**Status**: Updated for production-readiness branch
 
 ---
 
@@ -21,6 +21,8 @@
 | Unit | Repository, Service logic | Go `testing` | `tests/unit/` |
 | Integration | Handler + real SQLite DB | Go `httptest` + `testing` | `tests/integration/` |
 | E2E | Full browser user flows | Playwright | `e2e/` |
+| Stress | High-concurrency capacity checks | Go `testing` with `stress` build tag | `tests/stress/` |
+| Load | Runtime HTTP load profile | k6 | `tests/load/` |
 
 ---
 
@@ -73,6 +75,24 @@
 | E2E-DETAIL-001 | Open detail | Click journey card | URL = `#/journey/:slug`, story visible |
 | E2E-DETAIL-002 | Back navigation | Browser back | Returns to explore with filter preserved |
 
+### 2.5 Stress Test Cases — Production Readiness
+
+| Test ID | Function | Input | Expected |
+|---|---|---|---|
+| STRESS-PUBLIC-001 | Public browse API | `STRESS_PUBLIC_REQUESTS=3000` | health/tags/list/search/detail return 200 |
+| STRESS-BUFFER-001 | Analytics buffer burst | `STRESS_ANALYTICS_EVENTS=20000` | no event drop; all events persisted after flush |
+| STRESS-ORDER-001 | P0 order payment | `STRESS_USERS=100`, `STRESS_ORDERS=500` | paid orders = purchase transactions = 500 |
+| STRESS-ADMIN-001 | Dashboard stats | `STRESS_ADMIN_REQUESTS=300` | admin stats return 200 and export succeeds |
+| STRESS-IMAGE-001 | Static image delivery | `STRESS_IMAGE_REQUESTS=2000` | local static images return 200 and cache headers |
+| STRESS-IMAGE-002 | Static image saturation | `STRESS_IMAGE_REQUESTS=3000` | expected to expose Go-static bottleneck if no CDN/Nginx |
+
+### 2.6 TDD Red/Green Records
+
+| Date | Test ID | Red Result | Green Result | Code Change |
+|---|---|---|---|---|
+| 2026-05-14 | STRESS-BUFFER-001 | event 8192 dropped with old capacity | `ok .../tests/stress 3.513s` for 20000 events | default analytics buffer capacity 32768, batch 512 |
+| 2026-05-14 | UT-BUFFER-002 | `TestBufferDefaultOptionsAcceptFiveFigureBurstWithoutDrop` failed at event 8192 | `ok .../internal/analytics 2.645s` | default options increased and cleanup timeout adjusted |
+
 ---
 
 ## 3. Test Environment
@@ -95,6 +115,8 @@ Browser:  Chromium via Playwright
 | Service | 85% line |
 | Handler | 80% line (via integration) |
 | E2E flows | 100% of listed test cases |
+| Stress target matrix | P0/P1 target profile passing |
+| Buffer burst | 20,000 instantaneous P2 events accepted without drop |
 
 ---
 
@@ -106,6 +128,11 @@ Browser:  Chromium via Playwright
 - [ ] Unit tests: all passing, coverage ≥ targets
 - [ ] Integration tests: all passing against real SQLite + seed data
 - [ ] E2E tests: all 7 cases passing (Playwright)
+- [x] Buffer burst RED observed before capacity change
+- [x] Buffer burst GREEN observed after capacity change
+- [x] P0 order stress: 100 users / 500 orders
+- [x] Combined medium-site stress profile passed with image request limit 2000
+- [ ] Static image delivery at 3000 concurrent requests requires CDN/Nginx mitigation
 - [ ] `go test ./...` exits 0
 - [ ] Coverage report generated
 - [ ] Prompt log Phase 3 + 4 entries written
