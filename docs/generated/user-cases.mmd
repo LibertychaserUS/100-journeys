@@ -1,0 +1,18 @@
+flowchart LR
+    guest["游客<br/>Guest"] --> browse["浏览首页<br/>Browse home"]
+    guest --> explore["搜索筛选旅程<br/>Search/filter"]
+    guest --> detail["阅读详情<br/>Read detail"]
+    guest --> register["验证码注册<br/>Register"]
+    guest --> login["登录<br/>Login"]
+
+    user["注册用户<br/>Registered user"] --> explore
+    user --> pet["AI 宠物/MBTI<br/>AI pet quiz"]
+    user --> recharge["充值 WonderCoin<br/>Recharge"]
+    user --> order["创建订单<br/>Create order"]
+    user --> pay["支付订单<br/>Pay order"]
+    user --> profile["个人中心/流水<br/>Profile ledger"]
+
+    admin["管理员<br/>Admin"] --> adminLogin["隐藏后台登录<br/>Hidden admin login"]
+    admin --> dashboard["真实统计<br/>Dashboard metrics"]
+    admin --> export["导出 CSV/JSON<br/>Export"]
+    admin --> audit["审计与分析<br/>Audit/analytics"]

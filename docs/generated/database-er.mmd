@@ -1,0 +1,149 @@
+erDiagram
+    JOURNEYS ||--o{ JOURNEY_TAGS : has
+    TAGS ||--o{ JOURNEY_TAGS : categorizes
+    JOURNEYS ||--o{ JOURNEY_MBTI : matches
+    MBTI_TYPES ||--o{ JOURNEY_MBTI : assigned
+    USERS ||--o{ USER_POINTS_HISTORY : earns
+    USERS ||--o{ USER_SAVED_JOURNEYS : saves
+    JOURNEYS ||--o{ USER_SAVED_JOURNEYS : saved_as
+    USERS ||--o{ ORDERS : places
+    ORDERS ||--o{ ORDER_ITEMS : contains
+    JOURNEYS ||--o{ ORDER_ITEMS : snapshots
+    USERS ||--o{ TRANSACTIONS : has
+    ORDERS ||--o{ TRANSACTIONS : generates
+    USERS ||--o{ ANALYTICS_EVENTS : may_emit
+
+    JOURNEYS {
+        int id PK
+        string title NN
+        string slug UK NN
+        string subtitle
+        string story_hook NN
+        string story
+        string region
+        string fantasy_type NN
+        string visual_style NN
+        int adventure_index NN
+        string ...
+    }
+
+    TAGS {
+        int id PK
+        string name UK NN
+        string slug UK NN
+    }
+
+    JOURNEY_TAGS {
+        int journey_id FK NN
+        int tag_id FK NN
+    }
+
+    MBTI_TYPES {
+        int id PK
+        string code UK NN
+        string name NN
+        string description
+        string color NN
+    }
+
+    JOURNEY_MBTI {
+        int journey_id FK NN
+        int mbti_id FK NN
+        int compatibility_score NN
+    }
+
+    AI_LOGS {
+        int id PK
+        string session_id NN
+        string role NN
+        string content NN
+        datetime created_at
+    }
+
+    USERS {
+        int id PK
+        string username NN
+        string email UK NN
+        string password_hash NN
+        string role NN
+        int level NN
+        int points NN
+        int balance NN
+        string mbti_type
+        string gender NN
+        string ...
+    }
+
+    USER_POINTS_HISTORY {
+        int id PK
+        int user_id FK NN
+        string action_type NN
+        int points_delta NN
+        int balance_after NN
+        string description
+        datetime created_at
+    }
+
+    USER_SAVED_JOURNEYS {
+        int user_id FK NN
+        int journey_id FK NN
+        datetime created_at
+    }
+
+    ORDERS {
+        int id PK
+        string order_no UK NN
+        int user_id FK NN
+        string status NN
+        int total_amount NN
+        string currency NN
+        datetime paid_at
+        datetime created_at
+        datetime updated_at
+    }
+
+    ORDER_ITEMS {
+        int id PK
+        int order_id FK NN
+        int journey_id FK NN
+        string journey_title NN
+        int unit_price NN
+        int quantity NN
+        int subtotal NN
+    }
+
+    TRANSACTIONS {
+        int id PK
+        int user_id FK NN
+        int order_id FK
+        string txn_type NN
+        int amount NN
+        int balance_after NN
+        string description
+        datetime created_at
+    }
+
+    ANALYTICS_EVENTS {
+        int id PK
+        string event_type NN
+        string journey_slug
+        int user_id FK
+        string mbti_type
+        string gender NN
+        string metadata
+        datetime created_at
+    }
+
+    AUDIT_LOGS {
+        int id PK
+        string request_id
+        string level NN
+        string source NN
+        string method
+        string path
+        int status_code
+        int latency_ms
+        string client_ip
+        string user_agent
+        string ...
+    }

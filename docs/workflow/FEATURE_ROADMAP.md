@@ -44,7 +44,7 @@
 ## P1 — v1.1 (2 Weeks, Interfaces Prepared)
 
 ### Auth & Security
-- [ ] Cloudflare Turnstile captcha integration
+- [ ] Third-party captcha hardening integration
 - [ ] WeChat / QQ OAuth login stubs
 - [ ] User table (id, oauth_provider, oauth_id, nickname, avatar)
 - [ ] Password hashing (bcrypt) for email login stub

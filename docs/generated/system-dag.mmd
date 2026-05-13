@@ -1,0 +1,19 @@
+flowchart LR
+    user["游客/用户/管理员<br/>Guest/User/Admin"] --> nginx["Nginx/CDN 静态边缘<br/>Nginx or CDN edge"]
+    nginx --> spa["Hash SPA: HTML / CSS / JS"]
+    nginx --> api["Go Gin API"]
+    spa --> api
+    api --> mw["中间件<br/>CORS / RequestID / JWT / Audit"]
+    mw --> handlers["处理器<br/>Handlers"]
+    handlers --> services["服务层<br/>Journey / AI / Media"]
+    handlers --> repos["仓储层<br/>Repositories"]
+    services --> repos
+    repos --> sqlite[("SQLite WAL")]
+    handlers --> buffer["P2 分析缓冲<br/>Analytics Buffer"]
+    buffer --> sqlite
+    mw --> audit["P1 审计日志<br/>Audit Logs"]
+    audit --> sqlite
+    handlers --> eventbus["进程内事件总线<br/>Event Bus"]
+    eventbus --> logs["运行日志<br/>Runtime logs"]
+    admin["服务器侧管理员 CLI<br/>Admin CLI"] --> sqlite
+    backup["backup-sqlite.sh"] --> sqlite

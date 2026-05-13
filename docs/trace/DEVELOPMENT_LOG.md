@@ -198,3 +198,23 @@
 - Go unit tests for order/payment repositories and handlers
 - README industrialization + GitHub Pages deployment
 - Merge `dev/v1.1.0` → `main`
+
+---
+
+## Documentation Recovery — Real Prompt Preservation | 2026-05-14
+
+**Branch**: `feature/taoyuan-production-readiness`
+**Agent context**: Claude Code with Kimi API integration
+**Status**: Complete
+
+#### Done
+- Preserved three real user-provided original prompts in `docs/prompts/prompt-log.md`.
+- Added `docs/INITIAL_PRD.md` as the initial assignment PRD and requirement baseline.
+- Added `docs/workflow/AI_DEVELOPMENT_WORKFLOW.md` to explain SDD → DDD → TDD → E2E development through Claude Code connected to Kimi API.
+- Added `docs/workflow/DOCUMENTATION_EVOLUTION.md` to show how Markdown documents grow with Git/development stages.
+- Ensured new documentation remains Markdown-first and includes Mermaid diagrams.
+
+#### Decisions
+- Keep the real prompts close to the original wording; only punctuation, line breaks, and minor typo cleanup are allowed.
+- Do not describe the project as being “taken over” by another tool. Delivery wording is: **completed with Claude Code connected to the Kimi API**.
+- Treat generated diagrams and matrices as code-derived evidence, while `INITIAL_PRD.md` and prompt log preserve historical requirements.

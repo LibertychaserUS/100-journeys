@@ -58,6 +58,8 @@ tmp/
 .cache/
 .nginx/
 deploy/nginx.local.conf
+__pycache__/
+*.pyc
 
 # Node
 node_modules/

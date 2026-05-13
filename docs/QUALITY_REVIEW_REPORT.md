@@ -12,7 +12,7 @@
 - 修复图片路径与加载策略：生成图改用本地 JPG，首页先用内置 journey 数据即时渲染，再与 API 同步。
 - 修复卡片标题被遮挡问题：卡片标题常驻可见，简介仅在 hover 时从底部展开。
 - 登录态顶栏区分普通用户和管理员：普通用户显示头像、用户名、虚拟钱包、积分；管理员显示后台入口。
-- 注册页补充用户名、性别、头像上传；头像按用户唯一 ID 存放，用户名允许重复，邮箱仍唯一。
+- 注册页补充用户名、性别、头像上传；头像按服务端内部账户标识存放，用户名允许重复，邮箱仍唯一，前端不展示内部数据库 ID。
 - 后台 Dashboard 改为真实数据统计：用户数、旅程数、钱包余额、积分、订单、收入、审计日志、事件数、热门点击/购买、MBTI、性别分布。
 - 增加后台导出接口：`GET /api/admin/export?format=csv|json`。
 - 后台入口从普通导航拆出：`#/admin-login` 为隐藏入口，游客和普通用户在主页/导航看不到 Dashboard。
@@ -27,7 +27,7 @@
 
 ### 2.1 Nginx / 静态资源层
 
-当前仓库没有运行中的 Nginx。实际运行方式是：
+当前仓库已补充 Nginx 模板和本地生成器。开发直连方式仍是：
 
 ```text
 Browser -> Gin 静态文件 / Gin API -> SQLite
@@ -113,7 +113,7 @@ orders
 
 - 当前实现：文件系统保存头像，DB 只保存 `avatar_url`。
 - 不建议把头像二进制直接塞进 SQLite。原因是会放大 DB 文件、拖慢备份和查询。
-- 更合理的演进：本地文件/CDN/Object Storage 存图片，DB 存 `user_id`、URL、mime、size、hash、created_at。当前 MVP 已按用户 ID 分目录：`/uploads/avatars/u_<id>/avatar.ext`。
+- 更合理的演进：本地文件/CDN/Object Storage 存图片，DB 存内部账户标识、URL、mime、size、hash、created_at。当前 MVP 已按服务端内部账户标识分目录：`/uploads/avatars/u_<id>/avatar.ext`，该 ID 不在个人主页展示。
 
 ---
 
@@ -244,7 +244,7 @@ go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=420s
 - 20000 级瞬时分析事件已通过；超过 32768 默认容量时仍会按 P2 降级策略拒收。
 - 所有 API 请求都持久化审计会增加写入压力，生产应做异步批量和日志文件兜底。
 - 本地 Go 进程直出大图在高并发下会慢，生产应使用 CDN/Nginx。
-- 当前没有实际 Nginx 部署文件和真实线上压测环境。
+- 当前已有 Nginx 部署模板、本地 Nginx/k6 证据；腾讯云公网 IP 演示已上线，正式域名/HTTPS 仍需备案后补充。
 - `k6` 脚本已准备，但本机未安装 `k6`，因此本轮只执行了 Go 压力测试。
 - 中型独立站生产预案已补充：`docs/ops/PRODUCTION_READINESS.md`、`docs/ops/DISASTER_RECOVERY.md`。
 
