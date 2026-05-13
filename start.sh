@@ -15,7 +15,7 @@ C='\033[0;36m'
 NC='\033[0m'
 
 # ── 默认值 ──
-PORT="8080"
+PORT="8090"
 DB_PATH="${DB_PATH:-./data/app.db}"
 CDN_BASE_URL="${CDN_BASE_URL:-}"
 RUN_MODE="dev"
@@ -32,7 +32,7 @@ show_help() {
   ./start.sh [选项] [端口]
 
 参数:
-  端口              服务器端口 (默认: 8080)
+  端口              服务器端口 (默认: 8090)
 
 选项:
   -b, --build       先编译二进制文件，再启动 (启动更快，适合频繁重启)
@@ -46,8 +46,8 @@ show_help() {
   CDN_BASE_URL      CDN 基础 URL (留空则使用本地静态资源)
 
 示例:
-  ./start.sh                    # 默认 8080 端口，dev 模式
-  ./start.sh 8090               # 指定 8090 端口
+  ./start.sh                    # 默认 8090 端口，dev 模式
+  ./start.sh 8080               # 指定 8080 端口
   ./start.sh -b                 # 编译后运行
   ./start.sh -r                 # 重置数据库并启动
   ./start.sh -b -r 8090         # 重置数据库 + 编译 + 8090 端口
