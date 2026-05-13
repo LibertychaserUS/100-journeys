@@ -90,6 +90,7 @@ func TestStressOrderPaymentAuditTrail(t *testing.T) {
 	journey := firstJourney(t, app.db)
 	ctx := context.Background()
 
+	userIDs := make([]int64, 0, users)
 	for i := 0; i < users; i++ {
 		u := &model.User{
 			Username:     "stress-user",
@@ -103,11 +104,12 @@ func TestStressOrderPaymentAuditTrail(t *testing.T) {
 		if err := app.userRepo.Create(ctx, u); err != nil {
 			t.Fatalf("create user: %v", err)
 		}
+		userIDs = append(userIDs, u.ID)
 	}
 
 	var failures atomic.Int64
 	parallel(t, orders, func(i int) {
-		userID := int64((i % users) + 1)
+		userID := userIDs[i%len(userIDs)]
 		order, err := app.orderRepo.Create(ctx, userID, []model.OrderItem{{
 			JourneyID:    journey.ID,
 			JourneyTitle: journey.Title,

@@ -161,7 +161,7 @@ go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
 本轮记录结果：
 
 ```text
-ok github.com/100-journeys/app/tests/stress 7.040s
+ok github.com/100-journeys/app/tests/stress 1.660s
 ```
 
 上一会话历史记录：
@@ -192,6 +192,8 @@ ok github.com/100-journeys/app/tests/stress 15.271s
 
 ## 7. 腾讯云上线检查清单
 
+本节描述的是“生产可用架构与演示部署进度”，不是已经完成全部正式生产上线。未勾选项必须在正式域名、证书和长期运维策略固定后由部署负责人补齐；当前提交可按公网演示和中型独立站 MVP 容量边界交付。
+
 - [x] 创建腾讯云 CVM，公网 IP 为 `49.232.207.220`。
 - [x] Go 二进制、`web/`、`db/schema.sql`、`db/seed.sql` 部署到 `/opt/100-journeys/app`。
 - [x] 设置 `PORT=8080`、`BIND_ADDR=127.0.0.1:8080`、`DB_PATH`、`UPLOAD_DIR`、`JWT_SECRET`。
@@ -211,6 +213,8 @@ ok github.com/100-journeys/app/tests/stress 15.271s
 - [x] Playwright E2E 全量通过并记录日期：2026-05-14，`29 passed`。
 - [ ] 管理员账号不使用默认密码，且只通过服务器侧 CLI 创建或提升。
 - [ ] 日志目录、DB 目录、备份目录有磁盘空间告警。
+
+未完成项归属与时限：域名备案/HTTPS、异机备份、恢复演练、磁盘空间告警和生产默认密码轮换属于正式上线前运维任务；在域名与证书确定后的同一部署窗口完成。k6 六脚本已在本地 Nginx 等价入口完成基线与回归，正式域名切换后需重新记录生产入口证据。
 
 当前演示地址：`http://49.232.207.220/`。隐藏后台入口：`http://49.232.207.220/#/admin-login`。域名备案完成后再切换为正式 HTTPS 域名。
 
@@ -267,6 +271,6 @@ P2：
 
 ## 11. 结论
 
-在腾讯云 CVM、Nginx 静态与反代、SQLite WAL、外部登录验证、k6 基线证据和恢复演练说明完成后，本项目可以按“中型独立站 MVP，具备可运行公网演示和明确容量边界”口径提交。正式域名与 HTTPS 仍需备案后补齐。
+在腾讯云 CVM、Nginx 静态与反代、SQLite WAL、外部登录验证、本地 Nginx/k6 基线证据和恢复预案说明完成后，本项目可以按“中型独立站 MVP，具备可运行公网演示和明确容量边界”口径提交。它不是全部正式生产运维项均已闭环的生产系统；正式域名、HTTPS、异机备份、恢复演练、磁盘告警和默认演示账号轮换仍需在上线部署窗口补齐。
 
 如果仍坚持单进程 Gin 同时承载 API、SQLite 写入和所有大图直出，则不能给出生产满意结论。

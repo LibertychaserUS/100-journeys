@@ -11,9 +11,9 @@ flowchart LR
     repos --> sqlite[("SQLite WAL")]
     handlers --> buffer["P2 分析缓冲<br/>Analytics Buffer"]
     buffer --> sqlite
-    mw --> audit["P1 审计日志<br/>Audit Logs"]
+    mw --> audit["P1 SQL 审计<br/>audit_logs"]
     audit --> sqlite
     handlers --> eventbus["进程内事件总线<br/>Event Bus"]
-    eventbus --> logs["运行日志<br/>Runtime logs"]
+    eventbus --> logs["进程/反代运行日志<br/>stdout/journal/nginx"]
     admin["服务器侧管理员 CLI<br/>Admin CLI"] --> sqlite
     backup["backup-sqlite.sh"] --> sqlite

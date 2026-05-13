@@ -86,7 +86,7 @@ func (r *sqliteAdminRepo) ListUsers(ctx context.Context) ([]model.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("admin list users: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var users []model.User
 	for rows.Next() {
@@ -115,7 +115,7 @@ func (r *sqliteAdminRepo) topClickedJourneys(ctx context.Context) ([]model.Journ
 	if err != nil {
 		return nil, fmt.Errorf("admin top clicked journeys: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var metrics []model.JourneyMetric
 	for rows.Next() {
@@ -153,7 +153,7 @@ func (r *sqliteAdminRepo) topPurchasedJourneys(ctx context.Context, paidOrders i
 	if err != nil {
 		return nil, fmt.Errorf("admin top purchased journeys: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var metrics []model.JourneyMetric
 	for rows.Next() {
@@ -181,7 +181,7 @@ func (r *sqliteAdminRepo) mbtiDistribution(ctx context.Context, totalUsers int) 
 	if err != nil {
 		return nil, fmt.Errorf("admin mbti distribution: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	return scanDistribution(rows, totalUsers)
 }
@@ -195,7 +195,7 @@ func (r *sqliteAdminRepo) genderDistribution(ctx context.Context, totalUsers int
 	if err != nil {
 		return nil, fmt.Errorf("admin gender distribution: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	return scanDistribution(rows, totalUsers)
 }
@@ -211,7 +211,7 @@ func (r *sqliteAdminRepo) purchaseGenderDistribution(ctx context.Context, paidOr
 	if err != nil {
 		return nil, fmt.Errorf("admin purchase gender distribution: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	return scanDistribution(rows, paidOrders)
 }

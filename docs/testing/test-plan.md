@@ -106,7 +106,7 @@ npx playwright test
 | Nginx 静态 CSS/JS | 通过 | `/static/css/tokens.css` 为 `text/css`，`/static/js/router.js` 为 `application/javascript` |
 | Nginx 静态图片 | 通过 | `/static/assets/images/generated/hero-taoyuan.jpg` 返回 `200 OK`，`Content-Length: 451823`，有 cache header |
 | Nginx 默认头像 | 通过 | `/static/assets/images/avatars/github-default/avatar-00.svg` 返回 `image/svg+xml` |
-| Go stress | 通过 | 目标组合档输出 `ok github.com/100-journeys/app/tests/stress 7.040s` |
+| Go stress | 通过 | 目标组合档输出 `ok github.com/100-journeys/app/tests/stress 1.660s` |
 | k6 public | 通过 | 200 VU / 30s，39193 请求，失败率 0，p95 61.21 ms |
 | k6 image | 通过 | 300 VU / 30s，9000 请求，失败率 0，p95 17.92 ms |
 | k6 pet/analytics | 通过 | 200 VU / 30s，12000 请求，失败率 0，p95 8.87 ms |

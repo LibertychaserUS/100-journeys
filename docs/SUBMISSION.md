@@ -6,7 +6,7 @@
 
 | 项目 | 内容 |
 |---|---|
-| 提交邮箱 | `xulei@wisquest.com` |
+| 提交邮箱 | `xulei@bizguest.com` |
 | 邮件主题 | `【远程作业提交】姓名` |
 | 附件/链接 | ZIP 源码包、Markdown 文档包、Prompt 记录、工作流说明、GitHub/Gitee 仓库链接、公网演示地址 |
 | 截止时间 | 收到作业后 72 小时内 |
@@ -15,7 +15,7 @@
 flowchart LR
     repo["GitHub/Gitee 仓库链接"] --> email["提交邮件"]
     zip["源码 ZIP"] --> email
-    docs["文档包<br/>PRD / SDD / DDD / TDD / API"] --> email
+    docs["文档包<br/>PRD / BDD / SDD / DDD / TDD / API"] --> email
     prompt["Prompt 记录<br/>docs/prompts/prompt-log.md"] --> email
     workflow["工作流说明<br/>AI_DEVELOPMENT_WORKFLOW.md"] --> email
     demo["公网演示<br/>http://49.232.207.220/"] --> email
@@ -27,9 +27,9 @@ flowchart LR
 |---|---|
 | 公开演示 | `http://49.232.207.220/` |
 | 普通用户登录 | `http://49.232.207.220/#/login` |
-| 普通用户账号 | `user@100journeys.demo` / `TaoyuanUser12345` |
+| 普通用户账号 | 邮件单独提供公网 demo-only 账号；本地一键部署会输出 `DEMO_USER_EMAIL` / `DEMO_USER_PASSWORD` |
 | 管理员隐藏登录 | `http://49.232.207.220/#/admin-login` |
-| 管理员账号 | `admin@100journeys.demo` / `TaoyuanAdmin12345` |
+| 管理员账号 | 邮件单独提供公网 demo-only 账号；本地一键部署会输出 `DEMO_ADMIN_EMAIL` / `DEMO_ADMIN_PASSWORD` |
 
 说明：当前域名备案尚未完成，因此演示地址使用腾讯云 CVM 公网 IP。备案通过后，再将域名解析到 Nginx 并配置 HTTPS。
 
@@ -39,9 +39,10 @@ flowchart LR
 |---|---|
 | 完整项目源码 | GitHub/Gitee 仓库 + ZIP 包 |
 | 数据库初始化脚本 | `db/schema.sql`、`db/seed.sql` |
-| 至少 5 条高质量样例数据 | `db/seed.sql` 中 12 条 journeys |
+| 至少 5 条高质量样例数据 | `db/seed.sql` 中 12 条 journeys；`docs/SAMPLE_DATA.md`；`docs/generated/sample-journeys.csv` |
 | README 运行说明和后台账号 | `README.md` |
 | PRD | `docs/PRD.md`、`docs/INITIAL_PRD.md` |
+| BDD / 业务行为规格 | `docs/BDD-spec.md` |
 | SDD / API 契约 | `docs/schema/SDD-spec.md`、`docs/schema/api-contract.md` |
 | DDD / UI 设计说明 | `docs/ui-components/DDD-spec.md` |
 | TDD / 测试说明 | `docs/testing/TDD-spec.md`、`docs/testing/test-plan.md` |

@@ -201,7 +201,7 @@
 
 ---
 
-## Documentation Recovery — Real Prompt Preservation | 2026-05-14
+### Documentation Recovery — Real Prompt Preservation | 2026-05-14
 
 **Branch**: `feature/taoyuan-production-readiness`
 **Agent context**: Claude Code with Kimi API integration

@@ -35,6 +35,20 @@
   border-color: var(--accent, #e86b5f);
 }
 
+.recharge-close:focus {
+  outline: 2px solid var(--accent, #e86b5f);
+  outline-offset: 2px;
+}
+
+.recharge-close:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.recharge-close:focus-visible {
+  outline: 2px solid var(--accent, #e86b5f);
+  outline-offset: 2px;
+}
+
 .recharge-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -174,6 +188,20 @@
 .recharge-secondary:hover {
   border-color: var(--accent, #e86b5f);
   color: var(--accent, #e86b5f);
+}
+
+.recharge-secondary:focus {
+  outline: 2px solid var(--accent, #e86b5f);
+  outline-offset: 2px;
+}
+
+.recharge-secondary:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.recharge-secondary:focus-visible {
+  outline: 2px solid var(--accent, #e86b5f);
+  outline-offset: 2px;
 }
 
 .recharge-error {

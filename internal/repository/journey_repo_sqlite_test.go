@@ -178,6 +178,19 @@ func TestRepo_List_SearchQuery(t *testing.T) {
 	t.Fatalf("expected keyword search to include a night-sky journey, got %+v", journeys)
 }
 
+func TestRepo_List_SearchQueryEscapesLikeWildcards(t *testing.T) {
+	repo := setupTestDB(t)
+	ctx := context.Background()
+
+	journeys, total, err := repo.List(ctx, model.JourneyFilter{Query: "%", Limit: 20, Page: 1})
+	if err != nil {
+		t.Fatalf("List error: %v", err)
+	}
+	if total != 0 || len(journeys) != 0 {
+		t.Fatalf("expected literal wildcard search to match no seeded journeys, total=%d journeys=%d", total, len(journeys))
+	}
+}
+
 // UT-REPO-007: GetBySlug — existing
 func TestRepo_GetBySlug_Exists(t *testing.T) {
 	repo := setupTestDB(t)

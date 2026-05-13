@@ -17,8 +17,10 @@ import (
 )
 
 const (
-	defaultUserPassword  = "TaoyuanUser12345"
-	defaultAdminPassword = "TaoyuanAdmin12345"
+	defaultUserEmail     = "demo-user@example.invalid"
+	defaultAdminEmail    = "demo-admin@example.invalid"
+	defaultUserPassword  = "LocalDemoUserChangeMe12345"
+	defaultAdminPassword = "LocalDemoAdminChangeMe12345!"
 )
 
 type journeyLite struct {
@@ -45,6 +47,8 @@ func main() {
 		avatarURLBase = flag.String("avatar-url-base", "/static/assets/images/avatars/github-default", "public URL prefix for default avatar assets")
 		userCount     = flag.Int("users", 50, "number of virtual ordinary users to create")
 		adminCount    = flag.Int("admins", 3, "number of demo admin users to create")
+		userEmail     = flag.String("user-email", envOrDefault("DEMO_USER_EMAIL", defaultUserEmail), "primary demo ordinary user email")
+		adminEmail    = flag.String("admin-email", envOrDefault("DEMO_ADMIN_EMAIL", defaultAdminEmail), "primary demo admin email")
 		userPassword  = flag.String("user-password", envOrDefault("DEMO_USER_PASSWORD", defaultUserPassword), "password for virtual ordinary users")
 		adminPassword = flag.String("admin-password", envOrDefault("DEMO_ADMIN_PASSWORD", defaultAdminPassword), "password for demo admin users")
 	)
@@ -79,7 +83,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	if err := resetDemoData(ctx, db); err != nil {
+	if err := resetDemoData(ctx, db, *userEmail, *adminEmail); err != nil {
 		log.Fatal(err)
 	}
 	journeys, err := listJourneys(ctx, db)
@@ -99,11 +103,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	adminIDs, err := createAdmins(ctx, db, *avatarURLBase, *adminCount, string(adminHash))
+	adminIDs, err := createAdmins(ctx, db, *avatarURLBase, *adminCount, *adminEmail, string(adminHash))
 	if err != nil {
 		log.Fatal(err)
 	}
-	userIDs, err := createVirtualUsers(ctx, db, *avatarURLBase, *userCount, string(userHash), journeys)
+	userIDs, err := createVirtualUsers(ctx, db, *avatarURLBase, *userCount, *userEmail, string(userHash), journeys)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -117,8 +121,8 @@ func main() {
 	}
 	fmt.Printf("demo data ready: users=%d admins=%d total_users=%d paid_orders=%d gross_revenue=%d analytics_events=%d audit_errors=%d\n",
 		len(userIDs), len(adminIDs), stats.totalUsers, stats.paidOrders, stats.grossRevenue, stats.analyticsEvents, stats.auditErrors)
-	fmt.Printf("admin login: admin@100journeys.demo / %s\n", *adminPassword)
-	fmt.Printf("user login: user@100journeys.demo / %s\n", *userPassword)
+	fmt.Printf("admin login: %s / %s\n", *adminEmail, *adminPassword)
+	fmt.Printf("user login: %s / %s\n", *userEmail, *userPassword)
 	fmt.Printf("fixture admin login: demo-admin-01@example.com / %s\n", *adminPassword)
 	fmt.Printf("fixture user login: demo-virtual-01@example.com / %s\n", *userPassword)
 }
@@ -130,7 +134,7 @@ func envOrDefault(name, fallback string) string {
 	return fallback
 }
 
-func resetDemoData(ctx context.Context, db *sql.DB) error {
+func resetDemoData(ctx context.Context, db *sql.DB, userEmail, adminEmail string) error {
 	stmts := []struct {
 		query string
 		args  []interface{}
@@ -138,7 +142,7 @@ func resetDemoData(ctx context.Context, db *sql.DB) error {
 		{`DELETE FROM analytics_events WHERE metadata LIKE ?`, []interface{}{"%demo_fixture%"}},
 		{`DELETE FROM audit_logs WHERE source = ?`, []interface{}{"demo-fixture"}},
 		{`DELETE FROM users WHERE email LIKE ? OR email LIKE ?`, []interface{}{"demo-virtual-%@example.com", "demo-admin-%@example.com"}},
-		{`DELETE FROM users WHERE email IN (?, ?)`, []interface{}{"user@100journeys.demo", "admin@100journeys.demo"}},
+		{`DELETE FROM users WHERE email IN (?, ?, ?, ?)`, []interface{}{userEmail, adminEmail, "user@100journeys.demo", "admin@100journeys.demo"}},
 	}
 	for _, stmt := range stmts {
 		if _, err := db.ExecContext(ctx, stmt.query, stmt.args...); err != nil {
@@ -166,7 +170,7 @@ func listJourneys(ctx context.Context, db *sql.DB) ([]journeyLite, error) {
 	return journeys, rows.Err()
 }
 
-func createAdmins(ctx context.Context, db *sql.DB, avatarURLBase string, count int, passwordHash string) ([]int64, error) {
+func createAdmins(ctx context.Context, db *sql.DB, avatarURLBase string, count int, primaryEmail string, passwordHash string) ([]int64, error) {
 	genders := []string{"female", "male", "non_binary", "prefer_not_to_say"}
 	mbtis := []string{"INTJ", "ENTJ", "INFJ"}
 	ids := make([]int64, 0, count)
@@ -175,7 +179,7 @@ func createAdmins(ctx context.Context, db *sql.DB, avatarURLBase string, count i
 		email := fmt.Sprintf("demo-admin-%02d@example.com", i)
 		if i == 0 {
 			username = "桃源后台管理员"
-			email = "admin@100journeys.demo"
+			email = primaryEmail
 		}
 		res, err := db.ExecContext(ctx,
 			`INSERT INTO users (username, email, password_hash, role, level, points, balance, mbti_type, gender)
@@ -202,10 +206,10 @@ func createAdmins(ctx context.Context, db *sql.DB, avatarURLBase string, count i
 	return ids, nil
 }
 
-func createVirtualUsers(ctx context.Context, db *sql.DB, avatarURLBase string, count int, passwordHash string, journeys []journeyLite) ([]int64, error) {
+func createVirtualUsers(ctx context.Context, db *sql.DB, avatarURLBase string, count int, primaryEmail string, passwordHash string, journeys []journeyLite) ([]int64, error) {
 	ids := make([]int64, 0, count)
 	for i := 0; i < count; i++ {
-		profile := profileFor(i)
+		profile := profileFor(i, primaryEmail)
 		points := 5000 + (i%5)*5000
 		level := 1 + (i % 10)
 		rechargeAmount := 90000 + i*137
@@ -246,7 +250,7 @@ func createVirtualUsers(ctx context.Context, db *sql.DB, avatarURLBase string, c
 	return ids, nil
 }
 
-func profileFor(index int) virtualProfile {
+func profileFor(index int, primaryEmail string) virtualProfile {
 	names := []string{
 		"林见鹿", "周云澜", "陈听雪", "许南星", "沈知远",
 		"顾清川", "宋月白", "陆闻舟", "何青岚", "叶星河",
@@ -273,7 +277,7 @@ func profileFor(index int) virtualProfile {
 	if index == 0 {
 		return virtualProfile{
 			Username: "桃源试游用户",
-			Email:    "user@100journeys.demo",
+			Email:    primaryEmail,
 			Gender:   "prefer_not_to_say",
 			MBTI:     "",
 		}

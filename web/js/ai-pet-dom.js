@@ -45,7 +45,7 @@
       <div class="ai-pet__chat ${chatOpen ? 'ai-pet__chat--open' : ''}" id="ai-pet-chat">
         <div class="ai-pet__header">
           <div class="ai-pet__header-avatar">
-            <img class="ai-pet__light" src="/static/assets/images/generated/guide-light.png" alt="">
+            <img class="ai-pet__light" src="/static/assets/images/generated/guide-light.png" alt="旅行向导">
           </div>
           <div>
             <div class="ai-pet__header-name">${profile.name || '小旅'}</div>
@@ -212,7 +212,7 @@
       const params = new URLSearchParams();
       if (action.data?.risk_max != null) params.set('adventure_max', String(action.data.risk_max * 2));
       if (action.data?.risk_min != null) params.set('adventure_min', String(action.data.risk_min * 2));
-      Router.navigate(`/explore${params.toString() ? '?' + params.toString() : ''}`);
+      Router.navigate(`#/explore${params.toString() ? '?' + params.toString() : ''}`);
       closeChat();
     }
   }

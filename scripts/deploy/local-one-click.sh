@@ -8,8 +8,10 @@ DB_PATH=""
 SEED_DEMO=1
 USE_NGINX=1
 STOP_ONLY=0
-DEMO_USER_PASSWORD="${DEMO_USER_PASSWORD:-TaoyuanUser12345}"
-DEMO_ADMIN_PASSWORD="${DEMO_ADMIN_PASSWORD:-TaoyuanAdmin12345}"
+DEMO_USER_EMAIL="${DEMO_USER_EMAIL:-demo-user@example.invalid}"
+DEMO_ADMIN_EMAIL="${DEMO_ADMIN_EMAIL:-demo-admin@example.invalid}"
+DEMO_USER_PASSWORD="${DEMO_USER_PASSWORD:-LocalDemoUserChangeMe12345}"
+DEMO_ADMIN_PASSWORD="${DEMO_ADMIN_PASSWORD:-LocalDemoAdminChangeMe12345!}"
 
 usage() {
   cat <<'USAGE'
@@ -148,6 +150,8 @@ cd "$ROOT_DIR"
 if [ "$SEED_DEMO" -eq 1 ]; then
   DEMO_USER_PASSWORD="$DEMO_USER_PASSWORD" \
   DEMO_ADMIN_PASSWORD="$DEMO_ADMIN_PASSWORD" \
+  DEMO_USER_EMAIL="$DEMO_USER_EMAIL" \
+  DEMO_ADMIN_EMAIL="$DEMO_ADMIN_EMAIL" \
   "$ROOT_DIR/scripts/deploy/init-demo-data.sh" "$DB_PATH"
 else
   mkdir -p "$(dirname "$DB_PATH")"
@@ -257,6 +261,6 @@ SQLite DB: $DB_PATH
 Log: $LOG_FILE
 Stop: scripts/deploy/local-one-click.sh --stop
 
-User: user@100journeys.demo / $DEMO_USER_PASSWORD
-Admin: admin@100journeys.demo / $DEMO_ADMIN_PASSWORD
+User: $DEMO_USER_EMAIL / $DEMO_USER_PASSWORD
+Admin: $DEMO_ADMIN_EMAIL / $DEMO_ADMIN_PASSWORD
 EOF

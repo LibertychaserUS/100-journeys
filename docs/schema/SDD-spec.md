@@ -140,7 +140,7 @@ JSON envelope:
 
 当前证据：
 
-- Go stress 目标组合档通过：`ok github.com/100-journeys/app/tests/stress 7.040s`
+- Go stress 目标组合档通过：`ok github.com/100-journeys/app/tests/stress 1.660s`
 - Nginx 本地配置语法通过。
 - Nginx `/api/health` 反代通过。
 - Nginx `/static/assets/...` 静态图片通过。

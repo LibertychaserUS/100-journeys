@@ -6,6 +6,7 @@ const scriptPath = fileURLToPath(import.meta.url);
 const fallbackRoot = path.resolve(path.dirname(scriptPath), "../..");
 const root = process.env.PROJECT_ROOT ? path.resolve(process.env.PROJECT_ROOT) : fallbackRoot;
 const csvPath = path.join(root, "docs/generated/app-test-cases.csv");
+const sampleCsvPath = path.join(root, "docs/generated/sample-journeys.csv");
 const outputPath = path.join(root, "app.xlsx");
 const stableTimestamp = "2026-05-14T00:00:00.000Z";
 
@@ -50,7 +51,12 @@ function countBy(rows, index) {
     const key = row[index] || "Unspecified";
     counts.set(key, (counts.get(key) || 0) + 1);
   }
-  return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  return [...counts.entries()].sort((a, b) => stableCompare(a[0], b[0]));
+}
+
+function stableCompare(left, right) {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
 }
 
 function xml(value) {
@@ -262,8 +268,11 @@ function zip(entries) {
 }
 
 const csvText = await fs.readFile(csvPath, "utf8");
+const sampleCsvText = await fs.readFile(sampleCsvPath, "utf8");
 const sourceRows = parseCsv(csvText);
+const sampleRows = parseCsv(sampleCsvText);
 const [headers, ...cases] = sourceRows;
+const [sampleHeaders, ...samples] = sampleRows;
 const typeCounts = countBy(cases, headers.indexOf("Category"));
 
 const summaryRows = [
@@ -271,9 +280,11 @@ const summaryRows = [
   [],
   ["指标", "值", "", "类别", "数量"],
   ["测试用例总数", cases.length, "", typeCounts[0]?.[0] ?? "", typeCounts[0]?.[1] ?? ""],
+  ["样例旅程总数", samples.length, "", "", ""],
   ["来源", "docs/generated/app-test-cases.csv", "", typeCounts[1]?.[0] ?? "", typeCounts[1]?.[1] ?? ""],
-  ["生成方式", "由代码路由、schema、测试文件生成后汇总", "", typeCounts[2]?.[0] ?? "", typeCounts[2]?.[1] ?? ""],
-  ["适用分支", "codex/tencent-cloud-deploy -> main", "", typeCounts[3]?.[0] ?? "", typeCounts[3]?.[1] ?? ""],
+  ["样例数据来源", "docs/generated/sample-journeys.csv", "", typeCounts[2]?.[0] ?? "", typeCounts[2]?.[1] ?? ""],
+  ["生成方式", "由代码路由、schema、seed、测试文件生成后汇总", "", typeCounts[3]?.[0] ?? "", typeCounts[3]?.[1] ?? ""],
+  ["适用分支", "codex/tencent-cloud-deploy -> main", "", typeCounts[4]?.[0] ?? "", typeCounts[4]?.[1] ?? ""],
 ];
 
 const verificationRows = [
@@ -282,7 +293,7 @@ const verificationRows = [
   ["Go 单元/集成测试", "go test ./...", "通过"],
   ["Go vet", "go vet ./...", "通过"],
   ["JS 语法检查", "find web/js -name '*.js' -exec node --check {} \\;", "通过"],
-  ["Go stress", "go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s", "目标组合档通过：ok .../tests/stress 7.040s"],
+  ["Go stress", "go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s", "目标组合档通过：ok .../tests/stress 1.660s"],
   ["Nginx 本地代理", "nginx -t / curl /api/health / curl -I static assets", "通过，详见 docs/ops/LOAD_TEST_RESULTS.md"],
   ["本地一键部署", "scripts/deploy/local-one-click.sh", "初始化 SQLite、演示用户、管理员并自动选择空闲端口"],
   ["k6 负载脚本", "tests/load/*.k6.js", "基线通过，auth/admin 重压边界已记录"],
@@ -291,7 +302,7 @@ const verificationRows = [
   ["CI/CD", ".github/workflows/ci.yml", "workflow 已新增，远端运行待 push 后确认"],
 ];
 
-const sheetNames = ["Summary", "Test Cases", "Verification"];
+const sheetNames = ["Summary", "Test Cases", "Seed Samples", "Verification"];
 const entries = [
   ["[Content_Types].xml", contentTypes(sheetNames)],
   ["_rels/.rels", rootRels()],
@@ -302,7 +313,8 @@ const entries = [
   ["xl/styles.xml", stylesXml()],
   ["xl/worksheets/sheet1.xml", sheetXml(summaryRows, { mergeTitle: true })],
   ["xl/worksheets/sheet2.xml", sheetXml([headers, ...cases])],
-  ["xl/worksheets/sheet3.xml", sheetXml(verificationRows)],
+  ["xl/worksheets/sheet3.xml", sheetXml([sampleHeaders, ...samples])],
+  ["xl/worksheets/sheet4.xml", sheetXml(verificationRows)],
 ];
 
 await fs.writeFile(outputPath, zip(entries));

@@ -162,7 +162,7 @@ func (b *Buffer) persist(ctx context.Context, events []Event) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	stmt, err := tx.PrepareContext(ctx,
 		`INSERT INTO analytics_events (event_type, journey_slug, user_id, mbti_type, gender, metadata, created_at)
@@ -170,7 +170,7 @@ func (b *Buffer) persist(ctx context.Context, events []Event) error {
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	for _, event := range events {
 		if !isAllowedEvent(event.Type) {

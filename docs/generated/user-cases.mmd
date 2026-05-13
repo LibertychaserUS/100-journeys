@@ -5,7 +5,13 @@ flowchart LR
     guest --> register["验证码注册<br/>Register"]
     guest --> login["登录<br/>Login"]
 
-    user["注册用户<br/>Registered user"] --> explore
+    register --> authed["已认证正式用户<br/>Authenticated user"]
+    login --> authed
+    cookie["本地 token 自动登录<br/>Remembered token"] --> authed
+
+    authed --> explore
+    authed --> logout["退出登录<br/>Logout"]
+    authed --> user["正式用户能力<br/>Registered user capabilities"]
     user --> pet["AI 宠物/MBTI<br/>AI pet quiz"]
     user --> recharge["充值 WonderCoin<br/>Recharge"]
     user --> order["创建订单<br/>Create order"]

@@ -196,7 +196,8 @@ CREATE INDEX IF NOT EXISTS idx_analytics_created_at    ON analytics_events(creat
 
 -- =============================================================
 -- Persistent audit logs (v1.4.0)
--- API errors and runtime request evidence for later debugging.
+-- API request evidence, API errors, panic evidence, and frontend client errors.
+-- Raw stdout/journal/Nginx runtime logs are intentionally not stored here.
 -- =============================================================
 
 CREATE TABLE IF NOT EXISTS audit_logs (

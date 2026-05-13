@@ -49,6 +49,7 @@ deploy/secrets/
 # Logs
 *.log
 .worktrees/
+docs/HANDOFF.md
 
 # Runtime data and local caches
 data/

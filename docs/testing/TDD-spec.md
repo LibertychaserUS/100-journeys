@@ -259,7 +259,7 @@ go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
 | `LOG-GO-TEST-20260514` | `go test ./...` | 通过 | 管理员统计契约修复后已最终复跑 |
 | `LOG-GO-VET-20260514` | `go vet ./...` | 通过 | 退出码 0，无错误输出 |
 | `LOG-JS-CHECK-20260514` | `find web/js -name '*.js' -exec node --check {} \;` | 通过 | 无语法错误输出 |
-| `LOG-STRESS-20260514` | 目标组合档 Go stress 命令 | 通过 | 输出 `ok github.com/100-journeys/app/tests/stress 7.040s` |
+| `LOG-STRESS-20260514` | 目标组合档 Go stress 命令 | 通过 | 输出 `ok github.com/100-journeys/app/tests/stress 1.660s` |
 | `LOG-K6-20260514` | `tests/load/*.k6.js` | 已执行 | 详见 `docs/ops/LOAD_TEST_RESULTS.md` |
 | `LOG-NGINX-20260514` | `nginx -t`、health curl、图片 HEAD | 已执行 | 详见 `docs/ops/LOAD_TEST_RESULTS.md` |
 | `LOG-PLAYWRIGHT-20260514` | `cd e2e && npx playwright test` | 通过 | 29/29，覆盖 captcha-aware 注册登录、充值、下单支付、订单和流水 |

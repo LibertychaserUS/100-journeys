@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -31,10 +32,11 @@ func Migrate(db *sql.DB, schemaPath string) error {
 	if _, err := db.Exec(string(schema)); err != nil {
 		return fmt.Errorf("exec schema: %w", err)
 	}
-	if err := ensureColumn(db, "users", "gender", "TEXT NOT NULL DEFAULT 'prefer_not_to_say'"); err != nil {
+	ctx := context.Background()
+	if err := ensureColumn(ctx, db, "users", "gender", "TEXT NOT NULL DEFAULT 'prefer_not_to_say'"); err != nil {
 		return err
 	}
-	if err := ensureDuplicateUsernamesAllowed(db); err != nil {
+	if err := ensureDuplicateUsernamesAllowed(ctx, db); err != nil {
 		return err
 	}
 	return nil
@@ -51,12 +53,18 @@ func Seed(db *sql.DB, seedPath string) error {
 	return nil
 }
 
-func ensureColumn(db *sql.DB, table, column, definition string) error {
-	rows, err := db.Query(fmt.Sprintf("PRAGMA table_info(%s)", table))
+func ensureColumn(ctx context.Context, db *sql.DB, table, column, definition string) error {
+	if !isValidIdentifier(table) {
+		return fmt.Errorf("invalid table identifier %q", table)
+	}
+	if !isValidIdentifier(column) {
+		return fmt.Errorf("invalid column identifier %q", column)
+	}
+	rows, err := db.QueryContext(ctx, fmt.Sprintf("PRAGMA table_info(%s)", quoteIdentifier(table)))
 	if err != nil {
 		return fmt.Errorf("inspect table %s: %w", table, err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var cid int
@@ -74,14 +82,17 @@ func ensureColumn(db *sql.DB, table, column, definition string) error {
 	if err := rows.Err(); err != nil {
 		return fmt.Errorf("iterate table info %s: %w", table, err)
 	}
-	if _, err := db.Exec(fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, column, definition)); err != nil {
+	if _, err := db.ExecContext(ctx, fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", quoteIdentifier(table), quoteIdentifier(column), definition)); err != nil {
 		return fmt.Errorf("add column %s.%s: %w", table, column, err)
 	}
 	return nil
 }
 
-func ensureDuplicateUsernamesAllowed(db *sql.DB) error {
-	hasUniqueUsername, err := hasUniqueColumnIndex(db, "users", "username")
+func ensureDuplicateUsernamesAllowed(ctx context.Context, db *sql.DB) error {
+	if !isValidIdentifier("users") {
+		return fmt.Errorf("invalid table identifier %q", "users")
+	}
+	hasUniqueUsername, err := hasUniqueColumnIndex(ctx, db, "users", "username")
 	if err != nil {
 		return err
 	}
@@ -89,16 +100,24 @@ func ensureDuplicateUsernamesAllowed(db *sql.DB) error {
 		return nil
 	}
 
-	if _, err := db.Exec(`PRAGMA foreign_keys=OFF`); err != nil {
+	if _, err := db.ExecContext(ctx, `PRAGMA foreign_keys=OFF`); err != nil {
 		return fmt.Errorf("disable foreign keys for users rebuild: %w", err)
 	}
-	defer db.Exec(`PRAGMA foreign_keys=ON`)
+	defer func() {
+		if _, err := db.ExecContext(ctx, `PRAGMA foreign_keys=ON`); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: re-enable foreign keys: %v\n", err)
+		}
+	}()
 
-	tx, err := db.Begin()
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			fmt.Fprintf(os.Stderr, "warning: rollback users rebuild: %v\n", err)
+		}
+	}()
 
 	stmts := []string{
 		`CREATE TABLE users_new (
@@ -126,19 +145,25 @@ func ensureDuplicateUsernamesAllowed(db *sql.DB) error {
 		`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`,
 	}
 	for _, stmt := range stmts {
-		if _, err := tx.Exec(stmt); err != nil {
+		if _, err := tx.ExecContext(ctx, stmt); err != nil {
 			return fmt.Errorf("rebuild users table: %w", err)
 		}
 	}
 	return tx.Commit()
 }
 
-func hasUniqueColumnIndex(db *sql.DB, table, column string) (bool, error) {
-	rows, err := db.Query(fmt.Sprintf("PRAGMA index_list(%s)", table))
+func hasUniqueColumnIndex(ctx context.Context, db *sql.DB, table, column string) (bool, error) {
+	if !isValidIdentifier(table) {
+		return false, fmt.Errorf("invalid table identifier %q", table)
+	}
+	if !isValidIdentifier(column) {
+		return false, fmt.Errorf("invalid column identifier %q", column)
+	}
+	rows, err := db.QueryContext(ctx, fmt.Sprintf("PRAGMA index_list(%s)", quoteIdentifier(table)))
 	if err != nil {
 		return false, fmt.Errorf("list indexes %s: %w", table, err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	type indexInfo struct {
 		name   string
@@ -157,35 +182,74 @@ func hasUniqueColumnIndex(db *sql.DB, table, column string) (bool, error) {
 		indexes = append(indexes, indexInfo{name: name, unique: unique == 1})
 	}
 	if err := rows.Err(); err != nil {
-		return false, err
+		return false, fmt.Errorf("iterate index list %s: %w", table, err)
 	}
 
 	for _, idx := range indexes {
 		if !idx.unique {
 			continue
 		}
-		infoRows, err := db.Query(fmt.Sprintf("PRAGMA index_info(%s)", idx.name))
+		matches, columnCount, err := indexMatchesColumn(ctx, db, idx.name, column)
 		if err != nil {
-			return false, fmt.Errorf("inspect index %s: %w", idx.name, err)
+			return false, err
 		}
-		matches := false
-		columnCount := 0
-		for infoRows.Next() {
-			columnCount++
-			var seqno, cid int
-			var name string
-			if err := infoRows.Scan(&seqno, &cid, &name); err != nil {
-				infoRows.Close()
-				return false, fmt.Errorf("scan index info %s: %w", idx.name, err)
-			}
-			if name == column {
-				matches = true
-			}
-		}
-		infoRows.Close()
 		if matches && columnCount == 1 {
 			return true, nil
 		}
 	}
 	return false, nil
+}
+
+func indexMatchesColumn(ctx context.Context, db *sql.DB, indexName, column string) (bool, int, error) {
+	if !isValidIdentifier(indexName) {
+		return false, 0, fmt.Errorf("invalid index identifier %q", indexName)
+	}
+	infoRows, err := db.QueryContext(ctx, fmt.Sprintf("PRAGMA index_info(%s)", quoteIdentifier(indexName)))
+	if err != nil {
+		return false, 0, fmt.Errorf("inspect index %s: %w", indexName, err)
+	}
+
+	matches := false
+	columnCount := 0
+	for infoRows.Next() {
+		columnCount++
+		var seqno, cid int
+		var name string
+		if err := infoRows.Scan(&seqno, &cid, &name); err != nil {
+			if closeErr := infoRows.Close(); closeErr != nil {
+				return false, 0, fmt.Errorf("close index info rows after scan error: %w", closeErr)
+			}
+			return false, 0, fmt.Errorf("scan index info %s: %w", indexName, err)
+		}
+		if name == column {
+			matches = true
+		}
+	}
+	if err := infoRows.Err(); err != nil {
+		if closeErr := infoRows.Close(); closeErr != nil {
+			return false, 0, fmt.Errorf("close index info rows after iteration error: %w", closeErr)
+		}
+		return false, 0, fmt.Errorf("iterate index info %s: %w", indexName, err)
+	}
+	if err := infoRows.Close(); err != nil {
+		return false, 0, fmt.Errorf("close index info rows %s: %w", indexName, err)
+	}
+	return matches, columnCount, nil
+}
+
+func isValidIdentifier(value string) bool {
+	if value == "" {
+		return false
+	}
+	for _, r := range value {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '_' {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+func quoteIdentifier(value string) string {
+	return `"` + value + `"`
 }

@@ -125,7 +125,11 @@ func (h *AuthHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, newErrorEnvelope("unauthorized"))
 		return
 	}
-	uid := userID.(int64)
+	uid, ok := userID.(int64)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, newErrorEnvelope("invalid user context"))
+		return
+	}
 
 	fileHeader, err := c.FormFile("avatar")
 	if err != nil {
@@ -142,9 +146,12 @@ func (h *AuthHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, newErrorEnvelope("failed to open avatar"))
 		return
 	}
-	defer file.Close()
 
 	data, err := io.ReadAll(io.LimitReader(file, maxAvatarBytes+1))
+	if closeErr := file.Close(); closeErr != nil {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope("failed to close avatar"))
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusBadRequest, newErrorEnvelope("failed to read avatar"))
 		return

@@ -44,8 +44,8 @@ Stop: scripts/deploy/local-one-click.sh --stop
 
 | 类型 | 入口 | 账号 |
 |---|---|---|
-| 普通用户 | `#/login` | `user@100journeys.demo` / `TaoyuanUser12345` |
-| 管理员 | `#/admin-login` | `admin@100journeys.demo` / `TaoyuanAdmin12345` |
+| 普通用户 | `#/login` | 以脚本输出为准，默认 `demo-user@example.invalid` / `LocalDemoUserChangeMe12345` |
+| 管理员 | `#/admin-login` | 以脚本输出为准，默认 `demo-admin@example.invalid` / `LocalDemoAdminChangeMe12345!` |
 
 另外还会生成：
 
@@ -53,6 +53,16 @@ Stop: scripts/deploy/local-one-click.sh --stop
 - `demo-admin-01@example.com` 到 `demo-admin-02@example.com`
 
 密码与上表相同。所有密码都以 bcrypt hash 写入数据库。
+
+可通过环境变量覆盖本地演示账号，避免在公开文档或 Git 历史中保存真实公网凭据：
+
+```bash
+DEMO_USER_EMAIL=review-user@example.com \
+DEMO_ADMIN_EMAIL=review-admin@example.com \
+DEMO_USER_PASSWORD='replace-user-demo-password' \
+DEMO_ADMIN_PASSWORD='replace-admin-demo-password' \
+scripts/deploy/local-one-click.sh
+```
 
 ## 4. 停止本地全栈
 

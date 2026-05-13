@@ -47,11 +47,13 @@ SSH_OPTS=(
   -o StrictHostKeyChecking=accept-new
 )
 
-ssh "${SSH_OPTS[@]}" "$USER@$HOST" "mkdir -p '$REMOTE_DIR'"
+REMOTE_DIR_Q="$(printf '%q' "$REMOTE_DIR")"
+
+ssh "${SSH_OPTS[@]}" "$USER@$HOST" "mkdir -p $REMOTE_DIR_Q"
 
 rsync -az --delete --delete-excluded \
   --filter="merge $FILTER_FILE" \
   -e "ssh -i '$SSH_KEY' -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
   "$ROOT_DIR"/ "$USER@$HOST:$REMOTE_DIR"/
 
-ssh "${SSH_OPTS[@]}" "$USER@$HOST" "find '$REMOTE_DIR' -maxdepth 2 -type f | sed 's#^$REMOTE_DIR/##' | sort"
+ssh "${SSH_OPTS[@]}" "$USER@$HOST" "cd $REMOTE_DIR_Q && find . -maxdepth 2 -type f | sed 's#^\./##' | sort"

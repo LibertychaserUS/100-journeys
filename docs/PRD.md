@@ -222,7 +222,7 @@ External browser
 当前本轮证据：
 
 - 文档生成：`python3 scripts/docs/generate_project_artifacts.py` 通过。
-- Go stress 目标组合档：`ok github.com/100-journeys/app/tests/stress 7.040s`。
+- Go stress 目标组合档：`ok github.com/100-journeys/app/tests/stress 1.660s`。
 - Nginx：语法检查、API 反代、静态图片响应头均通过。
 - 浏览器视觉审查：已捕获桌面/移动页面、个人页、充值页和后台 dashboard 截图，个人页只展示用户名等用户资料，不展示内部数据库 ID。
 - k6：public、image、pet、order、auth baseline、admin baseline 通过。

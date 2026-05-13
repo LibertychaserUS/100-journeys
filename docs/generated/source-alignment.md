@@ -8,6 +8,8 @@
 | `api-routes.md` | `cmd/server/main.go`, `internal/handler/*_handler.go` | Routes are parsed from Gin registration plus route helper registrations. |
 | `frontend-routes.md` | `web/js/router.js` | Routes are parsed from `Router.define(...)`. |
 | `test-evidence.md` | `internal/**/*_test.go`, `e2e/tests/*.js`, `tests/stress/*.go`, `tests/load/*.js` | Test counts are file-system derived. |
+| `sample-journeys.csv` | `db/schema.sql`, `db/seed.sql` | A temporary SQLite database loads the authoritative schema and seed, then exports every seeded journey row. |
+| `sample-journeys.md` | `db/schema.sql`, `db/seed.sql` | Same generated seed data as CSV, formatted as a reviewer-readable table. |
 | `user-cases.mmd` | `web/js/router.js`, auth/admin/order/payment handlers | Actors only cover implemented routes and role gates. |
 | `system-dag.mmd` | `cmd/server/main.go`, repository/service/handler wiring | Nodes reflect instantiated runtime dependencies. |
 | `delivery-gantt.mmd` | `git log`, maintained trace docs | Timeline reflects committed phase progression. |

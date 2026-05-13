@@ -8,9 +8,14 @@ const API = (() => {
 
   async function request(path, options = {}) {
     try {
+      const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+      const headers = {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        ...options.headers,
+      };
       const res = await fetch(`${base()}${path}`, {
-        headers: { 'Content-Type': 'application/json', ...options.headers },
         ...options,
+        headers,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ message: res.statusText }));
@@ -66,16 +71,7 @@ const API = (() => {
     uploadAvatar: async (file) => {
       const form = new FormData();
       form.append('avatar', file);
-      const res = await fetch(`${base()}/auth/avatar`, {
-        method: 'POST',
-        headers: authHeader(),
-        body: form,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: res.statusText }));
-        throw new Error(err.error || err.message || `HTTP ${res.status}`);
-      }
-      return res.json();
+      return authedRequest('/auth/avatar', { method: 'POST', body: form });
     },
 
     // Orders

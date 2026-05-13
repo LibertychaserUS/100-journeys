@@ -49,7 +49,7 @@ Pages.Recharge = {
           </div>
 
           <button class="recharge-submit" id="recharge-submit" onclick="Pages.Recharge._submit()">立即充值</button>
-          <button class="recharge-secondary" type="button" id="recharge-back">返回个人页</button>
+          <button class="recharge-secondary" type="button" id="recharge-back" aria-label="返回个人页">返回个人页</button>
           <p class="recharge-error" id="recharge-error"></p>
         </div>
       </section>

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"net/http"
@@ -51,26 +52,20 @@ func (h *AdminHandler) ExportStats(c *gin.Context) {
 	}
 
 	if c.DefaultQuery("format", "json") == "csv" {
+		var buf bytes.Buffer
+		writer := csv.NewWriter(&buf)
+		if err := writeAdminStatsCSV(writer, stats); err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorEnvelope(err.Error()))
+			return
+		}
+		writer.Flush()
+		if err := writer.Error(); err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorEnvelope(err.Error()))
+			return
+		}
 		c.Header("Content-Type", "text/csv; charset=utf-8")
 		c.Header("Content-Disposition", `attachment; filename="100-journeys-admin-stats.csv"`)
-		writer := csv.NewWriter(c.Writer)
-		_ = writer.Write([]string{"metric", "value"})
-		_ = writer.Write([]string{"total_users", strconv.Itoa(stats.TotalUsers)})
-		_ = writer.Write([]string{"total_journeys", strconv.Itoa(stats.TotalJourneys)})
-		_ = writer.Write([]string{"total_points", strconv.Itoa(stats.TotalPoints)})
-		_ = writer.Write([]string{"total_balance", strconv.Itoa(stats.TotalBalance)})
-		_ = writer.Write([]string{"total_orders", strconv.Itoa(stats.TotalOrders)})
-		_ = writer.Write([]string{"paid_orders", strconv.Itoa(stats.PaidOrders)})
-		_ = writer.Write([]string{"gross_revenue", strconv.Itoa(stats.GrossRevenue)})
-		_ = writer.Write([]string{"analytics_events", strconv.Itoa(stats.AnalyticsEvents)})
-		_ = writer.Write([]string{"audit_logs", strconv.Itoa(stats.AuditLogs)})
-		_ = writer.Write([]string{"audit_errors", strconv.Itoa(stats.AuditErrors)})
-		writeMetricsCSV(writer, "top_clicked", stats.TopClickedJourneys)
-		writeMetricsCSV(writer, "top_purchased", stats.TopPurchasedJourneys)
-		writeDistributionCSV(writer, "mbti", stats.MBTIDistribution)
-		writeDistributionCSV(writer, "gender", stats.GenderDistribution)
-		writeDistributionCSV(writer, "purchase_gender", stats.PurchaseGenderDistribution)
-		writer.Flush()
+		c.String(http.StatusOK, buf.String())
 		return
 	}
 
@@ -88,14 +83,54 @@ func AdminRoutes(r *gin.RouterGroup, h *AdminHandler) {
 	}
 }
 
-func writeMetricsCSV(writer *csv.Writer, prefix string, rows []model.JourneyMetric) {
-	for _, row := range rows {
-		_ = writer.Write([]string{fmt.Sprintf("%s:%s:%s", prefix, row.Slug, row.Title), strconv.Itoa(row.Count)})
+func writeAdminStatsCSV(writer *csv.Writer, stats *model.AdminStats) error {
+	rows := [][]string{
+		{"metric", "value"},
+		{"total_users", strconv.Itoa(stats.TotalUsers)},
+		{"total_journeys", strconv.Itoa(stats.TotalJourneys)},
+		{"total_points", strconv.Itoa(stats.TotalPoints)},
+		{"total_balance", strconv.Itoa(stats.TotalBalance)},
+		{"total_orders", strconv.Itoa(stats.TotalOrders)},
+		{"paid_orders", strconv.Itoa(stats.PaidOrders)},
+		{"gross_revenue", strconv.Itoa(stats.GrossRevenue)},
+		{"analytics_events", strconv.Itoa(stats.AnalyticsEvents)},
+		{"audit_logs", strconv.Itoa(stats.AuditLogs)},
+		{"audit_errors", strconv.Itoa(stats.AuditErrors)},
 	}
+	for _, row := range rows {
+		if err := writer.Write(row); err != nil {
+			return err
+		}
+	}
+	if err := writeMetricsCSV(writer, "top_clicked", stats.TopClickedJourneys); err != nil {
+		return err
+	}
+	if err := writeMetricsCSV(writer, "top_purchased", stats.TopPurchasedJourneys); err != nil {
+		return err
+	}
+	if err := writeDistributionCSV(writer, "mbti", stats.MBTIDistribution); err != nil {
+		return err
+	}
+	if err := writeDistributionCSV(writer, "gender", stats.GenderDistribution); err != nil {
+		return err
+	}
+	return writeDistributionCSV(writer, "purchase_gender", stats.PurchaseGenderDistribution)
 }
 
-func writeDistributionCSV(writer *csv.Writer, prefix string, rows []model.DistributionItem) {
+func writeMetricsCSV(writer *csv.Writer, prefix string, rows []model.JourneyMetric) error {
 	for _, row := range rows {
-		_ = writer.Write([]string{fmt.Sprintf("%s:%s", prefix, row.Label), strconv.Itoa(row.Count)})
+		if err := writer.Write([]string{fmt.Sprintf("%s:%s:%s", prefix, row.Slug, row.Title), strconv.Itoa(row.Count)}); err != nil {
+			return err
+		}
 	}
+	return nil
+}
+
+func writeDistributionCSV(writer *csv.Writer, prefix string, rows []model.DistributionItem) error {
+	for _, row := range rows {
+		if err := writer.Write([]string{fmt.Sprintf("%s:%s", prefix, row.Label), strconv.Itoa(row.Count)}); err != nil {
+			return err
+		}
+	}
+	return nil
 }

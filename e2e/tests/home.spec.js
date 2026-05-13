@@ -44,8 +44,8 @@ test.describe('Home Page', () => {
     await expect(page).toHaveURL(new RegExp(`#\\/journey\\/${slug}`));
   });
 
-  // E2E-HOME-005: Card MBTI tag click navigates to explore
-  test('card MBTI tag click navigates to explore with filter', async ({ page }) => {
+  // E2E-HOME-005: Home card click navigates to detail
+  test('clicking a card navigates to journey detail', async ({ page }) => {
     const card = page.locator('.home-card').first();
     await expect(card.locator('.home-card__tags span').nth(1)).toBeVisible();
     await card.click();

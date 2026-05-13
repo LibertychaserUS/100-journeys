@@ -7,7 +7,10 @@ test files so the generated diagrams stay auditable instead of hand-waved.
 
 from __future__ import annotations
 
+import csv
+import io
 import re
+import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -117,6 +120,15 @@ def normalize_type(dtype: str) -> str:
     return "string"
 
 
+def mermaid_key(markers: str) -> str:
+    """GitHub Mermaid ER supports one key marker per field; keep NN out."""
+    marker_set = set(markers.split())
+    for marker in ("PK", "FK", "UK"):
+        if marker in marker_set:
+            return marker
+    return ""
+
+
 def parse_direct_api_routes() -> list[Route]:
     main = read("cmd/server/main.go")
     routes: list[Route] = []
@@ -152,6 +164,52 @@ def test_files() -> dict[str, list[str]]:
     return groups
 
 
+def sample_journeys() -> list[dict[str, str]]:
+    """Load the authoritative SQLite schema/seed and return every journey row."""
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    try:
+        conn.executescript(read("db/schema.sql"))
+        conn.executescript(read("db/seed.sql"))
+        rows = conn.execute(
+            """
+            SELECT
+                j.slug,
+                j.title,
+                j.subtitle,
+                j.region,
+                j.fantasy_type,
+                j.visual_style,
+                j.adventure_index,
+                j.obscurity_level,
+                j.risk_level,
+                j.price,
+                j.image_path,
+                j.story_hook,
+                COALESCE(GROUP_CONCAT(DISTINCT t.slug), '') AS tags,
+                COALESCE(GROUP_CONCAT(DISTINCT m.code || ':' || jm.compatibility_score), '') AS mbti
+            FROM journeys j
+            LEFT JOIN journey_tags jt ON jt.journey_id = j.id
+            LEFT JOIN tags t ON t.id = jt.tag_id
+            LEFT JOIN journey_mbti jm ON jm.journey_id = j.id
+            LEFT JOIN mbti_types m ON m.id = jm.mbti_id
+            GROUP BY j.id
+            ORDER BY j.id
+            """
+        ).fetchall()
+        samples = []
+        for row in rows:
+            item = {key: str(row[key]) for key in row.keys()}
+            # Keep generated CSV friendly to spreadsheet tools and simple
+            # comma-split reviewers by avoiding commas inside aggregate cells.
+            item["tags"] = item["tags"].replace(",", ";")
+            item["mbti"] = item["mbti"].replace(",", ";")
+            samples.append(item)
+        return samples
+    finally:
+        conn.close()
+
+
 def mermaid_er(tables: list[Table]) -> str:
     lines = ["erDiagram"]
     for left, right, label in RELATIONSHIPS:
@@ -160,10 +218,11 @@ def mermaid_er(tables: list[Table]) -> str:
         lines.append("")
         lines.append(f"    {table.name} {{")
         for column in table.columns[:10]:
-            suffix = f" {column.markers}" if column.markers else ""
+            key = mermaid_key(column.markers)
+            suffix = f" {key}" if key else ""
             lines.append(f"        {column.dtype} {column.name}{suffix}")
         if len(table.columns) > 10:
-            lines.append("        string ...")
+            lines.append("        string additional_fields")
         lines.append("    }")
     return "\n".join(lines) + "\n"
 
@@ -182,10 +241,10 @@ def mermaid_system_dag() -> str:
     repos --> sqlite[("SQLite WAL")]
     handlers --> buffer["P2 分析缓冲<br/>Analytics Buffer"]
     buffer --> sqlite
-    mw --> audit["P1 审计日志<br/>Audit Logs"]
+    mw --> audit["P1 SQL 审计<br/>audit_logs"]
     audit --> sqlite
     handlers --> eventbus["进程内事件总线<br/>Event Bus"]
-    eventbus --> logs["运行日志<br/>Runtime logs"]
+    eventbus --> logs["进程/反代运行日志<br/>stdout/journal/nginx"]
     admin["服务器侧管理员 CLI<br/>Admin CLI"] --> sqlite
     backup["backup-sqlite.sh"] --> sqlite
 """
@@ -199,7 +258,13 @@ def mermaid_user_cases() -> str:
     guest --> register["验证码注册<br/>Register"]
     guest --> login["登录<br/>Login"]
 
-    user["注册用户<br/>Registered user"] --> explore
+    register --> authed["已认证正式用户<br/>Authenticated user"]
+    login --> authed
+    cookie["本地 token 自动登录<br/>Remembered token"] --> authed
+
+    authed --> explore
+    authed --> logout["退出登录<br/>Logout"]
+    authed --> user["正式用户能力<br/>Registered user capabilities"]
     user --> pet["AI 宠物/MBTI<br/>AI pet quiz"]
     user --> recharge["充值 WonderCoin<br/>Recharge"]
     user --> order["创建订单<br/>Create order"]
@@ -246,6 +311,8 @@ def source_alignment_markdown(tables: list[Table], routes_: list[Route], fronten
         "| `api-routes.md` | `cmd/server/main.go`, `internal/handler/*_handler.go` | Routes are parsed from Gin registration plus route helper registrations. |",
         "| `frontend-routes.md` | `web/js/router.js` | Routes are parsed from `Router.define(...)`. |",
         "| `test-evidence.md` | `internal/**/*_test.go`, `e2e/tests/*.js`, `tests/stress/*.go`, `tests/load/*.js` | Test counts are file-system derived. |",
+        "| `sample-journeys.csv` | `db/schema.sql`, `db/seed.sql` | A temporary SQLite database loads the authoritative schema and seed, then exports every seeded journey row. |",
+        "| `sample-journeys.md` | `db/schema.sql`, `db/seed.sql` | Same generated seed data as CSV, formatted as a reviewer-readable table. |",
         "| `user-cases.mmd` | `web/js/router.js`, auth/admin/order/payment handlers | Actors only cover implemented routes and role gates. |",
         "| `system-dag.mmd` | `cmd/server/main.go`, repository/service/handler wiring | Nodes reflect instantiated runtime dependencies. |",
         "| `delivery-gantt.mmd` | `git log`, maintained trace docs | Timeline reflects committed phase progression. |",
@@ -330,6 +397,78 @@ def workbook_csv(groups: dict[str, list[str]], routes_: list[Route]) -> str:
     return "\n".join(rows) + "\n"
 
 
+def sample_journeys_csv(rows: list[dict[str, str]]) -> str:
+    fieldnames = [
+        "slug",
+        "title",
+        "subtitle",
+        "region",
+        "fantasy_type",
+        "visual_style",
+        "adventure_index",
+        "obscurity_level",
+        "risk_level",
+        "price",
+        "image_path",
+        "story_hook",
+        "tags",
+        "mbti",
+    ]
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows)
+    return buffer.getvalue()
+
+
+def sample_journeys_markdown(rows: list[dict[str, str]]) -> str:
+    lines = [
+        "# 样例旅程数据逐条清单 / Seed Journey Data",
+        "",
+        "> 来源：脚本临时加载 `db/schema.sql` 与 `db/seed.sql` 到 SQLite 后导出；不是手写摘要。",
+        "",
+        f"当前 `db/seed.sql` 共初始化 {len(rows)} 条高质量旅程样例，满足“至少 5 条高质量样例数据”要求。",
+        "",
+        "| # | slug | 标题 | 地区 | 类型 | 风格 | 冒险/小众/风险 | 价格 | 图片 | 标签 | MBTI 匹配 |",
+        "|---:|---|---|---|---|---|---|---:|---|---|---|",
+    ]
+    for index, row in enumerate(rows, start=1):
+        score = f"{row['adventure_index']}/{row['obscurity_level']}/{row['risk_level']}"
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    str(index),
+                    f"`{row['slug']}`",
+                    row["title"],
+                    row["region"],
+                    row["fantasy_type"],
+                    row["visual_style"],
+                    score,
+                    row["price"],
+                    f"`{row['image_path']}`",
+                    row["tags"],
+                    row["mbti"],
+                ]
+            )
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "## 字段说明",
+            "",
+            "- `slug`：旅程唯一业务标识，用于详情页路由和订单快照。",
+            "- `price`：WonderCoin 模拟价格，和真实高端旅行费用大致对齐。",
+            "- `image_path`：本地优先静态图路径；生产可由 Nginx/CDN/R2 等承接。",
+            "- `tags`：与 `journey_tags` 关联的分类标签。",
+            "- `mbti`：与 `journey_mbti` 关联的 MBTI 代码和 1-5 匹配分。",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
@@ -341,6 +480,7 @@ def main() -> None:
     routes_ = routes()
     frontend = frontend_routes()
     tests = test_files()
+    samples = sample_journeys()
 
     write(OUT / "database-er.mmd", mermaid_er(tables))
     write(OUT / "system-dag.mmd", mermaid_system_dag())
@@ -350,6 +490,8 @@ def main() -> None:
     write(OUT / "frontend-routes.md", route_markdown(frontend))
     write(OUT / "test-evidence.md", test_markdown(tests))
     write(OUT / "app-test-cases.csv", workbook_csv(tests, routes_))
+    write(OUT / "sample-journeys.csv", sample_journeys_csv(samples))
+    write(OUT / "sample-journeys.md", sample_journeys_markdown(samples))
     write(OUT / "source-alignment.md", source_alignment_markdown(tables, routes_, frontend, tests))
 
     index = [
@@ -365,7 +507,10 @@ def main() -> None:
         "- `frontend-routes.md` - 生成 SPA 路由矩阵。",
         "- `test-evidence.md` - 生成测试文件证据矩阵。",
         "- `app-test-cases.csv` - `app.xlsx` 的源数据。",
+        "- `sample-journeys.csv` - 从 SQLite 初始化脚本导出的逐条样例旅程 CSV。",
+        "- `sample-journeys.md` - 从 SQLite 初始化脚本导出的逐条样例旅程表格。",
         "- `source-alignment.md` - 代码来源到文档产物的可追踪关系。",
+        "- `rendered/*.svg` - Mermaid 图的 SVG 渲染版本，便于不支持 Mermaid 的环境查看。",
         "",
     ]
     write(OUT / "README.md", "\n".join(index))

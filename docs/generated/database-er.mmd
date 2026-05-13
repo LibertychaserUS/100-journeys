@@ -15,88 +15,88 @@ erDiagram
 
     JOURNEYS {
         int id PK
-        string title NN
-        string slug UK NN
+        string title
+        string slug UK
         string subtitle
-        string story_hook NN
+        string story_hook
         string story
         string region
-        string fantasy_type NN
-        string visual_style NN
-        int adventure_index NN
-        string ...
+        string fantasy_type
+        string visual_style
+        int adventure_index
+        string additional_fields
     }
 
     TAGS {
         int id PK
-        string name UK NN
-        string slug UK NN
+        string name UK
+        string slug UK
     }
 
     JOURNEY_TAGS {
-        int journey_id FK NN
-        int tag_id FK NN
+        int journey_id FK
+        int tag_id FK
     }
 
     MBTI_TYPES {
         int id PK
-        string code UK NN
-        string name NN
+        string code UK
+        string name
         string description
-        string color NN
+        string color
     }
 
     JOURNEY_MBTI {
-        int journey_id FK NN
-        int mbti_id FK NN
-        int compatibility_score NN
+        int journey_id FK
+        int mbti_id FK
+        int compatibility_score
     }
 
     AI_LOGS {
         int id PK
-        string session_id NN
-        string role NN
-        string content NN
+        string session_id
+        string role
+        string content
         datetime created_at
     }
 
     USERS {
         int id PK
-        string username NN
-        string email UK NN
-        string password_hash NN
-        string role NN
-        int level NN
-        int points NN
-        int balance NN
+        string username
+        string email UK
+        string password_hash
+        string role
+        int level
+        int points
+        int balance
         string mbti_type
-        string gender NN
-        string ...
+        string gender
+        string additional_fields
     }
 
     USER_POINTS_HISTORY {
         int id PK
-        int user_id FK NN
-        string action_type NN
-        int points_delta NN
-        int balance_after NN
+        int user_id FK
+        string action_type
+        int points_delta
+        int balance_after
         string description
         datetime created_at
     }
 
     USER_SAVED_JOURNEYS {
-        int user_id FK NN
-        int journey_id FK NN
+        int user_id FK
+        int journey_id FK
         datetime created_at
     }
 
     ORDERS {
         int id PK
-        string order_no UK NN
-        int user_id FK NN
-        string status NN
-        int total_amount NN
-        string currency NN
+        string order_no UK
+        int user_id FK
+        string status
+        int total_amount
+        string currency
         datetime paid_at
         datetime created_at
         datetime updated_at
@@ -104,32 +104,32 @@ erDiagram
 
     ORDER_ITEMS {
         int id PK
-        int order_id FK NN
-        int journey_id FK NN
-        string journey_title NN
-        int unit_price NN
-        int quantity NN
-        int subtotal NN
+        int order_id FK
+        int journey_id FK
+        string journey_title
+        int unit_price
+        int quantity
+        int subtotal
     }
 
     TRANSACTIONS {
         int id PK
-        int user_id FK NN
+        int user_id FK
         int order_id FK
-        string txn_type NN
-        int amount NN
-        int balance_after NN
+        string txn_type
+        int amount
+        int balance_after
         string description
         datetime created_at
     }
 
     ANALYTICS_EVENTS {
         int id PK
-        string event_type NN
+        string event_type
         string journey_slug
         int user_id FK
         string mbti_type
-        string gender NN
+        string gender
         string metadata
         datetime created_at
     }
@@ -137,13 +137,13 @@ erDiagram
     AUDIT_LOGS {
         int id PK
         string request_id
-        string level NN
-        string source NN
+        string level
+        string source
         string method
         string path
         int status_code
         int latency_ms
         string client_ip
         string user_agent
-        string ...
+        string additional_fields
     }

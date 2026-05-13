@@ -34,7 +34,13 @@ flowchart LR
     guest --> register["验证码注册 Register"]
     guest --> login["登录 Login"]
 
-    user["注册用户 User"] --> explore
+    register --> authed["已认证正式用户 Authenticated user"]
+    login --> authed
+    cookie["本地 token 自动登录 Remembered token"] --> authed
+
+    authed --> explore
+    authed --> logout["退出登录 Logout"]
+    authed --> user["正式用户能力 User capabilities"]
     user --> pet["AI 宠物聊天/MBTI AI pet"]
     user --> recharge["充值 WonderCoin Recharge"]
     user --> order["创建订单 Create order"]
@@ -66,13 +72,14 @@ stateDiagram-v2
 | `UC-002` | 游客 | 搜索/筛选 | Explore 发送后端支持的筛选值到 `/api/journeys`。 | 返回标准 envelope，并展示筛选结果。 |
 | `UC-003` | 游客 | 点击旅程卡片 | 路由进入 `/#/journey/:slug` 并调用 `/api/journeys/:slug`。 | 展示故事、角色/任务/线索、标签、MBTI、价格。 |
 | `UC-004` | 游客 | 注册 | 获取 captcha，提交 username/email/password/gender。 | 创建 role=`user` 的账号并返回 JWT。 |
-| `UC-005` | 用户 | 充值 | Recharge 页调用 `/api/payments/recharge`。 | 余额增加并产生 recharge 流水。 |
-| `UC-006` | 用户 | 下单 | Detail CTA 提交 journey slug 和 quantity。 | 订单有唯一订单号和价格快照。 |
-| `UC-007` | 用户 | 支付 | 支付接口校验归属、余额和订单状态。 | 订单变为 paid，生成 purchase 流水。 |
-| `UC-008` | 用户 | 查看个人中心 | Profile 调用 `/api/auth/me`、`/api/orders`、`/api/payments/transactions`。 | 用户可见头像、用户名、钱包、积分、订单和流水。 |
-| `UC-009` | 管理员 | 打开 `#/admin-login` | 管理员登录后进入 `#/admin`。 | 普通用户不可访问后台数据。 |
-| `UC-010` | 管理员 | 查看统计 | 后台调用 `/api/admin/stats`。 | 显示用户、订单、收入、点击、购买、MBTI、性别、审计指标。 |
-| `UC-011` | 管理员 | 导出 | 后台调用 `/api/admin/export?format=csv|json`。 | 导出内容来自真实数据库聚合。 |
+| `UC-005` | 游客/用户 | 登录/自动登录 | 登录页提交邮箱、密码、captcha；本地 token 存在时自动恢复登录态。 | 进入已认证正式用户状态，顶栏刷新头像、用户名、钱包和积分。 |
+| `UC-006` | 用户 | 充值 | Recharge 页调用 `/api/payments/recharge`。 | 余额增加并产生 recharge 流水。 |
+| `UC-007` | 用户 | 下单 | Detail CTA 提交 journey slug 和 quantity。 | 订单有唯一订单号和价格快照。 |
+| `UC-008` | 用户 | 支付 | 支付接口校验归属、余额和订单状态。 | 订单变为 paid，生成 purchase 流水。 |
+| `UC-009` | 用户 | 查看个人中心 | Profile 调用 `/api/auth/me`、`/api/orders`、`/api/payments/transactions`。 | 用户可见头像、用户名、钱包、积分、订单和流水。 |
+| `UC-010` | 管理员 | 打开 `#/admin-login` | 管理员登录后进入 `#/admin`。 | 普通用户不可访问后台数据。 |
+| `UC-011` | 管理员 | 查看统计 | 后台调用 `/api/admin/stats`。 | 显示用户、订单、收入、点击、购买、MBTI、性别、审计指标。 |
+| `UC-012` | 管理员 | 导出 | 后台调用 `/api/admin/export?format=csv\|json`。 | 导出内容来自真实数据库聚合。 |
 
 ## 6. 页面访问矩阵
 

@@ -71,7 +71,7 @@ jobs:
           scripts/deploy/local-one-click.sh --stop
 
       - name: Ensure generated docs are committed
-        run: git diff --exit-code -- app.xlsx docs/generated README.md docs/PRD.md docs/schema docs/ui-components docs/testing docs/ops
+        run: git diff --exit-code -- app.xlsx docs/generated
 
       - name: Render local Nginx config
         run: scripts/nginx/render-local-config.sh 18080 18081

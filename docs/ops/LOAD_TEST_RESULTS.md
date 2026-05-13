@@ -41,7 +41,7 @@ go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
 结果：
 
 ```text
-ok  	github.com/100-journeys/app/tests/stress	7.040s
+ok  	github.com/100-journeys/app/tests/stress	1.660s
 ```
 
 覆盖：公开 API、20000 analytics buffer、100 用户、500 订单支付、300 后台统计请求、2000 图片请求。
@@ -61,6 +61,14 @@ ok  	github.com/100-journeys/app/tests/stress	7.040s
 | `public-content-flow.k6.js` | 公网 IP 1 VU / 10s | 0 | 49 | 0% | 100% | 105.89 ms | 通过，验证腾讯云公网入口与限流内访问 |
 | `public-content-flow.k6.js` | 公网 IP 10 VU / 10s | 99 | 560 | 78.57% | 19.37% | 67.28 ms | 触发公网单 IP 限流，不作为服务失败结论 |
 
+补充回归（2026-05-14）：修复 k6 `BASE_URL` 尾部 `/` 归一化后，使用本地一键部署输出的 `http://127.0.0.1:18780/` 重新跑 Nginx 链路 smoke：
+
+| 脚本 | 档位 | 退出 | HTTP 请求 | 失败率 | Checks | p95 | 结论 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| `public-content-flow.k6.js` | 5 VU / 10s | 0 | 350 | 0% | 400/400 | 18.67 ms | 通过 |
+| `order-payment-audit.k6.js` | 3 VU / 10s | 0 | 216 | 0% | 189/189 | 134.44 ms | 通过 |
+| `image-static-cache.k6.js` | 10 VU / 10s | 0 | 100 | 0% | 300/300 | 59.21 ms | 通过 |
+
 ## 4. 本轮发现并修复的问题
 
 | 问题 | 现象 | 处理 |
@@ -68,6 +76,7 @@ ok  	github.com/100-journeys/app/tests/stress	7.040s
 | Nginx 静态路径不覆盖代码真实 URL | 代码使用 `/static/css/...`、`/static/js/...`、`/static/assets/...`，Nginx 初版只覆盖旧 `/assets/...` 等路径，导致 CSS/JS 可被 fallback 成 `index.html` | `deploy/nginx.conf` 和本地生成器增加 `/static/css/`、`/static/js/`、`/static/assets/` alias |
 | 管理员统计空榜单 JSON 契约不稳定 | 压测早期 `top_clicked_journeys` 可为 `null`，脚本期望数组 | `internal/repository/admin_repo.go` 初始化空 slice，新增回归测试 |
 | 本地 Go build cache 权限 | 沙箱不能写 `~/Library/Caches/go-build` | 使用 repo-local `GOCACHE=.cache/go-build` |
+| k6 BASE_URL 尾部 `/` | 一键脚本输出 `http://127.0.0.1:port/`，旧 k6 拼出 `//api/...` 后拿不到预期 JSON | 所有 `tests/load/*.k6.js` 统一去掉尾部 `/` |
 
 ## 5. 容量边界结论
 

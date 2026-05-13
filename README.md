@@ -2,6 +2,7 @@
 
 [![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
 [![Pages](https://github.com/LibertychaserUS/100-journeys/actions/workflows/pages.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/pages.yml)
+[![CodeRabbit](https://img.shields.io/badge/CodeRabbit-review%20actioned-orange)](https://github.com/LibertychaserUS/100-journeys/pull/1)
 [![Stress](https://img.shields.io/badge/stress-target%20profile%20passing-green)](docs/ops/LOAD_TEST_RESULTS.md)
 [![k6](https://img.shields.io/badge/k6-baseline%20recorded-blue)](docs/ops/LOAD_TEST_RESULTS.md)
 [![E2E](https://img.shields.io/badge/Playwright-29%2F29%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
@@ -30,15 +31,19 @@ English: The domain filing is not complete yet, so the public demo uses the Tenc
 
 | Item | URL / Account |
 |---|---|
-| Public demo | `http://49.232.207.220/` |
-| User login | `http://49.232.207.220/#/login` |
-| User account | `user@100journeys.demo` / `TaoyuanUser12345` |
-| Hidden admin login | `http://49.232.207.220/#/admin-login` |
-| Admin account | `admin@100journeys.demo` / `TaoyuanAdmin12345` |
+| Public demo | `[DEMO_URL]` |
+| User login | `[DEMO_URL]/#/login` |
+| User account | `[DEMO_USER]` / `[DEMO_USER_PASSWORD]` |
+| Hidden admin login | `[DEMO_URL]/#/admin-login` |
+| Admin account | `[DEMO_ADMIN]` / `[DEMO_ADMIN_PASSWORD]` |
+
+中文：公网演示地址和账号通过提交邮件或面试现场单独提供，均为 assignment/demo-only，评审结束后立即轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
+
+English: Demo URL and credentials are supplied separately in the submission email or interview context. They are assignment/demo-only and must be rotated or disabled after review. Plaintext production credentials must never be stored in README, Git history, or public docs; admin users are created/promoted through the server-side `cmd/admin-user` CLI, while local demo accounts are printed by `scripts/deploy/local-one-click.sh`. To reset local demo data, remove `data/*.db*` and rerun `scripts/deploy/local-one-click.sh`; public demo credentials are controlled by server environment variables and `scripts/deploy/init-demo-data.sh`, separate from production credentials.
 
 ```mermaid
 flowchart LR
-    browser["外部浏览器"] --> cvm["Tencent Cloud CVM<br/>49.232.207.220:80"]
+    browser["外部浏览器"] --> cvm["Tencent Cloud CVM<br/>[DEMO_URL]:80"]
     cvm --> nginx["Nginx reverse proxy"]
     nginx --> spa["Hash SPA"]
     nginx --> api["Go API<br/>127.0.0.1:8080"]
@@ -107,13 +112,17 @@ flowchart LR
     repos --> sqlite[("SQLite WAL")]
     handlers --> buffer["Analytics Buffer P2"]
     buffer --> sqlite
-    mw --> audit["Audit Logs P1"]
+    mw --> audit["P1 SQL audit: audit_logs"]
     audit --> sqlite
     handlers --> eventbus["In-process Event Bus"]
-    eventbus --> logs["Runtime logs"]
+    eventbus --> logs["Process/reverse-proxy runtime logs"]
     admin["Server-side admin CLI"] --> sqlite
     backup["backup-sqlite.sh"] --> sqlite
 ```
+
+中文：`audit_logs` 是 SQLite 中的审计表，只保存 API 请求证据、API 错误、panic 和前端 client error。高频原始运行日志，例如 Go stdout/stderr、本地一键启动的 `tmp/local-one-click/server.log`、Nginx access/error log、systemd/journal，保留为文件或进程日志，避免把 SQLite 变成通用日志仓库。
+
+English: `audit_logs` is the SQLite audit table for API request evidence, API errors, panics, and frontend client errors. High-volume raw runtime logs, such as Go stdout/stderr, local one-click `tmp/local-one-click/server.log`, Nginx access/error logs, and systemd/journal output, remain file/process logs so SQLite is not turned into a general log sink.
 
 ---
 
@@ -127,7 +136,13 @@ flowchart LR
     guest --> register["Register with captcha"]
     guest --> login["Login"]
 
-    user["Registered user"] --> explore
+    register --> authed["Authenticated registered user"]
+    login --> authed
+    cookie["Remembered token auto login"] --> authed
+
+    authed --> explore
+    authed --> logout["Logout"]
+    authed --> user["Registered user capabilities"]
     user --> pet["AI pet chat and MBTI quiz"]
     user --> recharge["Recharge WonderCoin"]
     user --> order["Create order"]
@@ -162,32 +177,32 @@ erDiagram
 
     JOURNEYS {
         int id PK
-        string title NN
-        string slug UK NN
-        string fantasy_type NN
-        string visual_style NN
-        int adventure_index NN
-        int risk_level NN
-        int price NN
+        string title
+        string slug UK
+        string fantasy_type
+        string visual_style
+        int adventure_index
+        int risk_level
+        int price
     }
 
     USERS {
         int id PK
-        string username NN
-        string email UK NN
-        string password_hash NN
-        string role NN
-        int points NN
-        int balance NN
-        string gender NN
+        string username
+        string email UK
+        string password_hash
+        string role
+        int points
+        int balance
+        string gender
     }
 
     ORDERS {
         int id PK
-        string order_no UK NN
+        string order_no UK
         int user_id FK
-        string status NN
-        int total_amount NN
+        string status
+        int total_amount
         datetime paid_at
     }
 
@@ -195,23 +210,23 @@ erDiagram
         int id PK
         int order_id FK
         int journey_id FK
-        string journey_title NN
-        int unit_price NN
-        int quantity NN
+        string journey_title
+        int unit_price
+        int quantity
     }
 
     TRANSACTIONS {
         int id PK
         int user_id FK
         int order_id FK
-        string txn_type NN
-        int amount NN
-        int balance_after NN
+        string txn_type
+        int amount
+        int balance_after
     }
 
     ANALYTICS_EVENTS {
         int id PK
-        string event_type NN
+        string event_type
         string journey_slug
         int user_id FK
         string mbti_type
@@ -221,8 +236,8 @@ erDiagram
     AUDIT_LOGS {
         int id PK
         string request_id
-        string level NN
-        string source NN
+        string level
+        string source
         string path
         int status_code
     }
@@ -302,11 +317,11 @@ The URL printed by the script, for example http://127.0.0.1:18080/
 Create or promote an admin account server-side:
 
 ```bash
-ADMIN_PASSWORD='replace-with-a-long-secret' \
+ADMIN_PASSWORD='<set-via-env-or-secret-manager>' \
 go run ./cmd/admin-user \
   -db ./data/app.db \
-  -email admin@example.com \
-  -username admin
+  -email '<admin-email>' \
+  -username '<admin-username>'
 ```
 
 Generate deterministic demo data for dashboard review:
@@ -317,12 +332,7 @@ scripts/deploy/init-demo-data.sh ./data/demo.db
 
 The demo generator creates 50 ordinary users and 3 admin users with bcrypt password hashes, local GitHub-style default avatars, complete required profile fields, paid orders, wallet transactions, saved journeys, analytics events, and audit evidence. Usernames may repeat in product terms; ownership is bound to the server-side account identity, not displayed as an internal database ID.
 
-Demo accounts after initialization:
-
-| Role | Account |
-|---|---|
-| User | `user@100journeys.demo` / `TaoyuanUser12345` |
-| Admin | `admin@100journeys.demo` / `TaoyuanAdmin12345` |
+Demo accounts after initialization are printed by `scripts/deploy/init-demo-data.sh` and `scripts/deploy/local-one-click.sh`. For public submissions, provide current demo-only credentials separately and rotate or disable them after review.
 
 ## One-Click Local Deploy | 本地一键部署
 
@@ -391,12 +401,12 @@ Current evidence status | 当前证据状态:
 |---|---|
 | Go unit/integration | Passing: `go test ./...` |
 | Go vet | Passing: `go vet ./...` |
-| JS syntax | Passing: `node --check` over `web/js` |
-| Go stress target profile | Passing: `ok .../tests/stress 7.040s` |
-| k6 | Local Nginx baseline recorded; Tencent Cloud public-IP smoke passed within Nginx rate limit |
+| JS syntax | Passing: `node --check` over `web/js`, `e2e/tests`, and `tests/load` |
+| Go stress target profile | Passing: `ok .../tests/stress 1.660s` |
+| k6 | Local Nginx baseline recorded; post-fix smoke passed through one-click Nginx URL with trailing slash; Tencent Cloud public-IP smoke passed within Nginx rate limit |
 | Browser visual audit | Captured real desktop/mobile pages, profile, recharge, and admin dashboard screenshots from local Nginx |
 | Playwright | Passing: `29 passed` on 2026-05-14 |
-| Nginx/CDN | Local Nginx verified; Tencent Cloud Nginx reverse proxy deployed on `http://49.232.207.220/`; public API is rate-limited; HTTPS waits for filed domain |
+| Nginx/CDN | Local Nginx verified; Tencent Cloud Nginx reverse proxy deployed at `[DEMO_URL]`; public API is rate-limited; HTTPS waits for filed domain |
 | CI/CD | `.github/workflows/ci.yml` added; remote GitHub Actions result pending after push |
 
 ---
@@ -411,7 +421,7 @@ Deployment paths:
 
 | Path | Fit | Notes |
 |---|---|---|
-| Tencent Cloud CVM public IP | Current external demo | Go + SQLite + Nginx on `http://49.232.207.220/`; no domain filing required for IP demo |
+| Tencent Cloud CVM public IP | Current external demo | Go + SQLite + Nginx on `[DEMO_URL]`; no domain filing required for IP demo |
 | Tencent Cloud filed domain | Formal China mainland domain path | Requires ICP filing before domain points to mainland CVM |
 | Local/demo | Development proof | `go run`, SQLite file, local generated images |
 | Alibaba Cloud mainland ECS | Alternative China-access candidate after ICP | Requires ICP filing for formal mainland-domain service |
@@ -421,9 +431,9 @@ Deployment paths:
 | Vercel static asset preview | Possible for the dynamic Hash SPA shell only | Current Go + SQLite full stack is not Vercel-native without external API/storage redesign |
 | CDN/R2/OSS for images | Future media layer | Mirror public assets and use `CDN_BASE_URL` as a missing-local fallback or edge cache source |
 
-Current demo URL: `http://49.232.207.220/`
+Current demo URL: `[DEMO_URL]`
 
-Hidden admin route: `http://49.232.207.220/#/admin-login`
+Hidden admin route: `[DEMO_URL]/#/admin-login`
 
 Current choice: Tencent Cloud CVM public IP demo. Formal domain deployment waits for ICP filing and HTTPS certificate setup.
 
@@ -445,9 +455,11 @@ Operational docs:
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | Current product requirements derived from implemented behavior |
 | [`docs/INITIAL_PRD.md`](docs/INITIAL_PRD.md) | Initial assignment PRD and original requirement baseline |
+| [`docs/BDD-spec.md`](docs/BDD-spec.md) | Given/When/Then business behavior scenarios |
 | [`docs/schema/SDD-spec.md`](docs/schema/SDD-spec.md) | Schema/API-driven requirements baseline |
 | [`docs/ui-components/DDD-spec.md`](docs/ui-components/DDD-spec.md) | UI component/design description baseline |
 | [`docs/testing/TDD-spec.md`](docs/testing/TDD-spec.md) | Test plan and RED/GREEN evidence |
+| [`docs/SAMPLE_DATA.md`](docs/SAMPLE_DATA.md) | Seed data quality explanation and generated sample CSV pointers |
 | [`docs/ops/LOAD_TEST_RESULTS.md`](docs/ops/LOAD_TEST_RESULTS.md) | Nginx and k6 execution evidence |
 | [`docs/workflow/AI_DEVELOPMENT_WORKFLOW.md`](docs/workflow/AI_DEVELOPMENT_WORKFLOW.md) | Claude Code + Kimi API workflow explanation |
 | [`docs/workflow/DOCUMENTATION_EVOLUTION.md`](docs/workflow/DOCUMENTATION_EVOLUTION.md) | Documentation history and Git-stage evolution |
@@ -484,7 +496,7 @@ English: The submission email should include the source archive, documentation p
 
 | Item | Value |
 |---|---|
-| Email | `xulei@wisquest.com` |
+| Email | `xulei@bizguest.com` |
 | Subject | `【远程作业提交】姓名` |
 | Required attachments/links | ZIP source package, Markdown docs, `docs/prompts/prompt-log.md`, `docs/workflow/AI_DEVELOPMENT_WORKFLOW.md`, GitHub/Gitee link, demo URL |
 | Deadline | Within 72 hours after receiving the assignment |

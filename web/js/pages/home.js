@@ -9,6 +9,10 @@ Pages.Home = {
   _sceneTimer: null,
   _particleFrame: null,
   _particles: [],
+  _particleHero: null,
+  _resizeHandler: null,
+  _pointerMoveHandler: null,
+  _pointerLeaveHandler: null,
   _imageMap: {
     'bolivia-salt-flat-trek': '/static/assets/images/generated/card-salt-mirror.jpg',
     'iceland-lava-tunnel-cycling': '/static/assets/images/generated/card-lava-tunnel.jpg',
@@ -123,6 +127,19 @@ Pages.Home = {
       cancelAnimationFrame(this._particleFrame);
       this._particleFrame = null;
     }
+    if (this._resizeHandler) {
+      window.removeEventListener('resize', this._resizeHandler);
+      this._resizeHandler = null;
+    }
+    if (this._particleHero && this._pointerMoveHandler) {
+      this._particleHero.removeEventListener('pointermove', this._pointerMoveHandler);
+      this._pointerMoveHandler = null;
+    }
+    if (this._particleHero && this._pointerLeaveHandler) {
+      this._particleHero.removeEventListener('pointerleave', this._pointerLeaveHandler);
+      this._pointerLeaveHandler = null;
+    }
+    this._particleHero = null;
     this._particles = [];
   },
 
@@ -247,18 +264,22 @@ Pages.Home = {
       this._seedParticles(rect.width, rect.height);
     };
     resize();
-    window.addEventListener('resize', resize, { passive: true });
-    hero.addEventListener('pointermove', (e) => {
+    this._particleHero = hero;
+    this._resizeHandler = resize;
+    this._pointerMoveHandler = (e) => {
       const rect = hero.getBoundingClientRect();
       pointer.x = e.clientX - rect.left;
       pointer.y = e.clientY - rect.top;
       pointer.active = true;
-    }, { passive: true });
-    hero.addEventListener('pointerleave', () => {
+    };
+    this._pointerLeaveHandler = () => {
       pointer.active = false;
       pointer.x = -9999;
       pointer.y = -9999;
-    }, { passive: true });
+    };
+    window.addEventListener('resize', this._resizeHandler, { passive: true });
+    hero.addEventListener('pointermove', this._pointerMoveHandler, { passive: true });
+    hero.addEventListener('pointerleave', this._pointerLeaveHandler, { passive: true });
 
     const draw = () => {
       const rect = hero.getBoundingClientRect();
