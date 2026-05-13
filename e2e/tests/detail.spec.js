@@ -60,8 +60,7 @@ test.describe('Detail Page', () => {
     const shareBtn = page.locator('.detail-hero__btn--share');
     await shareBtn.click();
 
-    // Visual feedback (scale transform)
-    await expect(shareBtn).toHaveCSS('transform', /matrix/);
+    await expect(shareBtn).toHaveAttribute('data-copied', 'true');
   });
 
   // E2E-DETAIL-004: 404 page for non-existent journey
