@@ -12,4 +12,5 @@ type JourneyRepository interface {
 	List(ctx context.Context, filter model.JourneyFilter) ([]model.Journey, int, error)
 	GetBySlug(ctx context.Context, slug string) (*model.Journey, error)
 	ListTags(ctx context.Context) ([]model.Tag, error)
+	ListMBTITypes(ctx context.Context) ([]model.MBTIType, error)
 }
