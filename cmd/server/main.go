@@ -59,6 +59,7 @@ func main() {
 	engine := ai.NewRecommendEngine(repo)
 	h := handler.NewJourneyHandler(svc, aiProvider, engine)
 	authH := handler.NewAuthHandler(userRepo)
+	adminH := handler.NewAdminHandler(userRepo, repo)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -94,6 +95,9 @@ func main() {
 		{
 			auth.GET("/me", authH.Me)
 		}
+
+		// Admin (protected + admin role)
+		handler.AdminRoutes(api, adminH)
 	}
 
 	// SPA fallback: serve index.html for non-API, non-static routes

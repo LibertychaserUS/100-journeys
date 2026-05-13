@@ -16,6 +16,7 @@ const Nav = {
         <a href="#/" class="nav__logo">100种不可思议的旅行</a>
         <div class="nav__links" id="nav-links">
           <a href="#/explore" class="nav__link">探索</a>
+          <a href="#/profile" class="nav__link" id="nav-profile" style="display:none;">我的</a>
           <a href="#/login" class="nav__link" id="nav-login">登录</a>
           <a href="#/register" class="nav__link" id="nav-register">注册</a>
           <span class="nav__user" id="nav-user" style="display:none;"></span>
@@ -38,6 +39,7 @@ const Nav = {
   async updateAuth() {
     const loginLink = document.getElementById('nav-login');
     const registerLink = document.getElementById('nav-register');
+    const profileLink = document.getElementById('nav-profile');
     const userEl = document.getElementById('nav-user');
     const logoutBtn = document.getElementById('nav-logout');
     if (!loginLink) return;
@@ -45,6 +47,7 @@ const Nav = {
     if (API.isLoggedIn()) {
       loginLink.style.display = 'none';
       registerLink.style.display = 'none';
+      profileLink.style.display = '';
       logoutBtn.style.display = '';
 
       try {
@@ -58,6 +61,7 @@ const Nav = {
     } else {
       loginLink.style.display = '';
       registerLink.style.display = '';
+      profileLink.style.display = 'none';
       userEl.style.display = 'none';
       logoutBtn.style.display = 'none';
     }
