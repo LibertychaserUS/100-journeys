@@ -42,10 +42,10 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := repository.Migrate(db); err != nil {
+	if err := repository.Migrate(db, "db/schema.sql"); err != nil {
 		log.Fatalf("migrate db: %v", err)
 	}
-	if err := repository.Seed(db); err != nil {
+	if err := repository.Seed(db, "db/seed.sql"); err != nil {
 		log.Fatalf("seed db: %v", err)
 	}
 

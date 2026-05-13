@@ -122,23 +122,23 @@ VALUES
 -- Attach tags to journeys
 INSERT OR IGNORE INTO journey_tags (journey_id, tag_id)
 SELECT j.id, t.id FROM journeys j, tags t
-WHERE j.slug = 'bolivia-salt-flat-trek'     AND t.slug IN ('孤独感','视觉奇观','隐秘小众');
+WHERE j.slug = 'bolivia-salt-flat-trek'     AND t.slug IN ('solitude','visual','hidden');
 
 INSERT OR IGNORE INTO journey_tags (journey_id, tag_id)
 SELECT j.id, t.id FROM journeys j, tags t
-WHERE j.slug = 'iceland-lava-tunnel-cycling' AND t.slug IN ('极限挑战','隐秘小众','自然原始');
+WHERE j.slug = 'iceland-lava-tunnel-cycling' AND t.slug IN ('extreme','hidden','nature');
 
 INSERT OR IGNORE INTO journey_tags (journey_id, tag_id)
 SELECT j.id, t.id FROM journeys j, tags t
-WHERE j.slug = 'japan-onsen-temple-meditation' AND t.slug IN ('精神体验','文化沉浸','孤独感');
+WHERE j.slug = 'japan-onsen-temple-meditation' AND t.slug IN ('spiritual','culture','solitude');
 
 INSERT OR IGNORE INTO journey_tags (journey_id, tag_id)
 SELECT j.id, t.id FROM journeys j, tags t
-WHERE j.slug = 'morocco-sahara-camel-camp'  AND t.slug IN ('夜晚魔法','视觉奇观','自然原始');
+WHERE j.slug = 'morocco-sahara-camel-camp'  AND t.slug IN ('night','visual','nature');
 
 INSERT OR IGNORE INTO journey_tags (journey_id, tag_id)
 SELECT j.id, t.id FROM journeys j, tags t
-WHERE j.slug = 'greenland-dog-sled-solo'    AND t.slug IN ('极限挑战','孤独感','自然原始');
+WHERE j.slug = 'greenland-dog-sled-solo'    AND t.slug IN ('extreme','solitude','nature');
 
 -- Attach MBTI compatibilities to journeys
 -- Bolivia salt flat: INFP ★★★★★, ISFJ ★★★★☆, INFJ ★★★★☆

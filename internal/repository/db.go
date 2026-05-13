@@ -19,8 +19,8 @@ func NewDB(dbPath string) (*sql.DB, error) {
 	return db, nil
 }
 
-func Migrate(db *sql.DB) error {
-	schema, err := os.ReadFile("db/schema.sql")
+func Migrate(db *sql.DB, schemaPath string) error {
+	schema, err := os.ReadFile(schemaPath)
 	if err != nil {
 		return fmt.Errorf("read schema.sql: %w", err)
 	}
@@ -30,8 +30,8 @@ func Migrate(db *sql.DB) error {
 	return nil
 }
 
-func Seed(db *sql.DB) error {
-	seed, err := os.ReadFile("db/seed.sql")
+func Seed(db *sql.DB, seedPath string) error {
+	seed, err := os.ReadFile(seedPath)
 	if err != nil {
 		return fmt.Errorf("read seed.sql: %w", err)
 	}
