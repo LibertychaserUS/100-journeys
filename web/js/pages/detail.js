@@ -216,6 +216,10 @@ Pages.Detail = {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             收藏
           </button>
+          <div class="detail-auth-notice" id="detail-auth-notice" hidden>
+            请先登录后购买旅程。
+            <button type="button" id="detail-auth-login">去登录</button>
+          </div>
         </div>
       </article>
     `;
@@ -250,8 +254,12 @@ Pages.Detail = {
           navigator.clipboard.writeText(url).catch(() => {});
         }
         // Visual feedback
+        shareBtn.dataset.copied = 'true';
         shareBtn.style.transform = 'scale(1.15)';
-        setTimeout(() => (shareBtn.style.transform = ''), 200);
+        setTimeout(() => {
+          shareBtn.style.transform = '';
+          delete shareBtn.dataset.copied;
+        }, 1000);
       });
     }
 
@@ -259,6 +267,10 @@ Pages.Detail = {
     const buyBtn = document.getElementById('detail-cta-buy');
     if (buyBtn && !buyBtn.disabled) {
       buyBtn.addEventListener('click', async () => {
+        if (!API.isLoggedIn()) {
+          this._showLoginNotice();
+          return;
+        }
         try {
           const res = await API.createOrder([{ journey_slug: data.slug, quantity: 1 }]);
           const order = res.data || res;
@@ -266,11 +278,17 @@ Pages.Detail = {
           if (ok) {
             await API.payOrder(order.id);
             alert('支付成功！');
+            if (window.App && window.App.updateNav) window.App.updateNav();
           }
         } catch (err) {
           alert('下单失败: ' + (err.message || '请登录后再试'));
         }
       });
+    }
+
+    const loginBtn = document.getElementById('detail-auth-login');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => Router.navigate('#/login'));
     }
 
     // Save button
@@ -284,6 +302,14 @@ Pages.Detail = {
           : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>收藏`;
       });
     }
+  },
+
+  _showLoginNotice() {
+    const notice = document.getElementById('detail-auth-notice');
+    if (!notice) return;
+    notice.hidden = false;
+    notice.classList.add('is-visible');
+    notice.scrollIntoView({ behavior: 'smooth', block: 'center' });
   },
 
   _setupParallax() {

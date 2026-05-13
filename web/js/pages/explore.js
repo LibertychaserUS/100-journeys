@@ -371,7 +371,8 @@ Pages.Explore = {
         results.textContent = reset && journeys.length === 0 ? '' : `共 ${total} 个结果`;
       }
 
-      this._hasMore = journeys.length === 12;
+      const loadedCount = reset ? journeys.length : grid.querySelectorAll('.journey-card').length;
+      this._hasMore = loadedCount < total;
       if (loadMoreWrap) {
         if (!this._hasMore && journeys.length > 0) {
           loadMoreWrap.innerHTML = '<p class="explore-end">已到底部</p>';
