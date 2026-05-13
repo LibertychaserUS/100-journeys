@@ -21,8 +21,12 @@ const Router = (() => {
       return routes['/journey/:slug']?.(parts[1]);
     }
 
-    const handler = routes[path] || routes[root] || routes['/'];
-    handler?.();
+    const handler = routes[path] || routes[root];
+    if (handler) {
+      handler();
+    } else {
+      routes['/404']?.();
+    }
   }
 
   function navigate(path) {
@@ -45,3 +49,4 @@ Router.define('/register',        Pages.Register.render, Pages.Register);
 Router.define('/profile',         Pages.Profile.render, Pages.Profile);
 Router.define('/admin',           Pages.Admin.render,   Pages.Admin);
 Router.define('/recharge',        Pages.Recharge.render, Pages.Recharge);
+Router.define('/404',             Pages.NotFound.render, Pages.NotFound);

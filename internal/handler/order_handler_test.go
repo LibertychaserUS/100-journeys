@@ -13,13 +13,14 @@ import (
 	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
+	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"
 )
 
-func setupOrderPaymentTestRouter(t *testing.T) (*gin.Engine, *sql.DB, repository.UserRepository) {
+func setupOrderPaymentTestRouter(t *testing.T) (*gin.Engine, *sql.DB, repository.UserRepository, *service.CaptchaStore) {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 
@@ -34,10 +35,11 @@ func setupOrderPaymentTestRouter(t *testing.T) (*gin.Engine, *sql.DB, repository
 	journeyRepo := repository.NewJourneyRepository(db)
 	orderRepo := repository.NewOrderRepository(db)
 	txnRepo := repository.NewTransactionRepository(db)
+	captchaStore := service.NewCaptchaStore()
 
 	orderH := NewOrderHandler(orderRepo, journeyRepo, userRepo)
 	paymentH := NewPaymentHandler(userRepo, txnRepo)
-	authH := NewAuthHandler(userRepo)
+	authH := NewAuthHandler(userRepo, captchaStore)
 
 	r := gin.New()
 	api := r.Group("/api")
@@ -50,11 +52,12 @@ func setupOrderPaymentTestRouter(t *testing.T) (*gin.Engine, *sql.DB, repository
 		auth.GET("/me", authH.Me)
 	}
 
-	return r, db, userRepo
+	return r, db, userRepo, captchaStore
 }
 
-func registerAndGetToken(t *testing.T, r *gin.Engine) string {
-	body, _ := json.Marshal(model.RegisterRequest{Username: "testuser", Email: "test@example.com", Password: "password123"})
+func registerAndGetToken(t *testing.T, r *gin.Engine, captchaStore *service.CaptchaStore) string {
+	cid, _, ans := captchaStore.Generate()
+	body, _ := json.Marshal(model.RegisterRequest{Username: "testuser", Email: "test@example.com", Password: "password123", CaptchaID: cid, CaptchaAnswer: ans})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
@@ -75,8 +78,8 @@ func seedJourney(t *testing.T, db *sql.DB) int64 {
 
 // UT-HANDLER-PAYMENT-001: Recharge success
 func TestPaymentHandler_Recharge_Success(t *testing.T) {
-	r, _, _ := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, _, _, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 
 	body, _ := json.Marshal(model.RechargeRequest{Amount: 5000})
 	w := httptest.NewRecorder()
@@ -93,7 +96,7 @@ func TestPaymentHandler_Recharge_Success(t *testing.T) {
 
 // UT-HANDLER-PAYMENT-002: Recharge unauthorized
 func TestPaymentHandler_Recharge_Unauthorized(t *testing.T) {
-	r, _, _ := setupOrderPaymentTestRouter(t)
+	r, _, _, _ := setupOrderPaymentTestRouter(t)
 
 	body, _ := json.Marshal(model.RechargeRequest{Amount: 5000})
 	w := httptest.NewRecorder()
@@ -106,8 +109,8 @@ func TestPaymentHandler_Recharge_Unauthorized(t *testing.T) {
 
 // UT-HANDLER-PAYMENT-003: List transactions after recharge
 func TestPaymentHandler_Transactions_AfterRecharge(t *testing.T) {
-	r, _, _ := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, _, _, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 
 	// Recharge
 	body, _ := json.Marshal(model.RechargeRequest{Amount: 3000})
@@ -134,8 +137,8 @@ func TestPaymentHandler_Transactions_AfterRecharge(t *testing.T) {
 
 // UT-HANDLER-ORDER-001: Create order success
 func TestOrderHandler_Create_Success(t *testing.T) {
-	r, db, _ := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, db, _, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 	seedJourney(t, db)
 
 	body, _ := json.Marshal(model.CreateOrderRequest{
@@ -158,8 +161,8 @@ func TestOrderHandler_Create_Success(t *testing.T) {
 
 // UT-HANDLER-ORDER-002: Create order with discount (5000 points = Lv2 = 2% off)
 func TestOrderHandler_Create_WithDiscount(t *testing.T) {
-	r, db, _ := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, db, _, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 	seedJourney(t, db)
 
 	body, _ := json.Marshal(model.CreateOrderRequest{
@@ -181,8 +184,8 @@ func TestOrderHandler_Create_WithDiscount(t *testing.T) {
 
 // UT-HANDLER-ORDER-003: List orders
 func TestOrderHandler_List(t *testing.T) {
-	r, db, _ := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, db, _, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 	seedJourney(t, db)
 
 	for i := 0; i < 2; i++ {
@@ -211,8 +214,8 @@ func TestOrderHandler_List(t *testing.T) {
 
 // UT-HANDLER-ORDER-004: Pay order success
 func TestOrderHandler_Pay_Success(t *testing.T) {
-	r, db, userRepo := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, db, userRepo, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 	seedJourney(t, db)
 
 	// Recharge
@@ -259,8 +262,8 @@ func TestOrderHandler_Pay_Success(t *testing.T) {
 
 // UT-HANDLER-ORDER-005: Pay order insufficient balance
 func TestOrderHandler_Pay_InsufficientBalance(t *testing.T) {
-	r, db, _ := setupOrderPaymentTestRouter(t)
-	token := registerAndGetToken(t, r)
+	r, db, _, captchaStore := setupOrderPaymentTestRouter(t)
+	token := registerAndGetToken(t, r, captchaStore)
 	seedJourney(t, db)
 
 	// Create order without recharging

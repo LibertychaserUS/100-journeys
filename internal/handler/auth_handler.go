@@ -3,19 +3,22 @@ package handler
 import (
 	"net/http"
 
+	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
+	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
-	userRepo repository.UserRepository
+	userRepo      repository.UserRepository
+	captchaStore  *service.CaptchaStore
 }
 
-func NewAuthHandler(userRepo repository.UserRepository) *AuthHandler {
-	return &AuthHandler{userRepo: userRepo}
+func NewAuthHandler(userRepo repository.UserRepository, captchaStore *service.CaptchaStore) *AuthHandler {
+	return &AuthHandler{userRepo: userRepo, captchaStore: captchaStore}
 }
 
 // POST /api/auth/register
@@ -23,6 +26,12 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	var req model.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, newErrorEnvelope(err.Error()))
+		return
+	}
+
+	// Verify captcha
+	if !h.captchaStore.Verify(req.CaptchaID, req.CaptchaAnswer) {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope("验证码错误或已过期"))
 		return
 	}
 
@@ -62,6 +71,12 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	_ = h.userRepo.AddPoints(c.Request.Context(), user.ID, 5000, "register", "欢迎加入，注册奖励5000积分")
 	user.Points = 5000
 
+	eventbus.Default.Publish(eventbus.UserRegistered, map[string]interface{}{
+		"user_id":  user.ID,
+		"username": user.Username,
+		"email":    user.Email,
+	})
+
 	// Generate JWT
 	token, err := middleware.GenerateToken(user)
 	if err != nil {
@@ -81,6 +96,12 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var req model.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, newErrorEnvelope(err.Error()))
+		return
+	}
+
+	// Verify captcha
+	if !h.captchaStore.Verify(req.CaptchaID, req.CaptchaAnswer) {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope("验证码错误或已过期"))
 		return
 	}
 

@@ -31,15 +31,19 @@ func (u *User) IsAdmin() bool {
 
 // RegisterRequest holds incoming registration payload.
 type RegisterRequest struct {
-	Username string `json:"username" binding:"required,min=3,max=30"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Username      string `json:"username" binding:"required,min=3,max=30"`
+	Email         string `json:"email" binding:"required,email"`
+	Password      string `json:"password" binding:"required,min=6"`
+	CaptchaID     string `json:"captcha_id" binding:"required"`
+	CaptchaAnswer string `json:"captcha_answer" binding:"required"`
 }
 
 // LoginRequest holds incoming login payload.
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Email         string `json:"email" binding:"required,email"`
+	Password      string `json:"password" binding:"required"`
+	CaptchaID     string `json:"captcha_id" binding:"required"`
+	CaptchaAnswer string `json:"captcha_answer" binding:"required"`
 }
 
 // AuthResponse is returned on successful register/login.

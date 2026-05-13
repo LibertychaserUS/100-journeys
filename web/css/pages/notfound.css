@@ -1,0 +1,74 @@
+/* 404 Not Found page */
+
+.notfound-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.notfound-code {
+  font-family: var(--font-mono);
+  font-size: clamp(4rem, 12vw, 8rem);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent-primary);
+  line-height: 1;
+  margin-bottom: var(--space-4);
+  opacity: 0.8;
+}
+
+.notfound-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.notfound-desc {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+  max-width: 400px;
+}
+
+.notfound-actions {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.notfound-btn {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  text-decoration: none;
+}
+
+.notfound-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.notfound-btn--primary {
+  background: var(--color-accent-primary);
+  color: #0a0a0a;
+  border: none;
+}
+
+.notfound-btn--ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.notfound-btn--ghost:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}

@@ -11,6 +11,7 @@ import (
 	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
+	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,7 +19,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func setupAuthTestRouter(t *testing.T) (*gin.Engine, repository.UserRepository) {
+func setupAuthTestRouter(t *testing.T) (*gin.Engine, repository.UserRepository, *service.CaptchaStore) {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 
@@ -30,7 +31,8 @@ func setupAuthTestRouter(t *testing.T) (*gin.Engine, repository.UserRepository) 
 	require.NoError(t, repository.Migrate(db, filepath.Join(projectRoot, "db/schema.sql")))
 
 	userRepo := repository.NewUserRepository(db)
-	authH := NewAuthHandler(userRepo)
+	captchaStore := service.NewCaptchaStore()
+	authH := NewAuthHandler(userRepo, captchaStore)
 
 	r := gin.New()
 	api := r.Group("/api")
@@ -43,22 +45,28 @@ func setupAuthTestRouter(t *testing.T) (*gin.Engine, repository.UserRepository) 
 			auth.GET("/me", authH.Me)
 		}
 	}
-	return r, userRepo
+	return r, userRepo, captchaStore
 }
 
 func TestAuth_Register_Success(t *testing.T) {
-	r, _ := setupAuthTestRouter(t)
+	r, _, captchaStore := setupAuthTestRouter(t)
+	cid, _, answer := captchaStore.Generate()
 
 	body, _ := json.Marshal(model.RegisterRequest{
-		Username: "testuser",
-		Email:    "test@example.com",
-		Password: "password123",
+		Username:      "testuser",
+		Email:         "test@example.com",
+		Password:      "password123",
+		CaptchaID:     cid,
+		CaptchaAnswer: answer,
 	})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
+	if w.Code != http.StatusCreated {
+		t.Logf("Register response: %s", w.Body.String())
+	}
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	var resp map[string]interface{}
@@ -71,12 +79,15 @@ func TestAuth_Register_Success(t *testing.T) {
 }
 
 func TestAuth_Register_DuplicateEmail(t *testing.T) {
-	r, _ := setupAuthTestRouter(t)
+	r, _, captchaStore := setupAuthTestRouter(t)
+	cid1, _, ans1 := captchaStore.Generate()
 
 	body, _ := json.Marshal(model.RegisterRequest{
-		Username: "user1",
-		Email:    "dup@example.com",
-		Password: "password123",
+		Username:      "user1",
+		Email:         "dup@example.com",
+		Password:      "password123",
+		CaptchaID:     cid1,
+		CaptchaAnswer: ans1,
 	})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
@@ -85,10 +96,13 @@ func TestAuth_Register_DuplicateEmail(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	// Second registration with same email
+	cid2, _, ans2 := captchaStore.Generate()
 	body2, _ := json.Marshal(model.RegisterRequest{
-		Username: "user2",
-		Email:    "dup@example.com",
-		Password: "password123",
+		Username:      "user2",
+		Email:         "dup@example.com",
+		Password:      "password123",
+		CaptchaID:     cid2,
+		CaptchaAnswer: ans2,
 	})
 	w2 := httptest.NewRecorder()
 	req2, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body2))
@@ -99,12 +113,15 @@ func TestAuth_Register_DuplicateEmail(t *testing.T) {
 }
 
 func TestAuth_Register_ValidationError(t *testing.T) {
-	r, _ := setupAuthTestRouter(t)
+	r, _, captchaStore := setupAuthTestRouter(t)
+	cid, _, ans := captchaStore.Generate()
 
 	body, _ := json.Marshal(model.RegisterRequest{
-		Username: "ab", // too short
-		Email:    "not-an-email",
-		Password: "123", // too short
+		Username:      "ab", // too short
+		Email:         "not-an-email",
+		Password:      "123", // too short
+		CaptchaID:     cid,
+		CaptchaAnswer: ans,
 	})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
@@ -115,7 +132,7 @@ func TestAuth_Register_ValidationError(t *testing.T) {
 }
 
 func TestAuth_Login_Success(t *testing.T) {
-	r, userRepo := setupAuthTestRouter(t)
+	r, userRepo, captchaStore := setupAuthTestRouter(t)
 	ctx := t.Context()
 
 	// Create user manually
@@ -123,9 +140,12 @@ func TestAuth_Login_Success(t *testing.T) {
 	user := &model.User{Username: "loginuser", Email: "login@example.com", PasswordHash: string(hash), Role: model.RoleUser, Level: 1}
 	require.NoError(t, userRepo.Create(ctx, user))
 
+	cid, _, ans := captchaStore.Generate()
 	body, _ := json.Marshal(model.LoginRequest{
-		Email:    "login@example.com",
-		Password: "mypassword",
+		Email:         "login@example.com",
+		Password:      "mypassword",
+		CaptchaID:     cid,
+		CaptchaAnswer: ans,
 	})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewReader(body))
@@ -140,16 +160,19 @@ func TestAuth_Login_Success(t *testing.T) {
 }
 
 func TestAuth_Login_WrongPassword(t *testing.T) {
-	r, userRepo := setupAuthTestRouter(t)
+	r, userRepo, captchaStore := setupAuthTestRouter(t)
 	ctx := t.Context()
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte("correct"), bcrypt.DefaultCost)
 	user := &model.User{Username: "wrongpass", Email: "wrong@example.com", PasswordHash: string(hash), Role: model.RoleUser, Level: 1}
 	require.NoError(t, userRepo.Create(ctx, user))
 
+	cid, _, ans := captchaStore.Generate()
 	body, _ := json.Marshal(model.LoginRequest{
-		Email:    "wrong@example.com",
-		Password: "incorrect",
+		Email:         "wrong@example.com",
+		Password:      "incorrect",
+		CaptchaID:     cid,
+		CaptchaAnswer: ans,
 	})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewReader(body))
@@ -160,11 +183,14 @@ func TestAuth_Login_WrongPassword(t *testing.T) {
 }
 
 func TestAuth_Login_NonexistentUser(t *testing.T) {
-	r, _ := setupAuthTestRouter(t)
+	r, _, captchaStore := setupAuthTestRouter(t)
+	cid, _, ans := captchaStore.Generate()
 
 	body, _ := json.Marshal(model.LoginRequest{
-		Email:    "nobody@example.com",
-		Password: "password123",
+		Email:         "nobody@example.com",
+		Password:      "password123",
+		CaptchaID:     cid,
+		CaptchaAnswer: ans,
 	})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewReader(body))
@@ -175,7 +201,7 @@ func TestAuth_Login_NonexistentUser(t *testing.T) {
 }
 
 func TestAuth_Me_Success(t *testing.T) {
-	r, userRepo := setupAuthTestRouter(t)
+	r, userRepo, _ := setupAuthTestRouter(t)
 	ctx := t.Context()
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte("pass"), bcrypt.DefaultCost)
@@ -198,7 +224,7 @@ func TestAuth_Me_Success(t *testing.T) {
 }
 
 func TestAuth_Me_NoToken(t *testing.T) {
-	r, _ := setupAuthTestRouter(t)
+	r, _, _ := setupAuthTestRouter(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/auth/me", nil)
@@ -208,7 +234,7 @@ func TestAuth_Me_NoToken(t *testing.T) {
 }
 
 func TestAuth_Me_InvalidToken(t *testing.T) {
-	r, _ := setupAuthTestRouter(t)
+	r, _, _ := setupAuthTestRouter(t)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/auth/me", nil)

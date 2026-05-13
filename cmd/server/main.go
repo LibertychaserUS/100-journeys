@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/100-journeys/app/internal/ai"
+	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/handler"
 	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/repository"
@@ -50,6 +51,14 @@ func main() {
 		log.Fatalf("seed db: %v", err)
 	}
 
+	// Event bus subscribers
+	eventbus.Default.Subscribe(eventbus.UserRegistered, func(evt eventbus.Event) {
+		log.Printf("[Event] user registered: uid=%v username=%s", evt.Data["user_id"], evt.Data["username"])
+	})
+	eventbus.Default.Subscribe(eventbus.OrderPaid, func(evt eventbus.Event) {
+		log.Printf("[Event] order paid: oid=%v uid=%v amount=%v", evt.Data["order_id"], evt.Data["user_id"], evt.Data["total_amount"])
+	})
+
 	// Wire dependencies
 	repo := repository.NewJourneyRepository(db)
 	userRepo := repository.NewUserRepository(db)
@@ -59,11 +68,13 @@ func main() {
 	svc := service.NewJourneyService(repo, media)
 	aiProvider := ai.NewMockAI()
 	engine := ai.NewRecommendEngine(repo)
+	captchaStore := service.NewCaptchaStore()
 	h := handler.NewJourneyHandler(svc, aiProvider, engine)
-	authH := handler.NewAuthHandler(userRepo)
+	authH := handler.NewAuthHandler(userRepo, captchaStore)
 	adminH := handler.NewAdminHandler(userRepo, repo)
 	orderH := handler.NewOrderHandler(orderRepo, repo, userRepo)
 	paymentH := handler.NewPaymentHandler(userRepo, txnRepo)
+	captchaH := handler.NewCaptchaHandler(captchaStore)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -88,6 +99,9 @@ func main() {
 		api.GET("/mbti", h.ListMBTITypes)
 		api.POST("/ai/chat", h.AIChat)
 		api.GET("/health", h.Health)
+
+		// Captcha (public)
+		api.GET("/captcha", captchaH.Generate)
 
 		// Auth (public)
 		api.POST("/auth/register", authH.Register)

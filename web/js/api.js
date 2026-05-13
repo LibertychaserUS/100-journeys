@@ -43,6 +43,9 @@ const API = (() => {
     // Tags
     getTags: () => request('/tags'),
 
+    // Captcha
+    getCaptcha: () => request('/captcha'),
+
     // Auth
     register: (data) => authRequest('/auth/register', data),
     login: (data) => authRequest('/auth/login', data),

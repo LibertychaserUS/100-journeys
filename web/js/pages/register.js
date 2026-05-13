@@ -24,6 +24,15 @@ Pages.Register = {
               <label for="reg-password">密码</label>
               <input type="password" id="reg-password" required placeholder="至少6位字符" minlength="6" />
             </div>
+            <div class="auth-field captcha-field">
+              <label for="reg-captcha">验证码</label>
+              <div class="captcha-row">
+                <input type="text" id="reg-captcha" required placeholder="输入答案" />
+                <span class="captcha-question" id="reg-captcha-q">加载中...</span>
+                <button type="button" class="captcha-refresh" id="reg-captcha-refresh" title="换一题">↻</button>
+              </div>
+              <input type="hidden" id="reg-captcha-id" />
+            </div>
             <button type="submit" class="auth-submit">注册</button>
           </form>
 
@@ -38,6 +47,24 @@ Pages.Register = {
 
     const form = document.getElementById('register-form');
     const errorEl = document.getElementById('register-error');
+    const captchaIdEl = document.getElementById('reg-captcha-id');
+    const captchaQEl = document.getElementById('reg-captcha-q');
+    const captchaRefreshBtn = document.getElementById('reg-captcha-refresh');
+
+    async function loadCaptcha() {
+      try {
+        const res = await API.getCaptcha();
+        const data = res.data || res;
+        captchaIdEl.value = data.id;
+        captchaQEl.textContent = data.question;
+        document.getElementById('reg-captcha').value = '';
+      } catch (err) {
+        captchaQEl.textContent = '加载失败';
+      }
+    }
+
+    captchaRefreshBtn.addEventListener('click', loadCaptcha);
+    loadCaptcha();
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -46,9 +73,11 @@ Pages.Register = {
       const username = document.getElementById('reg-username').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-password').value;
+      const captchaId = captchaIdEl.value;
+      const captchaAnswer = document.getElementById('reg-captcha').value.trim();
 
       try {
-        const res = await API.register({ username, email, password });
+        const res = await API.register({ username, email, password, captcha_id: captchaId, captcha_answer: captchaAnswer });
         const data = res.data || res;
         if (data.token) {
           API.setToken(data.token);
@@ -57,6 +86,7 @@ Pages.Register = {
         }
       } catch (err) {
         errorEl.textContent = err.message || '注册失败，邮箱可能已被使用';
+        loadCaptcha();
       }
     });
   },

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/model"
 )
 
@@ -216,7 +217,16 @@ func (r *sqliteOrderRepo) Pay(ctx context.Context, orderID, userID int64) error 
 		return fmt.Errorf("mark paid: %w", err)
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	eventbus.Default.Publish(eventbus.OrderPaid, map[string]interface{}{
+		"order_id":     orderID,
+		"user_id":      userID,
+		"total_amount": total,
+	})
+	return nil
 }
 
 func (r *sqliteOrderRepo) listItems(ctx context.Context, orderID int64) ([]model.OrderItem, error) {
