@@ -109,7 +109,8 @@ if [[ ! -f "go.sum" ]] || [[ "go.mod" -nt "go.sum" ]]; then
     go mod tidy
 fi
 # 预下载依赖，避免首次启动慢
-if [[ ! -d "$GOPATH/pkg/mod" ]] 2>/dev/null; then
+_GO_MOD_CACHE=$(go env GOPATH 2>/dev/null || echo "$HOME/go")
+if [[ ! -d "$_GO_MOD_CACHE/pkg/mod" ]]; then
     go mod download 2>/dev/null || true
 fi
 echo -e "${G}  依赖就绪${NC}"
