@@ -242,6 +242,20 @@
   border-color: var(--color-accent-primary);
 }
 
+/* Journey links inside chat */
+.ai-pet__journey-link {
+  display: inline-block;
+  color: var(--color-accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin: 2px 0;
+  transition: opacity var(--transition-fast);
+}
+
+.ai-pet__journey-link:hover {
+  opacity: 0.8;
+}
+
 /* Quiz options */
 .ai-pet__quiz-options {
   display: flex;

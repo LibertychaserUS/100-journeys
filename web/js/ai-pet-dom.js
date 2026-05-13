@@ -215,8 +215,30 @@
       API.getJourneys({ limit: 3 }).then(data => {
         const journeys = data.data || [];
         if (journeys.length > 0) {
-          const names = journeys.map(j => `「${j.title}」`).join('、');
-          addPetMessage(`为你找到了这些不可思议的旅行：${names} ✨ 点击卡片可以查看详情哦！`);
+          const msgs = document.getElementById('ai-pet-messages');
+          if (msgs) {
+            const div = document.createElement('div');
+            div.className = 'ai-pet__msg ai-pet__msg--pet';
+            let html = '为你找到了这些不可思议的旅行：✨<br>';
+            journeys.forEach(j => {
+              html += `<a href="#/journey/${encodeURIComponent(j.slug)}" class="ai-pet__journey-link" data-slug="${escapeHtml(j.slug)}">「${escapeHtml(j.title)}」</a><br>`;
+            });
+            html += '<br>点击名称查看详情哦！';
+            div.innerHTML = html;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+
+            // Bind router navigation
+            div.querySelectorAll('.ai-pet__journey-link').forEach(link => {
+              link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const slug = link.dataset.slug;
+                if (slug) Router.navigate(`#/journey/${encodeURIComponent(slug)}`);
+              });
+            });
+          }
+        } else {
+          addPetMessage('抱歉，暂时没有符合条件的旅行推荐... 换个条件试试？😅');
         }
       }).catch(() => {
         addPetMessage('哎呀，网络有点问题... 等下再试试好吗？😅');
