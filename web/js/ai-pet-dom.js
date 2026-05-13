@@ -238,10 +238,10 @@
             });
           }
         } else {
-          addPetMessage('抱歉，暂时没有符合条件的旅行推荐... 换个条件试试？😅');
+          addPetMessage('抱歉，暂时没有符合条件的旅行推荐... 换个条件试试？');
         }
       }).catch(() => {
-        addPetMessage('哎呀，网络有点问题... 等下再试试好吗？😅');
+        addPetMessage('哎呀，网络有点问题... 等下再试试好吗？');
       });
     } else if (action.action === 'mbti_quiz' || action.type === 'mbti_quiz') {
       startQuiz();

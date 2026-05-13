@@ -154,7 +154,7 @@ const AIPet = (() => {
     }
 
     return {
-      text: `嗯... 我不太确定你在说什么呢 😅 你可以试试跟我说 "推荐旅行"、"性格测试" 或者 "你好"~`,
+      text: `嗯... 我不太确定你在说什么呢 🌙 你可以试试跟我说 "推荐旅行"、"性格测试" 或者 "你好"~`,
       actions: [
         { type: 'button', label: '推荐旅行', action: 'recommend' },
         { type: 'button', label: '性格测试', action: 'mbti_quiz' },
