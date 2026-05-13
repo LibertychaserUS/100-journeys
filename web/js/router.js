@@ -25,7 +25,7 @@ const Router = (() => {
     if (handler) {
       handler();
     } else {
-      routes['/404']?.();
+      Pages.Error.render(500, '你寻找的旅程不在地图上，也许它正在某个未知的角落等待被发现。');
     }
   }
 
@@ -49,4 +49,3 @@ Router.define('/register',        Pages.Register.render, Pages.Register);
 Router.define('/profile',         Pages.Profile.render, Pages.Profile);
 Router.define('/admin',           Pages.Admin.render,   Pages.Admin);
 Router.define('/recharge',        Pages.Recharge.render, Pages.Recharge);
-Router.define('/404',             Pages.NotFound.render, Pages.NotFound);

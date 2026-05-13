@@ -7,15 +7,28 @@ const API = (() => {
   const base = () => window.APP_CONFIG.apiBase;
 
   async function request(path, options = {}) {
-    const res = await fetch(`${base()}${path}`, {
-      headers: { 'Content-Type': 'application/json', ...options.headers },
-      ...options,
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ message: res.statusText }));
-      throw new Error(err.message || `HTTP ${res.status}`);
+    try {
+      const res = await fetch(`${base()}${path}`, {
+        headers: { 'Content-Type': 'application/json', ...options.headers },
+        ...options,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: res.statusText }));
+        const e = new Error(err.message || `HTTP ${res.status}`);
+        e.status = res.status;
+        throw e;
+      }
+      return res.json();
+    } catch (err) {
+      if (err.name === 'TypeError' || err.message.includes('fetch') || err.message.includes('Failed')) {
+        Pages.Error?.render(0, '网络断开，无法连接到服务器。');
+      } else if (err.status === 403) {
+        Pages.Error?.render(403);
+      } else if (err.status === 503) {
+        Pages.Error?.render(503);
+      }
+      throw err;
     }
-    return res.json();
   }
 
   // Auth helpers

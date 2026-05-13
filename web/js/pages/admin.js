@@ -1,9 +1,31 @@
 var Pages = window.Pages || {};
 
 Pages.Admin = {
-  render() {
+  async render() {
     const main = document.getElementById('main-content');
     if (!main) return;
+
+    // Guard: must be logged in
+    if (!API.isLoggedIn()) {
+      Router.navigate('#/login');
+      return;
+    }
+
+    // Guard: must be admin
+    let isAdmin = false;
+    try {
+      const res = await API.me();
+      const user = res.data || res;
+      isAdmin = user.role === 'admin';
+    } catch {
+      Router.navigate('#/login');
+      return;
+    }
+
+    if (!isAdmin) {
+      Pages.Error.render(403);
+      return;
+    }
 
     main.innerHTML = `
       <section class="admin-page">
@@ -33,17 +55,24 @@ Pages.Admin = {
 
   async _loadStats() {
     try {
+      const res = await API.me();
+      const user = res.data || res;
+      if (user.role !== 'admin') {
+        Pages.Error.render(403);
+        return;
+      }
       const token = API.getToken();
-      const res = await fetch(`${window.APP_CONFIG.apiBase}/admin/stats`, {
+      const statsRes = await fetch(`${window.APP_CONFIG.apiBase}/admin/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
+      const data = await statsRes.json();
       const stats = data.data || {};
       document.getElementById('admin-stat-users').textContent = stats.total_users ?? '—';
       document.getElementById('admin-stat-journeys').textContent = stats.total_journeys ?? '—';
       document.getElementById('admin-stat-points').textContent = stats.total_points ?? '—';
     } catch (err) {
       console.error('Admin stats load failed:', err);
+      Pages.Error.fromError(err);
     }
   },
 };

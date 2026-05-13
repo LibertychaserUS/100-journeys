@@ -12,6 +12,10 @@ Pages.Recharge = {
   ],
 
   render() {
+    if (!API.isLoggedIn()) {
+      Router.navigate('#/login');
+      return;
+    }
     const main = document.getElementById('main-content');
     if (!main) return;
 

@@ -17,6 +17,7 @@ const Nav = {
         <div class="nav__links" id="nav-links">
           <a href="#/explore" class="nav__link">探索</a>
           <a href="#/profile" class="nav__link" id="nav-profile" style="display:none;">我的</a>
+          <a href="#/admin" class="nav__link" id="nav-admin" style="display:none;">管理</a>
           <a href="#/login" class="nav__link" id="nav-login">登录</a>
           <a href="#/register" class="nav__link" id="nav-register">注册</a>
           <span class="nav__user" id="nav-user" style="display:none;"></span>
@@ -40,9 +41,13 @@ const Nav = {
     const loginLink = document.getElementById('nav-login');
     const registerLink = document.getElementById('nav-register');
     const profileLink = document.getElementById('nav-profile');
+    const adminLink = document.getElementById('nav-admin');
     const userEl = document.getElementById('nav-user');
     const logoutBtn = document.getElementById('nav-logout');
     if (!loginLink) return;
+
+    // Reset
+    adminLink.style.display = 'none';
 
     if (API.isLoggedIn()) {
       loginLink.style.display = 'none';
@@ -55,6 +60,9 @@ const Nav = {
         const user = res.data || res;
         userEl.style.display = '';
         userEl.textContent = (user.username || user.email) + ' · ' + (user.balance ?? 0).toLocaleString() + '币';
+        if (user.role === 'admin') {
+          adminLink.style.display = '';
+        }
       } catch {
         userEl.style.display = 'none';
       }
