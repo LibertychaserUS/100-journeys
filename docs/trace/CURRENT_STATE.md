@@ -4,27 +4,38 @@
 ---
 
 ## Phase
-**Phase 0 — Skeleton**
-**Git tag**: `v0.0.0-skeleton`
-**Checkpoint**: `checkpoints/CP-000-skeleton.md`
-**Date**: 2025-01-01
+**Phase 2 — DDD (Design-Driven Development)**
+**Git tag**: `v0.2.0-ddd`
+**Checkpoint**: `checkpoints/CP-DDD-001.md`
+**Date**: 2026-05-13
 
 ## Build Status
-| Item               | Status  |
-|--------------------|---------|
-| Go module init     | ⏳ Pending (Go not yet installed) |
-| Frontend scaffold  | ✅      |
-| DB schema          | ✅      |
-| Seed data          | ✅      |
-| API contract draft | ✅      |
-| Git initialized    | ✅      |
+| Item | Status |
+|------|--------|
+| Go backend | ✅ `go build ./cmd/server/` passes |
+| Frontend (Home) | ✅ |
+| Frontend (Explore) | ✅ |
+| Frontend (Detail) | ✅ |
+| AI Pet | ✅ |
+| DB schema + seed | ✅ |
+| API contract | ✅ |
+| Git tags | `v0.0.0-skeleton`, `v0.1.0-sdd`, `v0.2.0-ddd` |
+
+## Worktree Branches
+| Directory | Branch | Purpose |
+|-----------|--------|---------|
+| `100-journeys/` | `main` | MVP 版本推进 |
+| `.worktrees/frontend-dev/` | `frontend-dev` | 前端开发 |
+| `.worktrees/backend-dev/` | `backend-dev` | 后端开发 |
+| `.worktrees/sql-dev/` | `sql-dev` | 数据库/schema |
+| `.worktrees/doc-trace/` | `doc-trace` | 文档/trace |
 
 ## Active Blockers
-- Go not installed on machine → run `brew install go` then `go mod init`
+- None
 
 ## Next Action
-Start **Phase 1 — SDD**:
-1. Install Go + run `go mod tidy`
-2. Implement SQLite repository
-3. Wire up Gin handlers
-4. Validate API contract against live server
+Start **Phase 3 — TDD**:
+1. Write `docs/testing/TDD-spec.md` — test plan (ISO/IEC/IEEE 29119-3)
+2. Unit tests: `tests/unit/` — repository + service
+3. Integration tests: `tests/integration/` — httptest for all API endpoints
+4. Run `go test ./...` and ensure all pass

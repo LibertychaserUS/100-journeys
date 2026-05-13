@@ -55,3 +55,62 @@
 
 #### Next
 - Phase 1: SDD — finalize API contract, data models, Go module init, repo impl
+
+---
+
+## Phase 1 — SDD | 2026-05-12
+
+**Git tag**: `v0.1.0-sdd`
+**Checkpoint**: `checkpoints/CP-SDD-001.md`
+**Agent**: Main + Sub:backend
+**Status**: Complete
+
+#### Done
+- Go 1.26 installed, module initialized (`go mod init github.com/100-journeys/app`)
+- Dependencies: `gin-gonic/gin`, `gin-contrib/cors`, `modernc.org/sqlite`
+- Database schema v1.1: journeys + tags + journey_tags + mbti_types + journey_mbti + ai_logs
+- New fields: story_hook, fantasy_type, risk_level, mood_keywords, booking_url
+- SQLite repository: parameterized queries, filtering by tag/visual_style/fantasy_type/adventure/obscurity/MBTI
+- Service layer: MediaProvider interface (CDN-ready), JourneyService
+- Gin handlers: 7 API endpoints with standard envelope `{ data, error, total?, page?, limit? }`
+- CORS configured, static files served, SPA fallback with APP_CONFIG injection
+- `db/seed.sql`: 5 journeys, 8 tags, 16 MBTI types, compatibility associations
+- `docs/schema/SDD-spec.md` + `api-contract.md` finalized
+
+#### Decisions
+- `modernc.org/sqlite` confirmed as pure Go (no CGO), builds cleanly
+- `//go:embed` replaced with `os.ReadFile` for schema/seed loading (path resolution issue)
+- HTTPS push via `gh auth setup-git` (SSH deploy key not available)
+- Worktrees: main + frontend-dev + backend-dev + sql-dev + doc-trace
+
+#### Next
+- Phase 2: DDD — UI/UX implementation, AI Pet, responsive pages
+
+---
+
+## Phase 2 — DDD | 2026-05-13
+
+**Git tag**: `v0.2.0-ddd`
+**Checkpoint**: `checkpoints/CP-DDD-001.md`
+**Agent**: Main + Sub:frontend
+**Status**: Complete
+
+#### Done
+- **Home page**: hero (100vh, fade-up animation), MBTI teaser scroll, featured 6-card grid with staggered entrance
+- **Explore page**: search bar (300ms debounce), filter chips (fantasy_type, visual_style), adventure slider (1-10), masonry card grid, pagination, skeleton loading
+- **Detail page**: full-bleed hero (40vh) with parallax, gradient overlay, back/share buttons, fantasy type badge, story hook quote, meta row (region/duration/cost), tags + MBTI chips with compatibility scores, mood keywords, story text with visual_style typography overrides, clue reveal (IntersectionObserver blur→clear), booking CTA, save toggle
+- **AI Pet**: 8-bit pixel art CSS avatar (dog/cat), localStorage profile, weighted MBTI quiz (5 questions, all 4 dimensions scored per option), rule-based mock AI engine, chat panel, setup modal, idle trigger (10s / 3 page views)
+- **Router**: hash-based SPA — `/`, `/explore`, `/journey/:slug`
+- **CSS layer order**: tokens → global → layout → components → pages
+- **Animations**: only transform/opacity, cubic-bezier easing, 60fps target
+- **Responsive**: 375px → 768px → 1024px → 1280px breakpoints
+- **Worktree branches**: all 5 branches rebased to latest main, pushed to origin
+
+#### Decisions
+- Vanilla JS — zero bundle size, no framework lock-in
+- Skeleton loading instead of spinner for perceived performance
+- MBTI tie-breaker defaults to I/N/F/P (traveler bias)
+- All SVG icons inline (no external dependencies)
+
+#### Next
+- Phase 3: TDD — unit tests (repository + service), integration tests (httptest), test plan documentation
