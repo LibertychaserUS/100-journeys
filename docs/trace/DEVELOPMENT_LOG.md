@@ -114,3 +114,30 @@
 
 #### Next
 - Phase 3: TDD — unit tests (repository + service), integration tests (httptest), test plan documentation
+
+---
+
+## Phase 3 — TDD | 2026-05-13
+
+**Git tag**: `v0.3.0-tdd`
+**Checkpoint**: `checkpoints/CP-TDD-001.md`
+**Agent**: Main
+**Status**: Complete
+
+#### Done
+- `docs/testing/TDD-spec.md` updated — ISO/IEC/IEEE 29119-3 test plan with 43 test cases
+- Repository tests (11): List filters (tag, visual_style, fantasy_type, adventure range, MBTI), pagination, GetBySlug exists/not-found, ListTags, ListMBTITypes
+- Service tests (9): default pagination, image URL resolution, GetJourney exists/not-found/error, ListTags, ListMBTITypes, GetBookingInfo
+- AI tests (10): mock chat (recommend, MBTI, greeting, risk, fallback), recommend engine (MBTI scoring, keyword matching, fallback, limit, no-match)
+- Handler integration tests (13): all 7 API endpoints × happy path + error cases
+- Coverage: repository 84.2%, service 83.3%, ai 84.0%, handler 78.6% — all meet targets
+- Bug found + fixed: seed.sql journey_tags used Chinese names instead of English slugs
+- Bug found + fixed: db.Migrate/Seed hardcoded paths — changed to accept parameters
+
+#### Decisions
+- Hand-rolled mocks (no external mock library) to minimize dependencies
+- Fresh `:memory:` DB per test — zero pollution, parallel-safe
+- `gin.TestMode()` for silent handler tests
+
+#### Next
+- Phase 4: E2E — Playwright browser automation for core user flows

@@ -4,22 +4,29 @@
 ---
 
 ## Phase
-**Phase 2 — DDD (Design-Driven Development)**
-**Git tag**: `v0.2.0-ddd`
-**Checkpoint**: `checkpoints/CP-DDD-001.md`
+**Phase 3 — TDD (Test-Driven Development)**
+**Git tag**: `v0.3.0-tdd`
+**Checkpoint**: `checkpoints/CP-TDD-001.md`
 **Date**: 2026-05-13
 
 ## Build Status
 | Item | Status |
 |------|--------|
 | Go backend | ✅ `go build ./cmd/server/` passes |
-| Frontend (Home) | ✅ |
-| Frontend (Explore) | ✅ |
-| Frontend (Detail) | ✅ |
+| Go tests | ✅ `go test ./...` — 43 tests, all green |
+| Coverage | ✅ All packages meet targets |
+| Frontend (Home/Explore/Detail) | ✅ |
 | AI Pet | ✅ |
 | DB schema + seed | ✅ |
-| API contract | ✅ |
-| Git tags | `v0.0.0-skeleton`, `v0.1.0-sdd`, `v0.2.0-ddd` |
+| Git tags | `v0.0.0-skeleton`, `v0.1.0-sdd`, `v0.2.0-ddd`, `v0.3.0-tdd` |
+
+## Coverage Report
+| Package | Coverage | Target |
+|---------|----------|--------|
+| `internal/repository` | 84.2% | ≥ 80% ✅ |
+| `internal/service` | 83.3% | ≥ 80% ✅ |
+| `internal/ai` | 84.0% | ≥ 80% ✅ |
+| `internal/handler` | 78.6% | ≥ 70% ✅ |
 
 ## Worktree Branches
 | Directory | Branch | Purpose |
@@ -34,8 +41,7 @@
 - None
 
 ## Next Action
-Start **Phase 3 — TDD**:
-1. Write `docs/testing/TDD-spec.md` — test plan (ISO/IEC/IEEE 29119-3)
-2. Unit tests: `tests/unit/` — repository + service
-3. Integration tests: `tests/integration/` — httptest for all API endpoints
-4. Run `go test ./...` and ensure all pass
+Start **Phase 4 — E2E**:
+1. Install Playwright (`npm init -y && npx playwright install`)
+2. Write E2E tests for 3 core user flows
+3. Run E2E tests and verify all pass
