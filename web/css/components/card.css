@@ -1,1 +1,137 @@
-/* Journey Card — populated in DDD phase */
+/* Journey Card */
+
+.journey-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  will-change: transform;
+}
+
+.journey-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-glow);
+}
+
+.journey-card__image-wrap {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+.journey-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s var(--ease-standard);
+}
+
+.journey-card:hover .journey-card__image {
+  transform: scale(1.06);
+}
+
+.journey-card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-4);
+  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+}
+
+.journey-card__tags {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.journey-card__tag {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: var(--weight-medium);
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+}
+
+.journey-card__tag--fantasy {
+  color: var(--color-accent-primary);
+  border: 1px solid rgba(232, 213, 163, 0.3);
+}
+
+.journey-card__tag--mbti {
+  color: #c4a7e7;
+  border: 1px solid rgba(196, 167, 231, 0.3);
+}
+
+.journey-card__body {
+  padding: var(--space-4);
+}
+
+.journey-card__title {
+  font-family: var(--card-title-font);
+  font-size: var(--card-title-size);
+  font-weight: var(--card-title-weight);
+  letter-spacing: var(--card-title-tracking);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+  line-height: var(--leading-tight);
+}
+
+.journey-card__hook {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  line-height: var(--leading-normal);
+}
+
+.journey-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.journey-card__difficulty {
+  font-size: 0.75rem;
+  color: var(--color-accent-primary);
+  letter-spacing: 0.05em;
+}
+
+.journey-card__cta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.journey-card:hover .journey-card__cta {
+  color: var(--color-accent-primary);
+}
+
+/* Skeleton loading */
+.journey-card--skeleton .journey-card__image-wrap {
+  background: var(--color-bg-secondary);
+}
+
+.journey-card--skeleton .journey-card__image {
+  display: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.journey-card--skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-card) 25%,
+    var(--color-bg-secondary) 50%,
+    var(--color-bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}

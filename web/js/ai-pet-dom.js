@@ -1,0 +1,334 @@
+/**
+ * AI Pet DOM Controller
+ * Renders floating widget, setup modal, chat panel, MBTI quiz
+ * Handles triggers: idle 10s, 3 page views
+ */
+
+(function() {
+  const container = document.getElementById('ai-pet');
+  if (!container) return;
+
+  let profile = AIPet.getProfile();
+  let chatOpen = false;
+  let pageViewCount = 0;
+  let idleTimer = null;
+  let quizAnswers = [];
+  let quizStep = 0;
+
+  // ── Render ──
+  function render() {
+    container.innerHTML = `
+      ${renderSetup()}
+      ${renderChat()}
+      ${renderAvatar()}
+    `;
+    bindEvents();
+    if (profile.firstVisit) {
+      openSetup();
+    }
+  }
+
+  function renderSetup() {
+    return `
+      <div class="ai-pet__setup" id="ai-pet-setup">
+        <div class="ai-pet__setup-card">
+          <div class="ai-pet__setup-title">✨ 领养你的旅行向导</div>
+          <div class="ai-pet__setup-subtitle">选择一只可爱的像素宠物，陪你发现不可思议的旅行</div>
+          <div class="ai-pet__type-select">
+            <div class="ai-pet__type-option" data-type="dog">
+              <div class="ai-pet__type-icon">🐕</div>
+              <div class="ai-pet__type-label">小狗</div>
+            </div>
+            <div class="ai-pet__type-option" data-type="cat">
+              <div class="ai-pet__type-icon">🐈</div>
+              <div class="ai-pet__type-label">小猫</div>
+            </div>
+          </div>
+          <input type="text" class="ai-pet__name-input" id="ai-pet-name" placeholder="给它取个名字..." maxlength="10" value="小旅">
+          <button class="ai-pet__setup-btn" id="ai-pet-setup-btn">开始旅行 ✨</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAvatar() {
+    return `
+      <div class="ai-pet__avatar ${chatOpen ? '' : 'ai-pet__avatar--bounce'}" id="ai-pet-avatar">
+        <div class="ai-pet__ears">
+          <div class="ai-pet__ear ai-pet__ear--left"></div>
+          <div class="ai-pet__ear ai-pet__ear--right"></div>
+        </div>
+        <div class="ai-pet__face">
+          <div class="ai-pet__mouth"></div>
+        </div>
+        ${profile.firstVisit ? '<div class="ai-pet__notify">!</div>' : ''}
+      </div>
+    `;
+  }
+
+  function renderChat() {
+    return `
+      <div class="ai-pet__chat ${chatOpen ? 'ai-pet__chat--open' : ''}" id="ai-pet-chat">
+        <div class="ai-pet__header">
+          <div class="ai-pet__header-avatar">
+            <div class="ai-pet__face"><div class="ai-pet__mouth"></div></div>
+          </div>
+          <div>
+            <div class="ai-pet__header-name">${profile.name || '小旅'}</div>
+            <div class="ai-pet__header-status">在线</div>
+          </div>
+          <div class="ai-pet__close" id="ai-pet-close">✕</div>
+        </div>
+        <div class="ai-pet__messages" id="ai-pet-messages"></div>
+        <div class="ai-pet__input-area">
+          <input type="text" class="ai-pet__input" id="ai-pet-input" placeholder="和${profile.name || '小旅'}聊聊...">
+          <button class="ai-pet__send" id="ai-pet-send">发送</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Event Binding ──
+  function bindEvents() {
+    const avatar = document.getElementById('ai-pet-avatar');
+    const close = document.getElementById('ai-pet-close');
+    const send = document.getElementById('ai-pet-send');
+    const input = document.getElementById('ai-pet-input');
+    const setupBtn = document.getElementById('ai-pet-setup-btn');
+
+    if (avatar) avatar.addEventListener('click', toggleChat);
+    if (close) close.addEventListener('click', closeChat);
+    if (send) send.addEventListener('click', sendMessage);
+    if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+    if (setupBtn) setupBtn.addEventListener('click', completeSetup);
+
+    // Type selection
+    document.querySelectorAll('.ai-pet__type-option').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.ai-pet__type-option').forEach(o => o.classList.remove('ai-pet__type-option--selected'));
+        el.classList.add('ai-pet__type-option--selected');
+        el.dataset.selected = 'true';
+      });
+    });
+  }
+
+  // ── Setup ──
+  function openSetup() {
+    const modal = document.getElementById('ai-pet-setup');
+    if (modal) modal.classList.add('ai-pet__setup--open');
+  }
+
+  function closeSetup() {
+    const modal = document.getElementById('ai-pet-setup');
+    if (modal) modal.classList.remove('ai-pet__setup--open');
+  }
+
+  function completeSetup() {
+    const nameInput = document.getElementById('ai-pet-name');
+    const selectedType = document.querySelector('.ai-pet__type-option--selected');
+    const type = selectedType ? selectedType.dataset.type : 'dog';
+    const name = nameInput ? nameInput.value.trim() : '小旅';
+
+    profile = { ...profile, name: name || '小旅', type, firstVisit: false };
+    AIPet.saveProfile(profile);
+    closeSetup();
+    render();
+    openChat();
+    addPetMessage(`嗨~ 我是${profile.name}！🎉 以后我会陪你发现不可思议的旅行~ 你想先做个性格测试，还是让我直接推荐？`);
+  }
+
+  // ── Chat ──
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    const chat = document.getElementById('ai-pet-chat');
+    const avatar = document.getElementById('ai-pet-avatar');
+    if (chat) chat.classList.toggle('ai-pet__chat--open', chatOpen);
+    if (avatar) avatar.classList.toggle('ai-pet__avatar--bounce', !chatOpen);
+  }
+
+  function openChat() {
+    chatOpen = true;
+    const chat = document.getElementById('ai-pet-chat');
+    const avatar = document.getElementById('ai-pet-avatar');
+    if (chat) chat.classList.add('ai-pet__chat--open');
+    if (avatar) avatar.classList.remove('ai-pet__avatar--bounce');
+  }
+
+  function closeChat() {
+    chatOpen = false;
+    const chat = document.getElementById('ai-pet-chat');
+    const avatar = document.getElementById('ai-pet-avatar');
+    if (chat) chat.classList.remove('ai-pet__chat--open');
+    if (avatar) avatar.classList.add('ai-pet__avatar--bounce');
+  }
+
+  function addUserMessage(text) {
+    const msgs = document.getElementById('ai-pet-messages');
+    if (!msgs) return;
+    const div = document.createElement('div');
+    div.className = 'ai-pet__msg ai-pet__msg--user';
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function addPetMessage(text, actions = []) {
+    const msgs = document.getElementById('ai-pet-messages');
+    if (!msgs) return;
+    const div = document.createElement('div');
+    div.className = 'ai-pet__msg ai-pet__msg--pet';
+    div.innerHTML = escapeHtml(text);
+    if (actions && actions.length > 0) {
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'ai-pet__actions';
+      actions.forEach(a => {
+        const btn = document.createElement('button');
+        btn.className = 'ai-pet__action-btn';
+        btn.textContent = a.label;
+        btn.addEventListener('click', () => handleAction(a));
+        actionsDiv.appendChild(btn);
+      });
+      div.appendChild(actionsDiv);
+    }
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('ai-pet-input');
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addUserMessage(text);
+
+    const result = AIPet.generateReply(text, profile);
+    setTimeout(() => {
+      addPetMessage(result.text, result.actions);
+    }, 400 + Math.random() * 300);
+  }
+
+  function handleAction(action) {
+    if (action.action === 'recommend' || action.type === 'recommend') {
+      addPetMessage('让我为你找找... 🔍', []);
+      // Trigger recommendation API
+      API.getJourneys({ limit: 3 }).then(data => {
+        const journeys = data.data || [];
+        if (journeys.length > 0) {
+          const names = journeys.map(j => `「${j.title}」`).join('、');
+          addPetMessage(`为你找到了这些不可思议的旅行：${names} ✨ 点击卡片可以查看详情哦！`);
+        }
+      }).catch(() => {
+        addPetMessage('哎呀，网络有点问题... 等下再试试好吗？😅');
+      });
+    } else if (action.action === 'mbti_quiz' || action.type === 'mbti_quiz') {
+      startQuiz();
+    } else if (action.type === 'filter') {
+      window.location.hash = '#/explore';
+      closeChat();
+    }
+  }
+
+  // ── MBTI Quiz ──
+  function startQuiz() {
+    quizAnswers = [];
+    quizStep = 1;
+    showQuizQuestion();
+  }
+
+  function showQuizQuestion() {
+    const q = AIPet.getQuizQuestion(quizStep);
+    if (!q) {
+      finishQuiz();
+      return;
+    }
+    const msgs = document.getElementById('ai-pet-messages');
+    if (!msgs) return;
+
+    const div = document.createElement('div');
+    div.className = 'ai-pet__msg ai-pet__msg--pet';
+    div.innerHTML = `
+      <div>问题 ${quizStep}/${AIPet.quizLength}：</div>
+      <div style="margin: 8px 0; font-weight: 600;">${escapeHtml(q.q)}</div>
+      <div class="ai-pet__quiz-options"></div>
+    `;
+    const optionsDiv = div.querySelector('.ai-pet__quiz-options');
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'ai-pet__quiz-option';
+      btn.textContent = opt.text;
+      btn.addEventListener('click', () => answerQuiz(idx));
+      optionsDiv.appendChild(btn);
+    });
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function answerQuiz(answerIdx) {
+    quizAnswers.push(answerIdx);
+    quizStep++;
+    showQuizQuestion();
+  }
+
+  function finishQuiz() {
+    const result = AIPet.scoreMBTI(quizAnswers);
+    profile.mbti = result.code;
+    AIPet.saveProfile(profile);
+
+    addPetMessage(
+      `🎉 测试完成！你的旅行人格是 <strong>${result.code}</strong>！\n\n` +
+      `让我为你推荐最适合 ${result.code} 型旅行者的不可思议体验~ ✨`,
+      [{ type: 'recommend', label: '查看推荐' }]
+    );
+  }
+
+  // ── Triggers ──
+  function onPageView() {
+    pageViewCount++;
+    if (pageViewCount === 3 && !chatOpen && !profile.firstVisit) {
+      setTimeout(() => {
+        openChat();
+        addPetMessage('你已经看了好几个旅行啦！👀 要不要做个性格测试，让我给你推荐最适合的？', [
+          { type: 'button', label: '开始测试', action: 'mbti_quiz' },
+          { type: 'button', label: '不用啦', action: 'dismiss' },
+        ]);
+      }, 500);
+    }
+  }
+
+  function resetIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (!chatOpen && !profile.firstVisit) {
+        openChat();
+        addPetMessage('你还在吗？🌙 我发现了一些超棒的旅行体验，要不要看看？', [
+          { type: 'recommend', label: '看看推荐' },
+          { type: 'button', label: '我在忙', action: 'dismiss' },
+        ]);
+      }
+    }, 10000); // 10 seconds
+  }
+
+  // ── Utilities ──
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML.replace(/\n/g, '<br>');
+  }
+
+  // ── Init ──
+  document.addEventListener('mousemove', resetIdleTimer);
+  document.addEventListener('keydown', resetIdleTimer);
+  document.addEventListener('touchstart', resetIdleTimer);
+
+  window.addEventListener('hashchange', () => {
+    onPageView();
+    resetIdleTimer();
+  });
+
+  // Count initial page load
+  onPageView();
+  resetIdleTimer();
+
+  render();
+})();
