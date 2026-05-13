@@ -26,6 +26,11 @@ func Logger() gin.HandlerFunc {
 			path = path + "?" + raw
 		}
 
+		// Skip static asset requests to reduce terminal noise
+		if len(path) > 8 && path[:8] == "/static/" {
+			return
+		}
+
 		log.Printf("[%s] %s %s | %d | %v | %s",
 			requestID, method, path, statusCode, latency, clientIP)
 	}

@@ -44,11 +44,11 @@ func TestRepo_List_All(t *testing.T) {
 	if err != nil {
 		t.Fatalf("List error: %v", err)
 	}
-	if total != 5 {
-		t.Errorf("expected total=5, got %d", total)
+	if total != 12 {
+		t.Errorf("expected total=12, got %d", total)
 	}
-	if len(journeys) != 5 {
-		t.Errorf("expected 5 journeys, got %d", len(journeys))
+	if len(journeys) != 10 {
+		t.Errorf("expected 10 journeys, got %d", len(journeys))
 	}
 }
 
@@ -248,7 +248,7 @@ func TestRepo_List_Pagination(t *testing.T) {
 		t.Errorf("expected 2 journeys on page 2, got %d", len(page2))
 	}
 
-	if total != 5 {
-		t.Errorf("expected total=5, got %d", total)
+	if total != 12 {
+		t.Errorf("expected total=12, got %d", total)
 	}
 }

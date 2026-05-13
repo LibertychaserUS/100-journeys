@@ -14,7 +14,7 @@ Pages.Home = {
 
     main.innerHTML = '';
     main.appendChild(this._buildHero());
-    main.appendChild(this._buildMbtiTeaser());
+    main.appendChild(this._buildStatsBar());
     main.appendChild(this._buildFeatured());
 
     this._loadFeatured();
@@ -45,41 +45,31 @@ Pages.Home = {
   },
 
   /* ================================================================
-     MBTI Teaser Section
+     Stats Bar — adds credibility and exploration cues
      ================================================================ */
-  _buildMbtiTeaser() {
+  _buildStatsBar() {
     const section = document.createElement('section');
-    section.className = 'home-mbti';
-
-    const mbtiTypes = [
-      'INTJ', 'INTP', 'ENTJ', 'ENTP',
-      'INFJ', 'INFP', 'ENFJ', 'ENFP',
-      'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
-      'ISTP', 'ISFP', 'ESTP', 'ESFP',
-    ];
-
-    const chipsHtml = mbtiTypes
-      .map(
-        (type) =>
-          `<button class="home-mbti__chip" data-mbti="${type}">${type}</button>`
-      )
-      .join('');
-
+    section.className = 'home-stats';
     section.innerHTML = `
-      <div class="home-mbti__header container">
-        <h2 class="home-mbti__title">按人格探索</h2>
-        <p class="home-mbti__desc">选择你的 MBTI 类型，发现为你量身定制的旅程</p>
+      <div class="home-stats__grid container">
+        <div class="home-stats__item">
+          <span class="home-stats__num">12</span>
+          <span class="home-stats__label">精选旅程</span>
+        </div>
+        <div class="home-stats__item">
+          <span class="home-stats__num">7</span>
+          <span class="home-stats__label">大洲覆盖</span>
+        </div>
+        <div class="home-stats__item">
+          <span class="home-stats__num">16</span>
+          <span class="home-stats__label">MBTI适配</span>
+        </div>
+        <div class="home-stats__item">
+          <span class="home-stats__num">∞</span>
+          <span class="home-stats__label">不可思议</span>
+        </div>
       </div>
-      <div class="home-mbti__scroll">${chipsHtml}</div>
     `;
-
-    section.querySelectorAll('.home-mbti__chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        const code = chip.dataset.mbti;
-        Router.navigate(`#/explore?mbti=${encodeURIComponent(code)}`);
-      });
-    });
-
     return section;
   },
 
@@ -171,10 +161,13 @@ Pages.Home = {
 
     const difficultyDots = this._renderDifficulty(j.risk_level);
 
+    const overlayText = j.story ? j.story.substring(0, 80) + '…' : (j.story_hook || j.subtitle || '');
+
     return `
       <article class="home-card" data-slug="${this._escapeHtml(j.slug)}">
         <div class="home-card__media">
           <img src="${this._escapeHtml(imageUrl)}" alt="${this._escapeHtml(j.title)}" loading="lazy" />
+          <div class="home-card__overlay-text">${this._escapeHtml(overlayText)}</div>
         </div>
         <div class="home-card__body">
           <div class="home-card__tags">
