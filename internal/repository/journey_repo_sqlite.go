@@ -146,16 +146,15 @@ func (r *sqliteJourneyRepo) GetBySlug(ctx context.Context, slug string) (*model.
 	}
 
 	// Preload tags and MBTI
-	if err := r.preloadTags(ctx, []model.Journey{j}); err != nil {
+	journeys := []model.Journey{j}
+	if err := r.preloadTags(ctx, journeys); err != nil {
 		return nil, err
 	}
-	if err := r.preloadMBTI(ctx, []model.Journey{j}); err != nil {
+	if err := r.preloadMBTI(ctx, journeys); err != nil {
 		return nil, err
 	}
-
-	// Re-assign from slice back to return value
-	j.Tags = []model.Journey{j}[0].Tags
-	j.MBTITypes = []model.Journey{j}[0].MBTITypes
+	j.Tags = journeys[0].Tags
+	j.MBTITypes = journeys[0].MBTITypes
 
 	return &j, nil
 }

@@ -4,7 +4,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
+	"github.com/100-journeys/app/internal/ai"
+	"github.com/100-journeys/app/internal/handler"
+	"github.com/100-journeys/app/internal/repository"
+	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,45 +25,91 @@ func main() {
 		mediaBase = "/static/assets/images"
 	}
 
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "./data/app.db"
+	}
+
+	// Ensure data directory exists
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+		log.Fatalf("create data dir: %v", err)
+	}
+
+	// Initialize DB
+	db, err := repository.NewDB(dbPath)
+	if err != nil {
+		log.Fatalf("init db: %v", err)
+	}
+	defer db.Close()
+
+	if err := repository.Migrate(db); err != nil {
+		log.Fatalf("migrate db: %v", err)
+	}
+	if err := repository.Seed(db); err != nil {
+		log.Fatalf("seed db: %v", err)
+	}
+
+	// Wire dependencies
+	repo := repository.NewJourneyRepository(db)
+	media := &service.LocalProvider{BaseURL: mediaBase}
+	svc := service.NewJourneyService(repo, media)
+	aiProvider := ai.NewMockAI()
+	engine := ai.NewRecommendEngine(repo)
+	h := handler.NewJourneyHandler(svc, aiProvider, engine)
+
+	// Setup Gin
 	r := gin.Default()
 
-	// Inject APP_CONFIG into index.html via middleware
+	// CORS middleware
 	r.Use(func(c *gin.Context) {
-		c.Set("mediaBase", mediaBase)
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
 		c.Next()
 	})
 
 	// Static files
 	r.Static("/static", "./web")
 
-	// SPA: serve index.html for all non-API routes
+	// API routes
+	api := r.Group("/api")
+	{
+		api.GET("/journeys", h.List)
+		api.GET("/journeys/:slug", h.Get)
+		api.GET("/journeys/:slug/book", h.GetBookingInfo)
+		api.GET("/tags", h.ListTags)
+		api.GET("/mbti", h.ListMBTITypes)
+		api.POST("/ai/chat", h.AIChat)
+		api.GET("/health", h.Health)
+	}
+
+	// SPA fallback: serve index.html for non-API, non-static routes
+	// Inject window.APP_CONFIG into index.html
 	r.NoRoute(func(c *gin.Context) {
-		if len(c.Request.URL.Path) >= 4 && c.Request.URL.Path[:4] == "/api" {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return
 		}
-		c.File("./web/index.html")
+
+		indexPath := "./web/index.html"
+		content, err := os.ReadFile(indexPath)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "index.html not found")
+			return
+		}
+
+		html := string(content)
+		configScript := `<script>window.APP_CONFIG = { mediaBase: "` + mediaBase + `", apiBase: "/api" };</script>`
+		html = strings.Replace(html, "<!-- App config injected by Go server -->", configScript, 1)
+		html = strings.Replace(html, "<!-- window.APP_CONFIG = { mediaBase: \"...\", apiBase: \"/api\" } -->", "", 1)
+
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
 
-	// API routes — handlers wired up in SDD phase
-	api := r.Group("/api")
-	{
-		api.GET("/journeys",      placeholder("journeys list"))
-		api.GET("/journeys/:slug", placeholder("journey detail"))
-		api.GET("/tags",          placeholder("tags list"))
-		api.GET("/health",        health)
-	}
-
-	log.Printf("Server starting on :%s  mediaBase=%s\n", port, mediaBase)
+	log.Printf("Server starting on :%s  mediaBase=%s  db=%s\n", port, mediaBase, dbPath)
 	log.Fatal(r.Run(":" + port))
-}
-
-func placeholder(name string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "placeholder", "endpoint": name})
-	}
-}
-
-func health(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
