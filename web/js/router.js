@@ -1,0 +1,41 @@
+/**
+ * router.js — Hash-based SPA router
+ * Routes: / | /explore | /journey/:slug | /about
+ */
+
+const Router = (() => {
+  const routes = {};
+
+  function define(path, handler) {
+    routes[path] = handler;
+  }
+
+  function resolve() {
+    const hash   = window.location.hash.slice(1) || '/';
+    const parts  = hash.split('/').filter(Boolean);
+    const root   = '/' + (parts[0] || '');
+
+    // Dynamic route: /journey/:slug
+    if (root === '/journey' && parts[1]) {
+      return routes['/journey/:slug']?.(parts[1]);
+    }
+
+    const handler = routes[hash] || routes[root] || routes['/'];
+    handler?.();
+  }
+
+  function navigate(path) {
+    window.location.hash = path;
+  }
+
+  // Init
+  window.addEventListener('hashchange', resolve);
+  window.addEventListener('DOMContentLoaded', resolve);
+
+  return { define, navigate };
+})();
+
+// --- Route definitions ---
+Router.define('/',                Pages.Home.render);
+Router.define('/explore',         Pages.Explore.render);
+Router.define('/journey/:slug',   Pages.Detail.render);
