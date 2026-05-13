@@ -141,3 +141,30 @@
 
 #### Next
 - Phase 4: E2E — Playwright browser automation for core user flows
+
+---
+
+## Phase 4 — E2E | 2026-05-13
+
+**Git tag**: `v1.0.0`
+**Checkpoint**: `checkpoints/CP-E2E-001.md`
+**Agent**: Main
+**Status**: Complete
+
+#### Done
+- Playwright E2E suite: 17 tests across Home (5), Explore (6), Detail (6) — all passing
+- E2E config: PORT=8090 (avoids Tomcat conflict), auto-start Go backend, AI Pet modal skip
+- Critical bug found + fixed: **Router hash query string parsing** (`/#/explore?q=x` fell back to Home)
+- Critical bug found + fixed: **Detail page API envelope unwrapping** (passed `{data: journey}` to renderer)
+- Critical bug found + fixed: **`const Pages` redeclaration** across script tags in Chromium
+- Critical bug found + fixed: **Router `this` context loss** on method references
+- Bug found + fixed: seed.sql tag slug mismatch (Chinese vs English)
+
+#### Decisions
+- `var` instead of `const` for cross-script globals (Chromium scope sharing)
+- Router must strip query params before route matching: `hash.split('?')[0]`
+- All API consumers must unwrap envelope: `res.data || res`
+- E2E tests skip AI Pet via `localStorage` pre-seed
+
+#### Next
+- Project MVP complete. Optional: GitHub push, CodeRabbit review, deploy.
