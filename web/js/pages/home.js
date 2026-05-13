@@ -2,7 +2,7 @@
  * Home page controller
  * Renders hero, MBTI teaser, and featured journeys grid.
  */
-const Pages = window.Pages || {};
+var Pages = window.Pages || {};
 
 Pages.Home = {
   /**

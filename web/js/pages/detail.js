@@ -1,7 +1,7 @@
 /**
  * Detail page controller — Journey story view
  */
-const Pages = window.Pages || {};
+var Pages = window.Pages || {};
 
 Pages.Detail = {
   _observer: null,
@@ -11,7 +11,7 @@ Pages.Detail = {
     main.innerHTML = '<div class="detail-loading"></div>';
 
     API.getJourney(slug)
-      .then((data) => this._renderPage(data))
+      .then((res) => this._renderPage(res.data || res))
       .catch((err) => {
         if (err.message && err.message.includes('404')) {
           this._renderNotFound(main);

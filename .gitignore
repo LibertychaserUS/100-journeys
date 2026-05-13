@@ -38,3 +38,13 @@ build/
 # Logs
 *.log
 .worktrees/
+
+# Node
+node_modules/
+package-lock.json
+
+# Test artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+

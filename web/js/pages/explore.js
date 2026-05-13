@@ -3,7 +3,7 @@
  * Xiaohongshu-style card-based discovery with infinite scroll
  */
 
-const Pages = window.Pages || {};
+var Pages = window.Pages || {};
 
 Pages.Explore = {
   _currentFilter: {},

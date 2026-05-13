@@ -6,13 +6,14 @@
 const Router = (() => {
   const routes = {};
 
-  function define(path, handler) {
-    routes[path] = handler;
+  function define(path, handler, ctx) {
+    routes[path] = ctx ? handler.bind(ctx) : handler;
   }
 
   function resolve() {
     const hash   = window.location.hash.slice(1) || '/';
-    const parts  = hash.split('/').filter(Boolean);
+    const path   = hash.split('?')[0];
+    const parts  = path.split('/').filter(Boolean);
     const root   = '/' + (parts[0] || '');
 
     // Dynamic route: /journey/:slug
@@ -20,7 +21,7 @@ const Router = (() => {
       return routes['/journey/:slug']?.(parts[1]);
     }
 
-    const handler = routes[hash] || routes[root] || routes['/'];
+    const handler = routes[path] || routes[root] || routes['/'];
     handler?.();
   }
 
@@ -36,6 +37,6 @@ const Router = (() => {
 })();
 
 // --- Route definitions ---
-Router.define('/',                Pages.Home.render);
-Router.define('/explore',         Pages.Explore.render);
-Router.define('/journey/:slug',   Pages.Detail.render);
+Router.define('/',                Pages.Home.render,    Pages.Home);
+Router.define('/explore',         Pages.Explore.render, Pages.Explore);
+Router.define('/journey/:slug',   Pages.Detail.render,  Pages.Detail);
