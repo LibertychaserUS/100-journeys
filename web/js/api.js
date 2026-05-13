@@ -37,7 +37,7 @@ const API = (() => {
   }
 
   function authHeader() {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
@@ -63,6 +63,20 @@ const API = (() => {
     register: (data) => authRequest('/auth/register', data),
     login: (data) => authRequest('/auth/login', data),
     me: () => authedRequest('/auth/me'),
+    uploadAvatar: async (file) => {
+      const form = new FormData();
+      form.append('avatar', file);
+      const res = await fetch(`${base()}/auth/avatar`, {
+        method: 'POST',
+        headers: authHeader(),
+        body: form,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(err.error || err.message || `HTTP ${res.status}`);
+      }
+      return res.json();
+    },
 
     // Orders
     createOrder: (items) => authedRequest('/orders', { method: 'POST', body: JSON.stringify({ items }) }),
@@ -72,6 +86,10 @@ const API = (() => {
     // Payments
     recharge: (amount) => authedRequest('/payments/recharge', { method: 'POST', body: JSON.stringify({ amount }) }),
     listTransactions: () => authedRequest('/payments/transactions'),
+
+    // Admin
+    adminStats: () => authedRequest('/admin/stats'),
+    adminUsers: () => authedRequest('/admin/users'),
 
     // Media URL helper — CDN-aware
     mediaUrl: (path) => `${window.APP_CONFIG.mediaBase}/${path}`,

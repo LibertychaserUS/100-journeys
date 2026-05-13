@@ -1,6 +1,6 @@
 /**
  * router.js — Hash-based SPA router
- * Routes: / | /explore | /journey/:slug | /login | /register | /profile | /admin | /recharge
+ * Routes: / | /explore | /journey/:slug | /login | /register | /profile | /admin-login | /admin | /recharge | /about
  */
 
 const Router = (() => {
@@ -47,5 +47,7 @@ Router.define('/journey/:slug',   Pages.Detail.render,  Pages.Detail);
 Router.define('/login',           Pages.Login.render,   Pages.Login);
 Router.define('/register',        Pages.Register.render, Pages.Register);
 Router.define('/profile',         Pages.Profile.render, Pages.Profile);
+Router.define('/admin-login',     Pages.AdminLogin.render, Pages.AdminLogin);
 Router.define('/admin',           Pages.Admin.render,   Pages.Admin);
 Router.define('/recharge',        Pages.Recharge.render, Pages.Recharge);
+Router.define('/about',           Pages.About.render,   Pages.About);

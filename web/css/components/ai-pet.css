@@ -1,6 +1,5 @@
 /* =============================================================
-   AI PET — 8-bit pixel art floating companion
-   Gender-neutral, cute, draggable, expandable chat panel
+   AI PET — minimal guide-light companion
    ============================================================= */
 
 .ai-pet {
@@ -21,22 +20,23 @@
 
 /* ── Pet Avatar (8-bit pixel style) ── */
 .ai-pet__avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border-hover);
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 0 48px rgba(255, 198, 105, 0.14), 0 14px 40px rgba(0, 0, 0, 0.34);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-  image-rendering: pixelated;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .ai-pet__avatar:hover {
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: var(--shadow-glow);
+  transform: translateY(-5px) scale(1.04);
+  box-shadow: 0 0 72px rgba(255, 198, 105, 0.22), 0 20px 52px rgba(0, 0, 0, 0.4);
 }
 
 .ai-pet__avatar--bounce {
@@ -45,80 +45,27 @@
 
 @keyframes petBounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-8px); }
 }
 
-/* Pixel art face using CSS gradients */
-.ai-pet__face {
+.ai-pet__light {
   width: 100%;
   height: 100%;
-  position: relative;
-}
-
-/* Eyes */
-.ai-pet__face::before,
-.ai-pet__face::after {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: var(--color-accent-primary);
-  top: 18px;
-  border-radius: 1px;
-}
-
-.ai-pet__face::before { left: 14px; }
-.ai-pet__face::after { right: 14px; }
-
-/* Mouth */
-.ai-pet__mouth {
-  position: absolute;
-  width: 16px;
-  height: 6px;
-  background: var(--color-accent-primary);
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 0 0 4px 4px;
-}
-
-/* Type indicator (dog ears / cat ears) */
-.ai-pet__ears {
-  position: absolute;
-  top: -6px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.ai-pet__ear {
-  width: 10px;
-  height: 12px;
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border-hover);
-  border-bottom: none;
-}
-
-.ai-pet__ear--left {
-  border-radius: 4px 4px 0 0;
-  transform: rotate(-15deg);
-}
-
-.ai-pet__ear--right {
-  border-radius: 4px 4px 0 0;
-  transform: rotate(15deg);
+  object-fit: contain;
+  transform: scale(1.22);
+  filter: drop-shadow(0 0 18px rgba(255, 215, 141, 0.24));
 }
 
 /* ── Chat Panel ── */
 .ai-pet__chat {
-  width: 320px;
+  width: 340px;
   max-height: 420px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  background: rgba(13, 15, 17, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -144,11 +91,11 @@
 }
 
 .ai-pet__header-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
