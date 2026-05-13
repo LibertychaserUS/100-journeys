@@ -93,7 +93,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS users (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    username        TEXT    NOT NULL UNIQUE,
+    username        TEXT    NOT NULL,
     email           TEXT    NOT NULL UNIQUE,
     password_hash   TEXT    NOT NULL,
     role            TEXT    NOT NULL DEFAULT 'user' CHECK(role IN ('user','admin')),
@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS users (
     points          INTEGER NOT NULL DEFAULT 0,
     balance         INTEGER NOT NULL DEFAULT 0,           -- 不思议币 balance (smallest unit, integer only)
     mbti_type       TEXT,
+    gender          TEXT    NOT NULL DEFAULT 'prefer_not_to_say' CHECK(gender IN ('female','male','non_binary','prefer_not_to_say')),
     avatar_url      TEXT,
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -170,3 +171,49 @@ CREATE INDEX IF NOT EXISTS idx_orders_status        ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_order_items_order    ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_user    ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_order   ON transactions(order_id);
+
+-- =============================================================
+-- Analytics event buffer (v1.3.0)
+-- Non-critical product analytics only. P0 order/payment ledger events
+-- stay in orders + transactions and must not depend on this queue.
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS analytics_events (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_type      TEXT    NOT NULL CHECK(event_type IN ('journey_view', 'journey_click', 'pet_reply', 'search', 'filter')),
+    journey_slug    TEXT,
+    user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    mbti_type       TEXT,
+    gender          TEXT    NOT NULL DEFAULT 'unknown',
+    metadata        TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_analytics_event_type    ON analytics_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_analytics_journey_slug  ON analytics_events(journey_slug);
+CREATE INDEX IF NOT EXISTS idx_analytics_user          ON analytics_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_created_at    ON analytics_events(created_at);
+
+-- =============================================================
+-- Persistent audit logs (v1.4.0)
+-- API errors and runtime request evidence for later debugging.
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    request_id      TEXT,
+    level           TEXT    NOT NULL CHECK(level IN ('info','warn','error','panic')),
+    source          TEXT    NOT NULL DEFAULT 'api',
+    method          TEXT,
+    path            TEXT,
+    status_code     INTEGER,
+    latency_ms      INTEGER,
+    client_ip       TEXT,
+    user_agent      TEXT,
+    message         TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_logs_level      ON audit_logs(level);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_request_id ON audit_logs(request_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);

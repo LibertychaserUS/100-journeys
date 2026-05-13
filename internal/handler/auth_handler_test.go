@@ -3,9 +3,11 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/100-journeys/app/internal/middleware"
@@ -32,7 +34,7 @@ func setupAuthTestRouter(t *testing.T) (*gin.Engine, repository.UserRepository, 
 
 	userRepo := repository.NewUserRepository(db)
 	captchaStore := service.NewCaptchaStore()
-	authH := NewAuthHandler(userRepo, captchaStore)
+	authH := NewAuthHandler(userRepo, captchaStore, filepath.Join(t.TempDir(), "avatars"))
 
 	r := gin.New()
 	api := r.Group("/api")
@@ -43,6 +45,7 @@ func setupAuthTestRouter(t *testing.T) (*gin.Engine, repository.UserRepository, 
 		auth.Use(middleware.JWTAuth())
 		{
 			auth.GET("/me", authH.Me)
+			auth.POST("/avatar", authH.UploadAvatar)
 		}
 	}
 	return r, userRepo, captchaStore
@@ -56,6 +59,7 @@ func TestAuth_Register_Success(t *testing.T) {
 		Username:      "testuser",
 		Email:         "test@example.com",
 		Password:      "password123",
+		Gender:        "female",
 		CaptchaID:     cid,
 		CaptchaAnswer: answer,
 	})
@@ -86,6 +90,7 @@ func TestAuth_Register_DuplicateEmail(t *testing.T) {
 		Username:      "user1",
 		Email:         "dup@example.com",
 		Password:      "password123",
+		Gender:        "prefer_not_to_say",
 		CaptchaID:     cid1,
 		CaptchaAnswer: ans1,
 	})
@@ -101,6 +106,7 @@ func TestAuth_Register_DuplicateEmail(t *testing.T) {
 		Username:      "user2",
 		Email:         "dup@example.com",
 		Password:      "password123",
+		Gender:        "prefer_not_to_say",
 		CaptchaID:     cid2,
 		CaptchaAnswer: ans2,
 	})
@@ -120,6 +126,72 @@ func TestAuth_Register_ValidationError(t *testing.T) {
 		Username:      "ab", // too short
 		Email:         "not-an-email",
 		Password:      "123", // too short
+		Gender:        "prefer_not_to_say",
+		CaptchaID:     cid,
+		CaptchaAnswer: ans,
+	})
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestAuth_Register_DuplicateUsernameAllowed(t *testing.T) {
+	r, _, captchaStore := setupAuthTestRouter(t)
+	for i := 0; i < 2; i++ {
+		cid, _, ans := captchaStore.Generate()
+		body, _ := json.Marshal(model.RegisterRequest{
+			Username:      "同名旅人",
+			Email:         "same-name-" + string(rune('a'+i)) + "@example.com",
+			Password:      "password123",
+			Gender:        "male",
+			CaptchaID:     cid,
+			CaptchaAnswer: ans,
+		})
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
+		require.Equal(t, http.StatusCreated, w.Code, w.Body.String())
+	}
+}
+
+func TestAuth_Register_IgnoresInjectedAdminRole(t *testing.T) {
+	r, userRepo, captchaStore := setupAuthTestRouter(t)
+	cid, _, ans := captchaStore.Generate()
+
+	body := []byte(`{
+		"username":"游客不可见管理员",
+		"email":"role-injection@example.com",
+		"password":"password123",
+		"gender":"female",
+		"captcha_id":"` + cid + `",
+		"captcha_answer":"` + ans + `",
+		"role":"admin"
+	}`)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusCreated, w.Code, w.Body.String())
+	user, err := userRepo.GetByEmail(t.Context(), "role-injection@example.com")
+	require.NoError(t, err)
+	require.NotNil(t, user)
+	require.Equal(t, model.RoleUser, user.Role)
+}
+
+func TestAuth_Register_RejectsUnsafeUsernameAndPassword(t *testing.T) {
+	r, _, captchaStore := setupAuthTestRouter(t)
+	cid, _, ans := captchaStore.Generate()
+
+	body, _ := json.Marshal(model.RegisterRequest{
+		Username:      "bad<script>",
+		Email:         "unsafe@example.com",
+		Password:      "abc 123<script>",
+		Gender:        "female",
 		CaptchaID:     cid,
 		CaptchaAnswer: ans,
 	})
@@ -242,4 +314,45 @@ func TestAuth_Me_InvalidToken(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestAuth_UploadAvatar_BindsFileToUserID(t *testing.T) {
+	r, userRepo, _ := setupAuthTestRouter(t)
+	ctx := t.Context()
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte("pass1234"), bcrypt.DefaultCost)
+	user := &model.User{Username: "avataruser", Email: "avatar@example.com", PasswordHash: string(hash), Role: model.RoleUser, Level: 1, Gender: "female"}
+	require.NoError(t, userRepo.Create(ctx, user))
+
+	token, err := middleware.GenerateToken(user)
+	require.NoError(t, err)
+
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	part, err := writer.CreateFormFile("avatar", "avatar.png")
+	require.NoError(t, err)
+	_, err = part.Write([]byte{0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0, 0, 0, 0, 0})
+	require.NoError(t, err)
+	require.NoError(t, writer.Close())
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/auth/avatar", &body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+token)
+	r.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+	var resp map[string]interface{}
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &resp))
+	data := resp["data"].(map[string]interface{})
+	require.Equal(t, user.ID, int64(data["user_id"].(float64)))
+	require.Contains(t, data["avatar_url"], "/u_"+stringNumber(user.ID)+"/avatar.png")
+
+	found, err := userRepo.GetByID(ctx, user.ID)
+	require.NoError(t, err)
+	require.Contains(t, found.AvatarURL, "/u_"+stringNumber(user.ID)+"/avatar.png")
+}
+
+func stringNumber(id int64) string {
+	return strconv.FormatInt(id, 10)
 }

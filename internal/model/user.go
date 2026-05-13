@@ -19,6 +19,7 @@ type User struct {
 	Points       int       `json:"points"`
 	Balance      int       `json:"balance"`
 	MBTIType     string    `json:"mbti_type,omitempty"`
+	Gender       string    `json:"gender,omitempty"`
 	AvatarURL    string    `json:"avatar_url,omitempty"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
@@ -31,9 +32,10 @@ func (u *User) IsAdmin() bool {
 
 // RegisterRequest holds incoming registration payload.
 type RegisterRequest struct {
-	Username      string `json:"username" binding:"required,min=3,max=30"`
+	Username      string `json:"username" binding:"required,min=2,max=30"`
 	Email         string `json:"email" binding:"required,email"`
 	Password      string `json:"password" binding:"required,min=6"`
+	Gender        string `json:"gender" binding:"required,oneof=female male non_binary prefer_not_to_say"`
 	CaptchaID     string `json:"captcha_id" binding:"required"`
 	CaptchaAnswer string `json:"captcha_answer" binding:"required"`
 }

@@ -222,6 +222,11 @@ func (r *sqliteJourneyRepo) buildWhere(filter model.JourneyFilter) (string, []in
 	var conds []string
 	var args []interface{}
 
+	if strings.TrimSpace(filter.Query) != "" {
+		query := "%" + strings.ToLower(strings.TrimSpace(filter.Query)) + "%"
+		conds = append(conds, `(LOWER(j.title) LIKE ? OR LOWER(j.subtitle) LIKE ? OR LOWER(j.story_hook) LIKE ? OR LOWER(j.story) LIKE ? OR LOWER(j.region) LIKE ? OR LOWER(j.mood_keywords) LIKE ?)`)
+		args = append(args, query, query, query, query, query, query)
+	}
 	if filter.TagSlug != "" {
 		conds = append(conds, "t.slug = ?")
 		args = append(args, filter.TagSlug)

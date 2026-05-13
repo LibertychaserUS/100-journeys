@@ -12,16 +12,16 @@ const (
 
 // Order represents a purchase order.
 type Order struct {
-	ID           int64     `json:"id"`
-	OrderNo      string    `json:"order_no"`
-	UserID       int64     `json:"user_id"`
-	Status       string    `json:"status"`
-	TotalAmount  int       `json:"total_amount"`
-	Currency     string    `json:"currency"`
-	PaidAt       *time.Time `json:"paid_at,omitempty"`
-	Items        []OrderItem `json:"items,omitempty"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID          int64       `json:"id"`
+	OrderNo     string      `json:"order_no"`
+	UserID      int64       `json:"user_id"`
+	Status      string      `json:"status"`
+	TotalAmount int         `json:"total_amount"`
+	Currency    string      `json:"currency"`
+	PaidAt      *time.Time  `json:"paid_at,omitempty"`
+	Items       []OrderItem `json:"items,omitempty"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
 }
 
 // OrderItem represents a line item in an order.
@@ -48,5 +48,5 @@ type CreateOrderItemRequest struct {
 
 // RechargeRequest is the payload for virtual currency top-up.
 type RechargeRequest struct {
-	Amount int `json:"amount" binding:"required,min=1"`
+	Amount int `json:"amount" binding:"required,min=1,max=100000"`
 }

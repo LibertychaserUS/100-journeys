@@ -158,6 +158,26 @@ func TestRepo_List_FilterMBTI(t *testing.T) {
 	}
 }
 
+// UT-REPO-006A: Keyword search across story fields.
+func TestRepo_List_SearchQuery(t *testing.T) {
+	repo := setupTestDB(t)
+	ctx := context.Background()
+
+	journeys, total, err := repo.List(ctx, model.JourneyFilter{Query: "银河", Limit: 10, Page: 1})
+	if err != nil {
+		t.Fatalf("List error: %v", err)
+	}
+	if total == 0 {
+		t.Fatal("expected at least one journey matching keyword 银河")
+	}
+	for _, j := range journeys {
+		if j.Slug == "morocco-sahara-camel-camp" || j.Slug == "namibia-deadvlei-stars" {
+			return
+		}
+	}
+	t.Fatalf("expected keyword search to include a night-sky journey, got %+v", journeys)
+}
+
 // UT-REPO-007: GetBySlug — existing
 func TestRepo_GetBySlug_Exists(t *testing.T) {
 	repo := setupTestDB(t)
