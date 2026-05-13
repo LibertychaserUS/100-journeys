@@ -17,6 +17,7 @@ type User struct {
 	Role         string    `json:"role"`
 	Level        int       `json:"level"`
 	Points       int       `json:"points"`
+	Balance      int       `json:"balance"`
 	MBTIType     string    `json:"mbti_type,omitempty"`
 	AvatarURL    string    `json:"avatar_url,omitempty"`
 	CreatedAt    time.Time `json:"created_at"`

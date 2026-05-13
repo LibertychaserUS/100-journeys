@@ -32,7 +32,7 @@ test.describe('Detail Page', () => {
     await expect(clueCard).toBeVisible();
 
     // CTA buttons
-    await expect(page.locator('#detail-cta-book')).toBeVisible();
+    await expect(page.locator('#detail-cta-buy')).toBeVisible();
     await expect(page.locator('#detail-cta-save')).toBeVisible();
   });
 

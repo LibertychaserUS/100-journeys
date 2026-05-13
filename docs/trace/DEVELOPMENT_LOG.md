@@ -168,3 +168,33 @@
 
 #### Next
 - Project MVP complete. Optional: GitHub push, CodeRabbit review, deploy.
+
+---
+
+## Phase 5 — Feature Expansion v1.1.0 | 2026-05-13
+
+**Git tag**: `v1.1.0`
+**Checkpoint**: `checkpoints/CP-v1.1.0-features.md`
+**Agent**: Main
+**Status**: ✅ E2E Complete
+
+#### Done
+- **Order & Payment backend**: `orders`, `order_items`, `transactions` tables; atomic `Pay()` with `BEGIN…COMMIT`; unique `JNY`+timestamp order numbers
+- **Virtual currency (不思议币)**: 7-tier recharge page (60–9,980) with bonus amounts; custom input; simulated payment (no real charge)
+- **Journey pricing**: 5 sample journeys with prices 8,999–29,999; price displayed on detail page; disabled CTA when price ≤ 0
+- **Points & level system**: 5,000 welcome points on registration; Lv1–Lv6 with discount rates 0%/2%/5%/8%/12%/15%
+- **User profile v2**: balance badge, order cards with status/pay buttons, transaction rows with color-coded amounts
+- **E2E suite expansion**: `orders.spec.js` — recharge tiers, balance increase, order creation from detail, profile history, mass registration (10 users)
+- **Bug fixes**: unanchored `toHaveURL(/#\//)` regex caused race condition in `registerAndLogin`; old DB missing `price` column → deleted `data/app.db` to force fresh schema
+
+#### Decisions
+- Integer-only financial storage (no floats) to prevent rounding errors
+- `order_items` snapshots `unit_price` at creation time to prevent price-change disputes
+- Discount computed server-side based on user's points at order creation time
+- Playwright `workers: 1` + `fullyParallel: false` to avoid SQLite write-locking in E2E
+- `page.on('dialog', …)` moved to `beforeEach` to prevent duplicate handler crashes
+
+#### Next
+- Go unit tests for order/payment repositories and handlers
+- README industrialization + GitHub Pages deployment
+- Merge `dev/v1.1.0` → `main`

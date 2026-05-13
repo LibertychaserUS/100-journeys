@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS journeys (
     mood_keywords   TEXT,                                 -- JSON array: ["孤独","无限感"]
     image_path      TEXT,                                 -- local path OR CDN key
     booking_url     TEXT,                                 -- nullable, future booking partner
+    price           INTEGER NOT NULL DEFAULT 0,           -- simulated price in 不思议币 (smallest unit, integer only)
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -98,6 +99,7 @@ CREATE TABLE IF NOT EXISTS users (
     role            TEXT    NOT NULL DEFAULT 'user' CHECK(role IN ('user','admin')),
     level           INTEGER NOT NULL DEFAULT 1 CHECK(level BETWEEN 1 AND 10),
     points          INTEGER NOT NULL DEFAULT 0,
+    balance         INTEGER NOT NULL DEFAULT 0,           -- 不思议币 balance (smallest unit, integer only)
     mbti_type       TEXT,
     avatar_url      TEXT,
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -124,3 +126,47 @@ CREATE TABLE IF NOT EXISTS user_saved_journeys (
 CREATE INDEX IF NOT EXISTS idx_users_email        ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username     ON users(username);
 CREATE INDEX IF NOT EXISTS idx_points_history_user ON user_points_history(user_id);
+
+-- =============================================================
+-- Order & Payment system (v1.2.0)
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS orders (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_no        TEXT    NOT NULL UNIQUE,               -- human-readable unique order number
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status          TEXT    NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'paid', 'cancelled', 'refunded')),
+    total_amount    INTEGER NOT NULL,                      -- total in 不思议币 (integer)
+    currency        TEXT    NOT NULL DEFAULT 'WONDER',
+    paid_at         DATETIME,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id        INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    journey_id      INTEGER NOT NULL REFERENCES journeys(id) ON DELETE CASCADE,
+    journey_title   TEXT    NOT NULL,
+    unit_price      INTEGER NOT NULL,                      -- price at time of order
+    quantity        INTEGER NOT NULL DEFAULT 1 CHECK(quantity > 0),
+    subtotal        INTEGER NOT NULL                       -- unit_price * quantity
+);
+
+-- Transaction ledger: every balance change is recorded (audit trail)
+CREATE TABLE IF NOT EXISTS transactions (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    order_id        INTEGER REFERENCES orders(id) ON DELETE SET NULL,
+    txn_type        TEXT    NOT NULL CHECK(txn_type IN ('recharge', 'purchase', 'refund', 'bonus')),
+    amount          INTEGER NOT NULL,                      -- positive = credit, negative = debit
+    balance_after   INTEGER NOT NULL,
+    description     TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_user          ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status        ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_order_items_order    ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_user    ON transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_order   ON transactions(order_id);

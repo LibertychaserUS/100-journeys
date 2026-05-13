@@ -58,8 +58,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Award registration points
-	_ = h.userRepo.AddPoints(c.Request.Context(), user.ID, 100, "register", "欢迎加入，注册奖励")
+	// Award registration points (5000 welcome bonus)
+	_ = h.userRepo.AddPoints(c.Request.Context(), user.ID, 5000, "register", "欢迎加入，注册奖励5000积分")
+	user.Points = 5000
 
 	// Generate JWT
 	token, err := middleware.GenerateToken(user)

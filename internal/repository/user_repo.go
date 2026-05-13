@@ -18,6 +18,9 @@ type UserRepository interface {
 	UnsaveJourney(ctx context.Context, userID, journeyID int64) error
 	ListSavedJourneys(ctx context.Context, userID int64) ([]int64, error)
 	ListPointsHistory(ctx context.Context, userID int64) ([]model.PointsHistory, error)
+	GetBalance(ctx context.Context, userID int64) (int, error)
+	Recharge(ctx context.Context, userID int64, amount int, description string) error
+	Deduct(ctx context.Context, userID int64, amount int, orderID int64, description string) error
 }
 
 type sqliteUserRepo struct {
@@ -30,9 +33,9 @@ func NewUserRepository(db *sql.DB) UserRepository {
 
 func (r *sqliteUserRepo) Create(ctx context.Context, user *model.User) error {
 	res, err := r.db.ExecContext(ctx,
-		`INSERT INTO users (username, email, password_hash, role, level, points, mbti_type, avatar_url)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		user.Username, user.Email, user.PasswordHash, user.Role, user.Level, user.Points, user.MBTIType, user.AvatarURL)
+		`INSERT INTO users (username, email, password_hash, role, level, points, balance, mbti_type, avatar_url)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		user.Username, user.Email, user.PasswordHash, user.Role, user.Level, user.Points, user.Balance, user.MBTIType, user.AvatarURL)
 	if err != nil {
 		return fmt.Errorf("create user: %w", err)
 	}
@@ -44,9 +47,9 @@ func (r *sqliteUserRepo) Create(ctx context.Context, user *model.User) error {
 func (r *sqliteUserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	var u model.User
 	err := r.db.QueryRowContext(ctx,
-		`SELECT id, username, email, password_hash, role, level, points, mbti_type, avatar_url, created_at, updated_at
+		`SELECT id, username, email, password_hash, role, level, points, balance, mbti_type, avatar_url, created_at, updated_at
 		 FROM users WHERE email = ?`, email).Scan(
-		&u.ID, &u.Username, &u.Email, &u.PasswordHash, &u.Role, &u.Level, &u.Points,
+		&u.ID, &u.Username, &u.Email, &u.PasswordHash, &u.Role, &u.Level, &u.Points, &u.Balance,
 		&u.MBTIType, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -59,11 +62,14 @@ func (r *sqliteUserRepo) GetByEmail(ctx context.Context, email string) (*model.U
 
 func (r *sqliteUserRepo) GetByID(ctx context.Context, id int64) (*model.User, error) {
 	var u model.User
+	var mbtiType, avatarURL sql.NullString
 	err := r.db.QueryRowContext(ctx,
-		`SELECT id, username, email, password_hash, role, level, points, mbti_type, avatar_url, created_at, updated_at
+		`SELECT id, username, email, password_hash, role, level, points, balance, mbti_type, avatar_url, created_at, updated_at
 		 FROM users WHERE id = ?`, id).Scan(
-		&u.ID, &u.Username, &u.Email, &u.PasswordHash, &u.Role, &u.Level, &u.Points,
-		&u.MBTIType, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt)
+		&u.ID, &u.Username, &u.Email, &u.PasswordHash, &u.Role, &u.Level, &u.Points, &u.Balance,
+		&mbtiType, &avatarURL, &u.CreatedAt, &u.UpdatedAt)
+	u.MBTIType = mbtiType.String
+	u.AvatarURL = avatarURL.String
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -157,4 +163,70 @@ func (r *sqliteUserRepo) ListPointsHistory(ctx context.Context, userID int64) ([
 		history = append(history, h)
 	}
 	return history, rows.Err()
+}
+
+func (r *sqliteUserRepo) GetBalance(ctx context.Context, userID int64) (int, error) {
+	var balance int
+	if err := r.db.QueryRowContext(ctx, `SELECT balance FROM users WHERE id = ?`, userID).Scan(&balance); err != nil {
+		return 0, fmt.Errorf("get balance: %w", err)
+	}
+	return balance, nil
+}
+
+func (r *sqliteUserRepo) Recharge(ctx context.Context, userID int64, amount int, description string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	var current int
+	if err := tx.QueryRowContext(ctx, `SELECT balance FROM users WHERE id = ?`, userID).Scan(&current); err != nil {
+		return fmt.Errorf("get current balance: %w", err)
+	}
+
+	newBalance := current + amount
+	if _, err := tx.ExecContext(ctx, `UPDATE users SET balance = ? WHERE id = ?`, newBalance, userID); err != nil {
+		return fmt.Errorf("update balance: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx,
+		`INSERT INTO transactions (user_id, txn_type, amount, balance_after, description)
+		 VALUES (?, ?, ?, ?, ?)`,
+		userID, model.TxnTypeRecharge, amount, newBalance, description); err != nil {
+		return fmt.Errorf("insert transaction: %w", err)
+	}
+
+	return tx.Commit()
+}
+
+func (r *sqliteUserRepo) Deduct(ctx context.Context, userID int64, amount int, orderID int64, description string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	var current int
+	if err := tx.QueryRowContext(ctx, `SELECT balance FROM users WHERE id = ?`, userID).Scan(&current); err != nil {
+		return fmt.Errorf("get current balance: %w", err)
+	}
+
+	if current < amount {
+		return fmt.Errorf("insufficient balance")
+	}
+
+	newBalance := current - amount
+	if _, err := tx.ExecContext(ctx, `UPDATE users SET balance = ? WHERE id = ?`, newBalance, userID); err != nil {
+		return fmt.Errorf("update balance: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx,
+		`INSERT INTO transactions (user_id, order_id, txn_type, amount, balance_after, description)
+		 VALUES (?, ?, ?, ?, ?, ?)`,
+		userID, orderID, model.TxnTypePurchase, -amount, newBalance, description); err != nil {
+		return fmt.Errorf("insert transaction: %w", err)
+	}
+
+	return tx.Commit()
 }

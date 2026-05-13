@@ -54,7 +54,7 @@ const Nav = {
         const res = await API.me();
         const user = res.data || res;
         userEl.style.display = '';
-        userEl.textContent = user.username || user.email;
+        userEl.textContent = (user.username || user.email) + ' · ' + (user.balance ?? 0).toLocaleString() + '币';
       } catch {
         userEl.style.display = 'none';
       }

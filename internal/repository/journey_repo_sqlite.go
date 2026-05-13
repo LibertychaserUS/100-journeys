@@ -32,7 +32,7 @@ func (r *sqliteJourneyRepo) List(ctx context.Context, filter model.JourneyFilter
 	query := `
 		SELECT DISTINCT j.id, j.title, j.slug, j.subtitle, j.story_hook, j.story, j.region,
 			j.fantasy_type, j.visual_style, j.adventure_index, j.obscurity_level, j.risk_level,
-			j.mood_keywords, j.image_path, j.booking_url, j.created_at, j.updated_at
+			j.mood_keywords, j.image_path, j.booking_url, j.price, j.created_at, j.updated_at
 		FROM journeys j` + r.buildJoins(filter) + where + `
 		ORDER BY j.id
 		LIMIT ? OFFSET ?`
@@ -58,7 +58,7 @@ func (r *sqliteJourneyRepo) List(ctx context.Context, filter model.JourneyFilter
 		if err := rows.Scan(
 			&j.ID, &j.Title, &j.Slug, &subtitle, &storyHook, &story, &region,
 			&j.FantasyType, &j.VisualStyle, &adventureIndex, &obscurityLevel, &riskLevel,
-			&moodKeywords, &imagePath, &bookingURL, &j.CreatedAt, &j.UpdatedAt,
+			&moodKeywords, &imagePath, &bookingURL, &j.Price, &j.CreatedAt, &j.UpdatedAt,
 		); err != nil {
 			return nil, 0, fmt.Errorf("scan journey: %w", err)
 		}
@@ -105,7 +105,7 @@ func (r *sqliteJourneyRepo) GetBySlug(ctx context.Context, slug string) (*model.
 	query := `
 		SELECT j.id, j.title, j.slug, j.subtitle, j.story_hook, j.story, j.region,
 			j.fantasy_type, j.visual_style, j.adventure_index, j.obscurity_level, j.risk_level,
-			j.mood_keywords, j.image_path, j.booking_url, j.created_at, j.updated_at
+			j.mood_keywords, j.image_path, j.booking_url, j.price, j.created_at, j.updated_at
 		FROM journeys j
 		WHERE j.slug = ?`
 
@@ -116,7 +116,7 @@ func (r *sqliteJourneyRepo) GetBySlug(ctx context.Context, slug string) (*model.
 	if err := r.db.QueryRowContext(ctx, query, slug).Scan(
 		&j.ID, &j.Title, &j.Slug, &subtitle, &storyHook, &story, &region,
 		&j.FantasyType, &j.VisualStyle, &adventureIndex, &obscurityLevel, &riskLevel,
-		&moodKeywords, &imagePath, &bookingURL, &j.CreatedAt, &j.UpdatedAt,
+		&moodKeywords, &imagePath, &bookingURL, &j.Price, &j.CreatedAt, &j.UpdatedAt,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

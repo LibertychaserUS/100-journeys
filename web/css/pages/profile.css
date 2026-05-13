@@ -78,3 +78,127 @@
   color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
+
+.profile-actions {
+  margin-top: var(--space-4);
+}
+
+.profile-btn {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+
+.profile-btn--primary {
+  background: var(--color-accent-primary);
+  color: #fff;
+}
+
+.profile-btn--small {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.profile-order-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.profile-order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.profile-order-no {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.profile-order-status {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.profile-order-status--pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.profile-order-status--paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.profile-order-status--cancelled {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.profile-order-item {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  padding: var(--space-1) 0;
+}
+
+.profile-order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-weight: var(--weight-bold);
+}
+
+.profile-txn-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.profile-txn-type {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.profile-txn-type--recharge {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.profile-txn-type--purchase {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.profile-txn-amount--plus {
+  color: #16a34a;
+}
+
+.profile-txn-amount--minus {
+  color: #dc2626;
+}
+
+.profile-txn-date {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}

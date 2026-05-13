@@ -51,6 +51,9 @@ Pages.Detail = {
     if (data.cost) {
       metaItems.push(this._metaIcon('cost', data.cost));
     }
+    if (data.price > 0) {
+      metaItems.push(this._metaIcon('price', data.price.toLocaleString() + ' 不思议币'));
+    }
 
     // Build tags
     const tagsHtml = (data.tags || [])
@@ -164,9 +167,10 @@ Pages.Detail = {
         </section>
 
         <div class="detail-cta">
-          <button class="detail-cta__btn detail-cta__btn--primary" id="detail-cta-book">
+          <button class="detail-cta__btn detail-cta__btn--primary" id="detail-cta-buy"
+            ${data.price > 0 ? '' : 'disabled'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-            制定我的旅行计划
+            ${data.price > 0 ? '立即下单 (' + data.price.toLocaleString() + ' 币)' : '即将开放'}
           </button>
           <button class="detail-cta__btn detail-cta__btn--outline" id="detail-cta-save">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -211,14 +215,20 @@ Pages.Detail = {
       });
     }
 
-    // CTA — booking
-    const bookBtn = document.getElementById('detail-cta-book');
-    if (bookBtn) {
-      bookBtn.addEventListener('click', () => {
-        if (data.booking_url) {
-          window.open(data.booking_url, '_blank');
-        } else {
-          alert('预订功能即将上线');
+    // CTA — buy
+    const buyBtn = document.getElementById('detail-cta-buy');
+    if (buyBtn && !buyBtn.disabled) {
+      buyBtn.addEventListener('click', async () => {
+        try {
+          const res = await API.createOrder([{ journey_slug: data.slug, quantity: 1 }]);
+          const order = res.data || res;
+          const ok = confirm(`订单创建成功: ${order.order_no}\n金额: ${order.total_amount.toLocaleString()} 不思议币\n是否立即支付?`);
+          if (ok) {
+            await API.payOrder(order.id);
+            alert('支付成功！');
+          }
+        } catch (err) {
+          alert('下单失败: ' + (err.message || '请登录后再试'));
         }
       });
     }
@@ -285,6 +295,7 @@ Pages.Detail = {
       region: `<svg class="detail-meta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
       duration: `<svg class="detail-meta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
       cost: `<svg class="detail-meta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+      price: `<svg class="detail-meta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>`,
     };
     return `<span class="detail-meta__item">${icons[type] || ''}${this._escape(String(value))}</span>`;
   },

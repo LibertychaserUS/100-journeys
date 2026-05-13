@@ -19,6 +19,7 @@ type Journey struct {
 	ImagePath      string    `json:"-"` // raw DB path, resolved by service layer
 	ImageURL       string    `json:"image_url"` // resolved by service layer (local or CDN)
 	BookingURL     *string   `json:"booking_url,omitempty"`
+	Price          int       `json:"price"`
 	Tags           []Tag     `json:"tags,omitempty"`
 	MBTITypes      []JourneyMBTI `json:"mbti_types,omitempty"`
 	CreatedAt      time.Time `json:"created_at"`

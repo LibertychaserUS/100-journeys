@@ -53,6 +53,8 @@ func main() {
 	// Wire dependencies
 	repo := repository.NewJourneyRepository(db)
 	userRepo := repository.NewUserRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
+	txnRepo := repository.NewTransactionRepository(db)
 	media := &service.LocalProvider{BaseURL: mediaBase}
 	svc := service.NewJourneyService(repo, media)
 	aiProvider := ai.NewMockAI()
@@ -60,6 +62,8 @@ func main() {
 	h := handler.NewJourneyHandler(svc, aiProvider, engine)
 	authH := handler.NewAuthHandler(userRepo)
 	adminH := handler.NewAdminHandler(userRepo, repo)
+	orderH := handler.NewOrderHandler(orderRepo, repo, userRepo)
+	paymentH := handler.NewPaymentHandler(userRepo, txnRepo)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -98,6 +102,12 @@ func main() {
 
 		// Admin (protected + admin role)
 		handler.AdminRoutes(api, adminH)
+
+		// Orders (protected)
+		handler.OrderRoutes(api, orderH)
+
+		// Payments (protected)
+		handler.PaymentRoutes(api, paymentH)
 	}
 
 	// SPA fallback: serve index.html for non-API, non-static routes

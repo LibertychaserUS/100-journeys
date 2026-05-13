@@ -4,21 +4,24 @@
 ---
 
 ## Phase
-**Phase 4 — E2E (End-to-End Testing)** ✅ COMPLETE
-**Git tag**: `v1.0.0`
-**Checkpoint**: `checkpoints/CP-E2E-001.md`
+**Phase 5 — Feature Expansion v1.1.0** ✅ COMPLETE
+**Git tag**: `v1.1.0`
+**Checkpoint**: `checkpoints/CP-v1.1.0-features.md`
 **Date**: 2026-05-13
+**Branch**: `dev/v1.1.0`
 
 ## Build Status
 | Item | Status |
 |------|--------|
 | Go backend | ✅ `go build ./cmd/server/` passes |
-| Go tests | ✅ `go test ./...` — 43 tests, all green |
-| E2E tests | ✅ `npx playwright test` — 17 tests, all green |
-| Frontend (Home/Explore/Detail) | ✅ |
+| Go tests | ✅ `go test ./...` — 51 tests, all green |
+| E2E tests | ✅ `npx playwright test` — 29 tests, all green |
+| Frontend (Home/Explore/Detail/Profile/Recharge) | ✅ |
 | AI Pet | ✅ |
-| DB schema + seed | ✅ |
-| Git tags | `v0.0.0-skeleton` → `v0.3.0-tdd` → `v1.0.0` |
+| DB schema + seed (v1.1) | ✅ |
+| Order & Payment system | ✅ |
+| Points & Level system | ✅ |
+| Virtual currency (不思议币) | ✅ |
 
 ## Coverage Report
 | Package | Coverage | Target |
@@ -34,26 +37,24 @@
 | Home | 5 | ✅ |
 | Explore | 6 | ✅ |
 | Detail | 6 | ✅ |
-| **Total** | **17** | **✅ 100%** |
+| Auth | 8 | ✅ |
+| Order & Payment | 5 | ✅ |
+| **Total** | **29** | **✅ 100%** |
 
-## Worktree Branches
-| Directory | Branch | Purpose |
-|-----------|--------|---------|
-| `100-journeys/` | `main` | MVP 版本推进 |
-| `.worktrees/frontend-dev/` | `frontend-dev` | 前端开发 |
-| `.worktrees/backend-dev/` | `backend-dev` | 后端开发 |
-| `.worktrees/sql-dev/` | `sql-dev` | 数据库/schema |
-| `.worktrees/doc-trace/` | `doc-trace` | 文档/trace |
-
-## Critical Bugs Fixed in This Phase
-1. **Router query string parsing** — `/#/explore?q=x` fell back to Home (hash included `?` in path)
-2. **Detail API envelope unwrapping** — `_renderPage` received `{data: journey}` instead of `journey`
-3. **`const Pages` redeclaration** — multiple script tags share scope in Chromium
-4. **Router `this` context loss** — unbound method references
-5. **Seed tag slug mismatch** — Chinese names vs English slugs in `journey_tags`
+## Features v1.1.0
+| Feature | Description |
+|---------|-------------|
+| Unique order numbers | `JNY` + timestamp + random |
+| Multi-item orders | Bulk checkout with `[]CreateOrderItem` |
+| Atomic payment | SQLite transaction: verify → deduct → ledger → mark paid |
+| Recharge tiers | 7 tiers (60–9,980) with bonuses up to 2,888 |
+| Journey pricing | 5 journeys priced 8,999–29,999 |
+| Points & levels | 5,000 welcome points; Lv1–Lv6 discounts 0%–15% |
+| Audit trail | `transactions` table records every balance change |
 
 ## Active Blockers
 - None
 
 ## Next Action
-- Project complete. Optional: push to remote, CodeRabbit review, deploy.
+- Industrialize README + deploy to GitHub Pages
+- Merge `dev/v1.1.0` → `main`

@@ -28,6 +28,10 @@ const API = (() => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  function authedRequest(path, options = {}) {
+    return request(path, { ...options, headers: { ...authHeader(), ...options.headers } });
+  }
+
   return {
     // Journeys
     getJourneys: (params = {}) => {
@@ -42,7 +46,16 @@ const API = (() => {
     // Auth
     register: (data) => authRequest('/auth/register', data),
     login: (data) => authRequest('/auth/login', data),
-    me: () => request('/auth/me', { headers: authHeader() }),
+    me: () => authedRequest('/auth/me'),
+
+    // Orders
+    createOrder: (items) => authedRequest('/orders', { method: 'POST', body: JSON.stringify({ items }) }),
+    listOrders: () => authedRequest('/orders'),
+    payOrder: (id) => authedRequest(`/orders/${id}/pay`, { method: 'POST' }),
+
+    // Payments
+    recharge: (amount) => authedRequest('/payments/recharge', { method: 'POST', body: JSON.stringify({ amount }) }),
+    listTransactions: () => authedRequest('/payments/transactions'),
 
     // Media URL helper — CDN-aware
     mediaUrl: (path) => `${window.APP_CONFIG.mediaBase}/${path}`,

@@ -36,7 +36,7 @@ INSERT OR IGNORE INTO mbti_types (code, name, description, color) VALUES
 
 -- Journeys
 INSERT OR IGNORE INTO journeys
-  (title, slug, subtitle, story_hook, story, region, fantasy_type, visual_style, adventure_index, obscurity_level, risk_level, mood_keywords, image_path, booking_url)
+  (title, slug, subtitle, story_hook, story, region, fantasy_type, visual_style, adventure_index, obscurity_level, risk_level, mood_keywords, image_path, booking_url, price)
 VALUES
 (
   '徒步穿越玻利维亚盐沼',
@@ -52,7 +52,8 @@ VALUES
   3,
   '["孤独","无限感","镜面世界","极简主义"]',
   'bolivia-salt-flat.jpg',
-  NULL
+  NULL,
+  15999
 ),
 (
   '冰岛熔岩隧道骑行',
@@ -68,7 +69,8 @@ VALUES
   4,
   '["黑暗","回声","原始","恐惧","自由"]',
   'iceland-lava-tunnel.jpg',
-  NULL
+  NULL,
+  19999
 ),
 (
   '日本秘境温泉寺庙冥想',
@@ -84,7 +86,8 @@ VALUES
   2,
   '["冥想","沉默","蒸汽","冷却","纯净"]',
   'japan-temple-onsen.jpg',
-  NULL
+  NULL,
+  8999
 ),
 (
   '摩洛哥撒哈拉沙漠骆驼夜宿',
@@ -100,7 +103,8 @@ VALUES
   3,
   '["星空","辽阔","游牧","银河","夜晚"]',
   'morocco-sahara-camp.jpg',
-  NULL
+  NULL,
+  12999
 ),
 (
   '格陵兰犬拉雪橇独行',
@@ -116,7 +120,8 @@ VALUES
   5,
   '["极寒","孤独","犬队","生存","北极"]',
   'greenland-dog-sled.jpg',
-  NULL
+  NULL,
+  29999
 );
 
 -- Attach tags to journeys
