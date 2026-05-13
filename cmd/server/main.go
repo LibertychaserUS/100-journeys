@@ -24,6 +24,10 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	bindAddr := os.Getenv("BIND_ADDR")
+	if bindAddr == "" {
+		bindAddr = ":" + port
+	}
 
 	mediaBase := os.Getenv("CDN_BASE_URL")
 	if mediaBase == "" {
@@ -182,6 +186,6 @@ func main() {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
 
-	log.Printf("Server starting on :%s  mediaBase=%s  db=%s\n", port, mediaBase, dbPath)
-	log.Fatal(r.Run(":" + port))
+	log.Printf("Server starting on %s  mediaBase=%s  db=%s\n", bindAddr, mediaBase, dbPath)
+	log.Fatal(r.Run(bindAddr))
 }

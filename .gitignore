@@ -35,9 +35,29 @@ build/
 .env.local
 *.env
 
+# Secrets and cloud credentials
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+deploy/secrets/
+
 # Logs
 *.log
 .worktrees/
+
+# Runtime data and local caches
+data/
+uploads/
+tmp/
+.tmp/
+.cache/
+.nginx/
+deploy/nginx.local.conf
 
 # Node
 node_modules/
@@ -47,4 +67,3 @@ package-lock.json
 test-results/
 playwright-report/
 playwright/.cache/
-

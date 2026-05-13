@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+      - codex/**
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Go, JS, docs, and Nginx
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Nginx
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nginx sqlite3
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run Go tests
+        run: go test ./...
+
+      - name: Run Go vet
+        run: go vet ./...
+
+      - name: Check frontend JavaScript syntax
+        run: find web/js -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Check deployment script syntax
+        run: |
+          for f in scripts/deploy/install-systemd.sh scripts/deploy/verify-production-stack.sh scripts/backup-sqlite.sh scripts/nginx/render-local-config.sh scripts/nginx/update-cloudflare-real-ip.sh; do
+            bash -n "$f"
+          done
+
+      - name: Regenerate code-derived documentation
+        run: |
+          python3 scripts/docs/generate_project_artifacts.py
+          node scripts/docs/build_app_xlsx.mjs
+
+      - name: Dry-run systemd installer
+        run: scripts/deploy/install-systemd.sh --dry-run --skip-build
+
+      - name: Ensure generated docs are committed
+        run: git diff --exit-code -- app.xlsx docs/generated README.md docs/PRD.md docs/schema docs/ui-components docs/testing docs/ops
+
+      - name: Render local Nginx config
+        run: scripts/nginx/render-local-config.sh 18080 18081
+
+      - name: Check local Nginx config
+        run: nginx -t -c "$PWD/deploy/nginx.local.conf" -p "$PWD/.nginx"
+
+      - name: Run stress smoke profile
+        run: |
+          STRESS_PUBLIC_REQUESTS=120 \
+          STRESS_ANALYTICS_EVENTS=500 \
+          STRESS_USERS=10 \
+          STRESS_ORDERS=30 \
+          STRESS_ADMIN_REQUESTS=20 \
+          STRESS_IMAGE_REQUESTS=120 \
+          go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=120s
+
+  k6-smoke:
+    name: k6 through Nginx
+    runs-on: ubuntu-latest
+    needs: verify
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install Nginx
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nginx
+
+      - name: Set up k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Start Go server
+        run: |
+          mkdir -p tmp data
+          PORT=18081 DB_PATH=./data/ci-k6.db go run ./cmd/server > tmp/ci-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18081/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat tmp/ci-server.log
+          exit 1
+
+      - name: Start Nginx proxy
+        run: |
+          scripts/nginx/render-local-config.sh 18080 18081
+          nginx -c "$PWD/deploy/nginx.local.conf" -p "$PWD/.nginx"
+          curl -fsS http://127.0.0.1:18080/api/health
+          curl -fsSI http://127.0.0.1:18080/static/css/tokens.css | grep -qi 'content-type: text/css'
+          curl -fsSI http://127.0.0.1:18080/static/js/router.js | grep -Eqi 'content-type: (application|text)/javascript'
+          curl -fsSI http://127.0.0.1:18080/static/assets/images/generated/hero-taoyuan.jpg | grep -qi 'content-type: image/jpeg'
+
+      - name: Run public content k6 smoke
+        run: BASE_URL=http://127.0.0.1:18080 VUS=5 DURATION=10s k6 run tests/load/public-content-flow.k6.js
+
+      - name: Run order/payment k6 smoke
+        run: BASE_URL=http://127.0.0.1:18080 VUS=3 DURATION=10s k6 run tests/load/order-payment-audit.k6.js
+
+      - name: Run image cache k6 smoke
+        run: BASE_URL=http://127.0.0.1:18080 VUS=10 DURATION=10s k6 run tests/load/image-static-cache.k6.js
