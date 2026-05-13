@@ -51,7 +51,12 @@ jobs:
 
       - name: Check deployment script syntax
         run: |
-          for f in scripts/deploy/install-systemd.sh scripts/deploy/verify-production-stack.sh scripts/backup-sqlite.sh scripts/nginx/render-local-config.sh scripts/nginx/update-cloudflare-real-ip.sh; do
+          for f in \
+            scripts/deploy/init-demo-data.sh \
+            scripts/deploy/local-one-click.sh \
+            scripts/deploy/sync-tencent.sh \
+            scripts/backup-sqlite.sh \
+            scripts/nginx/render-local-config.sh; do
             bash -n "$f"
           done
 
@@ -60,8 +65,10 @@ jobs:
           python3 scripts/docs/generate_project_artifacts.py
           node scripts/docs/build_app_xlsx.mjs
 
-      - name: Dry-run systemd installer
-        run: scripts/deploy/install-systemd.sh --dry-run --skip-build
+      - name: Local one-click smoke
+        run: |
+          scripts/deploy/local-one-click.sh --no-nginx --public-port 18180 --api-port 18181 --db ./data/ci-local-one-click.db
+          scripts/deploy/local-one-click.sh --stop
 
       - name: Ensure generated docs are committed
         run: git diff --exit-code -- app.xlsx docs/generated README.md docs/PRD.md docs/schema docs/ui-components docs/testing docs/ops

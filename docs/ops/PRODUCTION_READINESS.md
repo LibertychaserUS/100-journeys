@@ -103,12 +103,21 @@
 - `/static/assets/images/avatars/github-default/avatar-00.svg` 经 Nginx 返回 `Content-Type: image/svg+xml`。
 - 初版 Nginx 模板漏掉 `/static/css/`、`/static/js/`、`/static/assets/`，本轮已修正生产模板和本地生成器。
 
+### 5.0 数据库访问层说明
+
+本项目没有使用 GORM。数据库写入由 `database/sql` + `modernc.org/sqlite` + repository 层完成：
+
+- `repository.NewDB` 开启 WAL、foreign keys、busy timeout，并限制 SQLite 单连接写入边界。
+- 注册用户由 `AuthHandler.Register` 完成校验和 bcrypt hash，再调用 `UserRepository.Create` 执行参数化 `INSERT INTO users`。
+- 钱包充值、订单支付、积分变更和交易流水属于 P0/P1，必须同步事务落库。
+- `analytics.Buffer` 只承接 P2 行为事件，默认容量 `32768`，后台 batch 写入 `analytics_events`；满载丢弃 P2 事件，不影响核心业务。
+
 ### 5.1 Demo 数据与后台验收
 
 `cmd/demo-data` 可生成可复现的演示数据：
 
 ```bash
-go run ./cmd/demo-data -db ./data/demo.db -users 50 -admins 3
+scripts/deploy/init-demo-data.sh ./data/demo.db
 ```
 
 数据口径：
@@ -118,6 +127,22 @@ go run ./cmd/demo-data -db ./data/demo.db -users 50 -admins 3
 - 部分用户可不透露 MBTI，符合“未测试/未填写可为空”的产品口径。
 - 头像、订单、流水和个人资料绑定服务端账户身份；前端个人页只展示用户名、邮箱、头像、钱包、积分、订单与流水，不展示内部数据库 ID。
 - 管理后台可看到用户数、订单数、收入、点击/购买、MBTI、性别、审计错误与导出结果。
+
+### 5.2 本地一键部署
+
+本地验收入口：
+
+```bash
+scripts/deploy/local-one-click.sh
+```
+
+脚本自动选择空闲端口，默认初始化 `./data/local-one-click.db`，创建 50 个普通用户与 3 个管理员，并打印最终访问 URL。端口递增最多尝试 5 次，超过后报错说明占用原因和处理命令。停止命令：
+
+```bash
+scripts/deploy/local-one-click.sh --stop
+```
+
+详细步骤：`docs/ops/LOCAL_ONE_CLICK_GUIDE.md`。
 
 ## 6. 当前压测证据
 
@@ -177,8 +202,8 @@ ok github.com/100-journeys/app/tests/stress 15.271s
 - [x] SSH 禁用密码登录，仅允许密钥；firewalld 开放 HTTP 和管理 IP 白名单 SSH。
 - [ ] `deploy/systemd/100-journeys-backup.timer` 已启用，定时调用 `scripts/backup-sqlite.sh`。
 - [ ] `deploy/systemd/100-journeys-stack.target` 能同时拉起 API、Nginx 和备份 timer。
-- [ ] `scripts/deploy/install-systemd.sh` 已在服务器 dry-run 后执行，并替换真实域名、TLS 证书、环境变量。
-- [ ] `scripts/deploy/verify-production-stack.sh` 已对生产域名执行 smoke 验证。
+- [x] 本地一键部署脚本 `scripts/deploy/local-one-click.sh` 已完成 SQLite 初始化、演示数据生成、自动换端口和停机验证。
+- [ ] 生产 systemd 安装脚本如需交付，可在正式域名/证书/服务器策略固定后从当前 Nginx 模板补齐。
 - [ ] 备份文件复制到异机、对象存储或另一块持久化盘。
 - [ ] 至少完成一次恢复演练。
 - [ ] 域名备案完成后配置 HTTPS 并截图/记录。

@@ -74,6 +74,8 @@
 | `NFR-SDD-007` | 图表和矩阵必须由 schema/routes/tests 生成或标注来源。 | `scripts/docs/generate_project_artifacts.py` |
 | `NFR-SDD-008` | 生产公网必须使用 HTTPS；本地 HTTP 只作为压测夹具。 | `deploy/nginx.conf` |
 | `NFR-SDD-009` | CI/CD 必须覆盖后端、前端语法、文档生成、Nginx 和 k6 smoke。 | `.github/workflows/ci.yml` |
+| `NFR-SDD-010` | 数据库访问必须使用可审计的参数化 SQL，不依赖 ORM 隐式映射。 | `database/sql`、repository 层 |
+| `NFR-SDD-011` | P0/P1 写入必须同步事务落库，P2 analytics 可异步缓冲。 | order/payment repos、`analytics.Buffer` |
 
 ## 4. 数据 Schema
 
@@ -160,7 +162,7 @@ JSON envelope:
 | API | `cmd/server/main.go`、`docs/generated/api-routes.md` |
 | 前端路由 | `web/js/router.js`、`docs/generated/frontend-routes.md` |
 | 测试 | `docs/testing/TDD-spec.md`、`docs/ops/LOAD_TEST_RESULTS.md`、`app.xlsx` |
-| 部署 | `deploy/nginx.conf`、`scripts/nginx/render-local-config.sh`、`docs/ops/` |
+| 部署 | `deploy/nginx.conf`、`scripts/deploy/local-one-click.sh`、`scripts/deploy/init-demo-data.sh`、`scripts/nginx/render-local-config.sh`、`docs/ops/` |
 
 ## 9. SDD 准入结论
 

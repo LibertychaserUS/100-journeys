@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	defaultUserPassword  = "DemoUser123"
-	defaultAdminPassword = "DemoAdmin12345"
+	defaultUserPassword  = "TaoyuanUser12345"
+	defaultAdminPassword = "TaoyuanAdmin12345"
 )
 
 type journeyLite struct {
@@ -117,8 +117,10 @@ func main() {
 	}
 	fmt.Printf("demo data ready: users=%d admins=%d total_users=%d paid_orders=%d gross_revenue=%d analytics_events=%d audit_errors=%d\n",
 		len(userIDs), len(adminIDs), stats.totalUsers, stats.paidOrders, stats.grossRevenue, stats.analyticsEvents, stats.auditErrors)
-	fmt.Printf("admin login: demo-admin-00@example.com / %s\n", *adminPassword)
-	fmt.Printf("user login: demo-virtual-00@example.com / %s\n", *userPassword)
+	fmt.Printf("admin login: admin@100journeys.demo / %s\n", *adminPassword)
+	fmt.Printf("user login: user@100journeys.demo / %s\n", *userPassword)
+	fmt.Printf("fixture admin login: demo-admin-01@example.com / %s\n", *adminPassword)
+	fmt.Printf("fixture user login: demo-virtual-01@example.com / %s\n", *userPassword)
 }
 
 func envOrDefault(name, fallback string) string {
@@ -136,6 +138,7 @@ func resetDemoData(ctx context.Context, db *sql.DB) error {
 		{`DELETE FROM analytics_events WHERE metadata LIKE ?`, []interface{}{"%demo_fixture%"}},
 		{`DELETE FROM audit_logs WHERE source = ?`, []interface{}{"demo-fixture"}},
 		{`DELETE FROM users WHERE email LIKE ? OR email LIKE ?`, []interface{}{"demo-virtual-%@example.com", "demo-admin-%@example.com"}},
+		{`DELETE FROM users WHERE email IN (?, ?)`, []interface{}{"user@100journeys.demo", "admin@100journeys.demo"}},
 	}
 	for _, stmt := range stmts {
 		if _, err := db.ExecContext(ctx, stmt.query, stmt.args...); err != nil {
@@ -168,11 +171,17 @@ func createAdmins(ctx context.Context, db *sql.DB, avatarURLBase string, count i
 	mbtis := []string{"INTJ", "ENTJ", "INFJ"}
 	ids := make([]int64, 0, count)
 	for i := 0; i < count; i++ {
+		username := fmt.Sprintf("DemoAdmin%02d", i)
+		email := fmt.Sprintf("demo-admin-%02d@example.com", i)
+		if i == 0 {
+			username = "桃源后台管理员"
+			email = "admin@100journeys.demo"
+		}
 		res, err := db.ExecContext(ctx,
 			`INSERT INTO users (username, email, password_hash, role, level, points, balance, mbti_type, gender)
 			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			fmt.Sprintf("DemoAdmin%02d", i),
-			fmt.Sprintf("demo-admin-%02d@example.com", i),
+			username,
+			email,
 			passwordHash,
 			model.RoleAdmin,
 			8+i%3,
@@ -185,7 +194,7 @@ func createAdmins(ctx context.Context, db *sql.DB, avatarURLBase string, count i
 			return nil, err
 		}
 		id, _ := res.LastInsertId()
-		if err := assignDefaultAvatar(ctx, db, avatarURLBase, id, i); err != nil {
+		if err := assignDefaultAvatar(ctx, db, avatarURLBase, id, i+8); err != nil {
 			return nil, err
 		}
 		ids = append(ids, id)
@@ -261,6 +270,14 @@ func profileFor(index int) virtualProfile {
 	}
 	name := names[index%len(names)]
 	emailStem := fmt.Sprintf("demo-virtual-%02d", index)
+	if index == 0 {
+		return virtualProfile{
+			Username: "桃源试游用户",
+			Email:    "user@100journeys.demo",
+			Gender:   "prefer_not_to_say",
+			MBTI:     "",
+		}
+	}
 	return virtualProfile{
 		Username: name,
 		Email:    emailStem + "@example.com",

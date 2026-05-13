@@ -1,6 +1,7 @@
 # 100 Journeys | 100种不可思议的旅行
 
-[![CI](https://img.shields.io/badge/CI-configured-blue)](.github/workflows/ci.yml)
+[![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
+[![Pages](https://github.com/LibertychaserUS/100-journeys/actions/workflows/pages.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/pages.yml)
 [![Stress](https://img.shields.io/badge/stress-target%20profile%20passing-green)](docs/ops/LOAD_TEST_RESULTS.md)
 [![k6](https://img.shields.io/badge/k6-baseline%20recorded-blue)](docs/ops/LOAD_TEST_RESULTS.md)
 [![E2E](https://img.shields.io/badge/Playwright-29%2F29%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
@@ -9,7 +10,7 @@
 
 English: **100 Journeys** is a lightweight full-stack Web App MVP for story-driven fantasy travel discovery. Users choose a mood, persona, or hidden world instead of browsing a conventional destination list.
 
-Current deploy branch: `codex/tencent-cloud-deploy`
+Current delivery target: `main`; deployment hardening branch: `codex/tencent-cloud-deploy`
 
 ---
 
@@ -74,6 +75,19 @@ English: The app is not a generic travel listing site. It is a compact content M
 | Tests | Go tests, Go stress, k6, Playwright | k6/Nginx baseline verified; visual browser audit captured; Playwright 29/29 passing |
 | CI/CD | GitHub Actions | Full-stack smoke added; remote run pending after push |
 | Image assets | image2 + local JPG/SVG assets | image2 was used as an image generation/material tool; it is not the core code-development tool |
+
+---
+
+## Database Access | 数据库访问
+
+中文：项目没有使用 GORM。数据库层采用 Go 标准 `database/sql`、`modernc.org/sqlite` 和 repository/service 分层。这样做的原因是本作业明确要求 SQLite、schema/API 契约、测试证据和可审计 SQL；手写参数化 SQL 更容易直接证明 `db/schema.sql`、API 行为和测试结果一致。
+
+English: The project does not use GORM. It uses Go `database/sql`, `modernc.org/sqlite`, and repository/service layers so the SQLite schema, API contract, SQL statements, and tests remain directly auditable.
+
+- 注册写入：`AuthHandler.Register` 校验验证码、用户名、密码和邮箱唯一性，然后 bcrypt 生成 `password_hash`，最后由 `UserRepository.Create` 用参数化 SQL 写入 `users`。
+- P0/P1 写入：用户、订单、钱包支付、交易流水使用同步 SQL 和事务，不进入 analytics buffer。
+- SQLite 并发：`repository.NewDB` 开启 WAL、foreign keys、busy timeout，并将连接限制为单连接；`retryBusy` 对 SQLite busy/lock 做短重试。
+- P2 buffer：`analytics.Buffer` 只处理点击、搜索、筛选、宠物回复等非关键事件，默认容量 `32768`，批量写入 `analytics_events`；满了只丢 P2，不影响注册、下单或支付。
 
 ---
 
@@ -273,16 +287,16 @@ Full generated route matrix: [`docs/generated/api-routes.md`](docs/generated/api
 ```bash
 git clone https://github.com/LibertychaserUS/100-journeys.git
 cd 100-journeys
-git switch feature/taoyuan-production-readiness
+git switch main
 
 go mod tidy
-PORT=8090 DB_PATH=./data/app.db go run ./cmd/server
+scripts/deploy/local-one-click.sh
 ```
 
 Then open:
 
 ```text
-http://127.0.0.1:8090
+The URL printed by the script, for example http://127.0.0.1:18080/
 ```
 
 Create or promote an admin account server-side:
@@ -298,13 +312,35 @@ go run ./cmd/admin-user \
 Generate deterministic demo data for dashboard review:
 
 ```bash
-go run ./cmd/demo-data \
-  -db ./data/demo.db \
-  -users 50 \
-  -admins 3
+scripts/deploy/init-demo-data.sh ./data/demo.db
 ```
 
 The demo generator creates 50 ordinary users and 3 admin users with bcrypt password hashes, local GitHub-style default avatars, complete required profile fields, paid orders, wallet transactions, saved journeys, analytics events, and audit evidence. Usernames may repeat in product terms; ownership is bound to the server-side account identity, not displayed as an internal database ID.
+
+Demo accounts after initialization:
+
+| Role | Account |
+|---|---|
+| User | `user@100journeys.demo` / `TaoyuanUser12345` |
+| Admin | `admin@100journeys.demo` / `TaoyuanAdmin12345` |
+
+## One-Click Local Deploy | 本地一键部署
+
+中文：本地验收推荐直接使用一键脚本。脚本会初始化 SQLite、演示用户、管理员、订单、流水和后台统计数据，并自动选择空闲端口。如果默认 `18080/18081` 被占用，会自动顺延到下一个可用端口；连续递增 5 次仍不可用时，会说明现实原因并退出。
+
+English: For local review, use the one-click script. It initializes SQLite, demo users, admins, orders, transactions, and dashboard evidence, then auto-selects free ports when the defaults are occupied.
+
+```bash
+scripts/deploy/local-one-click.sh
+```
+
+Stop it:
+
+```bash
+scripts/deploy/local-one-click.sh --stop
+```
+
+Full local guide: [`docs/ops/LOCAL_ONE_CLICK_GUIDE.md`](docs/ops/LOCAL_ONE_CLICK_GUIDE.md)
 
 ---
 
@@ -398,6 +434,7 @@ Operational docs:
 - [`docs/ops/PRODUCTION_READINESS.md`](docs/ops/PRODUCTION_READINESS.md)
 - [`docs/ops/DISASTER_RECOVERY.md`](docs/ops/DISASTER_RECOVERY.md)
 - [`docs/ops/LOAD_TEST_RESULTS.md`](docs/ops/LOAD_TEST_RESULTS.md)
+- [`docs/ops/LOCAL_ONE_CLICK_GUIDE.md`](docs/ops/LOCAL_ONE_CLICK_GUIDE.md)
 - [`deploy/nginx.conf`](deploy/nginx.conf)
 
 ---

@@ -42,6 +42,8 @@
 + /cmd/server/**
 + /cmd/admin-user/
 + /cmd/admin-user/**
++ /cmd/demo-data/
++ /cmd/demo-data/**
 + /internal/
 + /internal/**
 + /db/
@@ -55,6 +57,8 @@
 + /scripts/
 + /scripts/backup-sqlite.sh
 + /scripts/deploy/
-+ /scripts/deploy/sync-tencent.sh
++ /scripts/deploy/***
++ /scripts/nginx/
++ /scripts/nginx/***
 
 - /**

@@ -50,7 +50,7 @@ flowchart LR
 | Mermaid 图表 | README、PRD、SDD、DDD、Prompt log、`docs/generated/*.mmd` |
 | 测试代码 | `internal/**/*_test.go`、`e2e/tests/*.spec.js`、`tests/load/*.js`、`tests/stress/stress_test.go` |
 | 测试用例表 | `app.xlsx`、`docs/generated/app-test-cases.csv` |
-| 部署与灾备说明 | `docs/ops/PRODUCTION_READINESS.md`、`docs/ops/DISASTER_RECOVERY.md` |
+| 部署与灾备说明 | `docs/ops/PRODUCTION_READINESS.md`、`docs/ops/DISASTER_RECOVERY.md`、`docs/ops/LOCAL_ONE_CLICK_GUIDE.md` |
 
 ## 4. 提交前检查
 
@@ -72,4 +72,7 @@ GOCACHE="$PWD/.cache/go-build" go vet ./...
 find web/js -name '*.js' -exec node --check {} \;
 python3 scripts/docs/generate_project_artifacts.py
 node scripts/docs/build_app_xlsx.mjs
+bash -n scripts/deploy/*.sh
+scripts/deploy/local-one-click.sh
+scripts/deploy/local-one-click.sh --stop
 ```

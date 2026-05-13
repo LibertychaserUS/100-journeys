@@ -273,7 +273,7 @@ const summaryRows = [
   ["测试用例总数", cases.length, "", typeCounts[0]?.[0] ?? "", typeCounts[0]?.[1] ?? ""],
   ["来源", "docs/generated/app-test-cases.csv", "", typeCounts[1]?.[0] ?? "", typeCounts[1]?.[1] ?? ""],
   ["生成方式", "由代码路由、schema、测试文件生成后汇总", "", typeCounts[2]?.[0] ?? "", typeCounts[2]?.[1] ?? ""],
-  ["适用分支", "feature/taoyuan-production-readiness", "", typeCounts[3]?.[0] ?? "", typeCounts[3]?.[1] ?? ""],
+  ["适用分支", "codex/tencent-cloud-deploy -> main", "", typeCounts[3]?.[0] ?? "", typeCounts[3]?.[1] ?? ""],
 ];
 
 const verificationRows = [
@@ -282,11 +282,12 @@ const verificationRows = [
   ["Go 单元/集成测试", "go test ./...", "通过"],
   ["Go vet", "go vet ./...", "通过"],
   ["JS 语法检查", "find web/js -name '*.js' -exec node --check {} \\;", "通过"],
-  ["Go stress", "go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s", "目标组合档通过：ok .../tests/stress 1.701s"],
+  ["Go stress", "go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s", "目标组合档通过：ok .../tests/stress 7.040s"],
   ["Nginx 本地代理", "nginx -t / curl /api/health / curl -I static assets", "通过，详见 docs/ops/LOAD_TEST_RESULTS.md"],
+  ["本地一键部署", "scripts/deploy/local-one-click.sh", "初始化 SQLite、演示用户、管理员并自动选择空闲端口"],
   ["k6 负载脚本", "tests/load/*.k6.js", "基线通过，auth/admin 重压边界已记录"],
   ["浏览器视觉审查", "tmp/visual-review/*.png", "已捕获桌面/移动、用户页、充值页和后台页；22 张截图，0 破图/溢出/控制台错误"],
-  ["Playwright E2E", "E2E_BASE_URL=http://127.0.0.1:18080 npx playwright test", "通过，31/31"],
+  ["Playwright E2E", "cd e2e && npx playwright test", "通过，29/29"],
   ["CI/CD", ".github/workflows/ci.yml", "workflow 已新增，远端运行待 push 后确认"],
 ];
 
