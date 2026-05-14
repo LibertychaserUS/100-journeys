@@ -12,6 +12,15 @@ Pages.Explore = {
   _hasMore: true,
   _tags: [],
   _debounceTimer: null,
+  _imageMap: {
+    'bolivia-salt-flat-trek': '/static/assets/images/generated/card-salt-mirror.jpg',
+    'iceland-lava-tunnel-cycling': '/static/assets/images/generated/card-lava-tunnel.jpg',
+    'japan-onsen-temple-meditation': '/static/assets/images/generated/card-temple-onsen.jpg',
+    'morocco-sahara-camel-camp': '/static/assets/images/generated/card-sahara-stars.jpg',
+    'greenland-dog-sled-solo': '/static/assets/images/generated/card-greenland-sled.jpg',
+    'norway-aurora-hunt': '/static/assets/images/generated/hero-taoyuan.jpg',
+    'turkey-cappadocia-balloon': '/static/assets/images/generated/card-city-rules.jpg',
+  },
 
   render() {
     const main = document.getElementById('main-content');
@@ -66,8 +75,20 @@ Pages.Explore = {
       'ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP',
     ];
 
-    const visualStyles = ['写实','动漫','油画','像素','水墨','赛博朋克'];
-    const fantasyTypes = ['科幻','奇幻','武侠','末日','蒸汽朋克','克苏鲁'];
+    const visualStyles = [
+      { label: '纪实', value: 'raw' },
+      { label: '梦境', value: 'surreal' },
+      { label: '留白', value: 'minimal' },
+      { label: '暗光', value: 'dramatic' },
+    ];
+    const fantasyTypes = [
+      { label: '极限地貌', value: 'extreme' },
+      { label: '独处治愈', value: 'solitude' },
+      { label: '视觉奇观', value: 'visual' },
+      { label: '异域规则', value: 'culture' },
+      { label: '精神秘境', value: 'spiritual' },
+      { label: '夜行星空', value: 'night' },
+    ];
 
     const advMin = this._currentFilter.adventure_min ?? 0;
     const advMax = this._currentFilter.adventure_max ?? 10;
@@ -98,8 +119,8 @@ Pages.Explore = {
           <span class="explore-filters__label">视觉风格</span>
           <div class="explore-filters__chips" role="group" aria-label="视觉风格筛选" id="filter-visual">
             ${visualStyles.map(v => {
-              const active = this._currentFilter.visual_style === v ? 'explore-chip--active' : '';
-              return `<button class="explore-chip ${active}" data-key="visual_style" data-value="${v}" type="button" aria-pressed="${!!active}">${v}</button>`;
+              const active = this._currentFilter.visual_style === v.value ? 'explore-chip--active' : '';
+              return `<button class="explore-chip ${active}" data-key="visual_style" data-value="${v.value}" type="button" aria-pressed="${!!active}">${v.label}</button>`;
             }).join('')}
           </div>
         </div>
@@ -109,8 +130,8 @@ Pages.Explore = {
           <span class="explore-filters__label">幻想类型</span>
           <div class="explore-filters__chips" role="group" aria-label="幻想类型筛选" id="filter-fantasy">
             ${fantasyTypes.map(f => {
-              const active = this._currentFilter.fantasy_type === f ? 'explore-chip--active' : '';
-              return `<button class="explore-chip ${active}" data-key="fantasy_type" data-value="${f}" type="button" aria-pressed="${!!active}">${f}</button>`;
+              const active = this._currentFilter.fantasy_type === f.value ? 'explore-chip--active' : '';
+              return `<button class="explore-chip ${active}" data-key="fantasy_type" data-value="${f.value}" type="button" aria-pressed="${!!active}">${f.label}</button>`;
             }).join('')}
           </div>
         </div>
@@ -235,10 +256,11 @@ Pages.Explore = {
       const tagContainer = document.getElementById('filter-tags');
       if (!tagContainer) return;
 
-      const names = this._tags.map(t => t.name || t.slug || t);
-      tagContainer.innerHTML = names.map(name => {
-        const active = this._currentFilter.tag === name ? 'explore-chip--active' : '';
-        return `<button class="explore-chip ${active}" data-key="tag" data-value="${this._escapeHtml(name)}" type="button" aria-pressed="${!!active}">${this._escapeHtml(name)}</button>`;
+      tagContainer.innerHTML = this._tags.map(tag => {
+        const name = tag.name || tag.slug || tag;
+        const value = tag.slug || tag.name || tag;
+        const active = this._currentFilter.tag === value ? 'explore-chip--active' : '';
+        return `<button class="explore-chip ${active}" data-key="tag" data-value="${this._escapeHtml(value)}" type="button" aria-pressed="${!!active}">${this._escapeHtml(name)}</button>`;
       }).join('');
 
       // Bind clicks
@@ -327,13 +349,19 @@ Pages.Explore = {
       grid.querySelectorAll('.journey-card').forEach(card => {
         card.addEventListener('click', () => {
           const slug = card.dataset.slug;
-          if (slug) Router.navigate(`/journey/${encodeURIComponent(slug)}`);
+          if (slug) {
+            this._trackEvent('journey_click', slug);
+            Router.navigate(`/journey/${encodeURIComponent(slug)}`);
+          }
         });
         card.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             const slug = card.dataset.slug;
-            if (slug) Router.navigate(`/journey/${encodeURIComponent(slug)}`);
+            if (slug) {
+              this._trackEvent('journey_click', slug);
+              Router.navigate(`/journey/${encodeURIComponent(slug)}`);
+            }
           }
         });
       });
@@ -343,7 +371,8 @@ Pages.Explore = {
         results.textContent = reset && journeys.length === 0 ? '' : `共 ${total} 个结果`;
       }
 
-      this._hasMore = journeys.length === 12;
+      const loadedCount = reset ? journeys.length : grid.querySelectorAll('.journey-card').length;
+      this._hasMore = loadedCount < total;
       if (loadMoreWrap) {
         if (!this._hasMore && journeys.length > 0) {
           loadMoreWrap.innerHTML = '<p class="explore-end">已到底部</p>';
@@ -384,7 +413,7 @@ Pages.Explore = {
   },
 
   _renderCard(j) {
-    const imageUrl = j.image_url || '/static/assets/images/placeholder.jpg';
+    const imageUrl = this._imageMap[j.slug] || j.image_url || '/static/assets/images/placeholder.jpg';
 
     const aspectStyle = j.aspect_ratio
       ? `padding-bottom: ${(1 / j.aspect_ratio * 100).toFixed(2)}%;`
@@ -405,6 +434,9 @@ Pages.Explore = {
                src="${this._escapeHtml(imageUrl)}"
                alt="${this._escapeHtml(j.title)}"
                loading="lazy"
+               decoding="async"
+               width="900"
+               height="1200"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
                onerror="this.src='/static/assets/images/placeholder.jpg'">
         </div>
@@ -474,5 +506,21 @@ Pages.Explore = {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  },
+
+  _trackEvent(type, slug) {
+    try {
+      const payload = JSON.stringify({ type, journey_slug: slug || '' });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(`${window.APP_CONFIG.apiBase}/analytics/events`, new Blob([payload], { type: 'application/json' }));
+        return;
+      }
+      fetch(`${window.APP_CONFIG.apiBase}/analytics/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
   },
 };

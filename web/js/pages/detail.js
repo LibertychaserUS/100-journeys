@@ -5,6 +5,14 @@ var Pages = window.Pages || {};
 
 Pages.Detail = {
   _observer: null,
+  _imageMap: {
+    'bolivia-salt-flat-trek': '/static/assets/images/generated/card-salt-mirror.jpg',
+    'iceland-lava-tunnel-cycling': '/static/assets/images/generated/card-lava-tunnel.jpg',
+    'japan-onsen-temple-meditation': '/static/assets/images/generated/card-temple-onsen.jpg',
+    'morocco-sahara-camel-camp': '/static/assets/images/generated/card-sahara-stars.jpg',
+    'greenland-dog-sled-solo': '/static/assets/images/generated/card-greenland-sled.jpg',
+    'turkey-cappadocia-balloon': '/static/assets/images/generated/card-city-rules.jpg',
+  },
 
   render(slug) {
     const main = document.getElementById('main-content');
@@ -124,9 +132,21 @@ Pages.Detail = {
       .join('');
 
     // Image URL
-    const imageUrl = data.image_url
-      ? (data.image_url.startsWith('http') ? data.image_url : API.mediaUrl(data.image_url))
+    const rawImage = this._imageMap[data.slug] || data.image_url || '';
+    const imageUrl = rawImage
+      ? (rawImage.startsWith('http') || rawImage.startsWith('/') ? rawImage : API.mediaUrl(rawImage))
       : '';
+
+    const storyParts = data.story
+      ? data.story.split('。').map((p) => p.trim()).filter(Boolean)
+      : [];
+    const roleText = this._roleFor(data);
+    const missionText = this._missionFor(data);
+    const sceneText = [
+      data.story_hook || data.subtitle || '先把目的地当成一个可以进入的世界。',
+      storyParts[0] ? storyParts[0] + '。' : '你从熟悉的生活边界出发，进入一段带有规则、身份与线索的旅程。',
+      storyParts[1] ? storyParts[1] + '。' : '不要急着打卡，先观察光、声音、风向和陌生人的节奏。',
+    ];
 
     main.innerHTML = `
       <article class="detail-page">
@@ -157,6 +177,26 @@ Pages.Detail = {
 
         ${moodsHtml ? `<div class="detail-moods">${moodsHtml}</div>` : ''}
 
+        <section class="detail-cinematic" aria-label="沉浸式旅程简介">
+          <section class="detail-scene detail-reveal">
+            <span class="detail-scene__eyebrow">临时身份</span>
+            <h2>${this._escape(roleText)}</h2>
+            <p>${this._escape(sceneText[0])}</p>
+          </section>
+          <section class="detail-scene detail-scene--image detail-reveal">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${this._escape(data.title)}" loading="lazy" decoding="async">` : ''}
+            <div>
+              <span class="detail-scene__eyebrow">任务</span>
+              <h2>${this._escape(missionText)}</h2>
+              <p>${this._escape(sceneText[1])}</p>
+            </div>
+          </section>
+          <section class="detail-scene detail-scene--split detail-reveal">
+            <div class="detail-art-word">${this._escape(this._artWord(data))}</div>
+            <p>${this._escape(sceneText[2])}</p>
+          </section>
+        </section>
+
         <section class="detail-story">${storyHtml}</section>
 
         <section class="detail-clue">
@@ -176,6 +216,10 @@ Pages.Detail = {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             收藏
           </button>
+          <div class="detail-auth-notice" id="detail-auth-notice" hidden>
+            请先登录后购买旅程。
+            <button type="button" id="detail-auth-login">去登录</button>
+          </div>
         </div>
       </article>
     `;
@@ -210,8 +254,12 @@ Pages.Detail = {
           navigator.clipboard.writeText(url).catch(() => {});
         }
         // Visual feedback
+        shareBtn.dataset.copied = 'true';
         shareBtn.style.transform = 'scale(1.15)';
-        setTimeout(() => (shareBtn.style.transform = ''), 200);
+        setTimeout(() => {
+          shareBtn.style.transform = '';
+          delete shareBtn.dataset.copied;
+        }, 1000);
       });
     }
 
@@ -219,6 +267,10 @@ Pages.Detail = {
     const buyBtn = document.getElementById('detail-cta-buy');
     if (buyBtn && !buyBtn.disabled) {
       buyBtn.addEventListener('click', async () => {
+        if (!API.isLoggedIn()) {
+          this._showLoginNotice();
+          return;
+        }
         try {
           const res = await API.createOrder([{ journey_slug: data.slug, quantity: 1 }]);
           const order = res.data || res;
@@ -226,11 +278,17 @@ Pages.Detail = {
           if (ok) {
             await API.payOrder(order.id);
             alert('支付成功！');
+            if (window.App && window.App.updateNav) window.App.updateNav();
           }
         } catch (err) {
           alert('下单失败: ' + (err.message || '请登录后再试'));
         }
       });
+    }
+
+    const loginBtn = document.getElementById('detail-auth-login');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => Router.navigate('#/login'));
     }
 
     // Save button
@@ -244,6 +302,14 @@ Pages.Detail = {
           : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>收藏`;
       });
     }
+  },
+
+  _showLoginNotice() {
+    const notice = document.getElementById('detail-auth-notice');
+    if (!notice) return;
+    notice.hidden = false;
+    notice.classList.add('is-visible');
+    notice.scrollIntoView({ behavior: 'smooth', block: 'center' });
   },
 
   _setupParallax() {
@@ -267,8 +333,8 @@ Pages.Detail = {
   },
 
   _setupScrollReveal() {
-    const card = document.getElementById('clue-card');
-    if (!card) return;
+    const targets = document.querySelectorAll('.detail-reveal, #clue-card');
+    if (!targets.length) return;
 
     if (this._observer) {
       this._observer.disconnect();
@@ -278,16 +344,35 @@ Pages.Detail = {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            card.classList.remove('is-hidden');
-            card.classList.add('is-revealed');
-            this._observer.unobserve(card);
+            entry.target.classList.remove('is-hidden');
+            entry.target.classList.add('is-revealed');
+            this._observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.2, rootMargin: '0px 0px -40px 0px' }
     );
 
-    this._observer.observe(card);
+    targets.forEach((target) => this._observer.observe(target));
+  },
+
+  _roleFor(data) {
+    const firstMbti = (data.mbti_types || [])[0]?.mbti_type?.code || '旅人';
+    if ((data.fantasy_type || '').includes('night')) return `给 ${firstMbti} 的夜行观测者身份`;
+    if ((data.fantasy_type || '').includes('extreme')) return `给 ${firstMbti} 的边界勘探者身份`;
+    if ((data.fantasy_type || '').includes('spiritual')) return `给 ${firstMbti} 的静默修行者身份`;
+    return `给 ${firstMbti} 的隐秘世界访客身份`;
+  },
+
+  _missionFor(data) {
+    const title = data.title || '这段旅程';
+    if (data.story_hook) return data.story_hook;
+    return `用半天到一天，找到「${title}」真正让你停下来的那个瞬间。`;
+  },
+
+  _artWord(data) {
+    const words = data.mood_keywords || [];
+    return words[0] || data.fantasy_type || '桃源';
   },
 
   _metaIcon(type, value) {

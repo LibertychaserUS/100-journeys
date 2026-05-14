@@ -9,6 +9,10 @@
   if (!container) return;
 
   let profile = AIPet.getProfile();
+  if (profile.firstVisit) {
+    profile = { ...profile, name: profile.name || '小旅', type: profile.type || 'light', firstVisit: false };
+    AIPet.saveProfile(profile);
+  }
   let chatOpen = false;
   let pageViewCount = 0;
   let idleTimer = null;
@@ -18,50 +22,20 @@
   // ── Render ──
   function render() {
     container.innerHTML = `
-      ${renderSetup()}
       ${renderChat()}
       ${renderAvatar()}
     `;
     bindEvents();
-    if (profile.firstVisit) {
-      openSetup();
-    }
   }
 
   function renderSetup() {
-    return `
-      <div class="ai-pet__setup" id="ai-pet-setup">
-        <div class="ai-pet__setup-card">
-          <div class="ai-pet__setup-title">✨ 领养你的旅行向导</div>
-          <div class="ai-pet__setup-subtitle">选择一只可爱的像素宠物，陪你发现不可思议的旅行</div>
-          <div class="ai-pet__type-select">
-            <div class="ai-pet__type-option" data-type="dog">
-              <div class="ai-pet__type-icon">🐕</div>
-              <div class="ai-pet__type-label">小狗</div>
-            </div>
-            <div class="ai-pet__type-option" data-type="cat">
-              <div class="ai-pet__type-icon">🐈</div>
-              <div class="ai-pet__type-label">小猫</div>
-            </div>
-          </div>
-          <input type="text" class="ai-pet__name-input" id="ai-pet-name" placeholder="给它取个名字..." maxlength="10" value="小旅">
-          <button class="ai-pet__setup-btn" id="ai-pet-setup-btn">开始旅行 ✨</button>
-        </div>
-      </div>
-    `;
+    return '';
   }
 
   function renderAvatar() {
     return `
       <div class="ai-pet__avatar ${chatOpen ? '' : 'ai-pet__avatar--bounce'}" id="ai-pet-avatar">
-        <div class="ai-pet__ears">
-          <div class="ai-pet__ear ai-pet__ear--left"></div>
-          <div class="ai-pet__ear ai-pet__ear--right"></div>
-        </div>
-        <div class="ai-pet__face">
-          <div class="ai-pet__mouth"></div>
-        </div>
-        ${profile.firstVisit ? '<div class="ai-pet__notify">!</div>' : ''}
+        <img class="ai-pet__light" src="/static/assets/images/generated/guide-light.png" alt="旅行向导">
       </div>
     `;
   }
@@ -71,7 +45,7 @@
       <div class="ai-pet__chat ${chatOpen ? 'ai-pet__chat--open' : ''}" id="ai-pet-chat">
         <div class="ai-pet__header">
           <div class="ai-pet__header-avatar">
-            <div class="ai-pet__face"><div class="ai-pet__mouth"></div></div>
+            <img class="ai-pet__light" src="/static/assets/images/generated/guide-light.png" alt="旅行向导">
           </div>
           <div>
             <div class="ai-pet__header-name">${profile.name || '小旅'}</div>
@@ -94,22 +68,11 @@
     const close = document.getElementById('ai-pet-close');
     const send = document.getElementById('ai-pet-send');
     const input = document.getElementById('ai-pet-input');
-    const setupBtn = document.getElementById('ai-pet-setup-btn');
 
     if (avatar) avatar.addEventListener('click', toggleChat);
     if (close) close.addEventListener('click', closeChat);
     if (send) send.addEventListener('click', sendMessage);
     if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
-    if (setupBtn) setupBtn.addEventListener('click', completeSetup);
-
-    // Type selection
-    document.querySelectorAll('.ai-pet__type-option').forEach(el => {
-      el.addEventListener('click', () => {
-        document.querySelectorAll('.ai-pet__type-option').forEach(o => o.classList.remove('ai-pet__type-option--selected'));
-        el.classList.add('ai-pet__type-option--selected');
-        el.dataset.selected = 'true';
-      });
-    });
   }
 
   // ── Setup ──
@@ -246,7 +209,10 @@
     } else if (action.action === 'mbti_quiz' || action.type === 'mbti_quiz') {
       startQuiz();
     } else if (action.type === 'filter') {
-      window.location.hash = '#/explore';
+      const params = new URLSearchParams();
+      if (action.data?.risk_max != null) params.set('adventure_max', String(action.data.risk_max * 2));
+      if (action.data?.risk_min != null) params.set('adventure_min', String(action.data.risk_min * 2));
+      Router.navigate(`#/explore${params.toString() ? '?' + params.toString() : ''}`);
       closeChat();
     }
   }
@@ -307,28 +273,10 @@
   // ── Triggers ──
   function onPageView() {
     pageViewCount++;
-    if (pageViewCount === 3 && !chatOpen && !profile.firstVisit) {
-      setTimeout(() => {
-        openChat();
-        addPetMessage('你已经看了好几个旅行啦！👀 要不要做个性格测试，让我给你推荐最适合的？', [
-          { type: 'button', label: '开始测试', action: 'mbti_quiz' },
-          { type: 'button', label: '不用啦', action: 'dismiss' },
-        ]);
-      }, 500);
-    }
   }
 
   function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      if (!chatOpen && !profile.firstVisit) {
-        openChat();
-        addPetMessage('你还在吗？🌙 我发现了一些超棒的旅行体验，要不要看看？', [
-          { type: 'recommend', label: '看看推荐' },
-          { type: 'button', label: '我在忙', action: 'dismiss' },
-        ]);
-      }
-    }, 10000); // 10 seconds
   }
 
   // ── Utilities ──

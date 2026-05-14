@@ -1,367 +1,269 @@
-# PRD — 100种不可思议的旅行
+# PRD - 100种不可思议的旅行
 
-> Product Requirements Document
-> Version: 1.0
-> Date: 2026-05-13
-
----
-
-## 1. 产品概述
-
-### 1.1 产品定位
-一款轻量级 MVP Web 应用，展示"不可思议的旅行"体验。通过 AI 旅行伴侣、MBTI 性格匹配、虚拟货币系统，为用户提供沉浸式的奇幻旅行探索与预订体验。
-
-### 1.2 目标用户
-- 18-35 岁，追求独特旅行体验的都市青年
-- 对 MBTI、奇幻文学、视觉艺术有兴趣的人群
-- 愿意为先导概念付费的早期体验者
-
-### 1.3 核心卖点
-- **人格化匹配**: 16 种 MBTI 类型对应不同旅行风格
-- **AI 旅行伴侣**: 像素风宠物，陪伴探索、聊天推荐
-- **奇幻世界观**: 每段旅程都是一次进入异世界的冒险
+> 版本: 2026-05-14 production-readiness branch
+> 分支: `feature/taoyuan-production-readiness`
+> 标准对齐: ISO/IEC/IEEE 29148:2018 Requirements Engineering 风格
+> 追踪原则: PRD 必须与代码、schema、路由、测试证据和生成图表一致。
 
 ---
 
-## 2. 功能模块
+## 0. 标准对齐
 
-### 2.1 旅程探索系统
+本文档是产品级需求文档，用 ISO/IEC/IEEE 29148:2018 的需求质量原则组织：范围明确、干系人明确、需求可验证、接口和数据可追踪、验收证据可审计。
 
-#### 2.1.1 首页 (Home)
-**用户故事**: 作为游客，我想看到引人入胜的首页，快速了解平台价值。
+### 0.1 开发工具语境
 
-**功能需求**:
-- [x] 全屏 Hero 区域，带背景图 + 标题 + 副标题 + CTA 按钮
-- [x] 统计栏展示平台数据（旅程数、大洲数、MBTI 适配数）
-- [x] 精选旅程卡片网格（6 张）
-- [x] 卡片展示: 封面图、标题、故事钩子、类型标签、MBTI 标签、难度等级
-- [ ] **Hero 粒子动效背景** — Canvas 星空/粒子漂移效果
+本项目全部开发记录统一为：**使用已接入 Kimi API 的 Claude Code 完成**。Claude Code 是实际工程执行工具，Kimi API 是其本地接入的模型/服务后端；需求拆解、SDD/DDD/TDD/E2E、全栈实现、测试验证和交付文档均按该开发语境归档。
 
-**验收标准**:
-- 首屏加载 < 2s（本地）
-- 卡片图片懒加载
-- 响应式: 移动端 1 列，平板 2 列，桌面 3 列
+图片素材说明：项目中的生成类旅行图、品牌图和默认头像资产可记录为使用 **image2** 辅助生成或整理。image2 只作为图片资产生成工具，不作为主体代码开发工具。
 
-#### 2.1.2 探索页 (Explore)
-**用户故事**: 作为用户，我想通过多维度筛选找到适合我的旅程。
+| 标准关注点 | PRD 章节 | 证据规则 |
+|---|---|---|
+| 目的与范围 | 1、9 | 明确产品目的和不做什么 |
+| 干系人需求 | 2 | 游客、注册用户、管理员、审阅者、维护者分离 |
+| 系统需求 | 3、4 | 使用稳定 ID：`FR-*`、`NFR-*` |
+| 接口与数据 | 5、6 | 指向 `db/schema.sql` 和生成路由矩阵 |
+| 验证 | 8、10 | 结论必须有测试、k6、Nginx、CI 或文档证据 |
 
-**功能需求**:
-- [x] 搜索栏: 实时搜索（300ms debounce）
-- [x] MBTI 筛选: 16 种人格类型，单选
-- [x] 标签筛选: 动态从 API 加载
-- [x] 视觉风格筛选: 写实、动漫、油画、像素、水墨、赛博朋克
-- [x] 幻想类型筛选: 科幻、奇幻、武侠、末日、蒸汽朋克、克苏鲁
-- [x] 冒险程度双滑块: 0-10 范围
-- [x] Masonry 卡片网格 + 无限滚动
-- [x] 结果计数展示
-- [x] URL hash 同步筛选状态
+关联文档：
 
-**验收标准**:
-- 筛选切换后 500ms 内刷新结果
-- 无限滚动触发距离: 距底部 400px
-- 空状态展示引导文案
+- 初始 PRD: `docs/INITIAL_PRD.md`
+- SDD/API: `docs/schema/SDD-spec.md`、`docs/schema/api-contract.md`
+- DDD/UI: `docs/ui-components/DDD-spec.md`
+- TDD/Test: `docs/testing/TDD-spec.md`、`docs/testing/test-plan.md`
+- 负载与运维: `docs/ops/PRODUCTION_READINESS.md`、`docs/ops/LOAD_TEST_RESULTS.md`
+- 生成证据: `docs/generated/`
+- 文档演进: `docs/workflow/DOCUMENTATION_EVOLUTION.md`
 
-#### 2.1.3 旅程详情 (Detail)
-**用户故事**: 作为用户，我想深入了解一个旅程的故事、参数，并决定是否购买。
-
-**功能需求**:
-- [x] 大图封面 + 视觉风格主题色
-- [x] 标题 + 副标题 + 故事正文
-- [x] 元信息: 地区、时长、冒险等级、隐秘等级、风险等级
-- [x] 心情关键词标签
-- [x] 价格展示 + 下单按钮
-- [x] 相关推荐
-
-**验收标准**:
-- 页面进入时平滑滚动到顶部
-- 视觉风格自动切换 body class（如 `style-surreal`）
-
----
-
-### 2.2 用户系统
-
-#### 2.2.1 注册 (Register)
-**功能需求**:
-- [x] 用户名（2-30 字符）
-- [x] 邮箱（唯一）
-- [x] 密码（≥6 位）
-- [x] 数学题验证码（防机器人）
-- [x] 注册成功自动登录，跳转首页
-
-**验收标准**:
-- 验证码 5 分钟过期
-- 邮箱重复返回明确错误
-- 密码 bcrypt 加密存储
-
-#### 2.2.2 登录 (Login)
-**功能需求**:
-- [x] 邮箱 + 密码
-- [x] 数学题验证码
-- [x] "记住我" 选项（localStorage token 持久化）
-- [x] JWT Token 认证
-- [x] 登录后显示用户菜单
-
-**验收标准**:
-- Token 有效期 24h
-- 自动登录: 刷新页面保持登录态
-
-#### 2.2.3 个人中心 (Profile)
-**功能需求**:
-- [x] 用户基本信息展示
-- [x] 当前余额、积分、等级
-- [x] MBTI 人格展示（含 4 色组分类）
-- [x] 订单历史列表
-- [x] 交易流水（充值/消费/退款）
-- [ ] **收藏的旅程** — 心愿单功能
-
-**验收标准**:
-- 订单按时间倒序排列
-- 交易流水支持分页
-
----
-
-### 2.3 订单与支付系统
-
-#### 2.3.1 下单流程
-**功能需求**:
-- [x] 旅程详情页点击"预订"
-- [x] 创建订单（唯一订单号）
-- [x] 自动应用等级折扣（Lv1-Lv6: 0%-15%）
-- [x] 订单状态: pending → paid / cancelled
-
-#### 2.3.2 支付
-**功能需求**:
-- [x] 余额支付（原子事务）
-- [x] 余额不足提示充值
-- [x] 支付成功后更新订单状态 + 扣款 + 记录流水
-
-#### 2.3.3 充值 (Recharge)
-**功能需求**:
-- [x] 7 档充值档位: 60/300/680/1280/3280/6480/9980
-- [x] 档位赠送 bonus（最高 +2888）
-- [x] 自定义金额输入
-- [x] 模拟支付（不扣真实费用）
-- [x] 充值记录写入交易流水
-
-**验收标准**:
-- 充值事务原子性: 余额增加 + 流水记录同时成功/失败
-- 赠送额度计算准确
-
----
-
-### 2.4 AI 旅行伴侣
-
-#### 2.4.1 领养引导
-**功能需求**:
-- [x] 首次访问弹出模态框
-- [x] 选择宠物类型: 狗 / 猫
-- [x] 输入宠物名字（默认"小旅"）
-- [x] 完成后开始聊天
-
-#### 2.4.2 MBTI 性格测试
-**功能需求**:
-- [x] 5 道加权选择题
-- [x] 实时计分，输出 4 字母 MBTI 代码
-- [x] 测试结果保存到用户资料
-- [x] 测试后提供"查看推荐"按钮
-
-#### 2.4.3 聊天交互
-**功能需求**:
-- [x] 消息气泡（用户右，宠物左）
-- [x] 快捷操作按钮: 推荐旅行、性格测试、 dismiss
-- [x] 推荐结果: 3 条旅程，可点击跳转详情
-- [x] 规则引擎匹配关键词（推荐、测试、你好等）
-
-#### 2.4.4 触发器
-**功能需求**:
-- [x] 页面浏览 3 次后主动推荐
-- [x] 闲置 10 秒后主动问候
-- [x] 鼠标移动/键盘/触摸重置闲置计时
-
----
-
-### 2.5 管理后台 (Admin)
-
-#### 2.5.1 统计面板
-**功能需求**:
-- [x] 总用户数
-- [x] 总旅程数
-- [x] 总积分发放量
-- [ ] **数据真实化** — 当前硬编码为 0
-
-#### 2.5.2 用户管理
-**功能需求**:
-- [ ] 用户列表表格
-- [ ] 分页（每页 20 条）
-- [ ] 按用户名/邮箱搜索
-- [ ] 查看用户详情
-
-#### 2.5.3 旅程管理
-**功能需求**:
-- [ ] 旅程列表
-- [ ] 创建/编辑/删除旅程
-- [ ] 富文本故事编辑器
-- [ ] 图片上传
-
-#### 2.5.4 标签与 MBTI 管理
-**功能需求**:
-- [ ] 标签 CRUD
-- [ ] MBTI 类型管理
-- [ ] 旅程-MBTI 关联批量操作
-
----
-
-### 2.6 视觉系统
-
-#### 2.6.1 主题
-**功能需求**:
-- [x] 深色/浅色模式切换
-- [x] localStorage 持久化
-- [x] 系统偏好自动检测
-
-#### 2.6.2 设计 Token
-**功能需求**:
-- [x] CSS 变量体系: 颜色、字体、间距、圆角、阴影
-- [x] 分层架构: tokens → global → layout → components → pages
-
-#### 2.6.3 动画
-**功能需求**:
-- [x] 背景 ambient drift（CSS 渐变漂移）
-- [x] 消息气泡滑入动画
-- [x] AI 宠物 bounce 动画
-- [ ] **Canvas 粒子/星空动效** — 首页 Hero
-- [ ] **页面过渡动画** — 路由切换
-
----
-
-## 3. 技术架构
-
-### 3.1 后端
-- **语言**: Go 1.26.3
-- **框架**: Gin 1.12
-- **数据库**: SQLite via modernc.org/sqlite (pure Go)
-- **认证**: JWT (golang-jwt/jwt/v5)
-- **密码**: bcrypt (golang.org/x/crypto)
-- **测试**: 标准 testing + httptest
-
-### 3.2 前端
-- **技术栈**: Vanilla HTML5 / CSS3 / ES6+
-- **路由**: Hash-based SPA (`/#/`)
-- **状态管理**: localStorage + 内存对象
-- **构建工具**: 无（纯静态文件）
-
-### 3.3 数据流
-```
-Browser → Gin Router → Middleware → Handler → Service → Repository → SQLite
-              ↓
-        Static Files (./web → /static)
+```mermaid
+flowchart LR
+    I["初始 PRD<br/>docs/INITIAL_PRD.md"] --> P["当前 PRD<br/>docs/PRD.md"]
+    P --> S["SDD / API"]
+    P --> D["DDD / UI"]
+    P --> T["TDD / E2E"]
+    S --> G["generated diagrams"]
+    T --> X["app.xlsx"]
 ```
 
-### 3.4 安全要求
-- [x] SQL 参数化查询
-- [x] JWT 认证
-- [x] CORS 白名单
-- [x] 请求 ID 追踪
-- [x] 验证码防暴力破解
-- [ ] API Rate Limiting（未实现）
+## 1. 产品定位
 
----
+`100种不可思议的旅行` 是一个轻量级全栈内容 MVP。它不是传统旅游列表站，而是以“情绪 / MBTI / 隐藏身份 / 奇幻旅程”为入口的故事化旅行探索应用。
 
-## 4. API 规范
+当前产品表达为 **桃源百旅**：
 
-统一响应格式:
-```json
-{
-  "data": {},
-  "error": null,
-  "total": 0,
-  "page": 1,
-  "limit": 12
-}
+```text
+情绪/MBTI/隐藏身份
+-> 故事卡片探索
+-> 旅程详情：角色、任务、线索、风险、准备建议
+-> WonderCoin 模拟下单支付
+-> 管理后台统计、审计、导出
 ```
 
-### 4.1 公开接口
-| Method | Path | 描述 |
-|--------|------|------|
-| GET | `/api/journeys` | 旅程列表，支持 query: q, tag, mbti, visual_style, fantasy_type, adventure_min, adventure_max, page, limit |
-| GET | `/api/journeys/:slug` | 旅程详情 |
-| GET | `/api/tags` | 标签列表 |
-| GET | `/api/mbti` | MBTI 类型列表 |
-| POST | `/api/auth/register` | 注册 |
-| POST | `/api/auth/login` | 登录 |
-| GET | `/api/captcha` | 获取验证码 |
-| POST | `/api/ai/chat` | AI 聊天 |
+支付和预订均为模拟能力；本项目交付目标是 AI 开发实习生远程作业的可运行 MVP，不是真实旅游交易平台。
 
-### 4.2 认证接口
-| Method | Path | 描述 |
-|--------|------|------|
-| GET | `/api/auth/me` | 当前用户信息 |
-| POST | `/api/orders` | 创建订单 |
-| GET | `/api/orders` | 我的订单 |
-| POST | `/api/orders/:id/pay` | 支付订单 |
-| POST | `/api/payments/recharge` | 充值 |
-| GET | `/api/payments/transactions` | 交易流水 |
+## 2. 用户与干系人
 
-### 4.3 管理接口
-| Method | Path | 描述 |
-|--------|------|------|
-| GET | `/api/admin/stats` | 统计数据 |
-| GET | `/api/admin/users` | 用户列表 |
+| 用户/角色 | 需求 | 当前证据 |
+|---|---|---|
+| 95后/00后游客 | 第一屏快速感知“不可思议旅行”的调性 | 首页 hero、生成 JPG 卡片、情绪入口 |
+| 反套路生活方式用户 | 不走传统热门路线，按幻想类型和心情筛选 | Explore filters、MBTI、tag、adventure |
+| 沉浸式内容用户 | 像进入轻度故事游戏一样阅读旅行 | Detail 页角色/任务/线索 UI |
+| 注册用户 | 维护账号、钱包、积分、订单、流水 | Auth、Profile、Recharge、Orders |
+| 管理员 | 查看真实数据并导出提交证据 | Admin stats、CSV/JSON export |
+| 审阅者 | 审计开发方法、测试证据、文档一致性 | `docs/generated/`、`app.xlsx`、CI workflow |
 
----
+## 3. 功能需求
+
+### 3.1 公开探索
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `FR-DISC-001` | 首页必须在第一屏表达幻想旅行定位。 | 已实现 | `web/js/pages/home.js` |
+| `FR-DISC-002` | 首页和卡片必须使用真实静态/生成图片资产。 | 已实现 | `web/assets/images/generated/*.jpg` |
+| `FR-DISC-003` | 探索页必须支持关键词、tag、MBTI、视觉风格、幻想类型、冒险指数筛选。 | 已实现 | `web/js/pages/explore.js`、`JourneyFilter` |
+| `FR-DISC-004` | 前端筛选值必须匹配后端枚举，不发送纯展示中文标签。 | 已实现 | `explore.js` value/label maps |
+| `FR-DISC-005` | 卡片标题和主要信息不得被 hover 蒙层遮挡。 | 已实现 | `web/css/pages/home.css`、`explore.css` |
+
+### 3.2 旅程详情
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `FR-DETAIL-001` | 详情页必须展示标题、图片、故事钩子、正文、标签、MBTI、价格。 | 已实现 | `detail.js`、`journey_service.go` |
+| `FR-DETAIL-002` | 详情页必须表达临时身份、任务、线索、风险和准备建议。 | 已实现 | `Pages.Detail._roleFor`、`_missionFor` |
+| `FR-DETAIL-003` | 可购买旅程必须能创建订单。 | 已实现 | `API.createOrder`、`OrderHandler.Create` |
+| `FR-DETAIL-004` | 收藏/保存旅程如未完成，必须明确标记。 | 未完成 | 表和 repository 存在，handler 草稿未注册；前端当前仅本地 UI toggle |
+
+### 3.3 认证与个人中心
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `FR-AUTH-001` | 用户注册必须包含 username、email、password、gender、captcha。 | 已实现 | `RegisterRequest`、`register.js` |
+| `FR-AUTH-002` | 密码必须 bcrypt 哈希存储。 | 已实现 | `bcrypt.GenerateFromPassword` |
+| `FR-AUTH-003` | 公开注册不得通过 payload 注入 admin role。 | 已实现/已测试 | `TestAuth_Register_IgnoresInjectedAdminRole` |
+| `FR-AUTH-004` | 登录后导航必须展示头像、用户名、余额、积分，不展示内部数据库 ID。 | 已实现 | `nav.js`、`profile.js` |
+| `FR-AUTH-005` | 个人中心必须展示钱包、积分、订单和交易流水。 | 已实现 | `profile.js` |
+
+### 3.4 订单、钱包、审计账本
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `FR-PAY-001` | 新用户获得初始积分。 | 已实现 | `userRepo.AddPoints(..., "register")` |
+| `FR-PAY-002` | 充值为 WonderCoin 模拟充值，立即增加余额。 | 已实现 | `PaymentHandler.Recharge` |
+| `FR-PAY-003` | 订单创建支持多 item。 | 已实现 | `CreateOrderRequest` |
+| `FR-PAY-004` | 支付必须事务化更新余额、订单状态和交易流水。 | 已实现 | `OrderRepository.Pay` |
+| `FR-PAY-005` | 订单 item 必须保存下单时旅程标题和价格快照。 | 已实现 | `order_items` |
+| `FR-PAY-006` | P0 订单/钱包不得依赖可丢 buffer。 | 已实现 | `orders`、`transactions` |
+
+### 3.5 AI 宠物
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `FR-AI-001` | AI 宠物必须提供聊天和推荐回复。 | mock/rule 已实现 | `mock_ai.go`、`ai-pet.js` |
+| `FR-AI-002` | AI 宠物必须支持 MBTI 问答并引导到筛选页。 | 已实现 | `ai-pet-dom.js` |
+| `FR-AI-003` | 宠物回复事件可记录为 P2 analytics。 | 已实现 | `pet-chat-analytics.k6.js` |
+
+### 3.6 管理后台
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `FR-ADMIN-001` | 管理后台入口对游客和普通用户不可见。 | 已实现 | `#/admin-login`、`nav.js` |
+| `FR-ADMIN-002` | 管理员只能由服务器侧 CLI 创建或提升。 | 已实现 | `cmd/admin-user` |
+| `FR-ADMIN-003` | 后台统计必须来自真实 DB 聚合。 | 已实现 | `AdminRepository.Stats` |
+| `FR-ADMIN-004` | 后台必须支持 CSV/JSON 导出。 | 已实现 | `AdminHandler.ExportStats` |
+| `FR-ADMIN-005` | 统计列表字段必须稳定返回数组。 | 已实现/已测试 | `TestAdmin_Stats_EmptyMetricListsReturnArrays` |
+
+## 4. 非功能需求
+
+| ID | 需求 | 状态 | 证据 |
+|---|---|---|---|
+| `NFR-SEC-001` | SQL 查询必须参数化。 | 已实现 | repository methods |
+| `NFR-SEC-002` | API 请求必须有 request ID 和审计记录。 | 已实现 | `RequestID`、`AuditLogger` |
+| `NFR-SEC-003` | panic 必须被捕获并写入审计。 | 已实现 | `AuditRecovery` |
+| `NFR-PERF-001` | SQLite 写入必须使用单写边界和 busy retry。 | 已实现 | `repository.NewDB` |
+| `NFR-PERF-002` | P2 analytics burst 必须不拖垮 P0。 | 已验证 | 20000 stress、k6 pet |
+| `NFR-PERF-003` | 静态图片生产必须走 Nginx/CDN/R2。 | 已验证本地 Nginx | `LOAD_TEST_RESULTS.md` |
+| `NFR-DEPLOY-001` | 生产公网必须使用 HTTPS。 | 已写入模板 | `deploy/nginx.conf` |
+| `NFR-CICD-001` | 全栈 CI 必须覆盖 Go、JS、docs、Nginx、k6 smoke。 | 已新增 | `.github/workflows/ci.yml` |
+| `NFR-DOC-001` | 图表必须从代码或 schema 生成/对齐。 | 已实现 | `generate_project_artifacts.py` |
 
 ## 5. 数据模型
 
-### 5.1 核心实体
-- **Journey**: 旅程（标题、slug、故事、地区、幻想类型、视觉风格、冒险指数、隐秘等级、风险等级、价格、图片路径）
-- **Tag**: 标签（名称、slug）
-- **MBTIType**: MBTI 类型（代码、名称、描述、颜色）
-- **User**: 用户（用户名、邮箱、密码哈希、角色、等级、积分、余额、MBTI 类型）
-- **Order**: 订单（订单号、用户ID、状态、总金额、货币、支付时间）
-- **OrderItem**: 订单项（订单ID、旅程ID、旅程标题、单价、数量、小计）
-- **Transaction**: 交易流水（用户ID、订单ID、类型、金额、余额后、描述）
+权威 DDL：`db/schema.sql`
+生成 ER：`docs/generated/database-er.mmd`
 
-### 5.2 关联表
-- **journey_tags**: 旅程-标签多对多
-- **journey_mbti**: 旅程-MBTI 多对多
+核心表：
 
----
+- `journeys`、`tags`、`journey_tags`、`mbti_types`、`journey_mbti`
+- `users`、`user_points_history`、`user_saved_journeys`
+- `orders`、`order_items`、`transactions`
+- `analytics_events`、`audit_logs`
 
-## 6. 非功能需求
+边界：
 
-### 6.1 性能
-- 首屏加载 < 2s（本地）
-- API 响应 < 200ms（本地 SQLite）
-- 图片懒加载
-- 无限滚动分页（每页 12 条）
+- `transactions` 是 P0 财务审计账本。
+- `analytics_events` 是 P2，可降级。
+- `audit_logs` 是 P1 运维证据，高流量下需要归档或异步化。
+- `user_saved_journeys` 表存在，但收藏 API/UX 未完成。
 
-### 6.2 兼容性
-- Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
-- 移动端响应式（375px - 1920px）
+## 6. API 模型
 
-### 6.3 可访问性
-- [x] 按钮 aria 标签
-- [x] 表单 label 关联
-- [x] 颜色对比度 WCAG AA 级
-- [ ] 键盘全导航（部分页面缺失）
+生成路由矩阵：`docs/generated/api-routes.md`
+详细契约：`docs/schema/api-contract.md`
 
----
+主要路由族：
 
-## 7. 里程碑
+- Public: `/api/journeys`、`/api/tags`、`/api/mbti`
+- Auth: `/api/captcha`、`/api/auth/register`、`/api/auth/login`、`/api/auth/me`、`/api/auth/avatar`
+- Orders: `/api/orders`、`/api/orders/:id`、`/api/orders/:id/pay`
+- Payments: `/api/payments/recharge`、`/api/payments/transactions`
+- Admin: `/api/admin/users`、`/api/admin/stats`、`/api/admin/export`
+- Observability: `/api/analytics/events`、`/api/audit/client-error`、`/api/health`
 
-| 阶段 | 状态 | 说明 |
-|------|------|------|
-| v0.0.0 Skeleton | 完成 | 项目骨架 |
-| v0.1.0 SDD | 完成 | 需求工程文档 |
-| v0.2.0 DDD | 完成 | 设计文档 |
-| v0.3.0 TDD | 完成 | 测试文档 + 51 Go 测试 |
-| v1.0.0 MVP | **进行中** | 核心功能可用，Admin 与粒子动效待补 |
+JSON API 使用 envelope：
 
----
+```json
+{ "data": {}, "error": null, "total": 0, "page": 1, "limit": 12 }
+```
 
-## 8. 风险与假设
+CSV 导出是明确例外。
 
-- **SQLite 并发**: 高并发写入可能出现 database locked，需 WAL 模式或迁移到 PostgreSQL
-- **图片存储**: 当前 14 张本地图片，上线需 CDN
-- **AI 引擎**: 当前为规则引擎，后续可接入 LLM API
-- **支付**: 纯模拟，无真实支付网关集成
+## 7. 部署需求
+
+当前外部演示方案：
+
+```text
+External browser
+-> Tencent Cloud CVM public IP: 49.232.207.220
+-> Nginx reverse proxy and static cache
+-> Go Gin API
+-> SQLite WAL on persistent block volume
+-> backup-sqlite.sh scheduled backup
+```
+
+### 7.1 腾讯云 CVM
+
+当前公网演示运行在腾讯云 CVM：Nginx 对外监听 80，Go 服务仅监听 `127.0.0.1:8080`，SQLite 数据目录位于服务器持久化路径。由于域名备案尚未完成，演示 URL 使用公网 IP：`http://49.232.207.220/`。
+
+### 7.2 域名、备案与 HTTPS
+
+正式域名访问需要先完成 ICP 备案。备案完成后，将域名解析到腾讯云 CVM 或 CDN/Edge 入口，并配置 HTTPS 证书。当前 HTTP 公网 IP 仅作为作业演示入口，不宣称正式生产 HTTPS 域名已经完成。
+
+### 7.3 其他云与备案
+
+阿里云或其他中国大陆云厂商可以部署全栈，但分两类：
+
+- **中国大陆地域**：正式公网域名访问通常需要 ICP 备案；未备案不作为正式域名交付路线。
+- **阿里云香港/新加坡等非大陆地域**：可部署全栈，无中国大陆 ICP 备案要求，但大陆访问仍是 best-effort，不保证国内优化。
+
+因此当前采用腾讯云 CVM 公网 IP 作为可外部登录的临时演示方案。
+
+## 8. 测试与证据需求
+
+当前本轮证据：
+
+- 文档生成：`python3 scripts/docs/generate_project_artifacts.py` 通过。
+- Go stress 目标组合档：`ok github.com/100-journeys/app/tests/stress 1.660s`。
+- Nginx：语法检查、API 反代、静态图片响应头均通过。
+- 浏览器视觉审查：已捕获桌面/移动页面、个人页、充值页和后台 dashboard 截图，个人页只展示用户名等用户资料，不展示内部数据库 ID。
+- k6：public、image、pet、order、auth baseline、admin baseline 通过。
+- k6 重压边界：auth 120 VU 与 admin 60 VU 功能正确但 p95 超阈值。
+- `app.xlsx` 已由生成测试用例 CSV 构建。
+
+仍需最终刷新：
+
+- 全量 `go test ./...` 已通过。
+- 全量 `go vet ./...` 已通过。
+- JS syntax check 已通过。
+- Playwright E2E: 2026-05-14 按当前动态前端复跑，29/29 通过。
+- GitHub Actions 远端实际运行结果
+
+## 9. 已知边界
+
+| 边界 | 产品决策 |
+|---|---|
+| 真实支付 | 不做；WonderCoin 模拟 |
+| 真实旅游预订 | 不做；只保留 booking 信息展示 |
+| 真实 LLM | 不做；当前 mock/rule engine |
+| 收藏功能 | 表存在，完整 API/UX 未完成 |
+| SQLite | 可支撑单机 MVP；不是无限高并发数据库 |
+| 后台导出 | 管理低频操作；60 VU 连续导出为容量边界 |
+| 中国大陆访问 | 无备案时不承诺国内优化 |
+| HTTPS | 生产必须 HTTPS；本地 HTTP 仅为压测夹具 |
+
+## 10. 验收清单
+
+- [x] schema/API/路由图表可由脚本生成。
+- [x] PRD/SDD/DDD/TDD 文档为当前代码事实，不写旧状态。
+- [x] Nginx 本地代理和静态图片路径已验证。
+- [x] k6 基线负载已执行并记录。
+- [x] admin 空榜单 JSON 契约问题已修复并补测试。
+- [x] CI workflow 已补齐全栈 smoke。
+- [ ] 全量 Go test/vet/JS check 最终复跑。
+- [x] Playwright E2E 最终复跑：`29 passed`，入口 `http://localhost:8090`。
+- [ ] CI 推送后远端通过。
+- [x] 腾讯云 CVM 公网 IP 演示部署完成：Nginx、Go systemd、SQLite、普通用户/管理员公网登录已验证。
+- [ ] 域名备案和 HTTPS 证书配置完成后补正式域名证据。
+
+## 11. PRD 结论
+
+本项目可以按“中型独立站 MVP，具备可运行全栈、真实事务链路、Nginx/k6 证据和明确生产边界”提交。不得宣称无限生产级、真实支付、无备案大陆优化或完整收藏功能。

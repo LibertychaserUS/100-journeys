@@ -8,9 +8,14 @@ const API = (() => {
 
   async function request(path, options = {}) {
     try {
+      const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+      const headers = {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        ...options.headers,
+      };
       const res = await fetch(`${base()}${path}`, {
-        headers: { 'Content-Type': 'application/json', ...options.headers },
         ...options,
+        headers,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ message: res.statusText }));
@@ -37,7 +42,7 @@ const API = (() => {
   }
 
   function authHeader() {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
@@ -63,6 +68,11 @@ const API = (() => {
     register: (data) => authRequest('/auth/register', data),
     login: (data) => authRequest('/auth/login', data),
     me: () => authedRequest('/auth/me'),
+    uploadAvatar: async (file) => {
+      const form = new FormData();
+      form.append('avatar', file);
+      return authedRequest('/auth/avatar', { method: 'POST', body: form });
+    },
 
     // Orders
     createOrder: (items) => authedRequest('/orders', { method: 'POST', body: JSON.stringify({ items }) }),
@@ -72,6 +82,10 @@ const API = (() => {
     // Payments
     recharge: (amount) => authedRequest('/payments/recharge', { method: 'POST', body: JSON.stringify({ amount }) }),
     listTransactions: () => authedRequest('/payments/transactions'),
+
+    // Admin
+    adminStats: () => authedRequest('/admin/stats'),
+    adminUsers: () => authedRequest('/admin/users'),
 
     // Media URL helper — CDN-aware
     mediaUrl: (path) => `${window.APP_CONFIG.mediaBase}/${path}`,

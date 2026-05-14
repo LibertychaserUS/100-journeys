@@ -2,6 +2,7 @@
 
 > 按时间顺序记录从项目初始化到 v1.2.0 的全部开发节点。
 > 生成时间: 2026-05-13
+> 当前状态以 `docs/trace/CURRENT_STATE.md` 和 `docs/QUALITY_REVIEW_REPORT.md` 为准；历史节点中的旧测试声明不代表当前分支最新验证结果。
 
 ---
 

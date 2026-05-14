@@ -1,0 +1,64 @@
+# Tencent Cloud deploy payload filter.
+# Upload only files needed to build and run the Go + SQLite + static web app.
+
+- /.git/
+- /.github/
+- /.worktrees/
+- /.cache/
+- /.nginx/
+- /data/
+- /uploads/
+- /tmp/
+- /.tmp/
+- /node_modules/
+- /test-results/
+- /playwright-report/
+- /playwright/.cache/
+- /docs/
+- /e2e/
+- /tests/
+- **/.DS_Store
+- **/*.log
+- **/*.db
+- **/*.db-shm
+- **/*.db-wal
+- **/*.sqlite
+- **/*.sqlite3
+- **/*.pem
+- **/*.key
+- **/*.p12
+- **/*.pfx
+- **/*_test.go
+- /server
+- /bin/
+- /dist/
+- /build/
+
++ /go.mod
++ /go.sum
++ /start.sh
++ /cmd/
++ /cmd/server/
++ /cmd/server/**
++ /cmd/admin-user/
++ /cmd/admin-user/**
++ /cmd/demo-data/
++ /cmd/demo-data/**
++ /internal/
++ /internal/**
++ /db/
++ /db/schema.sql
++ /db/seed.sql
++ /web/
++ /web/**
++ /deploy/
++ /deploy/nginx.conf
++ /deploy/tencentcloud.rsync-filter
++ /scripts/
++ /scripts/backup-sqlite.sh
++ /scripts/deploy/
++ /scripts/deploy/***
++ /scripts/nginx/
++ /scripts/nginx/***
+
+- /**

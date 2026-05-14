@@ -12,25 +12,22 @@ test.describe('Home Page', () => {
   // E2E-HOME-001: Landing page loads with hero and featured cards
   test('landing page shows hero and featured journeys', async ({ page }) => {
     await expect(page.locator('.home-hero__title')).toBeVisible();
-    await expect(page.locator('.home-hero__title')).toContainText('100种不可思议的旅行');
+    await expect(page.locator('.home-hero__title')).toContainText('桃源百旅');
 
     // Featured section with cards
-    await expect(page.locator('.home-featured__grid .home-card')).toHaveCount(5);
+    await expect(page.locator('.home-featured__grid .home-card')).toHaveCount(6);
   });
 
-  // E2E-HOME-002: MBTI chips are rendered and clickable
-  test('MBTI teaser shows 16 type chips', async ({ page }) => {
-    const chips = page.locator('.home-mbti__chip');
-    await expect(chips).toHaveCount(16);
-
-    // Click first chip navigates to explore with filter
-    await chips.first().click();
-    await expect(page).toHaveURL(/#\/explore/);
+  // E2E-HOME-002: MBTI is intentionally not exposed as a full homepage grid
+  test('MBTI grid stays hidden from public home', async ({ page }) => {
+    await expect(page.locator('.home-mbti__chip')).toHaveCount(0);
+    await page.locator('.home-hero__chip[data-filter-key="mbti"]').click();
+    await expect(page).toHaveURL(/#\/explore\?mbti=INFP/);
   });
 
   // E2E-HOME-003: Hero CTA navigates to explore
   test('hero CTA button navigates to explore', async ({ page }) => {
-    await page.locator('[data-action="explore"]').click();
+    await page.locator('.home-hero__search button').click();
     await expect(page).toHaveURL(/#\/explore/);
   });
 
@@ -47,10 +44,11 @@ test.describe('Home Page', () => {
     await expect(page).toHaveURL(new RegExp(`#\\/journey\\/${slug}`));
   });
 
-  // E2E-HOME-005: Card MBTI tag click navigates to explore
-  test('card MBTI tag click navigates to explore with filter', async ({ page }) => {
-    const mbtiTag = page.locator('.home-card__tag--mbti').first();
-    await mbtiTag.click();
-    await expect(page).toHaveURL(/#\/explore\?mbti=/);
+  // E2E-HOME-005: Home card click navigates to detail
+  test('clicking a card navigates to journey detail', async ({ page }) => {
+    const card = page.locator('.home-card').first();
+    await expect(card.locator('.home-card__tags span').nth(1)).toBeVisible();
+    await card.click();
+    await expect(page).toHaveURL(/#\/journey\//);
   });
 });

@@ -18,14 +18,17 @@ const Nav = {
 
     this.el.innerHTML = `
       <div class="nav">
-        <a href="#/" class="nav__logo">100种不可思议的旅行</a>
+        <a href="#/" class="nav__logo" aria-label="桃源百旅首页">
+          <img class="nav__logo-mark" src="/static/assets/images/generated/brand-mark.png" alt="" aria-hidden="true">
+          <span class="nav__logo-text">桃源百旅</span>
+        </a>
         <div class="nav__links" id="nav-links">
           <a href="#/explore" class="nav__link">探索</a>
-          <a href="#/profile" class="nav__link" id="nav-profile" style="display:none;">我的</a>
+          <a href="#/profile" class="nav__link" id="nav-profile" style="display:none;">清单</a>
           <a href="#/admin" class="nav__link" id="nav-admin" style="display:none;">管理</a>
           <a href="#/login" class="nav__link" id="nav-login">登录</a>
-          <a href="#/register" class="nav__link" id="nav-register">注册</a>
-          <span class="nav__user" id="nav-user" style="display:none;"></span>
+          <a href="#/register" class="nav__link nav__link--ghost" id="nav-register">注册</a>
+          <a href="#/profile" class="nav__user" id="nav-user" style="display:none;" aria-label="账户状态"></a>
           <button class="nav__link" id="nav-logout" style="display:none;">退出</button>
           <button class="nav__theme-toggle" id="nav-theme" title="切换主题">${this._themeIcon}</button>
         </div>
@@ -78,7 +81,14 @@ const Nav = {
         const res = await API.me();
         const user = res.data || res;
         userEl.style.display = '';
-        userEl.textContent = (user.username || user.email) + ' · ' + (user.balance ?? 0).toLocaleString() + '币';
+        const avatar = this._escapeHtml(user.avatar_url || '/static/assets/images/generated/guide-light.png');
+        const name = this._escapeHtml(user.username || user.email || '旅人');
+        userEl.innerHTML = `
+          <img class="nav__avatar" src="${avatar}" alt="" aria-hidden="true">
+          <span class="nav__user-name">${name}</span>
+          <span class="nav__wallet">${(user.balance ?? 0).toLocaleString()}币</span>
+          <span class="nav__points">${(user.points ?? 0).toLocaleString()}积分</span>
+        `;
         if (user.role === 'admin') {
           adminLink.style.display = '';
         }
@@ -92,6 +102,15 @@ const Nav = {
       userEl.style.display = 'none';
       logoutBtn.style.display = 'none';
     }
+  },
+
+  _escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   },
 };
 

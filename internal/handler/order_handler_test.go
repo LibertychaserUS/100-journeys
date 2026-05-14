@@ -39,7 +39,7 @@ func setupOrderPaymentTestRouter(t *testing.T) (*gin.Engine, *sql.DB, repository
 
 	orderH := NewOrderHandler(orderRepo, journeyRepo, userRepo)
 	paymentH := NewPaymentHandler(userRepo, txnRepo)
-	authH := NewAuthHandler(userRepo, captchaStore)
+	authH := NewAuthHandler(userRepo, captchaStore, filepath.Join(t.TempDir(), "avatars"))
 
 	r := gin.New()
 	api := r.Group("/api")
@@ -57,7 +57,7 @@ func setupOrderPaymentTestRouter(t *testing.T) (*gin.Engine, *sql.DB, repository
 
 func registerAndGetToken(t *testing.T, r *gin.Engine, captchaStore *service.CaptchaStore) string {
 	cid, _, ans := captchaStore.Generate()
-	body, _ := json.Marshal(model.RegisterRequest{Username: "testuser", Email: "test@example.com", Password: "password123", CaptchaID: cid, CaptchaAnswer: ans})
+	body, _ := json.Marshal(model.RegisterRequest{Username: "testuser", Email: "test@example.com", Password: "password123", Gender: "prefer_not_to_say", CaptchaID: cid, CaptchaAnswer: ans})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")

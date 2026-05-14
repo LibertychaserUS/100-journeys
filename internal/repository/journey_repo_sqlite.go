@@ -222,6 +222,11 @@ func (r *sqliteJourneyRepo) buildWhere(filter model.JourneyFilter) (string, []in
 	var conds []string
 	var args []interface{}
 
+	if strings.TrimSpace(filter.Query) != "" {
+		query := "%" + strings.ToLower(escapeLikeWildcards(strings.TrimSpace(filter.Query))) + "%"
+		conds = append(conds, `(LOWER(j.title) LIKE ? ESCAPE '\' OR LOWER(j.subtitle) LIKE ? ESCAPE '\' OR LOWER(j.story_hook) LIKE ? ESCAPE '\' OR LOWER(j.story) LIKE ? ESCAPE '\' OR LOWER(j.region) LIKE ? ESCAPE '\' OR LOWER(j.mood_keywords) LIKE ? ESCAPE '\')`)
+		args = append(args, query, query, query, query, query, query)
+	}
 	if filter.TagSlug != "" {
 		conds = append(conds, "t.slug = ?")
 		args = append(args, filter.TagSlug)
@@ -255,6 +260,11 @@ func (r *sqliteJourneyRepo) buildWhere(filter model.JourneyFilter) (string, []in
 		return "", args
 	}
 	return " WHERE " + strings.Join(conds, " AND "), args
+}
+
+func escapeLikeWildcards(value string) string {
+	replacer := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+	return replacer.Replace(value)
 }
 
 func (r *sqliteJourneyRepo) preloadTags(ctx context.Context, journeys []model.Journey) error {

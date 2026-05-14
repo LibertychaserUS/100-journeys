@@ -2,8 +2,11 @@ package repository
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/100-journeys/app/internal/eventbus"
@@ -32,10 +35,24 @@ func NewOrderRepository(db *sql.DB) OrderRepository {
 // generateOrderNo creates a unique order number: JNY + yymmdd + 6-digit random.
 func generateOrderNo() string {
 	now := time.Now()
-	return fmt.Sprintf("JNY%s%06d", now.Format("060102150405"), now.Nanosecond()%1000000)
+	var suffix [4]byte
+	if _, err := rand.Read(suffix[:]); err != nil {
+		return fmt.Sprintf("JNY%s%09d", now.Format("060102150405"), now.Nanosecond())
+	}
+	return fmt.Sprintf("JNY%s%s", now.Format("060102150405"), hex.EncodeToString(suffix[:]))
 }
 
 func (r *sqliteOrderRepo) Create(ctx context.Context, userID int64, items []model.OrderItem) (*model.Order, error) {
+	var order *model.Order
+	err := retryBusy(ctx, func() error {
+		var err error
+		order, err = r.createOnce(ctx, userID, cloneOrderItems(items))
+		return err
+	})
+	return order, err
+}
+
+func (r *sqliteOrderRepo) createOnce(ctx context.Context, userID int64, items []model.OrderItem) (*model.Order, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -49,15 +66,26 @@ func (r *sqliteOrderRepo) Create(ctx context.Context, userID int64, items []mode
 		total += items[i].Subtotal
 	}
 
-	orderNo := generateOrderNo()
-	res, err := tx.ExecContext(ctx,
-		`INSERT INTO orders (order_no, user_id, status, total_amount, currency)
-		 VALUES (?, ?, ?, ?, ?)`,
-		orderNo, userID, model.OrderStatusPending, total, "WONDER")
-	if err != nil {
-		return nil, fmt.Errorf("insert order: %w", err)
+	var orderID int64
+	var orderNo string
+	var res sql.Result
+	for attempt := 0; attempt < 5; attempt++ {
+		orderNo = generateOrderNo()
+		res, err = tx.ExecContext(ctx,
+			`INSERT INTO orders (order_no, user_id, status, total_amount, currency)
+			 VALUES (?, ?, ?, ?, ?)`,
+			orderNo, userID, model.OrderStatusPending, total, "WONDER")
+		if err == nil {
+			orderID, _ = res.LastInsertId()
+			break
+		}
+		if !strings.Contains(err.Error(), "UNIQUE") {
+			return nil, fmt.Errorf("insert order: %w", err)
+		}
 	}
-	orderID, _ := res.LastInsertId()
+	if err != nil {
+		return nil, fmt.Errorf("insert order after retries: %w", err)
+	}
 
 	for _, item := range items {
 		if _, err := tx.ExecContext(ctx,
@@ -147,27 +175,49 @@ func (r *sqliteOrderRepo) ListByUser(ctx context.Context, userID int64) ([]model
 }
 
 func (r *sqliteOrderRepo) UpdateStatus(ctx context.Context, id int64, status string) error {
-	_, err := r.db.ExecContext(ctx, `UPDATE orders SET status = ? WHERE id = ?`, status, id)
-	if err != nil {
-		return fmt.Errorf("update order status: %w", err)
-	}
-	return nil
+	return retryBusy(ctx, func() error {
+		_, err := r.db.ExecContext(ctx, `UPDATE orders SET status = ? WHERE id = ?`, status, id)
+		if err != nil {
+			return fmt.Errorf("update order status: %w", err)
+		}
+		return nil
+	})
 }
 
 func (r *sqliteOrderRepo) MarkPaid(ctx context.Context, id int64) error {
-	_, err := r.db.ExecContext(ctx,
-		`UPDATE orders SET status = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?`,
-		model.OrderStatusPaid, id)
-	if err != nil {
-		return fmt.Errorf("mark order paid: %w", err)
-	}
-	return nil
+	return retryBusy(ctx, func() error {
+		_, err := r.db.ExecContext(ctx,
+			`UPDATE orders SET status = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?`,
+			model.OrderStatusPaid, id)
+		if err != nil {
+			return fmt.Errorf("mark order paid: %w", err)
+		}
+		return nil
+	})
 }
 
 func (r *sqliteOrderRepo) Pay(ctx context.Context, orderID, userID int64) error {
-	tx, err := r.db.BeginTx(ctx, nil)
+	var total int
+	err := retryBusy(ctx, func() error {
+		var err error
+		total, err = r.payOnce(ctx, orderID, userID)
+		return err
+	})
 	if err != nil {
 		return err
+	}
+	eventbus.Default.Publish(eventbus.OrderPaid, map[string]interface{}{
+		"order_id":     orderID,
+		"user_id":      userID,
+		"total_amount": total,
+	})
+	return nil
+}
+
+func (r *sqliteOrderRepo) payOnce(ctx context.Context, orderID, userID int64) (int, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return 0, err
 	}
 	defer tx.Rollback()
 
@@ -179,27 +229,27 @@ func (r *sqliteOrderRepo) Pay(ctx context.Context, orderID, userID int64) error 
 		`SELECT id, status, total_amount FROM orders WHERE id = ? AND user_id = ?`,
 		orderID, userID).Scan(&oid, &status, &total); err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("order not found")
+			return 0, fmt.Errorf("order not found")
 		}
-		return fmt.Errorf("get order: %w", err)
+		return 0, fmt.Errorf("get order: %w", err)
 	}
 	if status != model.OrderStatusPending {
-		return fmt.Errorf("order is not pending")
+		return 0, fmt.Errorf("order is not pending")
 	}
 
 	// Check balance
 	var balance int
 	if err := tx.QueryRowContext(ctx, `SELECT balance FROM users WHERE id = ?`, userID).Scan(&balance); err != nil {
-		return fmt.Errorf("get balance: %w", err)
+		return 0, fmt.Errorf("get balance: %w", err)
 	}
 	if balance < total {
-		return fmt.Errorf("insufficient balance")
+		return 0, fmt.Errorf("insufficient balance")
 	}
 
 	// Deduct balance
 	newBalance := balance - total
 	if _, err := tx.ExecContext(ctx, `UPDATE users SET balance = ? WHERE id = ?`, newBalance, userID); err != nil {
-		return fmt.Errorf("deduct balance: %w", err)
+		return 0, fmt.Errorf("deduct balance: %w", err)
 	}
 
 	// Record transaction
@@ -207,26 +257,21 @@ func (r *sqliteOrderRepo) Pay(ctx context.Context, orderID, userID int64) error 
 		`INSERT INTO transactions (user_id, order_id, txn_type, amount, balance_after, description)
 		 VALUES (?, ?, ?, ?, ?, ?)`,
 		userID, orderID, model.TxnTypePurchase, -total, newBalance, fmt.Sprintf("支付订单 %d", orderID)); err != nil {
-		return fmt.Errorf("insert transaction: %w", err)
+		return 0, fmt.Errorf("insert transaction: %w", err)
 	}
 
 	// Mark order paid
 	if _, err := tx.ExecContext(ctx,
 		`UPDATE orders SET status = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?`,
 		model.OrderStatusPaid, orderID); err != nil {
-		return fmt.Errorf("mark paid: %w", err)
+		return 0, fmt.Errorf("mark paid: %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {
-		return err
+		return 0, err
 	}
 
-	eventbus.Default.Publish(eventbus.OrderPaid, map[string]interface{}{
-		"order_id":     orderID,
-		"user_id":      userID,
-		"total_amount": total,
-	})
-	return nil
+	return total, nil
 }
 
 func (r *sqliteOrderRepo) listItems(ctx context.Context, orderID int64) ([]model.OrderItem, error) {
@@ -248,4 +293,10 @@ func (r *sqliteOrderRepo) listItems(ctx context.Context, orderID int64) ([]model
 		items = append(items, item)
 	}
 	return items, rows.Err()
+}
+
+func cloneOrderItems(items []model.OrderItem) []model.OrderItem {
+	cloned := make([]model.OrderItem, len(items))
+	copy(cloned, items)
+	return cloned
 }

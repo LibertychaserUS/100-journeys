@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>100种不可思议的旅行</title>
+  <link rel="preload" as="image" href="/static/assets/images/generated/hero-taoyuan.jpg" fetchpriority="high" />
 
   <!-- Theme: prevent flash -->
   <script>
@@ -31,6 +32,7 @@
   <link rel="stylesheet" href="/static/css/pages/profile.css" />
   <link rel="stylesheet" href="/static/css/pages/admin.css" />
   <link rel="stylesheet" href="/static/css/pages/recharge.css" />
+  <link rel="stylesheet" href="/static/css/pages/about.css" />
   <link rel="stylesheet" href="/static/css/pages/error.css" />
 </head>
 <body>
@@ -40,7 +42,10 @@
   <div id="app">
     <nav id="main-nav"></nav>
     <main id="main-content"></main>
-    <footer id="main-footer"></footer>
+    <footer id="main-footer" class="site-footer">
+      <a href="#/about">关于我们</a>
+      <p>本网站仅用于课程与实习作业演示，不提供真实旅游预订、支付或商业服务。</p>
+    </footer>
   </div>
 
   <!-- AI Pet -->
@@ -48,6 +53,7 @@
 
   <!-- JS: utilities first, then router last -->
   <script src="/static/js/config.js"></script>
+  <script src="/static/js/client-audit.js"></script>
   <script src="/static/js/eventbus.js"></script>
   <script src="/static/js/api.js"></script>
   <script src="/static/js/nav.js"></script>
@@ -59,8 +65,10 @@
   <script src="/static/js/pages/login.js"></script>
   <script src="/static/js/pages/register.js"></script>
   <script src="/static/js/pages/profile.js"></script>
+  <script src="/static/js/pages/admin-login.js"></script>
   <script src="/static/js/pages/admin.js"></script>
   <script src="/static/js/pages/recharge.js"></script>
+  <script src="/static/js/pages/about.js"></script>
   <script src="/static/js/pages/error.js"></script>
   <script src="/static/js/router.js"></script>
 </body>

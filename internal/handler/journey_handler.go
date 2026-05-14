@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/100-journeys/app/internal/ai"
+	"github.com/100-journeys/app/internal/analytics"
 	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
@@ -14,13 +15,19 @@ type JourneyHandler struct {
 	svc    *service.JourneyService
 	ai     ai.Provider
 	engine *ai.RecommendEngine
+	events *analytics.Buffer
 }
 
-func NewJourneyHandler(svc *service.JourneyService, aiProvider ai.Provider, engine *ai.RecommendEngine) *JourneyHandler {
+func NewJourneyHandler(svc *service.JourneyService, aiProvider ai.Provider, engine *ai.RecommendEngine, buffers ...*analytics.Buffer) *JourneyHandler {
+	var events *analytics.Buffer
+	if len(buffers) > 0 {
+		events = buffers[0]
+	}
 	return &JourneyHandler{
 		svc:    svc,
 		ai:     aiProvider,
 		engine: engine,
+		events: events,
 	}
 }
 
@@ -54,6 +61,7 @@ func (h *JourneyHandler) Get(c *gin.Context) {
 		return
 	}
 
+	h.trackEvent(analytics.Event{Type: analytics.EventJourneyView, JourneySlug: slug})
 	c.JSON(http.StatusOK, newDataEnvelope(journey))
 }
 
@@ -113,12 +121,37 @@ func (h *JourneyHandler) AIChat(c *gin.Context) {
 		Reply:   reply,
 		Actions: actions,
 	}
+	h.trackEvent(analytics.Event{Type: analytics.EventPetReply})
 	c.JSON(http.StatusOK, newDataEnvelope(resp))
+}
+
+// POST /api/analytics/events
+func (h *JourneyHandler) TrackAnalytics(c *gin.Context) {
+	var req model.AnalyticsEventRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope(err.Error()))
+		return
+	}
+	accepted := h.trackEvent(analytics.Event{
+		Type:        req.Type,
+		JourneySlug: req.JourneySlug,
+		MBTIType:    req.MBTIType,
+		Gender:      req.Gender,
+		Metadata:    req.Metadata,
+	})
+	c.JSON(http.StatusAccepted, newDataEnvelope(model.AnalyticsTrackResponse{Accepted: accepted}))
 }
 
 // GET /api/health
 func (h *JourneyHandler) Health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": map[string]string{"status": "ok"}, "error": nil})
+}
+
+func (h *JourneyHandler) trackEvent(event analytics.Event) bool {
+	if h.events == nil {
+		return false
+	}
+	return h.events.Track(event)
 }
 
 // ------------------------------------------------------------------

@@ -22,6 +22,9 @@ Pages.Recharge = {
     main.innerHTML = `
       <section class="recharge-page">
         <div class="recharge-card">
+          <div class="recharge-topbar">
+            <button class="recharge-close" type="button" id="recharge-close" aria-label="返回个人页">×</button>
+          </div>
           <h1 class="recharge-title">充值不思议币</h1>
           <p class="recharge-subtitle">模拟充值 · 仅供体验 · 不扣真实费用</p>
 
@@ -46,11 +49,14 @@ Pages.Recharge = {
           </div>
 
           <button class="recharge-submit" id="recharge-submit" onclick="Pages.Recharge._submit()">立即充值</button>
+          <button class="recharge-secondary" type="button" id="recharge-back" aria-label="返回个人页">返回个人页</button>
           <p class="recharge-error" id="recharge-error"></p>
         </div>
       </section>
     `;
 
+    document.getElementById('recharge-close')?.addEventListener('click', () => Router.navigate('#/profile'));
+    document.getElementById('recharge-back')?.addEventListener('click', () => Router.navigate('#/profile'));
     this._loadBalance();
   },
 

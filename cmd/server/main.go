@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/100-journeys/app/internal/ai"
+	"github.com/100-journeys/app/internal/analytics"
 	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/handler"
 	"github.com/100-journeys/app/internal/middleware"
@@ -21,6 +24,10 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	bindAddr := os.Getenv("BIND_ADDR")
+	if bindAddr == "" {
+		bindAddr = ":" + port
+	}
 
 	mediaBase := os.Getenv("CDN_BASE_URL")
 	if mediaBase == "" {
@@ -31,10 +38,17 @@ func main() {
 	if dbPath == "" {
 		dbPath = "./data/app.db"
 	}
+	uploadDir := os.Getenv("UPLOAD_DIR")
+	if uploadDir == "" {
+		uploadDir = "./data/uploads"
+	}
 
 	// Ensure data directory exists
 	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
 		log.Fatalf("create data dir: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(uploadDir, "avatars"), 0755); err != nil {
+		log.Fatalf("create upload dir: %v", err)
 	}
 
 	// Initialize DB
@@ -62,32 +76,54 @@ func main() {
 	// Wire dependencies
 	repo := repository.NewJourneyRepository(db)
 	userRepo := repository.NewUserRepository(db)
+	adminRepo := repository.NewAdminRepository(db)
 	orderRepo := repository.NewOrderRepository(db)
 	txnRepo := repository.NewTransactionRepository(db)
+	analyticsBuffer := analytics.NewBuffer(db, analytics.DefaultOptions())
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		if err := analyticsBuffer.Close(ctx); err != nil {
+			log.Printf("analytics buffer close: %v", err)
+		}
+	}()
 	media := &service.LocalProvider{BaseURL: mediaBase}
 	svc := service.NewJourneyService(repo, media)
 	aiProvider := ai.NewMockAI()
 	engine := ai.NewRecommendEngine(repo)
 	captchaStore := service.NewCaptchaStore()
-	h := handler.NewJourneyHandler(svc, aiProvider, engine)
-	authH := handler.NewAuthHandler(userRepo, captchaStore)
-	adminH := handler.NewAdminHandler(userRepo, repo)
+	h := handler.NewJourneyHandler(svc, aiProvider, engine, analyticsBuffer)
+	authH := handler.NewAuthHandler(userRepo, captchaStore, filepath.Join(uploadDir, "avatars"))
+	adminH := handler.NewAdminHandler(userRepo, repo, adminRepo)
 	orderH := handler.NewOrderHandler(orderRepo, repo, userRepo)
 	paymentH := handler.NewPaymentHandler(userRepo, txnRepo)
 	captchaH := handler.NewCaptchaHandler(captchaStore)
+	auditH := handler.NewAuditHandler(db)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
 	// Middleware stack (order matters)
-	r.Use(gin.Recovery())           // P1: panic recovery
-	r.Use(middleware.RequestID())   // P1: request tracing
-	r.Use(middleware.Logger())      // P1: structured request logging
-	r.Use(middleware.CORS())        // P1: whitelist CORS
+	r.Use(middleware.RequestID())       // P1: request tracing
+	r.Use(middleware.AuditRecovery(db)) // P1: persistent panic audit
+	r.Use(middleware.Logger())          // P1: structured terminal request logging
+	r.Use(middleware.AuditLogger(db))   // P1: persistent API audit logs
+	r.Use(middleware.CORS())            // P1: whitelist CORS
 
-	// Static files
-	r.Static("/static", "./web")
+	// Static files: long-lived local media/CSS/JS caching for faster repeat views.
+	static := r.Group("/static")
+	static.Use(func(c *gin.Context) {
+		c.Header("Cache-Control", "public, max-age=31536000, immutable")
+		c.Next()
+	})
+	static.StaticFS("/", http.Dir("./web"))
+	uploads := r.Group("/uploads")
+	uploads.Use(func(c *gin.Context) {
+		c.Header("Cache-Control", "public, max-age=86400")
+		c.Next()
+	})
+	uploads.StaticFS("/", http.Dir(uploadDir))
 
 	// API routes
 	api := r.Group("/api")
@@ -98,6 +134,8 @@ func main() {
 		api.GET("/tags", h.ListTags)
 		api.GET("/mbti", h.ListMBTITypes)
 		api.POST("/ai/chat", h.AIChat)
+		api.POST("/analytics/events", h.TrackAnalytics)
+		api.POST("/audit/client-error", auditH.ClientError)
 		api.GET("/health", h.Health)
 
 		// Captcha (public)
@@ -112,6 +150,7 @@ func main() {
 		auth.Use(middleware.JWTAuth())
 		{
 			auth.GET("/me", authH.Me)
+			auth.POST("/avatar", authH.UploadAvatar)
 		}
 
 		// Admin (protected + admin role)
@@ -147,6 +186,6 @@ func main() {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
 
-	log.Printf("Server starting on :%s  mediaBase=%s  db=%s\n", port, mediaBase, dbPath)
-	log.Fatal(r.Run(":" + port))
+	log.Printf("Server starting on %s  mediaBase=%s  db=%s\n", bindAddr, mediaBase, dbPath)
+	log.Fatal(r.Run(bindAddr))
 }
