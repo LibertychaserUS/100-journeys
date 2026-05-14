@@ -417,9 +417,9 @@ Current evidence status | 当前证据状态:
 
 ## Deployment Position | 部署口径
 
-中文：GitHub Pages 只能托管静态 SPA shell，不能运行 Go API，也不能持久化 SQLite。全栈部署必须使用能运行 Go 进程并保存 SQLite 数据目录的服务器。
+中文：GitHub Pages 实际不可作为本项目可用演示入口。当前 Pages URL 只能返回静态 HTML，但项目页位于 `/100-journeys/` 子路径下，页面中的 `/static/...` 资源请求会落到站点根路径而返回 404；同时 GitHub Pages 不能运行 Go API，也不能持久化 SQLite。因此完整可用演示以腾讯云公网地址为准。
 
-English: GitHub Pages can host only the static SPA shell. Full-stack deployment needs a host that runs the Go API and preserves the SQLite data directory.
+English: GitHub Pages is not a usable demo entry for this project. The current Pages URL can return static HTML, but the project is served under `/100-journeys/` while the SPA requests `/static/...` assets from the site root, which returns 404. GitHub Pages also cannot run the Go API or persist SQLite. The working full-stack demo is the Tencent Cloud public IP.
 
 Deployment paths:
 
@@ -431,7 +431,7 @@ Deployment paths:
 | Alibaba Cloud mainland ECS | Alternative China-access candidate after ICP | Requires ICP filing for formal mainland-domain service |
 | Alibaba Cloud HK/Singapore | Possible no-mainland-ICP host | Full-stack deployable, mainland access still best-effort |
 | Railway/Fly/Render paid small instance | Low-ops full-stack option | Needs paid persistent storage for reliable SQLite |
-| GitHub Pages + external API | Static preview only | Not enough for current full-stack product |
+| GitHub Pages | Not usable as demo | Static HTML may load, but root `/static/...` assets and `/api/...` calls return 404; no Go API or SQLite runtime |
 | Vercel static asset preview | Possible for the dynamic Hash SPA shell only | Current Go + SQLite full stack is not Vercel-native without external API/storage redesign |
 | CDN/R2/OSS for images | Future media layer | Mirror public assets and use `CDN_BASE_URL` as a missing-local fallback or edge cache source |
 
