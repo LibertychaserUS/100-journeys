@@ -5,7 +5,7 @@
 [![CodeRabbit](https://img.shields.io/badge/CodeRabbit-review%20actioned-orange)](https://github.com/LibertychaserUS/100-journeys/pull/1)
 [![Stress](https://img.shields.io/badge/stress-target%20profile%20passing-green)](docs/ops/LOAD_TEST_RESULTS.md)
 [![k6](https://img.shields.io/badge/k6-baseline%20recorded-blue)](docs/ops/LOAD_TEST_RESULTS.md)
-[![E2E](https://img.shields.io/badge/Playwright-29%2F29%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
+[![E2E Tests](https://img.shields.io/badge/E2E%20tests-Playwright%2029%2F29%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
 
 中文：**100种不可思议的旅行** 是一个轻量级全栈 Web App MVP，以“情绪 / MBTI / 隐藏身份 / 奇幻旅程”为入口，把旅行内容做成故事卡片、AI 宠物陪伴、WonderCoin 模拟下单和后台统计证据闭环。
 
@@ -36,6 +36,10 @@ English: The domain filing is not complete yet, so the public demo uses the Tenc
 | User account | `[DEMO_USER]` / `[DEMO_USER_PASSWORD]` |
 | Hidden admin login | `[DEMO_URL]/#/admin-login` |
 | Admin account | `[DEMO_ADMIN]` / `[DEMO_ADMIN_PASSWORD]` |
+
+中文：建议使用夜间模式查看，整体视觉观感最佳。
+
+English: Dark mode is recommended for the best visual experience.
 
 中文：公网演示地址和账号通过提交邮件或面试现场单独提供，均为 assignment/demo-only，评审结束后立即轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
 
