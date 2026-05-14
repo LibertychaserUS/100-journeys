@@ -1,7 +1,7 @@
 # 100 Journeys | 100种不可思议的旅行
 
 [![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
-[![Pages](https://github.com/LibertychaserUS/100-journeys/actions/workflows/pages.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/pages.yml)
+[![Live Demo](https://img.shields.io/badge/Tencent%20Cloud-live%20demo-blue)](http://49.232.207.220/)
 [![CodeRabbit](https://img.shields.io/badge/CodeRabbit-review%20actioned-orange)](https://github.com/LibertychaserUS/100-journeys/pull/1)
 [![Stress](https://img.shields.io/badge/stress-target%20profile%20passing-green)](docs/ops/LOAD_TEST_RESULTS.md)
 [![k6](https://img.shields.io/badge/k6-baseline%20recorded-blue)](docs/ops/LOAD_TEST_RESULTS.md)
@@ -11,7 +11,7 @@
 
 English: **100 Journeys** is a lightweight full-stack Web App MVP for story-driven fantasy travel discovery. Users choose a mood, persona, or hidden world instead of browsing a conventional destination list.
 
-Current delivery target: `main`; deployment hardening branch: `codex/tencent-cloud-deploy`
+Current stable branch: `main`
 
 ---
 
@@ -31,23 +31,23 @@ English: The domain filing is not complete yet, so the public demo uses the Tenc
 
 | Item | URL / Account |
 |---|---|
-| Public demo | `[DEMO_URL]` |
-| User login | `[DEMO_URL]/#/login` |
+| Public demo | <http://49.232.207.220/> |
+| User login | <http://49.232.207.220/#/login> |
 | User account | `[DEMO_USER]` / `[DEMO_USER_PASSWORD]` |
-| Hidden admin login | `[DEMO_URL]/#/admin-login` |
+| Hidden admin login | <http://49.232.207.220/#/admin-login> |
 | Admin account | `[DEMO_ADMIN]` / `[DEMO_ADMIN_PASSWORD]` |
 
 中文：建议使用夜间模式查看，整体视觉观感最佳。
 
 English: Dark mode is recommended for the best visual experience.
 
-中文：公网演示地址和账号通过提交邮件或面试现场单独提供，均为 assignment/demo-only，评审结束后立即轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
+中文：公网演示账号属于临时演示凭据，演示结束后可轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
 
-English: Demo URL and credentials are supplied separately in the submission email or interview context. They are assignment/demo-only and must be rotated or disabled after review. Plaintext production credentials must never be stored in README, Git history, or public docs; admin users are created/promoted through the server-side `cmd/admin-user` CLI, while local demo accounts are printed by `scripts/deploy/local-one-click.sh`. To reset local demo data, remove `data/*.db*` and rerun `scripts/deploy/local-one-click.sh`; public demo credentials are controlled by server environment variables and `scripts/deploy/init-demo-data.sh`, separate from production credentials.
+English: Public demo accounts are temporary demo credentials and can be rotated or disabled after use. Plaintext production credentials must never be stored in README, Git history, or public docs; admin users are created/promoted through the server-side `cmd/admin-user` CLI, while local demo accounts are printed by `scripts/deploy/local-one-click.sh`. To reset local demo data, remove `data/*.db*` and rerun `scripts/deploy/local-one-click.sh`; public demo credentials are controlled by server environment variables and `scripts/deploy/init-demo-data.sh`, separate from production credentials.
 
 ```mermaid
 flowchart LR
-    browser["外部浏览器"] --> cvm["Tencent Cloud CVM<br/>[DEMO_URL]:80"]
+    browser["外部浏览器"] --> cvm["Tencent Cloud CVM<br/>49.232.207.220:80"]
     cvm --> nginx["Nginx reverse proxy"]
     nginx --> spa["Hash SPA"]
     nginx --> api["Go API<br/>127.0.0.1:8080"]
@@ -89,7 +89,7 @@ English: The app is not a generic travel listing site. It is a compact content M
 
 ## Database Access | 数据库访问
 
-中文：项目没有使用 GORM。数据库层采用 Go 标准 `database/sql`、`modernc.org/sqlite` 和 repository/service 分层。这样做的原因是本作业明确要求 SQLite、schema/API 契约、测试证据和可审计 SQL；手写参数化 SQL 更容易直接证明 `db/schema.sql`、API 行为和测试结果一致。
+中文：项目没有使用 GORM。数据库层采用 Go 标准 `database/sql`、`modernc.org/sqlite` 和 repository/service 分层。这样做的原因是本项目强调 SQLite、schema/API 契约、测试证据和可审计 SQL；手写参数化 SQL 更容易直接证明 `db/schema.sql`、API 行为和测试结果一致。
 
 English: The project does not use GORM. It uses Go `database/sql`, `modernc.org/sqlite`, and repository/service layers so the SQLite schema, API contract, SQL statements, and tests remain directly auditable.
 
@@ -336,7 +336,7 @@ scripts/deploy/init-demo-data.sh ./data/demo.db
 
 The demo generator creates 50 ordinary users and 3 admin users with bcrypt password hashes, local GitHub-style default avatars, complete required profile fields, paid orders, wallet transactions, saved journeys, analytics events, and audit evidence. Usernames may repeat in product terms; ownership is bound to the server-side account identity, not displayed as an internal database ID.
 
-Demo accounts after initialization are printed by `scripts/deploy/init-demo-data.sh` and `scripts/deploy/local-one-click.sh`. For public submissions, provide current demo-only credentials separately and rotate or disable them after review.
+Demo accounts after initialization are printed by `scripts/deploy/init-demo-data.sh` and `scripts/deploy/local-one-click.sh`. Public demo credentials should be rotated or disabled after use.
 
 ## One-Click Local Deploy | 本地一键部署
 
@@ -410,7 +410,7 @@ Current evidence status | 当前证据状态:
 | k6 | Local Nginx baseline recorded; post-fix smoke passed through one-click Nginx URL with trailing slash; Tencent Cloud public-IP smoke passed within Nginx rate limit |
 | Browser visual audit | Captured real desktop/mobile pages, profile, recharge, and admin dashboard screenshots from local Nginx |
 | Playwright | Passing: `29 passed` on 2026-05-14 |
-| Nginx/CDN | Local Nginx verified; Tencent Cloud Nginx reverse proxy deployed at `[DEMO_URL]`; public API is rate-limited; HTTPS waits for filed domain |
+| Nginx/CDN | Local Nginx verified; Tencent Cloud Nginx reverse proxy deployed at `http://49.232.207.220/`; public API is rate-limited; HTTPS waits for filed domain |
 | CI/CD | `.github/workflows/ci.yml` added; remote GitHub Actions result pending after push |
 
 ---
@@ -425,7 +425,7 @@ Deployment paths:
 
 | Path | Fit | Notes |
 |---|---|---|
-| Tencent Cloud CVM public IP | Current external demo | Go + SQLite + Nginx on `[DEMO_URL]`; no domain filing required for IP demo |
+| Tencent Cloud CVM public IP | Current external demo | Go + SQLite + Nginx on `http://49.232.207.220/`; no domain filing required for IP demo |
 | Tencent Cloud filed domain | Formal China mainland domain path | Requires ICP filing before domain points to mainland CVM |
 | Local/demo | Development proof | `go run`, SQLite file, local generated images |
 | Alibaba Cloud mainland ECS | Alternative China-access candidate after ICP | Requires ICP filing for formal mainland-domain service |
@@ -435,9 +435,9 @@ Deployment paths:
 | Vercel static asset preview | Possible for the dynamic Hash SPA shell only | Current Go + SQLite full stack is not Vercel-native without external API/storage redesign |
 | CDN/R2/OSS for images | Future media layer | Mirror public assets and use `CDN_BASE_URL` as a missing-local fallback or edge cache source |
 
-Current demo URL: `[DEMO_URL]`
+Current demo URL: <http://49.232.207.220/>
 
-Hidden admin route: `[DEMO_URL]/#/admin-login`
+Hidden admin route: <http://49.232.207.220/#/admin-login>
 
 Current choice: Tencent Cloud CVM public IP demo. Formal domain deployment waits for ICP filing and HTTPS certificate setup.
 
@@ -458,7 +458,7 @@ Operational docs:
 | Artifact | Purpose |
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | Current product requirements derived from implemented behavior |
-| [`docs/INITIAL_PRD.md`](docs/INITIAL_PRD.md) | Initial assignment PRD and original requirement baseline |
+| [`docs/INITIAL_PRD.md`](docs/INITIAL_PRD.md) | Initial product requirement baseline |
 | [`docs/BDD-spec.md`](docs/BDD-spec.md) | Given/When/Then business behavior scenarios |
 | [`docs/schema/SDD-spec.md`](docs/schema/SDD-spec.md) | Schema/API-driven requirements baseline |
 | [`docs/ui-components/DDD-spec.md`](docs/ui-components/DDD-spec.md) | UI component/design description baseline |
@@ -467,10 +467,10 @@ Operational docs:
 | [`docs/ops/LOAD_TEST_RESULTS.md`](docs/ops/LOAD_TEST_RESULTS.md) | Nginx and k6 execution evidence |
 | [`docs/workflow/AI_DEVELOPMENT_WORKFLOW.md`](docs/workflow/AI_DEVELOPMENT_WORKFLOW.md) | Claude Code + Kimi API workflow explanation |
 | [`docs/workflow/DOCUMENTATION_EVOLUTION.md`](docs/workflow/DOCUMENTATION_EVOLUTION.md) | Documentation history and Git-stage evolution |
-| [`docs/SUBMISSION.md`](docs/SUBMISSION.md) | Final submission checklist, email format, and attachment list |
+| [`docs/SUBMISSION.md`](docs/SUBMISSION.md) | Delivery checklist and archive list |
 | [`docs/generated/`](docs/generated/) | Code-derived diagrams and route/test matrices |
 | [`docs/prompts/prompt-log.md`](docs/prompts/prompt-log.md) | Prompt trace |
-| [`app.xlsx`](app.xlsx) | Submission test-case spreadsheet |
+| [`app.xlsx`](app.xlsx) | Test-case spreadsheet |
 
 Regenerate code-derived docs:
 
@@ -492,15 +492,8 @@ python3 scripts/docs/generate_project_artifacts.py
 
 ---
 
-## Submission | 提交方式
+## Package | 打包材料
 
-中文：按作业要求，提交邮件应包含源码压缩包、文档包、Prompt 记录、工作流说明、GitHub/Gitee 仓库链接和公网演示地址。
+中文：完整交付材料包含源码压缩包、Markdown 文档、Prompt 记录、工作流说明、GitHub 仓库链接和公网演示地址。
 
-English: The submission email should include the source archive, documentation package, prompt records, workflow explanation, GitHub/Gitee repository link, and public demo URL.
-
-| Item | Value |
-|---|---|
-| Email | `xulei@bizguest.com` |
-| Subject | `【远程作业提交】姓名` |
-| Required attachments/links | ZIP source package, Markdown docs, `docs/prompts/prompt-log.md`, `docs/workflow/AI_DEVELOPMENT_WORKFLOW.md`, GitHub/Gitee link, demo URL |
-| Deadline | Within 72 hours after receiving the assignment |
+English: The complete package includes the source archive, Markdown documentation, prompt records, workflow explanation, GitHub repository link, and public demo URL.
