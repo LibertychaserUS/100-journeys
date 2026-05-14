@@ -174,20 +174,24 @@ def sample_journeys() -> list[dict[str, str]]:
         rows = conn.execute(
             """
             SELECT
+                j.id,
                 j.slug,
                 j.title,
                 j.subtitle,
+                j.story_hook,
+                j.story,
                 j.region,
                 j.fantasy_type,
                 j.visual_style,
                 j.adventure_index,
                 j.obscurity_level,
                 j.risk_level,
+                j.mood_keywords,
                 j.price,
                 j.image_path,
-                j.story_hook,
-                COALESCE(GROUP_CONCAT(DISTINCT t.slug), '') AS tags,
-                COALESCE(GROUP_CONCAT(DISTINCT m.code || ':' || jm.compatibility_score), '') AS mbti
+                COALESCE(j.booking_url, '') AS booking_url,
+                COALESCE(GROUP_CONCAT(DISTINCT t.name || '(' || t.slug || ')'), '') AS tags,
+                COALESCE(GROUP_CONCAT(DISTINCT m.code || '-' || m.name || ':' || jm.compatibility_score), '') AS mbti
             FROM journeys j
             LEFT JOIN journey_tags jt ON jt.journey_id = j.id
             LEFT JOIN tags t ON t.id = jt.tag_id
@@ -204,6 +208,8 @@ def sample_journeys() -> list[dict[str, str]]:
             # comma-split reviewers by avoiding commas inside aggregate cells.
             item["tags"] = item["tags"].replace(",", ";")
             item["mbti"] = item["mbti"].replace(",", ";")
+            item["story"] = item["story"].replace("\n", " ")
+            item["mood_keywords"] = item["mood_keywords"].replace(",", ";")
             samples.append(item)
         return samples
     finally:
@@ -399,18 +405,22 @@ def workbook_csv(groups: dict[str, list[str]], routes_: list[Route]) -> str:
 
 def sample_journeys_csv(rows: list[dict[str, str]]) -> str:
     fieldnames = [
+        "id",
         "slug",
         "title",
         "subtitle",
+        "story_hook",
+        "story",
         "region",
         "fantasy_type",
         "visual_style",
         "adventure_index",
         "obscurity_level",
         "risk_level",
+        "mood_keywords",
         "price",
         "image_path",
-        "story_hook",
+        "booking_url",
         "tags",
         "mbti",
     ]
@@ -427,31 +437,31 @@ def sample_journeys_markdown(rows: list[dict[str, str]]) -> str:
         "",
         "> 来源：脚本临时加载 `db/schema.sql` 与 `db/seed.sql` 到 SQLite 后导出；不是手写摘要。",
         "",
-        f"当前 `db/seed.sql` 共初始化 {len(rows)} 条高质量旅程样例，满足“至少 5 条高质量样例数据”要求。",
+        f"当前 `db/seed.sql` 共初始化 {len(rows)} 条高质量旅程样例，以下按数据库记录逐条列出完整字段，满足“至少 5 条高质量样例数据”要求。",
         "",
-        "| # | slug | 标题 | 地区 | 类型 | 风格 | 冒险/小众/风险 | 价格 | 图片 | 标签 | MBTI 匹配 |",
-        "|---:|---|---|---|---|---|---|---:|---|---|---|",
     ]
     for index, row in enumerate(rows, start=1):
         score = f"{row['adventure_index']}/{row['obscurity_level']}/{row['risk_level']}"
-        lines.append(
-            "| "
-            + " | ".join(
-                [
-                    str(index),
-                    f"`{row['slug']}`",
-                    row["title"],
-                    row["region"],
-                    row["fantasy_type"],
-                    row["visual_style"],
-                    score,
-                    row["price"],
-                    f"`{row['image_path']}`",
-                    row["tags"],
-                    row["mbti"],
-                ]
-            )
-            + " |"
+        lines.extend(
+            [
+                f"## {index}. {row['title']}",
+                "",
+                f"- `id`: {row['id']}",
+                f"- `slug`: `{row['slug']}`",
+                f"- 副标题：{row['subtitle']}",
+                f"- 故事钩子：{row['story_hook']}",
+                f"- 地区：{row['region']}",
+                f"- 类型/视觉风格：{row['fantasy_type']} / {row['visual_style']}",
+                f"- 冒险/小众/风险：{score}",
+                f"- 价格：{row['price']} 不思议币",
+                f"- 本地图片：`{row['image_path']}`",
+                f"- 预订链接：{row['booking_url'] or 'NULL，当前 MVP 不接真实交易'}",
+                f"- 情绪关键词：{row['mood_keywords']}",
+                f"- 标签：{row['tags']}",
+                f"- MBTI 匹配：{row['mbti']}",
+                f"- 正文：{row['story']}",
+                "",
+            ]
         )
     lines.extend(
         [
@@ -459,6 +469,8 @@ def sample_journeys_markdown(rows: list[dict[str, str]]) -> str:
             "## 字段说明",
             "",
             "- `slug`：旅程唯一业务标识，用于详情页路由和订单快照。",
+            "- `story_hook`/`story`：前端卡片、详情页和内容调性的核心文案来源。",
+            "- `mood_keywords`：内容情绪标签，保留 JSON 数组形式，CSV 中用分号避免简单审阅工具误切列。",
             "- `price`：WonderCoin 模拟价格，和真实高端旅行费用大致对齐。",
             "- `image_path`：本地优先静态图路径；生产可由 Nginx/CDN/R2 等承接。",
             "- `tags`：与 `journey_tags` 关联的分类标签。",
@@ -467,6 +479,50 @@ def sample_journeys_markdown(rows: list[dict[str, str]]) -> str:
         ]
     )
     return "\n".join(lines)
+
+
+def sample_data_document(rows: list[dict[str, str]]) -> str:
+    lines = [
+        "# 样例数据说明",
+        "",
+        "> 交付要求：数据库初始化脚本必须包含至少 5 条高质量样例数据。当前 `db/seed.sql` 初始化 12 条旅程、8 个标签、16 个 MBTI 类型，并为每条旅程绑定标签和 MBTI 匹配关系。",
+        "",
+        "## 1. 数据来源与生成链路",
+        "",
+        "```mermaid",
+        "flowchart LR",
+        "    schema[\"db/schema.sql<br/>权威 DDL\"] --> tempdb[\"临时 SQLite 数据库\"]",
+        "    seed[\"db/seed.sql<br/>初始化样例数据\"] --> tempdb",
+        "    tempdb --> generated[\"docs/generated/<br/>逐条样例清单\"]",
+        "    generated --> xlsx[\"app.xlsx<br/>Seed Samples sheet\"]",
+        "```",
+        "",
+        "说明：权威数据源是 `db/seed.sql`。运行 `python3 scripts/docs/generate_project_artifacts.py` 时，脚本会临时加载真实 schema/seed，并同步生成 `docs/generated/` 下的逐条样例清单和 `app.xlsx` 的 Seed Samples sheet；审阅时可以直接对照 `db/seed.sql`。",
+        "",
+        "## 2. 样例质量标准",
+        "",
+        "| 维度 | 标准 |",
+        "|---|---|",
+        "| 内容完整 | 每条旅程包含标题、slug、副标题、故事 hook、正文、地区、类型、视觉风格、风险、价格和图片路径 |",
+        "| 业务可用 | 每条旅程可进入详情页、可下单、可进入订单快照 |",
+        "| 个性化 | 每条旅程绑定标签和 MBTI 匹配分 |",
+        "| 审计可追溯 | 价格进入订单、订单明细和交易流水 |",
+        "| 图片本地化 | `image_path` 指向本地静态资源文件名，支持 CDN fallback |",
+        "",
+        "## 3. CSV 字段说明",
+        "",
+        "`docs/generated/sample-journeys.csv` 当前按数据库记录逐条导出，包含以下字段：",
+        "",
+        "- `id`, `slug`, `title`, `subtitle`, `story_hook`, `story`",
+        "- `region`, `fantasy_type`, `visual_style`, `adventure_index`, `obscurity_level`, `risk_level`",
+        "- `mood_keywords`, `price`, `image_path`, `booking_url`, `tags`, `mbti`",
+        "",
+        "## 4. 逐条样例数据完整清单",
+        "",
+    ]
+    detail = sample_journeys_markdown(rows).split("\n", 6)[6].strip()
+    lines.append(detail)
+    return "\n".join(lines) + "\n"
 
 
 def write(path: Path, text: str) -> None:
@@ -493,6 +549,7 @@ def main() -> None:
     write(OUT / "sample-journeys.csv", sample_journeys_csv(samples))
     write(OUT / "sample-journeys.md", sample_journeys_markdown(samples))
     write(OUT / "source-alignment.md", source_alignment_markdown(tables, routes_, frontend, tests))
+    write(ROOT / "docs" / "SAMPLE_DATA.md", sample_data_document(samples))
 
     index = [
         "# 生成文档产物 / Generated Documentation Artifacts",
