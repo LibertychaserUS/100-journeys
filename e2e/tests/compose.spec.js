@@ -173,8 +173,10 @@ test.describe('Compose: draw your own entrance', () => {
     expect(url).toMatch(/#\/compose\/[a-z0-9]{12}$/);
     await expect(page.locator('#compose-mine [data-action="share-kept"]')).toHaveCount(1);
 
-    // On a shared device the account's ticket leaves with the account.
+    // On a shared device the account's ticket leaves with the account (signing out goes home first).
     await logout(page);
+    await page.goto('/#/compose');
+    await expect(page.locator('#compose-tray .slip').first()).toBeVisible();
     await expect(page.locator('#compose-ticket .cline.is-empty')).toHaveCount(6);
     await expect(page.locator('#compose-mine .kept')).toHaveCount(0);
 
@@ -195,17 +197,23 @@ test.describe('Compose: draw your own entrance', () => {
     await guest.close();
   });
 
-  // E2E-COMPOSE-005: with reduced motion the ink and the stamp simply appear
-  test('reduced motion: no ink or stamp animation', async ({ page }) => {
+  // E2E-COMPOSE-005: a placed slip flies onto its line and inks in; with reduced motion it simply appears
+  test('motion: slip flight and ink, and none of it with reduced motion', async ({ page }) => {
     await page.goto('/#/compose');
+    await expect(page.locator('.compose.is-entering')).toHaveCount(0, { timeout: 3000 });
     await slip(page, 'place', 'uyuni').click();
-    expect(await page.locator('#compose-ticket .ink.is-new').evaluate((el) => getComputedStyle(el).animationName)).toBe('ink');
+    await expect(page.locator('.slip--flight')).toHaveCount(1);
+    expect(await page.locator('#compose-ticket .ink.is-new').evaluate((el) => getComputedStyle(el).animationName)).toContain('ink-phrase');
+    expect(await line(page, 'place').locator('dd').evaluate((el) => getComputedStyle(el).animationDelay)).not.toBe('0s');
+    await expect(page.locator('.slip--flight')).toHaveCount(0); // the paper copy dissolves when it lands
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await slip(page, 'hour', 'dawn').click();
+    await expect(page.locator('.slip--flight')).toHaveCount(0);
     const ink = page.locator('#compose-ticket .ink.is-new');
     await expect(ink).toHaveText('第一缕光落下时');
     expect(await ink.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+    expect(await page.locator('#compose-progress b.is-new').evaluate((el) => getComputedStyle(el, '::after').animationName)).toBe('none');
     expect(await line(page, 'hour').locator('dd').evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
     await page.locator('#compose-keep').click();
     const stamp = page.locator('#compose-ticket .cticket__stamp');

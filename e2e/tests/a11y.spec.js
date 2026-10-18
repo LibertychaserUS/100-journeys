@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
-const { freshPage, registerAndLogin } = require('./helpers');
+const { freshPage, registerAndLogin, settle } = require('./helpers');
 
 // Pages scanned in both themes. Hero imagery is excluded only from contrast checks over photos.
 const PAGES = [
@@ -23,6 +23,7 @@ for (const theme of ['dark', 'light']) {
         await page.goto(url);
         await expect(page.locator(ready).first()).toBeVisible();
         await page.waitForLoadState('networkidle');
+        await settle(page);
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
           .exclude('.home-hero__particles')
@@ -46,6 +47,7 @@ for (const theme of ['dark', 'light']) {
     await expect(page.locator('#compose-mine .kept')).toHaveCount(1);
     await expect(page.locator('#compose-ticket .cticket__stamp')).toBeVisible();
     await page.waitForLoadState('networkidle');
+    await settle(page);
     const scan = async () => {
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
       return results.violations.map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`);
@@ -56,6 +58,7 @@ for (const theme of ['dark', 'light']) {
     await page.goto(await page.evaluate(() => navigator.clipboard.readText()));
     await expect(page.locator('#shared-ticket-title')).toBeVisible();
     await page.waitForLoadState('networkidle');
+    await settle(page);
     summary = await scan();
     expect(summary, summary.join('\n')).toEqual([]);
   });

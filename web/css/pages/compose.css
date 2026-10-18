@@ -29,14 +29,33 @@
   color: var(--paper-ink);
 }
 
+/* Motion: one timing system for the game, built on the global --ease / --dur-* tokens.
+   press → quick → base are feedback; flight (JS: Pages.Compose.MOTION), ink and stamp are the
+   choreography. Only transform, opacity, filter, clip-path and background-size are animated, so
+   nothing reflows mid-animation; everything stops under prefers-reduced-motion. */
+.compose, .compose-shared, .compose-invite-wrap, .cticket {
+  --m-press: 90ms;
+  --m-quick: var(--dur-fast);
+  --m-base: var(--dur);
+  --m-ink: 640ms;
+  --m-stamp: 460ms;
+  --ease-out: var(--ease);
+  --ease-in-out: cubic-bezier(.6, 0, .25, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
 /* ---------- page ---------- */
 .compose__head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-6) var(--space-5); }
-.compose__head h1 { font-family: var(--font-story); font-size: var(--text-3xl); font-weight: 700; line-height: 1.2; }
-.compose__head p { margin-top: 6px; color: var(--color-text-2); font-size: var(--text-base); max-width: 36em; }
-.compose__progress { display: flex; align-items: center; gap: 10px; font-size: var(--text-sm); color: var(--color-text-3); white-space: nowrap; }
+.compose__head h1 { font-family: var(--font-story); font-size: clamp(1.875rem, 1.25rem + 1.6vw, 2.5rem); font-weight: 700; line-height: 1.15; letter-spacing: .02em; }
+:lang(en) .compose__head h1 { letter-spacing: -.012em; }
+.compose__head p { margin-top: 8px; color: var(--color-text-2); font-size: var(--text-base); line-height: 1.75; max-width: 36em; }
+:lang(en) .compose__head p { line-height: 1.6; }
+.compose__progress { display: flex; align-items: center; gap: 10px; font-size: var(--text-sm); color: var(--color-text-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .compose__bars { display: inline-flex; gap: 6px; }
-.compose__bars b { width: 22px; height: 4px; border-radius: 2px; background: var(--color-line-strong); transition: background var(--dur); }
-.compose__bars b.on { background: var(--color-action); }
+.compose__bars b { position: relative; overflow: hidden; width: 22px; height: 4px; border-radius: 2px; background: var(--color-line-strong); }
+.compose__bars b::after { content: ""; position: absolute; inset: 0; background: var(--color-action); transform: scaleX(0); transform-origin: left; }
+.compose__bars b.on::after { transform: none; }
+.compose__bars b.is-new::after { animation: fill 380ms var(--ease-out) var(--ink-delay, 0ms) backwards; }
 
 .compose__grid { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: var(--space-6) 40px; align-items: start; padding-bottom: var(--space-7); }
 
@@ -46,6 +65,8 @@
 .tray-group { min-width: 0; }
 .tray-group h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; font-size: var(--text-sm); font-weight: var(--weight-semibold); letter-spacing: .14em; color: var(--color-text-3); }
 .tray-group h2 span { letter-spacing: 0; font-weight: var(--weight-normal); color: var(--color-text-2); }
+:lang(en) .tray-group h2 { font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; }
+:lang(en) .tray-group h2 span { font-size: var(--text-sm); text-transform: none; }
 .slips { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px; margin: -4px; }
 
 /* A slip is a button with the torn paper drawn underneath, so the focus ring is never clipped. */
@@ -53,32 +74,39 @@
   position: relative; isolation: isolate; display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center;
   min-height: 46px; padding: 10px 16px 10px 14px; text-align: left;
   font-family: var(--font-story); font-size: 15px; line-height: 1.35; color: var(--paper-ink);
-  transform: rotate(var(--r, 0deg)); transition: transform var(--dur) var(--ease), opacity var(--dur);
+  transform: rotate(var(--r, 0deg)); transition: transform var(--m-base, 250ms) var(--ease-out, ease), opacity var(--m-base, 250ms), color var(--m-base, 250ms);
   filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .32));
   touch-action: manipulation; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none;
 }
 .slip::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); border-radius: 2px;
+  content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); border: 1.5px dashed transparent; border-radius: 2px;
   clip-path: polygon(0 5%, 6% 0, 40% 3%, 72% 0, 100% 5%, 98% 52%, 100% 95%, 66% 100%, 30% 97%, 0 100%, 2% 50%);
+  transition: background-color var(--m-base, 250ms) var(--ease-out, ease), border-color var(--m-base, 250ms);
 }
-.slip small { display: block; margin-top: 2px; font-family: var(--font-ui); font-size: 11px; line-height: 1.35; color: var(--paper-ink-2); }
+:lang(en) .slip { font-size: 15.5px; line-height: 1.3; }
+.slip small { display: block; margin-top: 3px; font-family: var(--font-ui); font-size: 12px; line-height: 1.35; color: var(--paper-ink-2); }
+:lang(en) .slip small { font-size: 11.5px; }
 [data-theme="light"] .slip { filter: drop-shadow(0 3px 4px rgba(60, 40, 10, .16)) drop-shadow(0 0 1px rgba(60, 40, 10, .25)); }
 button.slip { cursor: grab; }
-button.slip:hover { transform: rotate(0deg) translateY(-2px); }
+/* Hover and keyboard focus lift the slip and straighten it a little; pressing gives it a quick squeeze. */
+button.slip:hover, button.slip:focus-visible { transform: translateY(-3px) rotate(calc(var(--r, 0deg) * .3)); }
+button.slip:active { transform: translateY(0) rotate(0deg) scale(.965); transition-duration: var(--m-press); }
 .slip:focus-visible { outline-offset: 5px; border-radius: 3px; }
-/* Placed: the slip has gone into the frame and leaves its outline behind. */
+/* Placed: the paper has gone into the frame and leaves its outline behind. */
 .slip[aria-pressed="true"] { color: var(--color-text-2); filter: none; transform: rotate(0deg); }
-.slip[aria-pressed="true"]::before { background: transparent; clip-path: none; border: 1.5px dashed var(--color-action); border-radius: 4px; }
+.slip[aria-pressed="true"]::before { background-color: transparent; clip-path: none; border-color: var(--color-action); border-radius: 4px; }
 .slip[aria-pressed="true"] small { color: var(--color-text-3); }
+button.slip[aria-pressed="true"]:hover, button.slip[aria-pressed="true"]:focus-visible { color: var(--color-text); transform: translateY(-1px); }
 .slip.is-lifted { opacity: .4; }
-.slip--ghost { position: fixed; left: 0; top: 0; z-index: var(--z-overlay); pointer-events: none; transition: none; filter: drop-shadow(0 16px 18px rgba(0, 0, 0, .45)); }
+.slip--ghost { position: fixed; left: 0; top: 0; z-index: var(--z-overlay); pointer-events: none; transition: none; will-change: transform; filter: drop-shadow(0 16px 18px rgba(0, 0, 0, .45)); }
+.slip--flight { position: fixed; z-index: var(--z-overlay); margin: 0; pointer-events: none; transform-origin: 0 0; transition: none; will-change: transform, opacity; filter: drop-shadow(0 18px 20px rgba(0, 0, 0, .38)); }
 body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; user-select: none; }
 
 /* ---------- the lantern frame ---------- */
 .compose__frame {
   position: sticky; top: calc(var(--nav-h) + 20px); border-radius: 18px; background: var(--paper);
   box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .7), 0 0 0 1px var(--paper-line);
-  transition: transform var(--dur) var(--ease), outline-color var(--dur);
+  transition: transform var(--m-base) var(--ease-out), outline-color var(--m-base);
   outline: 2px dashed transparent; outline-offset: 6px;
 }
 [data-theme="light"] .compose__frame { box-shadow: 0 24px 60px -30px rgba(20, 22, 28, .35), 0 0 0 1px var(--paper-line); }
@@ -90,14 +118,17 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
 .compose__foot::after { content: ""; position: absolute; left: -1px; right: -1px; top: -10px; height: 20px; background: radial-gradient(circle at 0 50%, var(--color-bg) 9px, transparent 9.5px), radial-gradient(circle at 100% 50%, var(--color-bg) 9px, transparent 9.5px); pointer-events: none; }
 .compose__hint { font-size: var(--text-sm); line-height: 1.55; color: var(--paper-ink-2); }
 .compose__actions { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; }
-.compose__actions .btn { min-height: 48px; min-width: 0; }
-.compose__actions .icon-btn--square { width: 48px; height: 48px; }
+.compose__actions .btn { min-height: 48px; min-width: 0; transition: background var(--m-quick), transform var(--m-quick) var(--ease-out); }
+.compose__actions .btn:active:not(:disabled) { transform: scale(.98); transition-duration: var(--m-press); }
+.compose__actions .icon-btn--square { width: 48px; height: 48px; transition: color var(--m-quick), border-color var(--m-quick), transform var(--m-quick) var(--ease-out); }
+.compose__actions .icon-btn--square:hover:not(:disabled) { transform: translateY(-1px); }
+.compose__actions .icon-btn--square:active:not(:disabled) { transform: scale(.94); transition-duration: var(--m-press); }
 .compose__actions [data-copied="true"] { color: var(--color-ok); }
 
 /* ---------- ticket (game frame, share view, kept list) ---------- */
 .cticket { position: relative; overflow: hidden; border-radius: 18px; background: var(--paper); box-shadow: 0 24px 60px -30px rgba(0, 0, 0, .7), 0 0 0 1px var(--paper-line); }
 .cticket__img { position: relative; aspect-ratio: 16 / 10; background: var(--cover) center 60% / cover; }
-.cticket__img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--paper) 0%, transparent 55%); }
+.cticket__img::after { content: ""; position: absolute; inset: 0 0 -2px; background: linear-gradient(0deg, var(--paper) 0, var(--paper) 3px, transparent 55%); }
 .cticket__img--blank { background: none; display: grid; place-items: center; margin: 14px 14px 0; aspect-ratio: 16 / 9; border: 1.5px dashed var(--paper-line); border-radius: 12px; }
 .cticket__img--blank::after { content: none; }
 .cticket__img--blank[data-realm] { margin: 0; border: 0; border-radius: 0; aspect-ratio: 16 / 10; background: var(--realm-art); }
@@ -122,21 +153,34 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
 /* Over a photo or a painted sky the text starts inside the fade. */
 .cticket__img:not(.cticket__img--blank) ~ .cticket__body, .cticket__img--blank[data-realm] ~ .cticket__body { margin-top: -36px; padding-top: 0; }
 .cticket__label { font-size: 11px; letter-spacing: .14em; color: var(--paper-ink-2); }
-.cticket__title { margin-top: 6px; font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.45; font-weight: 700; text-wrap: pretty; }
-:lang(en) .cticket__title { font-size: 1.3rem; }
+:lang(en) .cticket__label { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
+/* CJK sets loose and open; the Latin serif sets tighter with a touch of negative tracking. */
+.cticket__title { margin-top: 6px; font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.5; letter-spacing: .02em; font-weight: 700; text-wrap: pretty; }
+:lang(en) .cticket__title { font-size: 1.3125rem; line-height: 1.32; letter-spacing: -.005em; }
 .cticket__placeholder { color: var(--paper-ink-2); font-weight: 400; }
-.cticket__story { margin-top: 8px; font-family: var(--font-story); font-size: var(--text-md); line-height: 1.6; }
-.ink.is-new { background: linear-gradient(transparent 62%, rgba(242, 196, 109, .5) 62%); animation: ink 1.2s var(--ease) both; }
+.cticket__story { margin-top: 8px; font-family: var(--font-story); font-size: var(--text-md); line-height: 1.75; }
+:lang(en) .cticket__story { font-size: 1.0625rem; line-height: 1.5; font-style: italic; }
+/* Ink: the phrase just placed comes up out of a blur, then a lantern-gold mark sweeps under it. */
+.ink.is-new {
+  background: linear-gradient(transparent 60%, rgba(242, 196, 109, .55) 60%) no-repeat 0 0 / 100% 100%;
+  animation: ink-phrase var(--m-ink) var(--ease-out) var(--ink-delay, 0ms) backwards, ink-mark 560ms var(--ease-in-out) calc(var(--ink-delay, 0ms) + 140ms) backwards;
+}
 .cticket__lines { margin-top: 16px; display: grid; gap: 8px; }
-.cline { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: var(--text-base); }
+.cline { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 14.5px; line-height: 1.5; }
 .cline dt { font-size: 11px; letter-spacing: .1em; color: var(--paper-ink-2); }
-:lang(en) .cline { grid-template-columns: 76px minmax(0, 1fr); }
-:lang(en) .cline dt, :lang(en) .cticket__label { letter-spacing: .06em; }
+:lang(en) .cline { grid-template-columns: 82px minmax(0, 1fr); font-size: 15px; line-height: 1.4; }
+:lang(en) .cline dt { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
 .cline dd { font-family: var(--font-story); min-width: 0; }
-.cline__blank { display: block; height: 1.15em; border-bottom: 1.5px dashed var(--paper-line); }
-.cline.is-new dd { animation: ink 1.2s var(--ease) both; }
-.cline__take { padding: 2px 0; text-align: left; font: inherit; line-height: 1.4; border-radius: 3px; text-decoration-thickness: 1px; }
-.cline__take:hover { text-decoration: line-through; text-decoration-color: var(--paper-ink-2); }
+.cline__blank { display: block; height: 1.15em; border-bottom: 1.5px dashed var(--paper-line); transform-origin: left; }
+.cline.is-new dd { animation: ink-line var(--m-ink) var(--ease-out) var(--ink-delay, 0ms) backwards; }
+.cline.is-cleared .cline__blank { animation: draw 420ms var(--ease-out) backwards; }
+/* Taking a line back: a pen stroke draws through it on hover and focus. */
+.cline__take {
+  padding: 2px 0; text-align: left; font: inherit; line-height: inherit; border-radius: 3px;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 58% / 0 1px;
+  transition: background-size var(--m-base) var(--ease-out);
+}
+.cline__take:hover, .cline__take:focus-visible { background-size: 100% 1px; }
 .cticket__link { display: inline-flex; align-items: center; gap: 4px; margin-top: 14px; font-size: var(--text-sm); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--paper-line); }
 .cticket__link:hover { text-decoration-color: currentColor; }
 .cticket__stamp {
@@ -146,10 +190,39 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
   font-family: var(--font-story); font-size: 12px; line-height: 1.25; transform: rotate(-14deg);
 }
 .cticket__stamp span:last-child { font-family: var(--font-ui); font-size: 11px; letter-spacing: .06em; }
-.cticket__stamp.is-new { animation: stamp .45s cubic-bezier(.3, 1.4, .5, 1) both; }
+/* Keeping: the seal comes down with a little overshoot and leaves a ring of ink as it lands. */
+.cticket__stamp.is-new { animation: stamp var(--m-stamp) var(--ease-spring) both; }
+.cticket__stamp.is-new::after, .cticket.is-revealing .cticket__stamp::after {
+  content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid var(--seal); opacity: 0;
+  animation: ring 640ms var(--ease-out) 240ms;
+}
 
-@keyframes ink { from { filter: blur(3px); opacity: 0; letter-spacing: .2em; } }
-@keyframes stamp { from { transform: rotate(-24deg) scale(1.9); opacity: 0; } }
+/* The share view writes itself in for whoever opens it: title, story, each line, then the seal. */
+.cticket.is-revealing .cticket__title { animation: ink-phrase 720ms var(--ease-out) 140ms backwards; }
+.cticket.is-revealing .cticket__story { animation: ink-phrase 720ms var(--ease-out) 300ms backwards; }
+.cticket.is-revealing .cline dd { animation: ink-line var(--m-ink) var(--ease-out) calc(420ms + var(--k, 0) * 90ms) backwards; }
+.cticket.is-revealing .cticket__stamp { animation: stamp var(--m-stamp) var(--ease-spring) 1080ms both; }
+.cticket.is-revealing .cticket__stamp::after { animation-delay: 1320ms; }
+
+@keyframes ink-phrase { from { opacity: 0; filter: blur(4px); } 55% { opacity: 1; } to { opacity: 1; filter: none; } }
+@keyframes ink-mark { from { background-size: 0 100%; } }
+@keyframes ink-line {
+  from { opacity: 0; filter: blur(3px); transform: translateX(-6px); clip-path: inset(-.4em 100% -.4em -.4em); }
+  45% { opacity: 1; }
+  to { opacity: 1; filter: none; transform: none; clip-path: inset(-.4em -.4em -.4em -.4em); }
+}
+@keyframes draw { from { transform: scaleX(0); } }
+@keyframes fill { from { transform: scaleX(0); } }
+@keyframes stamp { from { transform: rotate(-28deg) scale(2); opacity: 0; } 55% { opacity: 1; } }
+@keyframes ring { from { transform: scale(1); opacity: .5; } to { transform: scale(1.55); opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes rise-frame { from { opacity: 0; transform: translateY(18px) scale(.985); } }
+@keyframes bump { 40% { transform: scale(1.3); color: var(--color-text); } }
+
+/* Arriving: the heading and each pile rise in a short stagger, the frame settles last. */
+.compose.is-entering .compose__head, .compose.is-entering .tray-group { animation: rise 520ms var(--ease-out) calc(60ms + var(--i, 0) * 55ms) backwards; }
+.compose.is-entering .compose__frame { animation: rise-frame 680ms var(--ease-out) 160ms backwards; }
+.compose-shared__ticket { animation: rise-frame 680ms var(--ease-out) backwards; }
 
 /* Mini tickets in the kept list */
 .cticket--mini { border-radius: 14px; box-shadow: 0 16px 40px -24px rgba(0, 0, 0, .7), 0 0 0 1px var(--paper-line); }
@@ -157,8 +230,9 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
 .cticket--mini .cticket__img--blank:not([data-realm]) { display: none; }
 .cticket--mini .cticket__body { padding: 14px 18px 18px; }
 .cticket--mini .cticket__img:not(.cticket__img--blank) ~ .cticket__body, .cticket--mini .cticket__img--blank[data-realm] ~ .cticket__body { margin-top: -20px; padding-top: 0; }
-.cticket--mini .cticket__title { font-size: var(--text-md); }
-.cticket--mini .cticket__story { font-size: var(--text-sm); }
+.cticket--mini .cticket__title { font-size: var(--text-md); line-height: 1.5; }
+:lang(en) .cticket--mini .cticket__title { font-size: 1.0625rem; line-height: 1.3; }
+.cticket--mini .cticket__story { font-size: var(--text-sm); line-height: 1.6; }
 .cticket--mini .cticket__stamp { width: 56px; height: 56px; right: 12px; top: 10px; font-size: 10px; }
 .cticket--mini .cticket__stamp span:last-child { font-size: 9px; }
 
@@ -170,7 +244,8 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
 }
 .compose-peek__btn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 14px; border-radius: var(--radius-control); background: var(--color-surface); border: 1px solid var(--color-line-strong); text-align: left; }
 .compose-peek__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-story); font-size: var(--text-base); }
-.compose-peek__n { font-size: var(--text-sm); color: var(--color-text-3); }
+.compose-peek__n { display: inline-block; font-size: var(--text-sm); color: var(--color-text-3); }
+.compose-peek__n.is-bump { animation: bump 440ms var(--ease-spring) var(--ink-delay, 0ms); }
 .compose-peek__go { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-sm); font-weight: var(--weight-semibold); white-space: nowrap; }
 
 /* ---------- kept tickets ---------- */
@@ -181,6 +256,9 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
 .compose-mine__note, .compose-mine__empty { font-size: var(--text-base); color: var(--color-text-2); }
 .compose-mine__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-5); }
 .kept { display: grid; gap: 10px; align-content: start; }
+.kept .cticket { transition: transform var(--m-base) var(--ease-out), box-shadow var(--m-base); }
+.kept:hover .cticket, .kept:focus-within .cticket { transform: translateY(-3px); box-shadow: 0 22px 46px -24px rgba(0, 0, 0, .75), 0 0 0 1px var(--paper-line); }
+.kept.is-new { animation: rise 560ms var(--ease-out) 300ms backwards; }
 .kept__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .kept__actions .icon-btn { width: 36px; height: 36px; }
 .kept__tag { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: var(--radius-pill); border: 1px solid var(--color-line-strong); font-size: var(--text-xs); color: var(--color-text-2); }
@@ -210,11 +288,18 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
 .compose-invite:hover .compose-invite__cta { text-decoration: underline; text-underline-offset: 4px; }
 .compose-invite__slips { display: grid; gap: 10px; justify-items: end; padding-right: 8px; }
 .compose-invite__slips .slip { font-size: 14px; min-height: 40px; }
+/* Hovering the invitation fans the slips out a little, like a hand going to the pile. */
+.compose-invite:hover .compose-invite__slips .slip:nth-child(1), .compose-invite:focus-visible .compose-invite__slips .slip:nth-child(1) { transform: translate(-6px, -2px) rotate(-7deg); }
+.compose-invite:hover .compose-invite__slips .slip:nth-child(2), .compose-invite:focus-visible .compose-invite__slips .slip:nth-child(2) { transform: translate(4px, 0) rotate(5deg); }
+.compose-invite:hover .compose-invite__slips .slip:nth-child(3), .compose-invite:focus-visible .compose-invite__slips .slip:nth-child(3) { transform: translate(-2px, 2px) rotate(-3deg); }
 
 @media (prefers-reduced-motion: reduce) {
-  .ink.is-new, .cline.is-new dd, .cticket__stamp.is-new { animation: none; }
-  .slip, .compose__frame { transition: none; }
-  button.slip:hover { transform: rotate(var(--r, 0deg)); }
+  .ink.is-new, .cline.is-new dd, .cline.is-cleared .cline__blank, .compose__bars b.is-new::after, .compose-peek__n.is-bump,
+  .cticket__stamp.is-new, .cticket__stamp.is-new::after, .cticket.is-revealing *, .cticket.is-revealing .cticket__stamp::after,
+  .compose.is-entering *, .compose-shared__ticket, .kept.is-new { animation: none !important; }
+  .slip, .slip::before, .compose__frame, .kept .cticket, .cline__take, .compose__actions .btn, .compose__actions .icon-btn--square { transition: none; }
+  button.slip:hover, button.slip:focus-visible, button.slip:active, .compose-invite:hover .compose-invite__slips .slip { transform: rotate(var(--r, 0deg)); }
+  button.slip[aria-pressed="true"]:hover, .kept:hover .cticket, .compose__actions .btn:active, .compose__actions .icon-btn--square:hover { transform: none; }
 }
 
 @media (max-width: 960px) {
@@ -234,6 +319,8 @@ body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; us
   .cticket__title { font-size: var(--text-lg); }
   .cticket__lines { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
   .cline, :lang(en) .cline { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  /* The sentence-like lines get the full width, so they never break off a single character. */
+  .cline[data-group="ritual"], .cline[data-group="keepsake"] { grid-column: 1 / -1; }
   .compose-tray { gap: 16px; }
   .slips {
     flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 6px 16px 12px 4px; margin: -6px -16px -12px -4px;

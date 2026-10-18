@@ -97,7 +97,8 @@ const Compose = (() => {
   /**
    * The paper ticket. opts: editable (lines are take-back buttons, empty frame is a drop zone),
    * fresh (group just placed, inks in), stamped (kept), headingId, mini (compact card for lists),
-   * link: false (no link to the entrance inside the ticket).
+   * link: false (no link to the entrance inside the ticket), reveal (the ticket writes itself in,
+   * line by line, and the stamp lands last: the share view), cleared (group just taken back).
    */
   function ticketHTML(ticket, by, opts = {}) {
     const esc = UI.esc;
@@ -111,25 +112,24 @@ const Compose = (() => {
     const img = place && place.image_url
       ? `<div class="cticket__img" style="--cover:url('${esc(place.image_url)}')" aria-hidden="true"></div>`
       : `<div class="cticket__img cticket__img--blank" ${realm ? `data-realm="${esc(realm)}"` : ''} ${opts.editable && !place ? '' : 'aria-hidden="true"'}>${opts.editable && !place ? `<span class="cticket__drop">${esc(t('compose.ticket.drop'))}</span>` : ''}</div>`;
-    const line = (g) => {
+    const line = (g, k) => {
       const f = picks[g] && by[g][picks[g]];
       const label = `<dt>${esc(t(`compose.line.${g}`))}</dt>`;
-      if (!f) return `<div class="cline is-empty" data-group="${g}">${label}<dd><span class="cline__blank" aria-hidden="true"></span><span class="sr-only">${esc(t('compose.ticket.empty'))}</span></dd></div>`;
+      if (!f) return `<div class="cline is-empty${g === opts.cleared ? ' is-cleared' : ''}" data-group="${g}" style="--k:${k}">${label}<dd><span class="cline__blank" aria-hidden="true"></span><span class="sr-only">${esc(t('compose.ticket.empty'))}</span></dd></div>`;
       const value = opts.editable
         ? `<button type="button" class="cline__take" data-take="${g}" aria-label="${esc(t('compose.ticket.takeBack', { text: f.text }))}">${esc(f.text)}</button>`
         : esc(f.text);
-      return `<div class="cline${g === opts.fresh ? ' is-new' : ''}" data-group="${g}">${label}<dd>${value}</dd></div>`;
+      return `<div class="cline${g === opts.fresh ? ' is-new' : ''}" data-group="${g}" style="--k:${k}">${label}<dd>${value}</dd></div>`;
     };
-    const kept = opts.stamped ? `<span class="cticket__kept">${opts.mini && !realmLabel ? '' : ' · '}${esc(t('compose.ticket.kept', { date: I18n.date(ticket.created_at, false) }))}</span>` : '';
     return `
-      <div class="cticket${opts.mini ? ' cticket--mini' : ''}${opts.stamped ? ' is-stamped' : ''}" ${realm ? `data-realm="${esc(realm)}"` : ''}>
+      <div class="cticket${opts.mini ? ' cticket--mini' : ''}${opts.stamped ? ' is-stamped' : ''}${opts.reveal ? ' is-revealing' : ''}" ${realm ? `data-realm="${esc(realm)}"` : ''}>
         ${img}
         ${opts.stamped ? `<div class="cticket__stamp${opts.stampNew ? ' is-new' : ''}" aria-hidden="true"><span>${esc(t('compose.stamp.a'))}</span><span>${esc(t('compose.stamp.b'))}</span><span class="num">${esc(stampDate(ticket.created_at))}</span></div>` : ''}
         <div class="cticket__body">
-          <p class="cticket__label">${opts.mini ? '' : esc(t('compose.ticket.label'))}${realmLabel ? `${opts.mini ? '' : ' · '}${esc(realmLabel)}` : ''}${kept}</p>
+          <p class="cticket__label">${[opts.mini || opts.stamped ? '' : t('compose.ticket.label'), realmLabel, opts.stamped ? t('compose.ticket.kept', { date: I18n.date(ticket.created_at, false) }) : ''].filter(Boolean).map(esc).join(' · ')}</p>
           <${tag} class="cticket__title" ${opts.headingId ? `id="${opts.headingId}"` : ''}>${s.title || `<span class="cticket__placeholder">${esc(t('compose.ticket.blank'))}</span>`}</${tag}>
           ${s.story ? `<p class="cticket__story">${s.story}</p>` : ''}
-          ${opts.mini ? '' : `<dl class="cticket__lines">${GROUPS.map(line).join('')}</dl>`}
+          ${opts.mini ? '' : `<dl class="cticket__lines">${GROUPS.map((g, k) => line(g, k)).join('')}</dl>`}
           ${place && place.slug && !opts.mini && opts.link !== false ? `<a class="cticket__link" href="#/journey/${encodeURIComponent(place.slug)}">${esc(t('compose.ticket.entrance'))}${UI.icon('arrow', 'icon--sm')}</a>` : ''}
         </div>
       </div>`;
@@ -226,6 +226,8 @@ const Compose = (() => {
 
 Pages.Compose = {
   DRAFT_KEY: 'compose_draft',
+  // Motion timings in ms; compose.css holds the matching --m-* custom properties.
+  MOTION: { flight: 520, drop: 300, land: 0.8, spring: 'cubic-bezier(.34, 1.56, .64, 1)', inOut: 'cubic-bezier(.6, 0, .25, 1)' },
   _seq: 0,
   _by: null,
   _list: [],
@@ -300,15 +302,17 @@ Pages.Compose = {
 
   _count() { return Object.keys(this._state.picks).length; },
 
+  _motion() { return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; },
+
   // ---------- page ----------
   _renderGame(main) {
     const esc = UI.esc;
-    const groups = Compose.GROUPS.map((g) => {
+    const groups = Compose.GROUPS.map((g, gi) => {
       const slips = this._list.filter((f) => f.group === g);
       const tilt = (i) => [-2, 1.5, -1, 2, -1.5, 1][i % 6];
       const help = g === Compose.GROUPS[0] ? ' aria-describedby="compose-help"' : '';
       return `
-        <section class="tray-group" data-group="${g}" aria-labelledby="tray-${g}">
+        <section class="tray-group" data-group="${g}" aria-labelledby="tray-${g}" style="--i:${gi}">
           <h2 id="tray-${g}">${esc(t(`compose.group.${g}`))} <span>${esc(t(`compose.group.${g}.sub`))}</span></h2>
           <div class="slips" role="toolbar" aria-labelledby="tray-${g}"${help}>
             ${slips.map((f, i) => `<button type="button" class="slip" style="--r:${tilt(i)}deg" id="slip-${g}-${esc(f.key)}" data-group="${g}" data-key="${esc(f.key)}" aria-pressed="false" tabindex="-1"><span class="slip__text">${esc(f.text)}</span>${f.sub ? `<small>${esc(f.sub)}</small>` : ''}</button>`).join('')}
@@ -317,7 +321,7 @@ Pages.Compose = {
     }).join('');
 
     main.innerHTML = `
-      <div class="page compose">
+      <div class="page compose${this._motion() ? ' is-entering' : ''}">
         <div class="container">
           <header class="compose__head">
             <div><h1>${esc(t('compose.title'))}</h1><p>${esc(t('compose.lead'))}</p></div>
@@ -345,6 +349,9 @@ Pages.Compose = {
     this._renderTicket();
     this._bind(main);
     this._watchFrame();
+    const page = main.querySelector('.compose');
+    const settled = setTimeout(() => page.classList.remove('is-entering'), 1100);
+    this._cleanup.push(() => clearTimeout(settled));
   },
 
   /** Phones: the ticket sits above the tray, so while it is out of view a slim bar shows how it is going. */
@@ -417,10 +424,12 @@ Pages.Compose = {
     else this._place(group, key);
   },
 
-  _place(group, key, { announce = 'placed' } = {}) {
+  _place(group, key, { announce = 'placed', from = null } = {}) {
     const f = this._by[group] && this._by[group][key];
     if (!f) return;
     const s = this._state;
+    const slip = document.getElementById(`slip-${group}-${key}`);
+    const origin = from || (slip && { rect: slip.getBoundingClientRect(), tilt: parseFloat(slip.style.getPropertyValue('--r')) || 0 });
     if (!s.started && !s.everKept && !this._count()) {
       s.started = true;
       API.track('compose_start', group === 'place' ? f.slug : '');
@@ -429,9 +438,64 @@ Pages.Compose = {
     s.order = [...s.order.filter((g) => g !== group), group];
     s.kept = false;
     this._saveDraft();
-    this._syncTray();
+    // Plan against the line as it is now, so --ink-delay is set before the new ink is styled.
+    const flight = this._planFlight(slip, origin, group, from ? this.MOTION.drop : this.MOTION.flight);
+    this._syncTray({ fresh: group });
     this._renderTicket({ fresh: group });
+    if (flight) this._launch(flight);
     this._announce(t(`compose.announce.${announce}`, { group: t(`compose.group.${group}`), text: f.text }));
+  },
+
+  /**
+   * The signature moment: a paper copy of the slip lifts off the tray, arcs onto its line on the
+   * ticket (or onto the phone's progress bar when the ticket is scrolled away) and dissolves as
+   * the ink comes up. The ink, the progress bar and the frame wait for the landing via --ink-delay.
+   * Transform and opacity only; nothing moves when reduced motion is asked for.
+   */
+  _planFlight(slip, origin, group, duration) {
+    const page = document.querySelector('.compose');
+    if (!page) return null;
+    page.style.setProperty('--ink-delay', '0ms');
+    if (!slip || !origin || !this._motion()) return null;
+    const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
+    const onScreen = (r) => r.width > 0 && r.bottom > navH && r.top < window.innerHeight;
+    const line = document.querySelector(`#compose-ticket .cline[data-group="${group}"] dd`);
+    const peek = document.getElementById('compose-peek');
+    let target = line && onScreen(line.getBoundingClientRect()) ? line : null;
+    if (!target && peek && !peek.hidden) target = peek.querySelector('.compose-peek__title');
+    if (!target || !onScreen(origin.rect)) return null;
+    const land = Math.round(duration * this.MOTION.land);
+    page.style.setProperty('--ink-delay', `${land}ms`);
+    return { slip, origin, target: target.getBoundingClientRect(), toLine: target === line, duration, land };
+  },
+
+  _launch({ slip, origin, target: b, toLine, duration, land }) {
+    const a = origin.rect;
+    const scale = Math.max(0.5, Math.min(1, (Math.max(b.height, 18) * 1.35) / a.height));
+    const dx = b.left - a.left;
+    const dy = b.top - a.top + (b.height - a.height * scale) / 2;
+    const lift = Math.min(72, 24 + Math.hypot(dx, dy) * 0.12);
+    const ghost = slip.cloneNode(true);
+    ghost.removeAttribute('id');
+    ghost.className = 'slip slip--flight';
+    ghost.removeAttribute('aria-pressed'); // the copy is paper, not the outline left in the tray
+    ghost.setAttribute('aria-hidden', 'true');
+    Object.assign(ghost.style, { left: `${a.left}px`, top: `${a.top}px`, width: `${a.width}px`, height: `${a.height}px` });
+    document.body.appendChild(ghost);
+    const r = origin.tilt;
+    ghost.animate([
+      { transform: `translate(0, 0) rotate(${r}deg) scale(1)`, opacity: 1 },
+      { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - lift}px) rotate(${-r * 1.4}deg) scale(1.06)`, opacity: 1, offset: 0.45 },
+      { transform: `translate(${dx}px, ${dy}px) rotate(0deg) scale(${scale})`, opacity: 1, offset: 0.8 },
+      { transform: `translate(${dx}px, ${dy}px) rotate(0deg) scale(${scale})`, opacity: 0 },
+    ], { duration, easing: this.MOTION.inOut }).finished.catch(() => {}).finally(() => ghost.remove());
+    this._cleanup.push(() => ghost.remove());
+    if (toLine) {
+      document.getElementById('compose-frame')?.animate(
+        [{ transform: 'none' }, { transform: 'translateY(2px) scale(.996)' }, { transform: 'none' }],
+        { duration: 340, delay: land, easing: this.MOTION.spring },
+      );
+    }
   },
 
   _take(group, { focusSlip = false } = {}) {
@@ -446,9 +510,18 @@ Pages.Compose = {
     s.kept = false;
     this._saveDraft();
     this._syncTray();
-    this._renderTicket();
+    document.querySelector('.compose')?.style.setProperty('--ink-delay', '0ms');
+    this._renderTicket({ cleared: group });
     this._announce(t('compose.announce.removed', { group: t(`compose.group.${group}`), text: f.text }));
-    if (focusSlip) document.getElementById(`slip-${group}-${key}`)?.focus();
+    const slip = document.getElementById(`slip-${group}-${key}`);
+    if (slip && this._motion()) {
+      const r = parseFloat(slip.style.getPropertyValue('--r')) || 0;
+      slip.animate([
+        { transform: `translateY(-10px) rotate(${r * 2}deg) scale(.94)`, opacity: 0 },
+        { transform: `rotate(${r}deg)`, opacity: 1 },
+      ], { duration: 380, easing: this.MOTION.spring });
+    }
+    if (focusSlip) slip?.focus();
   },
 
   _takeLast(opts) {
@@ -461,6 +534,7 @@ Pages.Compose = {
    *  leaning towards slips of the same realm as the chosen place. */
   _shuffle() {
     const s = this._state;
+    if (this._motion()) document.querySelector('#compose-shuffle .icon')?.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-360deg)' }], { duration: 520, easing: this.MOTION.inOut });
     const blanks = Compose.GROUPS.filter((g) => !s.picks[g]);
     const group = blanks.length ? blanks[0] : Compose.GROUPS[Math.floor(Math.random() * Compose.GROUPS.length)];
     const options = this._list.filter((f) => f.group === group && f.key !== s.picks[group]);
@@ -511,10 +585,18 @@ Pages.Compose = {
       s.everKept = true;
       this._saveDraft();
       this._renderTicket({ stampNew: true, focus });
+      if (this._motion()) {
+        document.getElementById('compose-frame')?.animate(
+          [{ transform: 'none' }, { transform: 'scale(.985)' }, { transform: 'none' }],
+          { duration: 360, delay: 230, easing: this.MOTION.spring },
+        );
+      }
       if (first) API.track('compose_complete', s.picks.place ? this._by.place[s.picks.place].slug : '');
       if (saved.local) UI.toast(t('compose.toast.keptLocal'), { href: '#/register?next=%2Fcompose', label: t('nav.register') });
       else UI.toast(t('compose.toast.kept'));
-      this._loadMine(this._seq);
+      // The list below re-renders once the seal has landed, so it never competes with the stamp for a frame.
+      const seq = this._seq;
+      setTimeout(() => this._loadMine(seq, s.id), this._motion() ? 320 : 0);
       return saved;
     } catch (err) {
       if (btn) btn.removeAttribute('aria-busy');
@@ -582,13 +664,17 @@ Pages.Compose = {
   },
 
   // ---------- rendering ----------
-  _syncTray() {
+  _syncTray({ fresh = '' } = {}) {
     const picks = this._state.picks;
     document.querySelectorAll('#compose-tray .slips').forEach((row) => {
       const slips = [...row.querySelectorAll('.slip')];
       const group = slips[0] && slips[0].dataset.group;
       let current = slips.find((b) => b.tabIndex === 0);
-      slips.forEach((b) => b.setAttribute('aria-pressed', String(picks[group] === b.dataset.key)));
+      // Touch only what changed: every slip carries a drop-shadow filter, so restyling all of them costs a frame.
+      slips.forEach((b) => {
+        const on = String(picks[group] === b.dataset.key);
+        if (b.getAttribute('aria-pressed') !== on) b.setAttribute('aria-pressed', on);
+      });
       if (!current) current = slips.find((b) => b.dataset.key === picks[group]) || slips[0];
       if (current) this._rove(current);
     });
@@ -596,15 +682,18 @@ Pages.Compose = {
     const total = Compose.GROUPS.length;
     const progress = document.getElementById('compose-progress');
     if (progress) {
-      progress.innerHTML = `<span class="compose__bars" aria-hidden="true">${Compose.GROUPS.map((g) => `<b class="${picks[g] ? 'on' : ''}"></b>`).join('')}</span><span class="num">${UI.esc(t('compose.progress', { n, total }))}</span>`;
+      progress.innerHTML = `<span class="compose__bars" aria-hidden="true">${Compose.GROUPS.map((g) => `<b class="${picks[g] ? 'on' : ''}${g === fresh ? ' is-new' : ''}"></b>`).join('')}</span><span class="num">${UI.esc(t('compose.progress', { n, total }))}</span>`;
     }
   },
 
   _rove(slip) {
-    slip.closest('.slips').querySelectorAll('.slip').forEach((b) => { b.tabIndex = b === slip ? 0 : -1; });
+    slip.closest('.slips').querySelectorAll('.slip').forEach((b) => {
+      const want = b === slip ? 0 : -1;
+      if (b.tabIndex !== want) b.tabIndex = want;
+    });
   },
 
-  _renderTicket({ fresh = '', stampNew = false, focus = '' } = {}) {
+  _renderTicket({ fresh = '', cleared = '', stampNew = false, focus = '' } = {}) {
     const box = document.getElementById('compose-ticket');
     const foot = document.getElementById('compose-foot');
     if (!box || !foot) return;
@@ -615,7 +704,7 @@ Pages.Compose = {
     const active = document.activeElement;
     const keepFocus = focus || (active && foot.contains(active) ? active.id : '');
 
-    box.innerHTML = Compose.ticketHTML(s, this._by, { editable: true, fresh, stamped: s.kept, stampNew, headingId: 'compose-ticket-title' });
+    box.innerHTML = Compose.ticketHTML(s, this._by, { editable: true, fresh, cleared, stamped: s.kept, stampNew, headingId: 'compose-ticket-title' });
     let hint;
     if (s.kept) hint = t('compose.hint.kept');
     else if (s.everKept) hint = t('compose.hint.dirty');
@@ -635,7 +724,7 @@ Pages.Compose = {
     const peek = document.getElementById('compose-peek-btn');
     if (peek) {
       const title = n ? Compose.plainTitle(s, this._by) : t('compose.ticket.blank');
-      peek.innerHTML = `<span class="compose-peek__title">${esc(title)}</span><span class="compose-peek__n num">${n}/${total}</span><span class="compose-peek__go">${esc(t('compose.peek'))}${UI.icon('arrow', 'icon--sm')}</span>`;
+      peek.innerHTML = `<span class="compose-peek__title">${esc(title)}</span><span class="compose-peek__n num${fresh ? ' is-bump' : ''}">${n}/${total}</span><span class="compose-peek__go">${esc(t('compose.peek'))}${UI.icon('arrow', 'icon--sm')}</span>`;
       peek.setAttribute('aria-label', t('compose.peekAria', { title, n, total }));
     }
     if (keepFocus) {
@@ -656,7 +745,7 @@ Pages.Compose = {
     if (status) status.textContent = text;
   },
 
-  async _loadMine(seq) {
+  async _loadMine(seq, freshId = '') {
     let list;
     try {
       list = await Compose.list();
@@ -679,7 +768,7 @@ Pages.Compose = {
         ${local ? `<p class="compose-mine__note">${esc(t('compose.mine.local'))} <a class="link" href="#/register?next=%2Fcompose">${esc(t('nav.register'))}</a> · <a class="link" href="#/login?next=%2Fcompose">${esc(t('nav.login'))}</a></p>` : ''}
       </div>
       ${list.length ? `<ul class="compose-mine__list">${list.map((x, i) => `
-        <li class="kept${x.local ? ' is-local' : ''}" data-id="${esc(x.id)}">
+        <li class="kept${x.local ? ' is-local' : ''}${x.id === freshId ? ' is-new' : ''}" data-id="${esc(x.id)}">
           ${Compose.ticketHTML(x, this._by, { mini: true, stamped: true, headingId: `kept-${i}` })}
           <div class="kept__actions">
             ${x.local ? `<span class="kept__tag">${esc(t('compose.mine.localTag'))}</span>` : ''}
@@ -761,8 +850,24 @@ Pages.Compose = {
       const over = this._overFrame(e.clientX, e.clientY);
       this._suppressClick = true;
       setTimeout(() => { this._suppressClick = false; }, 0);
+      const ghost = d.ghost;
+      d.ghost = null;
+      const rect = ghost.getBoundingClientRect();
       this._endDrag();
-      if (over) this._place(d.slip.dataset.group, d.slip.dataset.key);
+      if (over) {
+        ghost.remove();
+        this._place(d.slip.dataset.group, d.slip.dataset.key, { from: { rect, tilt: -3 } });
+      } else if (this._motion() && d.slip.isConnected) {
+        // Dropped outside the frame: the slip springs back to its pile.
+        const home = d.slip.getBoundingClientRect();
+        const r = parseFloat(d.slip.style.getPropertyValue('--r')) || 0;
+        ghost.animate([
+          { transform: ghost.style.transform },
+          { transform: `translate(${home.left}px, ${home.top}px) rotate(${r}deg)` },
+        ], { duration: 280, easing: this.MOTION.spring, fill: 'forwards' }).finished.catch(() => {}).finally(() => ghost.remove());
+      } else {
+        ghost.remove();
+      }
       return;
     }
     this._endDrag();
@@ -838,7 +943,7 @@ Pages.Compose = {
                 <p>${esc(t('compose.shared.lead'))}</p>
               </header>
               <article class="compose-shared__ticket" aria-labelledby="shared-ticket-title">
-                ${Compose.ticketHTML(ticket, by, { stamped: true, link: false, headingId: 'shared-ticket-title' })}
+                ${Compose.ticketHTML(ticket, by, { stamped: true, link: false, reveal: true, headingId: 'shared-ticket-title' })}
               </article>
               <div class="compose-shared__actions">
                 <a class="btn btn--primary" href="#/compose">${esc(t('compose.shared.cta'))}</a>
