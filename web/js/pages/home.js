@@ -215,7 +215,7 @@ Pages.Home = {
     const mbti = UI.topMbti(j);
     return `
       <a class="feature-card home-card ${lead ? 'feature-card--lead' : ''}" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-testid="journey-card">
-        <img src="${esc(j.image_url)}" alt="" width="720" height="900" loading="${lead ? 'eager' : 'lazy'}" decoding="async">
+        ${UI.picture(j.image_url, { sizes: lead ? '(max-width: 760px) 100vw, 50vw' : '(max-width: 760px) 50vw, 25vw', width: 720, height: 900, eager: lead })}
         <div class="feature-card__body">
           <div class="feature-card__tags home-card__tags">
             ${mood ? `<span class="tag-mood">${esc(mood)}</span>` : ''}

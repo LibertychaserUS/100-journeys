@@ -80,3 +80,6 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
 @keyframes vt-out { to { opacity: 0; filter: blur(4px); } }
 @keyframes vt-in { from { opacity: 0; transform: translate3d(0, 14px, 0); } }
+
+/* <picture> wrappers (UI.picture) take no box of their own, so image rules apply to the <img>. */
+picture { display: contents; }

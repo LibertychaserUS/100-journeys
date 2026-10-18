@@ -3,6 +3,7 @@ package content
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -251,5 +252,43 @@ func TestScenes_AreValid(t *testing.T) {
 	}
 	if s, ok := SceneFor("bolivia-salt-flat-trek"); !ok || s.Motif != "mirror" {
 		t.Errorf("SceneFor should find the salt flat's mirror, got %+v %v", s, ok)
+	}
+}
+
+// UT-CONTENT-IMG-001: every generated image the pages use has its AVIF and WebP derivatives
+// (scripts/images/derive.py), so <picture> srcsets never point at a missing file.
+func TestImages_HaveDerivatives(t *testing.T) {
+	root, _ := filepath.Abs("../../web/assets/images/generated")
+	widths := func(rel string) []int {
+		base := filepath.Base(rel)
+		switch {
+		case strings.HasPrefix(base, "card-"):
+			return []int{480, 720}
+		case base == "cover.jpg":
+			return []int{480, 720, 1120}
+		case base == "hero.jpg" || strings.HasPrefix(base, "scene-") || base == "ending.jpg":
+			return []int{960, 1600}
+		case base == "fork.jpg" || base == "texture.jpg":
+			return []int{600, 1024}
+		}
+		return nil
+	}
+	err := filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !strings.HasSuffix(p, ".jpg") || strings.Count(filepath.Base(p), ".") > 1 {
+			return err
+		}
+		rel, _ := filepath.Rel(root, p)
+		for _, w := range widths(rel) {
+			for _, ext := range []string{"avif", "webp"} {
+				want := fmt.Sprintf("%s.%d.%s", strings.TrimSuffix(p, ".jpg"), w, ext)
+				if _, err := os.Stat(want); err != nil {
+					t.Errorf("%s: missing %s (run python3 scripts/images/derive.py)", rel, filepath.Base(want))
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
 	}
 }

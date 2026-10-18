@@ -101,7 +101,8 @@ Pages.Detail = {
 
   _media(j, slot, i, cls = '') {
     const { src, own } = this._img(j, slot, i);
-    return `<div class="scene__media ${cls}" data-grade="${own ? 'own' : `g${i % 3}`}"><img src="${UI.esc(src)}" alt="" loading="${slot === 'hero' ? 'eager' : 'lazy'}" decoding="async" ${slot === 'hero' ? 'fetchpriority="high"' : ''}></div>`;
+    const sizes = { hero: '100vw', ending: '220px', fork: '(max-width: 960px) 100vw, 40vw' }[slot] || (cls.includes('bleed') ? '100vw' : '(max-width: 960px) 100vw, 45vw');
+    return `<div class="scene__media ${cls}" data-grade="${own ? 'own' : `g${i % 3}`}">${UI.picture(src, { sizes, eager: slot === 'hero' })}</div>`;
   },
 
   _paras(list) { return (list || []).map((p) => `<p data-reveal>${UI.esc(p)}</p>`).join(''); },

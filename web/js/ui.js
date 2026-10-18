@@ -54,12 +54,30 @@ const UI = (() => {
     return `<span class="meter" role="img" aria-label="${esc(t('card.adventureAria', { n: value || 0 }))}">${esc(t('card.adventure'))}<span class="meter__dots">${dots}</span></span>`;
   }
 
+  // Responsive images: generated JPEGs ship AVIF and WebP derivatives at fixed widths
+  // (scripts/images/derive.py); other images fall back to the plain <img>.
+  const DERIVED = [
+    [/\/generated\/[^/]+\/cover\.jpg$/, [480, 720, 1120]],
+    [/\/generated\/card-[^/]+\.jpg$/, [480, 720]],
+    [/\/generated\/[^/]+\/(hero|scene-\d|ending)\.jpg$/, [960, 1600]],
+    [/\/generated\/[^/]+\/(fork|texture)\.jpg$/, [600, 1024]],
+  ];
+  function picture(src, { sizes = '100vw', alt = '', cls = '', eager = false, width, height, attrs = '' } = {}) {
+    const rule = DERIVED.find(([re]) => re.test(String(src || '')));
+    const dims = `${width ? ` width="${width}"` : ''}${height ? ` height="${height}"` : ''}`;
+    const img = `<img src="${esc(src)}" alt="${esc(alt)}"${dims} loading="${eager ? 'eager' : 'lazy'}" decoding="async"${eager ? ' fetchpriority="high"' : ''}${cls ? ` class="${cls}"` : ''} ${attrs}>`;
+    if (!rule) return img;
+    const base = String(src).replace(/\.jpg$/, '');
+    const set = (ext) => rule[1].map((w) => `${esc(base)}.${w}.${ext} ${w}w`).join(', ');
+    return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}"><source type="image/webp" srcset="${set('webp')}" sizes="${sizes}">${img}</picture>`;
+  }
+
   function journeyCard(j, { eager = false } = {}) {
     const mood = (j.mood_keywords || [])[0];
     return `
       <a class="journey-card" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-testid="journey-card">
         <div class="journey-card__media">
-          <img src="${esc(j.image_url)}" alt="" width="720" height="900" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+          ${picture(j.image_url, { sizes: '(max-width: 760px) 50vw, (max-width: 1200px) 33vw, 300px', width: 720, height: 900, eager })}
         </div>
         <div class="journey-card__body">
           <div class="journey-card__meta">
@@ -186,7 +204,7 @@ const UI = (() => {
 
   return {
     icon, esc, fantasyTypes, fantasyLabel, tagLabel, region, topMbti, coins, meter,
-    journeyCard, skeletonCards, trackCardClicks, toast, sheet, setMeta,
+    journeyCard, skeletonCards, trackCardClicks, toast, sheet, setMeta, picture,
   };
 })();
 
