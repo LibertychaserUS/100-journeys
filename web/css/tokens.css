@@ -1,147 +1,140 @@
 /* =============================================================
-   DESIGN TOKENS — Single source of truth for all design values
-   DDD Phase: populated after UIUXProMax design output
+   DESIGN TOKENS — single source of truth (DDD: docs/ui-components/DDD-spec.md §6)
+   Direction "灯笼夜游 / Lantern Night": the UI is night, light falls only on
+   what you can act on.
+
+   Role rules (do not repurpose):
+   - --color-action*  primary action, selected state, focus ring. Never decoration.
+   - --color-mood*    mood keywords (#孤独) only.
+   - --color-on-media text placed over photography, in both themes.
    ============================================================= */
 
+/* Story serif resolves only to a real Song/Ming face; otherwise it falls back to the UI sans
+   (avoids synthetic-bold SimSun on Windows). No web fonts: works behind the GFW. */
+@font-face { font-family: "Story Serif"; font-weight: 700; src: local("Songti SC Bold"), local("STSongti-SC-Bold"), local("Noto Serif SC Bold"), local("NotoSerifSC-Bold"), local("Noto Serif CJK SC Bold"), local("Source Han Serif SC Bold"), local("SourceHanSerifSC-Bold"); }
+@font-face { font-family: "Story Serif"; font-weight: 400; src: local("Songti SC Regular"), local("STSongti-SC-Regular"), local("Noto Serif SC"), local("NotoSerifSC-Regular"), local("Noto Serif CJK SC"), local("Source Han Serif SC"), local("SourceHanSerifSC-Regular"); }
+
 :root {
-  /* --- Color Palette --- */
-  --color-bg-primary:     #0a0a0a;
-  --color-bg-secondary:   #111111;
-  --color-bg-card:        #1a1a1a;
-  --color-bg-overlay:     rgba(0, 0, 0, 0.6);
-
-  --color-text-primary:   #f5f5f0;
-  --color-text-secondary: #a0a09a;
-  --color-text-muted:     #5a5a55;
-
-  --color-accent-primary: #e8d5a3;   /* warm gold */
-  --color-accent-hover:   #f0e4bc;
-  --color-accent-danger:  #e86b5f;
-
-  --color-border:         rgba(255, 255, 255, 0.08);
-  --color-border-hover:   rgba(255, 255, 255, 0.16);
-
   /* --- Typography --- */
-  --font-display:  'Georgia', 'Times New Roman', serif;
-  --font-body:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono:     'SF Mono', 'Fira Code', monospace;
+  --font-ui: "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-story: "Story Serif", var(--font-ui);
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --text-xs:    0.75rem;
-  --text-sm:    0.875rem;
-  --text-base:  1rem;
-  --text-lg:    1.125rem;
-  --text-xl:    1.25rem;
-  --text-2xl:   1.5rem;
-  --text-3xl:   1.875rem;
-  --text-4xl:   2.25rem;
-  --text-5xl:   3rem;
-  --text-hero:  clamp(2.5rem, 8vw, 5rem);
+  --text-xs:   0.75rem;    /* 12 */
+  --text-sm:   0.8125rem;  /* 13 */
+  --text-base: 0.875rem;   /* 14 */
+  --text-md:   1rem;       /* 16 */
+  --text-lg:   1.125rem;   /* 18 */
+  --text-xl:   1.375rem;   /* 22 */
+  --text-2xl:  1.75rem;    /* 28 */
+  --text-3xl:  2.25rem;    /* 36 */
+  --text-4xl:  3rem;       /* 48 */
 
-  --weight-normal:   400;
-  --weight-medium:   500;
+  --weight-normal: 400;
+  --weight-medium: 500;
   --weight-semibold: 600;
-  --weight-bold:     700;
+  --weight-bold: 700;
 
-  --leading-tight:  1.25;
+  --leading-tight: 1.2;
   --leading-normal: 1.6;
-  --leading-loose:  1.8;
+  --leading-prose: 1.85;
 
-  /* --- Spacing --- */
-  --space-1:  0.25rem;
-  --space-2:  0.5rem;
-  --space-3:  0.75rem;
-  --space-4:  1rem;
-  --space-5:  1.25rem;
-  --space-6:  1.5rem;
-  --space-8:  2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
+  /* --- Spacing (4px base) --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
 
   /* --- Layout --- */
-  --container-sm:  640px;
-  --container-md:  768px;
-  --container-lg:  1024px;
-  --container-xl:  1280px;
-  --container-2xl: 1536px;
+  --nav-h: 64px;
+  --container: 1200px;
+  --container-narrow: 760px;
 
-  /* --- Border radius --- */
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-full: 9999px;
+  /* --- Radius --- */
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-sheet: 20px;
+  --radius-pill: 999px;
 
-  /* --- Shadows --- */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:  0 4px 12px rgba(0,0,0,0.5);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
-  --shadow-glow: 0 0 24px rgba(232, 213, 163, 0.15);
+  /* --- Motion --- */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --dur-fast: 150ms;
+  --dur: 250ms;
+  --dur-slow: 600ms;
 
-  /* --- Transitions --- */
-  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-enter:  600ms cubic-bezier(0, 0, 0.2, 1);
+  /* --- Z-index --- */
+  --z-sticky: 20;
+  --z-nav: 50;
+  --z-pet: 45;
+  --z-bookbar: 40;
+  --z-overlay: 80;
+  --z-toast: 90;
 
-  /* --- Easing --- */
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
-  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
-
-  /* --- Typography: visual_style overrides --- */
-  --card-title-weight:    var(--weight-semibold);
-  --card-title-tracking:  0;
-  --card-title-font:      var(--font-body);
-  --card-title-size:      var(--text-sm);
-
-  /* --- Z-index scale --- */
-  --z-base:    0;
-  --z-above:   10;
-  --z-nav:     100;
-  --z-modal:   200;
-  --z-toast:   300;
+  /* --- Color: dark (brand default) --- */
+  --color-bg:           #0d0f13;
+  --color-surface:      #151820;
+  --color-surface-2:    #1c2029;
+  --color-line:         rgba(255, 255, 255, .09);
+  --color-line-strong:  rgba(255, 255, 255, .18);
+  --color-text:         #f2ede4;  /* 16.5:1 on bg */
+  --color-text-2:       #b8b1a5;  /*  9.0:1 */
+  --color-text-3:       #8f897f;  /*  5.5:1 on bg, 4.7:1 on surface-2 */
+  --color-action:       #f2c46d;  /* lantern gold */
+  --color-on-action:    #1d1405;  /* 11.2:1 on action */
+  --color-action-hover: #f7d48c;
+  --color-focus:        #f2c46d;
+  --color-mood:         #f3aebd;  /* blossom, 7.7:1 on its tint */
+  --color-mood-bg:      rgba(243, 174, 189, .12);
+  --color-ok:           #86d6a8;
+  --color-danger:       #ff9180;
+  --color-danger-bg:    rgba(255, 145, 128, .10);
+  --color-nav-bg:       rgba(13, 15, 19, .74);
+  --color-scrim:        rgba(4, 5, 7, .62);
+  --color-on-media:     #f6f1e8;
+  --color-on-media-2:   rgba(246, 241, 232, .78);
+  --color-media-shade:  rgba(6, 7, 10, .92);
+  --shadow-float: 0 18px 50px rgba(0, 0, 0, .45);
+  --shadow-raise: 0 1px 2px rgba(0, 0, 0, .3);
+  color-scheme: dark;
 }
 
-/* --- Light Theme Override --- */
+/* --- Color: light ("晨雾 / dawn mist") --- */
 [data-theme="light"] {
-  --color-bg-primary:     #f7f5f0;
-  --color-bg-secondary:   #edeae3;
-  --color-bg-card:        #ffffff;
-  --color-bg-overlay:     rgba(255, 255, 255, 0.6);
-
-  --color-text-primary:   #1a1a1a;
-  --color-text-secondary: #4a4a4a;
-  --color-text-muted:     #8a8a8a;
-
-  --color-border:         rgba(0, 0, 0, 0.08);
-  --color-border-hover:   rgba(0, 0, 0, 0.16);
-
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md:  0 4px 12px rgba(0,0,0,0.1);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
-  --shadow-glow: 0 0 24px rgba(180, 150, 80, 0.15);
+  --color-bg:           #f3f3f1;
+  --color-surface:      #ffffff;
+  --color-surface-2:    #e9e9e5;
+  --color-line:         rgba(20, 22, 28, .10);
+  --color-line-strong:  rgba(20, 22, 28, .22);
+  --color-text:         #17191e;  /* 15.8:1 */
+  --color-text-2:       #4a4e57;  /*  7.5:1 */
+  --color-text-3:       #62666f;  /*  5.2:1 */
+  --color-action:       #1a1c21;  /* lantern in daylight: ink button */
+  --color-on-action:    #fbe1a6;  /* 13.3:1 */
+  --color-action-hover: #2b2e35;
+  --color-focus:        #a86a12;  /* 4.0:1 against bg (non-text ≥ 3:1) */
+  --color-mood:         #a3384f;
+  --color-mood-bg:      rgba(163, 56, 79, .08);
+  --color-ok:           #1f7a4a;
+  --color-danger:       #b42318;
+  --color-danger-bg:    rgba(180, 35, 24, .07);
+  --color-nav-bg:       rgba(243, 243, 241, .84);
+  --color-scrim:        rgba(15, 17, 21, .45);
+  --shadow-float: 0 18px 50px rgba(20, 22, 28, .14);
+  --shadow-raise: 0 1px 3px rgba(20, 22, 28, .12);
+  color-scheme: light;
 }
 
-/* visual_style variant overrides */
-[data-visual-style="surreal"] {
-  --card-title-weight:   300;
-  --card-title-tracking: 0.05em;
+/* English: Latin-first stacks (CJK fonts set Latin hyphens and quotes too wide). */
+:root:lang(en) {
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-story: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Story Serif", serif;
 }
 
-[data-visual-style="dramatic"] {
-  --card-title-weight:   800;
-  --card-title-tracking: -0.03em;
-}
-
-[data-visual-style="raw"] {
-  --card-title-font:     var(--font-mono);
-  --card-title-size:     var(--text-xs);
-}
-
-[data-visual-style="minimal"] {
-  --card-title-weight:   200;
-  --card-title-tracking: 0.1em;
+@media (max-width: 760px) {
+  :root { --nav-h: 56px; }
 }

@@ -1,86 +1,87 @@
 const { test, expect } = require('@playwright/test');
+const { freshPage, registerAndLogin } = require('./helpers');
+
+const SLUG = 'bolivia-salt-flat-trek';
 
 test.describe('Detail Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Skip AI Pet setup modal
-    await page.addInitScript(() => {
-      localStorage.setItem('ai_pet_profile', JSON.stringify({ firstVisit: false, name: '小旅', type: 'dog' }));
-    });
+    await freshPage(page);
   });
 
+  // E2E-DETAIL-001: hero, chapters and the booking ticket render with real data
   test('detail page renders journey content', async ({ page }) => {
-    // First navigate to explore to get a valid slug
-    await page.goto('/#/explore');
-    await expect(page.locator('.journey-card')).not.toHaveCount(0);
-
-    const firstCard = page.locator('.journey-card').first();
-    const slug = await firstCard.getAttribute('data-slug');
-
-    // Navigate to detail
-    await page.goto(`/#/journey/${slug}`);
-
-    // Hero visible
-    await expect(page.locator('.detail-hero__title')).toBeVisible();
-    await expect(page.locator('.detail-hero__badge')).toBeVisible();
-
-    // Story section
-    await expect(page.locator('.detail-story')).toBeVisible();
-
-    // Clue section (may need scroll)
-    const clueCard = page.locator('#clue-card');
-    await clueCard.scrollIntoViewIfNeeded();
-    await expect(clueCard).toBeVisible();
-
-    // CTA buttons
+    await page.goto(`/#/journey/${SLUG}`);
+    await expect(page.locator('.detail-hero__title')).toHaveText('徒步穿越玻利维亚盐沼');
+    await expect(page.locator('.detail-hero__badge')).toHaveText('独处治愈'); // localized, not "solitude"
+    await expect(page.locator('.chapter')).toHaveCount(3);
+    await expect(page.locator('#clue-card .clue')).toHaveCount(4);
+    await expect(page.locator('#detail-ticket')).toContainText('匹配 5/5'); // 1–5 score, not "5%"
     await expect(page.locator('#detail-cta-buy')).toBeVisible();
     await expect(page.locator('#detail-cta-save')).toBeVisible();
+    // Story text is visible without scrolling into view (no reveal-to-black)
+    await expect(page.locator('.chapter p').first()).toHaveCSS('opacity', '1');
   });
 
-  // E2E-DETAIL-002: Back button works
+  // E2E-DETAIL-002: back returns to the previous page
   test('back button returns to previous page', async ({ page }) => {
     await page.goto('/#/explore');
-    await expect(page.locator('.journey-card')).not.toHaveCount(0);
-
-    const firstCard = page.locator('.journey-card').first();
-    const slug = await firstCard.getAttribute('data-slug');
-
-    await page.goto(`/#/journey/${slug}`);
+    await page.locator(`.journey-card[data-slug="${SLUG}"]`).click();
     await expect(page.locator('.detail-hero__title')).toBeVisible();
-
-    await page.locator('.detail-hero__btn--back').click();
+    await page.locator('#detail-back').click();
     await expect(page).toHaveURL(/#\/explore/);
   });
 
-  // E2E-DETAIL-003: Share button copies URL
-  test('share button provides copy feedback', async ({ page }) => {
-    await page.goto('/#/explore');
-    const slug = await page.locator('.journey-card').first().getAttribute('data-slug');
-    await page.goto(`/#/journey/${slug}`);
-
-    const shareBtn = page.locator('.detail-hero__btn--share');
-    await shareBtn.click();
-
-    await expect(shareBtn).toHaveAttribute('data-copied', 'true');
+  // E2E-DETAIL-003: share copies the link and confirms with a toast
+  test('share button copies the link', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto(`/#/journey/${SLUG}`);
+    await page.locator('#detail-share').click();
+    await expect(page.locator('#toast-region')).toContainText('链接已复制');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(`#/journey/${SLUG}`);
   });
 
-  // E2E-DETAIL-004: 404 page for non-existent journey
+  // E2E-DETAIL-004: unknown journey shows a 404 with ways back
   test('non-existent journey shows 404', async ({ page }) => {
     await page.goto('/#/journey/nonexistent-slug-xyz-123');
     await expect(page.locator('.detail-notfound')).toBeVisible();
-    await expect(page.locator('.detail-notfound__title')).toContainText('旅程未找到');
+    await expect(page.locator('.detail-notfound__title')).toHaveText('旅程未找到');
+    await expect(page.locator('.detail-notfound a[href="#/explore"]')).toBeVisible();
   });
 
-  // E2E-DETAIL-005: Save button toggle
-  test('save button toggles state', async ({ page }) => {
-    await page.goto('/#/explore');
-    const slug = await page.locator('.journey-card').first().getAttribute('data-slug');
-    await page.goto(`/#/journey/${slug}`);
+  // E2E-DETAIL-005: guests are asked to log in before saving
+  test('saving as a guest prompts to log in', async ({ page }) => {
+    await page.goto(`/#/journey/${SLUG}`);
+    await page.locator('#detail-cta-save').click();
+    await expect(page.locator('#toast-region')).toContainText('登录后可以收藏旅程');
+    await expect(page.locator('#detail-cta-save')).toHaveAttribute('aria-pressed', 'false');
+  });
 
-    const saveBtn = page.locator('#detail-cta-save');
-    await saveBtn.click();
-    await expect(saveBtn).toHaveClass(/is-saved/);
+  // E2E-DETAIL-006: saved state persists on the server and shows in My trips
+  test('save persists and appears in the saved tab', async ({ page }) => {
+    await registerAndLogin(page, { prefix: 'saver' });
+    await page.goto(`/#/journey/${SLUG}`);
+    const save = page.locator('#detail-cta-save');
+    await save.click();
+    await expect(save).toHaveAttribute('aria-pressed', 'true');
+    await expect(save).toHaveClass(/is-saved/);
 
-    await saveBtn.click();
-    await expect(saveBtn).not.toHaveClass(/is-saved/);
+    await page.reload();
+    await expect(page.locator('#detail-cta-save')).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto('/#/profile?tab=saved');
+    await expect(page.locator(`#profile-saved .journey-card[data-slug="${SLUG}"]`)).toBeVisible();
+
+    await page.goto(`/#/journey/${SLUG}`);
+    await page.locator('#detail-cta-save').click();
+    await expect(page.locator('#detail-cta-save')).toHaveAttribute('aria-pressed', 'false');
+    await page.goto('/#/profile?tab=saved');
+    await expect(page.locator('#panel-saved .state__title')).toHaveText('还没有收藏');
+  });
+
+  // E2E-DETAIL-007: unknown routes get a 404 page (was a "500 server error")
+  test('unknown route shows 404 page', async ({ page }) => {
+    await page.goto('/#/definitely-not-a-page');
+    await expect(page.locator('.error-code')).toHaveText('404');
+    await expect(page.locator('#error-picks .journey-card')).not.toHaveCount(0);
   });
 });

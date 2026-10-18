@@ -70,6 +70,20 @@ CREATE TABLE IF NOT EXISTS ai_logs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Localized journey copy (v1.5.0). The journeys table holds the base language (zh);
+-- each row here overlays one locale. Empty fields fall back to the base copy.
+CREATE TABLE IF NOT EXISTS journey_translations (
+    journey_id    INTEGER NOT NULL REFERENCES journeys(id) ON DELETE CASCADE,
+    locale        TEXT    NOT NULL CHECK(length(locale) BETWEEN 2 AND 10),  -- 'en'
+    title         TEXT    NOT NULL,
+    subtitle      TEXT,
+    story_hook    TEXT    NOT NULL DEFAULT '',
+    story         TEXT,
+    region        TEXT,
+    mood_keywords TEXT,                                                    -- JSON array
+    PRIMARY KEY (journey_id, locale)
+);
+
 -- Indexes for filter performance
 CREATE INDEX IF NOT EXISTS idx_journeys_fantasy_type    ON journeys(fantasy_type);
 CREATE INDEX IF NOT EXISTS idx_journeys_visual_style    ON journeys(visual_style);

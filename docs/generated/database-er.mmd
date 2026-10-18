@@ -60,6 +60,17 @@ erDiagram
         datetime created_at
     }
 
+    JOURNEY_TRANSLATIONS {
+        int journey_id FK
+        string locale
+        string title
+        string subtitle
+        string story_hook
+        string story
+        string region
+        string mood_keywords
+    }
+
     USERS {
         int id PK
         string username

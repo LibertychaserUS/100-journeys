@@ -12,11 +12,10 @@
 | `sample-journeys.md` | `db/schema.sql`, `db/seed.sql` | Same generated seed data as CSV, formatted as a reviewer-readable table. |
 | `user-cases.mmd` | `web/js/router.js`, auth/admin/order/payment handlers | Actors only cover implemented routes and role gates. |
 | `system-dag.mmd` | `cmd/server/main.go`, repository/service/handler wiring | Nodes reflect instantiated runtime dependencies. |
-| `delivery-gantt.mmd` | `git log`, maintained trace docs | Timeline reflects committed phase progression. |
 
 ## 当前计数 / Current Counts
 
-- 解析 schema 表数量 / Schema tables parsed: 14
-- 生成 API 路由数量 / API routes generated: 23
+- 解析 schema 表数量 / Schema tables parsed: 15
+- 生成 API 路由数量 / API routes generated: 28
 - 生成前端路由数量 / Frontend routes generated: 10
-- 测试证据文件数 / Test files in evidence matrix: 27
+- 测试证据文件数 / Test files in evidence matrix: 35

@@ -10,7 +10,7 @@
 | `/login` | login |
 | `/register` | register |
 | `/profile` | profile |
+| `/recharge` | recharge |
 | `/admin-login` | admin-login |
 | `/admin` | admin |
-| `/recharge` | recharge |
 | `/about` | about |

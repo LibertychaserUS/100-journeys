@@ -51,7 +51,7 @@ func (h *JourneyHandler) List(c *gin.Context) {
 // GET /api/journeys/:slug
 func (h *JourneyHandler) Get(c *gin.Context) {
 	slug := c.Param("slug")
-	journey, err := h.svc.GetJourney(c.Request.Context(), slug)
+	journey, err := h.svc.GetJourneyLocalized(c.Request.Context(), slug, c.Query("lang"))
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, newErrorEnvelope("journey not found"))

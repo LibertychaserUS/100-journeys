@@ -1,50 +1,45 @@
 /* =============================================================
-   LAYOUT — Page-level structural containers
+   LAYOUT — page-level structure. Vertical padding on .container
+   elements always uses padding-block so the side gutter survives.
    ============================================================= */
 
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-#main-content {
-  flex: 1;
-}
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+#main-content { flex: 1; }
 
 .container {
   width: 100%;
-  max-width: var(--container-xl);
-  margin: 0 auto;
-  padding: 0 var(--space-6);
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: max(var(--space-5), env(safe-area-inset-left, 0px)) max(var(--space-5), env(safe-area-inset-right, 0px));
 }
+.container--narrow { max-width: var(--container-narrow); }
 
-.container--narrow {
-  max-width: var(--container-md);
+/* Pages without a full-bleed media header start below the fixed nav. */
+.page { padding-top: var(--nav-h); }
+.page__head { padding-block: var(--space-6) var(--space-4); }
+.page__head h1 { font-size: var(--text-2xl); }
+.page__head p { margin-top: var(--space-1); color: var(--color-text-2); font-size: var(--text-base); max-width: 40em; }
+
+.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
+.section-head h2 { font-size: var(--text-2xl); }
+.section-head p { margin-top: 6px; color: var(--color-text-2); font-size: var(--text-base); }
+
+.grid-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
+
+/* Footer */
+.site-footer { border-top: 1px solid var(--color-line); padding-block: var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom, 0px)); color: var(--color-text-3); font-size: var(--text-sm); }
+.site-footer .container { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.site-footer nav { display: flex; gap: var(--space-5); flex-wrap: wrap; }
+.site-footer a:hover { color: var(--color-text); }
+body[data-bookbar] .site-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+
+@media (max-width: 1080px) {
+  .grid-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-
-.container--wide {
-  max-width: var(--container-2xl);
-}
-
-/* Grid system */
-.grid {
-  display: grid;
-  gap: var(--space-6);
-}
-
-.grid--2 { grid-template-columns: repeat(2, 1fr); }
-.grid--3 { grid-template-columns: repeat(3, 1fr); }
-.grid--4 { grid-template-columns: repeat(4, 1fr); }
-
-.grid--auto {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-}
-
-@media (max-width: 768px) {
-  .grid--2,
-  .grid--3,
-  .grid--4 {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 760px) {
+  .container { padding-inline: max(var(--space-4), env(safe-area-inset-left, 0px)) max(var(--space-4), env(safe-area-inset-right, 0px)); }
+  .page__head { padding-block: var(--space-5) var(--space-2); }
+  .page__head h1 { font-size: var(--text-xl); }
+  .section-head h2 { font-size: var(--text-xl); }
+  .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
 }

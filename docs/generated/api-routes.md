@@ -12,8 +12,12 @@
 | `POST` | `/api/audit/client-error` | Public | `cmd/server/main.go` |
 | `POST` | `/api/auth/avatar` | JWT | `cmd/server/main.go` |
 | `POST` | `/api/auth/login` | Public | `cmd/server/main.go` |
+| `PUT` | `/api/auth/mbti` | JWT | `internal/handler/me_handler.go` |
 | `GET` | `/api/auth/me` | JWT | `cmd/server/main.go` |
 | `POST` | `/api/auth/register` | Public | `cmd/server/main.go` |
+| `GET` | `/api/auth/saved` | JWT | `internal/handler/me_handler.go` |
+| `DELETE` | `/api/auth/saved/:slug` | JWT | `internal/handler/me_handler.go` |
+| `PUT` | `/api/auth/saved/:slug` | JWT | `internal/handler/me_handler.go` |
 | `GET` | `/api/captcha` | Public | `cmd/server/main.go` |
 | `GET` | `/api/health` | Public | `cmd/server/main.go` |
 | `GET` | `/api/journeys` | Public | `cmd/server/main.go` |
@@ -25,5 +29,6 @@
 | `GET` | `/api/orders/:id` | JWT | `internal/handler/order_handler.go` |
 | `POST` | `/api/orders/:id/pay` | JWT | `internal/handler/order_handler.go` |
 | `POST` | `/api/payments/recharge` | JWT | `internal/handler/payment_handler.go` |
+| `GET` | `/api/payments/tiers` | Public | `internal/handler/payment_handler.go` |
 | `GET` | `/api/payments/transactions` | JWT | `internal/handler/payment_handler.go` |
 | `GET` | `/api/tags` | Public | `cmd/server/main.go` |

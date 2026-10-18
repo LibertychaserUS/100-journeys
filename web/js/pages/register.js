@@ -1,127 +1,128 @@
+/**
+ * Register — validates each field inline before calling the API, then uploads the
+ * optional avatar against the new account.
+ */
 var Pages = window.Pages || {};
 
 Pages.Register = {
+  _avatarUrl: null,
+
   render() {
+    const esc = UI.esc;
     const main = document.getElementById('main-content');
-    if (!main) return;
-
-    main.innerHTML = `
-      <section class="auth-page">
-        <div class="auth-card">
-          <h1 class="auth-title">注册</h1>
-          <p class="auth-subtitle">开启你的100种不可思议旅行</p>
-
-          <form class="auth-form" id="register-form">
-            <div class="auth-field">
-              <label for="reg-username">用户名</label>
-              <input type="text" id="reg-username" required placeholder="2-30位，中英文/数字/_/-" minlength="2" maxlength="30" pattern="[\\u4e00-\\u9fa5A-Za-z0-9_-]{2,30}" />
-              <small class="auth-help">用户名可重复，真实身份以系统生成的用户 ID 为准。</small>
-            </div>
-            <div class="auth-field">
-              <label for="reg-email">邮箱</label>
-              <input type="email" id="reg-email" required placeholder="your@email.com" />
-            </div>
-            <div class="auth-field">
-              <label for="reg-password">密码</label>
-              <input type="password" id="reg-password" required placeholder="8-72位，需含字母和数字" minlength="8" maxlength="72" />
-            </div>
-            <div class="auth-field">
-              <label for="reg-gender">性别</label>
-              <select id="reg-gender" required>
-                <option value="">请选择</option>
-                <option value="female">女</option>
-                <option value="male">男</option>
-                <option value="non_binary">非二元/其他</option>
-                <option value="prefer_not_to_say">不愿透露</option>
-              </select>
-            </div>
-            <div class="auth-field">
-              <label for="reg-avatar">头像</label>
-              <input type="file" id="reg-avatar" accept="image/png,image/jpeg,image/webp" />
-              <small class="auth-help">可选。PNG/JPG/WebP，最大 512KB，上传后绑定到用户唯一 ID。</small>
-            </div>
-            <div class="auth-field captcha-field">
-              <label for="reg-captcha">验证码</label>
-              <div class="captcha-row">
-                <input type="text" id="reg-captcha" required placeholder="输入答案" />
-                <span class="captcha-question" id="reg-captcha-q">加载中...</span>
-                <button type="button" class="captcha-refresh" id="reg-captcha-refresh" title="换一题">↻</button>
-              </div>
-              <input type="hidden" id="reg-captcha-id" />
-            </div>
-            <button type="submit" class="auth-submit">注册</button>
-          </form>
-
-          <p class="auth-switch">
-            已有账号？<a href="#/login">立即登录</a>
-          </p>
-
-          <p class="auth-error" id="register-error"></p>
+    const genders = ['female', 'male', 'non_binary', 'prefer_not_to_say'];
+    main.innerHTML = AuthForm.layout(`
+      <form class="auth-form" id="register-form" novalidate>
+        <div>
+          <h1 class="auth-title">${esc(t('register.title'))}</h1>
+          <p class="auth-sub">${esc(t('register.sub'))}</p>
         </div>
-      </section>
-    `;
+        <div class="alert" id="register-error-box" role="alert" tabindex="-1" hidden>${UI.icon('alert')}<span id="register-error"></span></div>
+        ${AuthForm.field({ id: 'reg-username', label: t('register.username'), placeholder: t('register.usernamePh'), autocomplete: 'nickname', attrs: 'required maxlength="30"', help: t('register.usernameHelp') })}
+        ${AuthForm.field({ id: 'reg-email', label: t('register.email'), type: 'email', placeholder: 'you@example.com', autocomplete: 'email', attrs: 'required' })}
+        ${AuthForm.field({ id: 'reg-password', label: t('register.password'), type: 'password', placeholder: t('register.passwordPh'), autocomplete: 'new-password', attrs: 'required maxlength="72"', trailing: AuthForm.passwordToggle('reg-password') })}
+        <div class="field">
+          <label for="reg-gender">${esc(t('register.gender'))}</label>
+          <div class="input input--select">
+            <select id="reg-gender" required aria-describedby="reg-gender-error">
+              <option value="">${esc(t('register.genderPick'))}</option>
+              ${genders.map((g) => `<option value="${g}">${esc(t(`gender.${g}`))}</option>`).join('')}
+            </select>
+          </div>
+          <p class="field__error" id="reg-gender-error" hidden></p>
+        </div>
+        <div class="field">
+          <span class="field__label" id="reg-avatar-label">${esc(t('register.avatar'))}</span>
+          <div class="auth-avatar">
+            <span class="auth-avatar__preview" id="reg-avatar-preview">${UI.icon('image')}</span>
+            <label class="btn btn--ghost btn--sm" for="reg-avatar">${esc(t('register.avatarPick'))}</label>
+            <input class="sr-only" type="file" id="reg-avatar" accept="image/png,image/jpeg,image/webp" aria-labelledby="reg-avatar-label" aria-describedby="reg-avatar-help reg-avatar-error">
+            <span class="field__help" id="reg-avatar-help">${esc(t('register.avatarHelp'))}</span>
+          </div>
+          <p class="field__error" id="reg-avatar-error" hidden></p>
+        </div>
+        ${AuthForm.captcha('reg')}
+        <button type="submit" class="btn btn--primary btn--lg btn--block auth-submit">${esc(t('register.submit'))}</button>
+        <p class="auth-switch">${esc(t('register.switch'))} <a class="link" href="#/login${Router.query.get('next') ? `?next=${encodeURIComponent(Router.query.get('next'))}` : ''}">${esc(t('register.switchLink'))}</a></p>
+      </form>`);
 
-    const form = document.getElementById('register-form');
-    const errorEl = document.getElementById('register-error');
-    const captchaIdEl = document.getElementById('reg-captcha-id');
-    const captchaQEl = document.getElementById('reg-captcha-q');
-    const captchaRefreshBtn = document.getElementById('reg-captcha-refresh');
-
-    async function loadCaptcha() {
-      try {
-        const res = await API.getCaptcha();
-        const data = res.data || res;
-        captchaIdEl.value = data.id;
-        captchaQEl.textContent = data.question;
-        document.getElementById('reg-captcha').value = '';
-      } catch (err) {
-        captchaQEl.textContent = '加载失败';
-      }
-    }
-
-    captchaRefreshBtn.addEventListener('click', loadCaptcha);
-    loadCaptcha();
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorEl.textContent = '';
-
-      const username = document.getElementById('reg-username').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const password = document.getElementById('reg-password').value;
-      const gender = document.getElementById('reg-gender').value;
-      const avatarFile = document.getElementById('reg-avatar').files[0];
-      const captchaId = captchaIdEl.value;
-      const captchaAnswer = document.getElementById('reg-captcha').value.trim();
-
-      if (!/^[\u4e00-\u9fa5A-Za-z0-9_-]{2,30}$/.test(username)) {
-        errorEl.textContent = '用户名只能包含中英文、数字、下划线或短横线。';
-        return;
-      }
-      if (!/^[A-Za-z0-9!@#$%^&*()_+=,.?/-]{8,72}$/.test(password) || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
-        errorEl.textContent = '密码需为8-72位，包含字母和数字，不能含空格/引号/尖括号/分号。';
-        return;
-      }
-      if (avatarFile && avatarFile.size > 512 * 1024) {
-        errorEl.textContent = '头像不能超过512KB。';
-        return;
-      }
-
-      try {
-        const res = await API.register({ username, email, password, gender, captcha_id: captchaId, captcha_answer: captchaAnswer });
-        const data = res.data || res;
-        if (data.token) {
-          API.setToken(data.token);
-          if (avatarFile) {
-            await API.uploadAvatar(avatarFile);
-          }
-          if (window.App && window.App.updateNav) window.App.updateNav();
-          Router.navigate('#/');
-        }
-      } catch (err) {
-        errorEl.textContent = err.message || '注册失败，邮箱可能已被使用';
-        loadCaptcha();
-      }
+    const form = main.querySelector('#register-form');
+    const reloadCaptcha = AuthForm.bindCommon(form, 'reg');
+    const avatarInput = form.querySelector('#reg-avatar');
+    avatarInput.addEventListener('change', () => {
+      const file = avatarInput.files[0];
+      const preview = form.querySelector('#reg-avatar-preview');
+      if (this._avatarUrl) URL.revokeObjectURL(this._avatarUrl);
+      this._avatarUrl = null;
+      AuthForm.setFieldError(form, 'reg-avatar', '');
+      if (!file) { preview.innerHTML = UI.icon('image'); return; }
+      if (file.size > 512 * 1024) AuthForm.setFieldError(form, 'reg-avatar', t('err.avatarSize'));
+      this._avatarUrl = URL.createObjectURL(file);
+      preview.innerHTML = `<img src="${this._avatarUrl}" alt="">`;
     });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this._submit(form, reloadCaptcha);
+    });
+  },
+
+  destroy() {
+    if (this._avatarUrl) URL.revokeObjectURL(this._avatarUrl);
+    this._avatarUrl = null;
+  },
+
+  _validate(form, v) {
+    const errors = {
+      'reg-username': !v.username ? t('err.required') : (/^[一-龥A-Za-z0-9_-]{2,30}$/.test(v.username) ? '' : t('err.username')),
+      'reg-email': !v.email ? t('err.required') : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email) ? '' : t('err.email')),
+      'reg-password': !v.password ? t('err.required') : (/^[A-Za-z0-9!@#$%^&*()_+=,.?/-]{8,72}$/.test(v.password) && /[A-Za-z]/.test(v.password) && /\d/.test(v.password) ? '' : t('err.password')),
+      'reg-gender': v.gender ? '' : t('err.gender'),
+      'reg-captcha': v.captcha ? '' : t('err.required'),
+      'reg-avatar': v.avatar && v.avatar.size > 512 * 1024 ? t('err.avatarSize') : '',
+    };
+    Object.entries(errors).forEach(([id, msg]) => AuthForm.setFieldError(form, id, msg));
+    const first = Object.keys(errors).find((id) => errors[id]);
+    if (first) form.querySelector(`#${first}`).focus();
+    return !first;
+  },
+
+  async _submit(form, reloadCaptcha) {
+    const v = {
+      username: form.querySelector('#reg-username').value.trim(),
+      email: form.querySelector('#reg-email').value.trim(),
+      password: form.querySelector('#reg-password').value,
+      gender: form.querySelector('#reg-gender').value,
+      captcha: form.querySelector('#reg-captcha').value.trim(),
+      avatar: form.querySelector('#reg-avatar').files[0],
+    };
+    AuthForm.setFormError(form, 'register-error-box', '');
+    if (!this._validate(form, v)) return;
+
+    const submit = form.querySelector('.auth-submit');
+    AuthForm.busy(submit, true, t('register.submitting'));
+    try {
+      const res = await API.register({
+        username: v.username, email: v.email, password: v.password, gender: v.gender,
+        captcha_id: form.querySelector('#reg-captcha-id').value, captcha_answer: v.captcha,
+      });
+      API.setToken(res.data.token);
+      if (v.avatar) {
+        try { await API.uploadAvatar(v.avatar); }
+        catch (err) { UI.toast(t('err.avatarUpload', { msg: I18n.error(err) })); }
+      }
+      await Session.refresh();
+      Router.navigate(AuthForm.next());
+    } catch (err) {
+      AuthForm.busy(submit, false, t('register.submit'));
+      const raw = err.apiError || '';
+      const message = I18n.error(err);
+      if (/captcha|验证码/i.test(raw)) AuthForm.setFieldError(form, 'reg-captcha', message);
+      else if (/email already/i.test(raw)) AuthForm.setFieldError(form, 'reg-email', message);
+      else if (/username/i.test(raw)) AuthForm.setFieldError(form, 'reg-username', message);
+      else if (/password/i.test(raw)) AuthForm.setFieldError(form, 'reg-password', message);
+      else AuthForm.setFormError(form, 'register-error-box', message);
+      reloadCaptcha();
+    }
   },
 };

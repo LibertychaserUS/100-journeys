@@ -1,16 +1,20 @@
 {
   "name": "e2e",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playwright end-to-end tests for 100 Journeys",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test",
+    "test:desktop": "playwright test --project=chromium",
+    "test:mobile": "playwright test --project=mobile"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.60.0"
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "^1.60.0",
+    "axe-core": "4.14.0"
   }
 }

@@ -120,6 +120,7 @@ JWT 用户接口要求已登录；管理员接口还要求 `role = "admin"`。
 | `adventure_max` | integer | 最大冒险指数 |
 | `obscurity_min` | integer | 最小小众等级 |
 | `mbti` | string | MBTI 类型代码 |
+| `lang` | string | 内容语言：`zh`（默认，基础内容）或 `en`；`en-US` 等标签会被归一化。`lang=en` 时搜索同时匹配英文与中文内容 |
 | `page` | integer | 页码，默认由服务层补齐 |
 | `limit` | integer | 每页数量，默认由服务层补齐 |
 
@@ -479,7 +480,34 @@ AI 宠物/推荐对话接口。当前实现使用 mock provider。
 }
 ```
 
-**边界说明**: 源码中存在 `SaveJourney` handler 草稿，但当前没有注册 `/api/auth/save/:slug` 路由；收藏/保存旅程能力尚未完成，不能作为已交付 API。
+### 4.5 `GET /api/auth/saved`
+
+当前用户收藏的旅程，按收藏时间倒序。需要 JWT；支持 `?lang=en`。
+
+**响应 `200`**: `data` 为 Journey 数组（字段同 3.2，含 `image_url` 与 `locale`）。
+
+### 4.6 `PUT /api/auth/saved/:slug` / `DELETE /api/auth/saved/:slug`
+
+收藏 / 取消收藏一段旅程。幂等：重复收藏或取消不会报错。
+
+**响应 `200`**
+
+```json
+{ "data": { "slug": "bolivia-salt-flat-trek", "saved": true }, "error": null }
+```
+
+| 状态码 | `error` |
+|---|---|
+| `401` | 未登录 |
+| `404` | `journey not found` |
+
+### 4.7 `PUT /api/auth/mbti`
+
+保存当前用户的 MBTI 类型（个人页选择或向导测验结果），后台 MBTI 分布据此统计。
+
+**请求 JSON**: `{ "mbti_type": "INFP" }`，大小写不敏感，只接受 16 种标准代码。
+
+**响应 `200`**: `{ "data": { "mbti_type": "INFP" }, "error": null }`；非法代码返回 `400` + `invalid mbti type`。
 
 ---
 
@@ -583,13 +611,30 @@ AI 宠物/推荐对话接口。当前实现使用 mock provider。
 }
 ```
 
-**约束**: `amount` 范围为 `1-100000`。
+**约束**: `amount` 范围为 `1-100000`。金额与 6.3 的某个档位完全一致时，额外入账该档位的赠送；自定义金额不赠送。本金与赠送在同一事务内写入两条流水（`recharge` + `bonus`）。
 
 **响应 `200`**
 
 ```json
 {
-  "data": { "recharged": 1000 },
+  "data": { "recharged": 10000, "bonus": 800, "balance": 10800 },
+  "error": null
+}
+```
+
+### 6.3 `GET /api/payments/tiers`
+
+公开接口，返回充值档位及其赠送，前端充值页据此渲染。
+
+```json
+{
+  "data": [
+    { "amount": 5000, "bonus": 0 },
+    { "amount": 10000, "bonus": 800 },
+    { "amount": 20000, "bonus": 2000 },
+    { "amount": 30000, "bonus": 3600 },
+    { "amount": 50000, "bonus": 7000 }
+  ],
   "error": null
 }
 ```
@@ -709,11 +754,12 @@ CSV 模式不使用 JSON 信封。
 | `obscurity_level` | integer | 小众等级 |
 | `risk_level` | integer | 风险等级 |
 | `mood_keywords` | string[] | 情绪关键词 |
-| `image_url` | string | 服务层解析后的本地或 CDN 图片地址 |
+| `image_url` | string | 服务层解析后的本地或 CDN 封面地址；每段旅程一张，卡片与详情共用 |
 | `booking_url` | string/null | 外部预订地址 |
 | `price` | integer | 价格，单位为分或项目约定整数金额 |
 | `tags` | Tag[] | 标签 |
-| `mbti_types` | JourneyMBTI[] | MBTI 匹配信息 |
+| `mbti_types` | JourneyMBTI[] | MBTI 匹配信息，按 `compatibility_score`（1–5）从高到低排序 |
+| `locale` | string | 实际返回的内容语言：`zh` 或 `en`（缺少译文时回退为 `zh` 的字段仍按基础内容返回） |
 | `created_at` / `updated_at` | string | Go `time.Time` JSON 格式 |
 
 ### 8.2 User
@@ -732,7 +778,8 @@ CSV 模式不使用 JSON 信封。
 
 ## 9. 已知边界
 
-- 收藏/保存旅程尚未完成；不得在产品或接口文档中描述为已可用。
+- 每日登录奖励按 UTC 自然日计算，同一天多次登录只奖励一次。
+- 订单、宠物回复和后台统计中的旅程标题是下单/统计时的基础语言快照；前端按 `journey_id` / `slug` 显示当前语言的标题。
 - `POST /api/ai/chat` 当前是 mock AI provider，不代表真实外部大模型已接入。
 - `POST /api/analytics/events` 是可降级分析事件，不承载订单、支付、钱包等 P0 事实。
 - `GET /api/admin/export?format=csv` 是唯一不使用 JSON 信封的已注册 API。

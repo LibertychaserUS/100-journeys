@@ -1,54 +1,49 @@
 const { test, expect } = require('@playwright/test');
+const { freshPage } = require('./helpers');
 
 test.describe('Home Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Skip AI Pet setup modal
-    await page.addInitScript(() => {
-      localStorage.setItem('ai_pet_profile', JSON.stringify({ firstVisit: false, name: '小旅', type: 'dog' }));
-    });
+    await freshPage(page);
     await page.goto('/#/');
   });
 
-  // E2E-HOME-001: Landing page loads with hero and featured cards
+  // E2E-HOME-001: hero and five featured journeys from the API
   test('landing page shows hero and featured journeys', async ({ page }) => {
-    await expect(page.locator('.home-hero__title')).toBeVisible();
-    await expect(page.locator('.home-hero__title')).toContainText('桃源百旅');
-
-    // Featured section with cards
-    await expect(page.locator('.home-featured__grid .home-card')).toHaveCount(6);
+    await expect(page.locator('.home-hero__title')).toHaveText('桃源百旅');
+    await expect(page.locator('#featured-grid .feature-card[data-slug]')).toHaveCount(5);
+    await expect(page.locator('#featured-all')).toContainText('12');
   });
 
-  // E2E-HOME-002: MBTI is intentionally not exposed as a full homepage grid
-  test('MBTI grid stays hidden from public home', async ({ page }) => {
-    await expect(page.locator('.home-mbti__chip')).toHaveCount(0);
-    await page.locator('.home-hero__chip[data-filter-key="mbti"]').click();
-    await expect(page).toHaveURL(/#\/explore\?mbti=INFP/);
+  // E2E-HOME-002: mood shortcuts open Explore with that filter applied
+  test('mood chip opens explore with the matching filter', async ({ page }) => {
+    await page.locator('.home-hero__chip[data-filter-value="night"]').click();
+    await expect(page).toHaveURL(/#\/explore\?fantasy_type=night/);
+    await expect(page.locator('#filter-fantasy [data-value="night"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.journey-card[data-slug]')).not.toHaveCount(0);
   });
 
-  // E2E-HOME-003: Hero CTA navigates to explore
-  test('hero CTA button navigates to explore', async ({ page }) => {
-    await page.locator('.home-hero__search button').click();
-    await expect(page).toHaveURL(/#\/explore/);
+  // E2E-HOME-003: hero search submits the query to Explore
+  test('hero search carries the query to explore', async ({ page }) => {
+    await page.locator('#hero-q').fill('冰岛');
+    await page.locator('.home-hero__search button[type="submit"]').click();
+    await expect(page).toHaveURL(/#\/explore\?q=/);
+    await expect(page.locator('#explore-search')).toHaveValue('冰岛');
+    await expect(page.locator('.journey-card[data-slug]')).toHaveCount(1);
   });
 
-  // E2E-HOME-004: Featured cards navigate to detail
+  // E2E-HOME-004: featured card opens its detail page
   test('featured card click navigates to journey detail', async ({ page }) => {
-    const firstCard = page.locator('.home-card').first();
-    await expect(firstCard).toBeVisible();
-
-    // Get the slug from data attribute
-    const slug = await firstCard.getAttribute('data-slug');
-    expect(slug).toBeTruthy();
-
-    await firstCard.click();
+    const card = page.locator('#featured-grid .feature-card[data-slug]').first();
+    const slug = await card.getAttribute('data-slug');
+    await card.click();
     await expect(page).toHaveURL(new RegExp(`#\\/journey\\/${slug}`));
+    await expect(page.locator('.detail-hero__title')).toBeVisible();
   });
 
-  // E2E-HOME-005: Home card click navigates to detail
-  test('clicking a card navigates to journey detail', async ({ page }) => {
-    const card = page.locator('.home-card').first();
-    await expect(card.locator('.home-card__tags span').nth(1)).toBeVisible();
-    await card.click();
-    await expect(page).toHaveURL(/#\/journey\//);
+  // E2E-HOME-005: every featured journey shows its own cover
+  test('featured journeys do not share cover images', async ({ page }) => {
+    await expect(page.locator('#featured-grid .feature-card[data-slug]')).toHaveCount(5);
+    const srcs = await page.locator('#featured-grid .feature-card img').evaluateAll((imgs) => imgs.map((i) => i.getAttribute('src')));
+    expect(new Set(srcs).size).toBe(srcs.length);
   });
 });

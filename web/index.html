@@ -2,74 +2,81 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>100种不可思议的旅行</title>
-  <link rel="preload" as="image" href="/static/assets/images/generated/hero-taoyuan.jpg" fetchpriority="high" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>桃源百旅 · 一百种不可思议的旅行</title>
+  <meta name="description" content="桃源百旅 · 100 Journeys — 按心情、MBTI 和幻想类型进入的故事化旅行灵感。Story-driven fantasy travel by mood and personality." />
+  <meta name="theme-color" content="#0d0f13" />
+  <link rel="icon" type="image/png" href="/static/assets/images/generated/brand-mark-128.png" />
+  <link rel="preload" as="image" href="/static/assets/images/generated/hero-taoyuan-1600.jpg"
+        imagesrcset="/static/assets/images/generated/hero-taoyuan-960.jpg 960w, /static/assets/images/generated/hero-taoyuan-1600.jpg 1600w" imagesizes="100vw" fetchpriority="high" />
 
-  <!-- Theme: prevent flash -->
+  <!-- Theme before first paint: saved choice, else the OS preference. -->
   <script>
-    (function() {
-      var saved = localStorage.getItem('theme');
-      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var theme = saved || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      document.documentElement.setAttribute('data-theme', saved === 'light' || saved === 'dark' ? saved : (prefersLight ? 'light' : 'dark'));
     })();
   </script>
 
-  <!-- CSS layer order: tokens → global → layout → components → pages -->
-  <link rel="stylesheet" href="/static/css/tokens.css" />
-  <link rel="stylesheet" href="/static/css/global.css" />
-  <link rel="stylesheet" href="/static/css/layout.css" />
-  <link rel="stylesheet" href="/static/css/components/card.css" />
-  <link rel="stylesheet" href="/static/css/components/nav.css" />
-  <link rel="stylesheet" href="/static/css/components/filter.css" />
-  <link rel="stylesheet" href="/static/css/components/hero.css" />
-  <link rel="stylesheet" href="/static/css/components/ai-pet.css" />
-  <link rel="stylesheet" href="/static/css/pages/home.css" />
-  <link rel="stylesheet" href="/static/css/pages/explore.css" />
-  <link rel="stylesheet" href="/static/css/pages/detail.css" />
-  <link rel="stylesheet" href="/static/css/pages/auth.css" />
-  <link rel="stylesheet" href="/static/css/pages/profile.css" />
-  <link rel="stylesheet" href="/static/css/pages/admin.css" />
-  <link rel="stylesheet" href="/static/css/pages/recharge.css" />
-  <link rel="stylesheet" href="/static/css/pages/about.css" />
-  <link rel="stylesheet" href="/static/css/pages/error.css" />
+  <!-- CSS layer order: tokens → global → layout → components → pages. ?v= is stamped by the server. -->
+  <link rel="stylesheet" href="/static/css/tokens.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/global.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/layout.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/ui.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/nav.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/card.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/hero.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/filter.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/checkout.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/ai-pet.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/home.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/explore.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/detail.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/auth.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/profile.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/recharge.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/admin.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/about.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/error.css?v=__ASSET_VERSION__" />
 </head>
 <body>
   <!-- App config injected by Go server -->
   <!-- window.APP_CONFIG = { mediaBase: "...", apiBase: "/api" } -->
 
+  <a class="skip-link" href="#main-content" id="skip-link">跳到正文</a>
   <div id="app">
-    <nav id="main-nav"></nav>
-    <main id="main-content"></main>
-    <footer id="main-footer" class="site-footer">
-      <a href="#/about">关于我们</a>
-      <p>本网站仅用于课程与实习作业演示，不提供真实旅游预订、支付或商业服务。</p>
-    </footer>
+    <header id="main-nav"></header>
+    <main id="main-content" tabindex="-1"></main>
+    <footer id="main-footer" class="site-footer"></footer>
   </div>
 
-  <!-- AI Pet -->
   <div id="ai-pet" class="ai-pet"></div>
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
 
-  <!-- JS: utilities first, then router last -->
-  <script src="/static/js/config.js"></script>
-  <script src="/static/js/client-audit.js"></script>
-  <script src="/static/js/eventbus.js"></script>
-  <script src="/static/js/api.js"></script>
-  <script src="/static/js/nav.js"></script>
-  <script src="/static/js/ai-pet.js"></script>
-  <script src="/static/js/ai-pet-dom.js"></script>
-  <script src="/static/js/pages/home.js"></script>
-  <script src="/static/js/pages/explore.js"></script>
-  <script src="/static/js/pages/detail.js"></script>
-  <script src="/static/js/pages/login.js"></script>
-  <script src="/static/js/pages/register.js"></script>
-  <script src="/static/js/pages/profile.js"></script>
-  <script src="/static/js/pages/admin-login.js"></script>
-  <script src="/static/js/pages/admin.js"></script>
-  <script src="/static/js/pages/recharge.js"></script>
-  <script src="/static/js/pages/about.js"></script>
-  <script src="/static/js/pages/error.js"></script>
-  <script src="/static/js/router.js"></script>
+  <!-- JS: config and helpers first, pages next, router last -->
+  <script src="/static/js/config.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/client-audit.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/i18n.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/eventbus.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/api.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/ui.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/nav.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/checkout.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/ai-pet.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/ai-pet-dom.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/home.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/explore.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/detail.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/login.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/register.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/profile.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/admin-login.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/admin.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/recharge.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/about.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/error.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/router.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>

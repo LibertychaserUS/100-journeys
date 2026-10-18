@@ -1,290 +1,294 @@
+/**
+ * Profile ("My trips") — identity + wallet header, then tabs for orders, saved journeys,
+ * transactions and travel personality. ?tab= selects a tab without re-rendering.
+ */
 var Pages = window.Pages || {};
 
 Pages.Profile = {
-  _mbtiData: {
-    nt: {
-      name: '紫人 · 理性组',
-      color: '#8b5cf6',
-      desc: '以逻辑与远见驱动世界，在未知中寻找最优解。',
-      types: [
-        { code: 'INTJ', name: '建筑师', trait: '策略型探索者，偏爱计划和深度', travel: '冰岛熔岩隧道、巴塔哥尼亚徒步、挪威极光' },
-        { code: 'INTP', name: '逻辑学家', trait: '好奇的分析师，追求知识与创新', travel: '秘鲁马丘比丘、纳米比亚死亡谷、玻利维亚盐沼' },
-        { code: 'ENTJ', name: '指挥官', trait: '果断的领导者，追求效率与目标', travel: '格陵兰犬拉雪橇、巴塔哥尼亚徒步、新西兰皮划艇' },
-        { code: 'ENTP', name: '辩论家', trait: '好奇的发明家，喜欢挑战与辩论', travel: '新西兰米尔福德峡湾、冰岛熔岩隧道、土耳其热气球' },
-      ]
-    },
-    nf: {
-      name: '绿人 · 理想组',
-      color: '#22c55e',
-      desc: '以共情与意义连接万物，在旅途中寻找灵魂共鸣。',
-      types: [
-        { code: 'INFJ', name: '提倡者', trait: '安静的理想主义者，寻求深层连接', travel: '挪威极光、纳米比亚死亡谷、日本温泉寺庙' },
-        { code: 'INFP', name: '调停者', trait: '理想主义的旅行家，追求意义和内在体验', travel: '玻利维亚盐沼、纳米比亚死亡谷、摩洛哥撒哈拉' },
-        { code: 'ENFJ', name: '主人公', trait: '魅力的激励者，关注他人成长', travel: '摩洛哥撒哈拉、马尔代夫海底餐厅、土耳其热气球' },
-        { code: 'ENFP', name: '竞选者', trait: '充满热情的冒险家，渴望新鲜体验', travel: '摩洛哥撒哈拉、土耳其热气球、新西兰皮划艇' },
-      ]
-    },
-    sp: {
-      name: '黄人 · 冒险组',
-      color: '#eab308',
-      desc: '以感官与行动活在当下，每一秒都要真实触碰世界。',
-      types: [
-        { code: 'ISTP', name: '鉴赏家', trait: '冷静的实验者，擅长动手和观察', travel: '冰岛熔岩隧道、格陵兰犬拉雪橇、新西兰皮划艇' },
-        { code: 'ISFP', name: '探险家', trait: '灵活的艺术家，享受当下感官体验', travel: '日本温泉寺庙、土耳其热气球、马尔代夫海底餐厅' },
-        { code: 'ESTP', name: '企业家', trait: '活力四射的实干家，活在当下', travel: '格陵兰犬拉雪橇、新西兰米尔福德峡湾、挪威极光' },
-        { code: 'ESFP', name: '表演者', trait: '自发的表演者，热爱社交和乐趣', travel: '土耳其热气球、马尔代夫海底餐厅、摩洛哥撒哈拉' },
-      ]
-    },
-    sj: {
-      name: '蓝人 · 守护组',
-      color: '#3b82f6',
-      desc: '以稳定与责任守护传统，在结构化中感受安全与归属。',
-      types: [
-        { code: 'ISTJ', name: '物流师', trait: '务实的组织者，偏爱结构化的行程', travel: '秘鲁马丘比丘、日本温泉寺庙、挪威极光' },
-        { code: 'ISFJ', name: '守护者', trait: '细致体贴的旅行者，注重安全和舒适', travel: '日本温泉寺庙、马尔代夫海底餐厅、玻利维亚盐沼' },
-        { code: 'ESTJ', name: '总经理', trait: '务实的管理者，重视传统和秩序', travel: '秘鲁马丘比丘、挪威极光、格陵兰犬拉雪橇' },
-        { code: 'ESFJ', name: '执政官', trait: '热心的合作者，关注和谐和关怀', travel: '马尔代夫海底餐厅、挪威极光、日本温泉寺庙' },
-      ]
+  TABS: ['orders', 'saved', 'txns', 'persona'],
+  _tab: 'orders',
+  _user: null,
+  _journeys: null,
+  _seq: 0,
+  _counts: {},
+
+  async render(ctx) {
+    if (!API.isLoggedIn()) {
+      Router.navigate(`/login?next=${encodeURIComponent('/profile')}`);
+      return;
     }
-  },
-  render() {
+    const seq = ++this._seq;
+    this._tab = this.TABS.includes(ctx.query.get('tab')) ? ctx.query.get('tab') : 'orders';
+    this._counts = {};
+    const esc = UI.esc;
     const main = document.getElementById('main-content');
-    if (!main) return;
-
     main.innerHTML = `
-      <section class="profile-page">
+      <div class="page profile">
+        <header class="container profile-head" id="profile-card">
+          <div class="profile-id">
+            <img class="profile-id__avatar skeleton" id="profile-avatar" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="72" height="72">
+            <div>
+              <h1 class="profile-name" id="profile-name">${esc(t('common.loading'))}</h1>
+              <p class="profile-email" id="profile-email"></p>
+              <div class="profile-tags" id="profile-tags"></div>
+            </div>
+          </div>
+          <div class="profile-wallet">
+            <div><p class="profile-wallet__k">${esc(t('profile.wallet'))}</p><p class="profile-wallet__v num" id="profile-balance">—</p></div>
+            <div><p class="profile-wallet__k">${esc(t('profile.points'))}</p><p class="profile-wallet__v num" id="profile-points">—</p></div>
+            <a class="btn btn--primary" href="#/recharge">${esc(t('profile.recharge'))}</a>
+          </div>
+        </header>
         <div class="container">
-          <div class="profile-card" id="profile-card">
-            <div class="profile-avatar">
-              <span id="profile-avatar-text">?</span>
-            </div>
-            <h2 class="profile-name" id="profile-name">加载中…</h2>
-            <p class="profile-email" id="profile-email"></p>
-            <div class="profile-meta">
-              <div class="profile-badge">
-                <span class="profile-badge__label">等级</span>
-                <span class="profile-badge__value" id="profile-level">—</span>
-              </div>
-              <div class="profile-badge">
-                <span class="profile-badge__label">积分</span>
-                <span class="profile-badge__value" id="profile-points">—</span>
-              </div>
-              <div class="profile-badge">
-                <span class="profile-badge__label">不思议币</span>
-                <span class="profile-badge__value" id="profile-balance">—</span>
-              </div>
-              <div class="profile-badge">
-                <span class="profile-badge__label">MBTI</span>
-                <span class="profile-badge__value" id="profile-mbti">—</span>
-              </div>
-            </div>
-            <div class="profile-actions">
-              <a href="#/recharge" class="profile-btn profile-btn--primary">充值不思议币</a>
-            </div>
+          <div class="tabs" role="tablist" aria-label="${esc(t('profile.tabs'))}">
+            ${this.TABS.map((tab) => `<button role="tab" type="button" id="tab-${tab}" aria-controls="panel-${tab}" aria-selected="${tab === this._tab}" tabindex="${tab === this._tab ? 0 : -1}">${esc(t(`profile.tab.${tab}`))}<span class="count" data-count="${tab}"></span></button>`).join('')}
           </div>
-
-          <h3 class="profile-section-title">我的订单</h3>
-          <div class="profile-orders" id="profile-orders">
-            <p class="profile-empty">暂无订单</p>
-          </div>
-
-          <h3 class="profile-section-title">交易记录</h3>
-          <div class="profile-txns" id="profile-txns">
-            <p class="profile-empty">暂无交易记录</p>
-          </div>
-
-          <h3 class="profile-section-title">我的收藏</h3>
-          <div class="profile-saved" id="profile-saved">
-            <p class="profile-empty">暂无收藏的旅程</p>
-          </div>
-
-          <h3 class="profile-section-title">🐾 旅行人格宠物</h3>
-          <div class="mbti-companion" id="mbti-companion"></div>
+          ${this.TABS.map((tab) => `<section class="profile-panel" role="tabpanel" id="panel-${tab}" aria-labelledby="tab-${tab}" ${tab === this._tab ? '' : 'hidden'}></section>`).join('')}
         </div>
-      </section>
-    `;
+      </div>`;
 
-    this._loadProfile();
-    this._loadOrders();
-    this._loadTransactions();
-    this._renderMbtiCompanion();
+    const tablist = main.querySelector('[role="tablist"]');
+    tablist.addEventListener('click', (e) => {
+      const tab = e.target.closest('[role="tab"]');
+      if (tab) this._select(tab.id.replace('tab-', ''), true);
+    });
+    tablist.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+      e.preventDefault();
+      const i = this.TABS.indexOf(this._tab);
+      const next = e.key === 'Home' ? 0 : e.key === 'End' ? this.TABS.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + this.TABS.length) % this.TABS.length;
+      this._select(this.TABS[next], true);
+      document.getElementById(`tab-${this.TABS[next]}`).focus();
+    });
+    main.addEventListener('click', (e) => this._onClick(e));
+
+    const user = await Session.load(true);
+    if (seq !== this._seq) return;
+    if (!user) { Router.navigate(`/login?next=${encodeURIComponent('/profile')}`); return; }
+    this._user = user;
+    this._renderHead(user);
+    this._loadPanel(this._tab);
+    // Counts for the other tabs
+    this.TABS.filter((tab) => tab !== this._tab).forEach((tab) => this._loadPanel(tab));
   },
 
-  async _loadProfile() {
-    try {
-      const res = await API.me();
-      const user = res.data || res;
-      if (!user || !user.id) {
-        Router.navigate('#/login');
-        return;
-      }
+  update(ctx) {
+    const tab = ctx.query.get('tab');
+    if (this.TABS.includes(tab)) this._select(tab, false);
+  },
 
-      document.getElementById('profile-name').textContent = user.username || '旅行者';
-      document.getElementById('profile-email').textContent = user.email || '';
-      document.getElementById('profile-level').textContent = 'Lv' + (user.level ?? 1);
-      document.getElementById('profile-points').textContent = (user.points ?? 0).toLocaleString();
-      document.getElementById('profile-balance').textContent = (user.balance ?? 0).toLocaleString();
-      document.getElementById('profile-mbti').textContent = user.mbti_type || '未测试';
-      document.getElementById('profile-avatar-text').textContent = (user.username || '?')[0].toUpperCase();
-    } catch (err) {
-      console.error('Profile load failed:', err);
-      Router.navigate('#/login');
-    }
+  destroy() { this._seq++; },
+
+  _select(tab, pushUrl) {
+    if (!this.TABS.includes(tab)) return;
+    this._tab = tab;
+    this.TABS.forEach((name) => {
+      const btn = document.getElementById(`tab-${name}`);
+      const panel = document.getElementById(`panel-${name}`);
+      if (!btn || !panel) return;
+      btn.setAttribute('aria-selected', String(name === tab));
+      btn.tabIndex = name === tab ? 0 : -1;
+      panel.hidden = name !== tab;
+    });
+    if (pushUrl) Router.replaceQuery(tab === 'orders' ? {} : { tab });
+  },
+
+  _renderHead(user) {
+    const esc = UI.esc;
+    const avatar = document.getElementById('profile-avatar');
+    avatar.src = user.avatar_url || API.mediaUrl('generated/guide-light-128.png');
+    avatar.classList.remove('skeleton');
+    document.getElementById('profile-name').textContent = user.username || user.email;
+    document.getElementById('profile-email').textContent = user.email || '';
+    document.getElementById('profile-balance').textContent = I18n.num(user.balance);
+    document.getElementById('profile-points').textContent = I18n.num(user.points);
+    document.getElementById('profile-tags').innerHTML = `
+      <span class="tag-code">${esc(t('profile.level', { n: user.level || 1 }))}</span>
+      <span class="tag-code" id="profile-mbti">${user.mbti_type ? `${esc(user.mbti_type)} · ${esc(MBTI.name(user.mbti_type))}` : esc(t('profile.noMbti'))}</span>`;
+  },
+
+  _setCount(tab, n) {
+    this._counts[tab] = n;
+    const el = document.querySelector(`[data-count="${tab}"]`);
+    if (el) el.textContent = n ? String(n) : '';
+  },
+
+  async _journeyMap() {
+    if (this._journeys && this._journeys.lang === I18n.lang) return this._journeys.map;
+    const res = await API.getJourneys({ limit: 100 });
+    const map = new Map((res.data || []).map((j) => [j.id, j]));
+    this._journeys = { lang: I18n.lang, map };
+    return map;
+  },
+
+  _loadPanel(tab) {
+    if (tab === 'orders') return this._loadOrders();
+    if (tab === 'saved') return this._loadSaved();
+    if (tab === 'txns') return this._loadTxns();
+    if (tab === 'persona') return this._renderPersona();
+  },
+
+  _empty(titleKey, textKey, cta = true) {
+    return `<div class="state"><p class="state__title">${UI.esc(t(titleKey))}</p><p class="state__text">${UI.esc(t(textKey))}</p>
+      ${cta ? `<div class="state__actions"><a class="btn btn--primary" href="#/explore">${UI.esc(t('profile.goExplore'))}</a></div>` : ''}</div>`;
+  },
+
+  _failed(panel, err, tab) {
+    panel.innerHTML = `<div class="state" role="alert"><p class="state__title">${UI.esc(t('profile.loadError'))}</p><p class="state__text">${UI.esc(I18n.error(err))}</p>
+      <div class="state__actions"><button class="btn btn--ghost" type="button" data-reload="${tab}">${UI.icon('refresh')}${UI.esc(t('common.retry'))}</button></div></div>`;
   },
 
   async _loadOrders() {
+    const panel = document.getElementById('panel-orders');
+    if (!panel) return;
+    const seq = this._seq;
+    panel.innerHTML = '<div class="profile-list">' + '<div class="skeleton profile-row--skeleton"></div>'.repeat(2) + '</div>';
     try {
-      const res = await API.listOrders();
-      const orders = res.data || res || [];
-      const container = document.getElementById('profile-orders');
-      if (!orders.length) {
-        container.innerHTML = '<p class="profile-empty">暂无订单</p>';
-        return;
-      }
-      container.innerHTML = orders.map(o => `
-        <div class="profile-order-card">
-          <div class="profile-order-header">
-            <span class="profile-order-no">${o.order_no}</span>
-            <span class="profile-order-status profile-order-status--${o.status}">${this._statusText(o.status)}</span>
+      const [ordersRes, map] = await Promise.all([API.listOrders(), this._journeyMap()]);
+      if (seq !== this._seq) return;
+      const orders = ordersRes.data || [];
+      this._setCount('orders', orders.length);
+      if (!orders.length) { panel.innerHTML = this._empty('profile.orders.empty', 'profile.orders.emptyText'); return; }
+      const esc = UI.esc;
+      panel.innerHTML = `<ul class="profile-list">${orders.map((o) => {
+        const item = (o.items || [])[0] || {};
+        const j = map.get(item.journey_id);
+        const title = j ? j.title : item.journey_title;
+        return `<li class="profile-order" data-order="${o.id}">
+          ${j ? `<a href="#/journey/${encodeURIComponent(j.slug)}"><img src="${esc(j.image_url)}" alt="" width="64" height="64" loading="lazy"></a>` : '<span class="profile-order__ph"></span>'}
+          <div class="profile-order__main">
+            <b>${j ? `<a href="#/journey/${encodeURIComponent(j.slug)}">${esc(title)}</a>` : esc(title)}${item.quantity > 1 ? ` ×${item.quantity}` : ''}</b>
+            <p class="num">${esc(t('profile.orders.item', { no: o.order_no, date: I18n.date(o.created_at) }))}</p>
           </div>
-          <div class="profile-order-items">
-            ${(o.items || []).map(it => `<div class="profile-order-item">${it.journey_title} x${it.quantity} — ${it.subtotal.toLocaleString()} 币</div>`).join('')}
+          <div class="profile-order__side">
+            <span class="price">${esc(UI.coins(o.total_amount))}</span>
+            ${o.status === 'pending'
+              ? `<button class="btn btn--primary btn--sm" type="button" data-pay="${o.id}" data-journey="${j ? j.id : ''}">${esc(t('profile.orders.pay'))}</button>`
+              : `<span class="profile-status profile-order-status--${esc(o.status)}">${esc(t(`status.${o.status}`))}</span>`}
           </div>
-          <div class="profile-order-footer">
-            <span>合计: ${o.total_amount.toLocaleString()} 不思议币</span>
-            ${o.status === 'pending' ? `<button class="profile-btn profile-btn--small" onclick="Pages.Profile._payOrder(${o.id})">立即支付</button>` : ''}
-          </div>
-        </div>
-      `).join('');
+        </li>`;
+      }).join('')}</ul>`;
     } catch (err) {
-      console.error('Orders load failed:', err);
+      if (seq === this._seq) this._failed(panel, err, 'orders');
     }
   },
 
-  async _loadTransactions() {
+  async _loadSaved() {
+    const panel = document.getElementById('panel-saved');
+    if (!panel) return;
+    const seq = this._seq;
+    panel.innerHTML = `<div class="grid-cards profile-saved">${UI.skeletonCards(4)}</div>`;
+    try {
+      const res = await API.listSaved();
+      if (seq !== this._seq) return;
+      const list = res.data || [];
+      this._setCount('saved', list.length);
+      panel.innerHTML = list.length
+        ? `<div class="grid-cards profile-saved" id="profile-saved">${list.map((j) => UI.journeyCard(j)).join('')}</div>`
+        : this._empty('profile.saved.empty', 'profile.saved.emptyText');
+    } catch (err) {
+      if (seq === this._seq) this._failed(panel, err, 'saved');
+    }
+  },
+
+  async _loadTxns() {
+    const panel = document.getElementById('panel-txns');
+    if (!panel) return;
+    const seq = this._seq;
     try {
       const res = await API.listTransactions();
-      const txns = res.data || res || [];
-      const container = document.getElementById('profile-txns');
-      if (!txns.length) {
-        container.innerHTML = '<p class="profile-empty">暂无交易记录</p>';
-        return;
-      }
-      container.innerHTML = txns.map(t => `
-        <div class="profile-txn-row">
-          <span class="profile-txn-type profile-txn-type--${t.txn_type}">${this._txnText(t.txn_type)}</span>
-          <span class="profile-txn-amount ${t.amount > 0 ? 'profile-txn-amount--plus' : 'profile-txn-amount--minus'}">${t.amount > 0 ? '+' : ''}${t.amount.toLocaleString()}</span>
-          <span class="profile-txn-balance">余额 ${t.balance_after.toLocaleString()}</span>
-          <span class="profile-txn-date">${new Date(t.created_at).toLocaleString()}</span>
+      if (seq !== this._seq) return;
+      const txns = res.data || [];
+      this._setCount('txns', txns.length);
+      if (!txns.length) { panel.innerHTML = this._empty('profile.txns.empty', 'profile.orders.emptyText', false); return; }
+      const esc = UI.esc;
+      panel.innerHTML = `
+        <div class="profile-txns" id="profile-txns">
+          <div class="profile-txn-head" aria-hidden="true"><span>${esc(t('profile.txns.type'))}</span><span>${esc(t('profile.txns.amount'))}</span><span>${esc(t('profile.txns.balance'))}</span><span>${esc(t('profile.txns.time'))}</span></div>
+          <ul>${txns.map((x) => `
+            <li class="profile-txn-row">
+              <span class="profile-txn-type profile-txn-type--${esc(x.txn_type)}">${esc(t(`txn.${x.txn_type}`))}</span>
+              <span class="profile-txn-amount num ${x.amount > 0 ? 'is-plus' : 'is-minus'}">${x.amount > 0 ? '+' : '−'}${I18n.num(Math.abs(x.amount))}</span>
+              <span class="profile-txn-balance num"><span class="sr-only">${esc(t('profile.txns.balance'))} </span>${I18n.num(x.balance_after)}</span>
+              <time class="profile-txn-date" datetime="${esc(x.created_at)}">${esc(I18n.date(x.created_at))}</time>
+            </li>`).join('')}</ul>
+        </div>`;
+    } catch (err) {
+      if (seq === this._seq) this._failed(panel, err, 'txns');
+    }
+  },
+
+  _renderPersona(message) {
+    const panel = document.getElementById('panel-persona');
+    if (!panel || !this._user) return;
+    const esc = UI.esc;
+    const current = this._user.mbti_type;
+    panel.innerHTML = `
+      <div class="persona">
+        <p class="persona__intro">${esc(t('persona.intro'))}</p>
+        ${message ? `<p class="persona__saved alert alert--ok" role="status">${UI.icon('check')}<span>${esc(message)}</span></p>` : ''}
+        <div class="persona__groups" id="mbti-companion">
+          ${Object.entries(MBTI.groups).map(([g, codes]) => `
+            <div class="persona__group">
+              <h3>${esc(t(`persona.group.${g}`))}</h3>
+              <div class="persona__codes">${codes.map((c) => `
+                <button class="persona__code mbti-type" type="button" data-code="${c}" aria-pressed="${c === current}">
+                  <b>${c}</b><span>${esc(MBTI.name(c))}</span>
+                </button>`).join('')}</div>
+            </div>`).join('')}
         </div>
-      `).join('');
-    } catch (err) {
-      console.error('Transactions load failed:', err);
-    }
+        <button class="btn btn--quiet" type="button" data-action="quiz">${esc(t('persona.quiz'))}</button>
+        ${current ? `
+          <div class="persona__result">
+            <h3>${esc(current)} · ${esc(MBTI.name(current))}</h3>
+            <p>${esc(MBTI.trait(current))}</p>
+            <h4>${esc(t('persona.picks', { code: current }))}</h4>
+            <div class="grid-cards persona__picks" id="persona-picks">${UI.skeletonCards(3)}</div>
+          </div>` : ''}
+      </div>`;
+    if (current) this._loadPicks(current);
   },
 
-  async _payOrder(id) {
+  async _loadPicks(code) {
     try {
-      await API.payOrder(id);
-      alert('支付成功！');
-      this._loadOrders();
-      this._loadTransactions();
-      this._loadProfile();
-    } catch (err) {
-      alert('支付失败: ' + (err.message || '余额不足'));
+      const res = await API.getJourneys({ mbti: code, limit: 4 });
+      const el = document.getElementById('persona-picks');
+      if (el) el.innerHTML = (res.data || []).map((j) => UI.journeyCard(j)).join('');
+    } catch {
+      const el = document.getElementById('persona-picks');
+      if (el) el.innerHTML = '';
     }
   },
 
-  _statusText(status) {
-    const map = { pending: '待支付', paid: '已支付', cancelled: '已取消', refunded: '已退款' };
-    return map[status] || status;
-  },
-
-  _txnText(type) {
-    const map = { recharge: '充值', purchase: '消费', refund: '退款', bonus: '奖励' };
-    return map[type] || type;
-  },
-
-  /* ================================================================
-     MBTI Companion — Pet-like interactive personality selector
-     ================================================================ */
-  _renderMbtiCompanion() {
-    const container = document.getElementById('mbti-companion');
-    if (!container) return;
-
-    const saved = localStorage.getItem('user_mbti');
-    const selected = saved ? JSON.parse(saved) : null;
-
-    if (selected) {
-      this._showMbtiDetail(container, selected);
+  async _onClick(e) {
+    const pay = e.target.closest('[data-pay]');
+    if (pay) {
+      const map = await this._journeyMap();
+      const j = map.get(Number(pay.dataset.journey));
+      if (j) Checkout.resume(pay.dataset.pay, j, { onPaid: () => { this._loadOrders(); this._loadTxns(); this._refreshUser(); } });
       return;
     }
-
-    container.innerHTML = `
-      <div class="mbti-intro">
-        <p class="mbti-intro__text">选择你的 MBTI 类型，解锁专属旅行人格宠物。</p>
-        <p class="mbti-intro__hint">它会根据你的性格，推荐最适合你的不可思议旅程。</p>
-      </div>
-      <div class="mbti-groups">
-        ${Object.entries(this._mbtiData).map(([key, group]) => `
-          <div class="mbti-group" data-group="${key}">
-            <div class="mbti-group__header" style="--group-color: ${group.color}">
-              <span class="mbti-group__badge" style="background: ${group.color}">${group.name}</span>
-              <p class="mbti-group__desc">${group.desc}</p>
-            </div>
-            <div class="mbti-group__grid">
-              ${group.types.map(t => `
-                <button class="mbti-type" data-code="${t.code}" data-group="${key}">
-                  <span class="mbti-type__code">${t.code}</span>
-                  <span class="mbti-type__name">${t.name}</span>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-
-    container.querySelectorAll('.mbti-type').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const code = btn.dataset.code;
-        const groupKey = btn.dataset.group;
-        const group = this._mbtiData[groupKey];
-        const type = group.types.find(t => t.code === code);
-        if (type) {
-          localStorage.setItem('user_mbti', JSON.stringify({ ...type, groupName: group.name, groupColor: group.color }));
-          this._showMbtiDetail(container, { ...type, groupName: group.name, groupColor: group.color });
-          // Update profile badge
-          const mbtiBadge = document.getElementById('profile-mbti');
-          if (mbtiBadge) mbtiBadge.textContent = code;
-        }
-      });
-    });
+    const reload = e.target.closest('[data-reload]');
+    if (reload) { this._loadPanel(reload.dataset.reload); return; }
+    const code = e.target.closest('[data-code]');
+    if (code) { this._saveMbti(code.dataset.code, code); return; }
+    if (e.target.closest('[data-action="quiz"]') && window.Pet) window.Pet.startQuiz();
   },
 
-  _showMbtiDetail(container, data) {
-    container.innerHTML = `
-      <div class="mbti-result">
-        <div class="mbti-result__header" style="--group-color: ${data.groupColor}">
-          <span class="mbti-result__badge" style="background: ${data.groupColor}">${data.groupName}</span>
-          <h4 class="mbti-result__title">${data.code} · ${data.name}</h4>
-        </div>
-        <div class="mbti-result__body">
-          <p class="mbti-result__trait">${data.trait}</p>
-          <div class="mbti-result__travel">
-            <span class="mbti-result__label">适合旅程</span>
-            <p class="mbti-result__journeys">${data.travel}</p>
-          </div>
-        </div>
-        <button class="mbti-result__reset" onclick="Pages.Profile._resetMbti()">重新选择</button>
-      </div>
-    `;
+  async _saveMbti(code, btn) {
+    btn.setAttribute('aria-busy', 'true');
+    try {
+      await API.updateMBTI(code);
+      await this._refreshUser();
+      this._renderPersona(t('persona.saved', { code }));
+    } catch (err) {
+      btn.removeAttribute('aria-busy');
+      UI.toast(I18n.error(err));
+    }
   },
 
-  _resetMbti() {
-    localStorage.removeItem('user_mbti');
-    this._renderMbtiCompanion();
-    const mbtiBadge = document.getElementById('profile-mbti');
-    if (mbtiBadge) mbtiBadge.textContent = '未测试';
+  async _refreshUser() {
+    const user = await Session.refresh();
+    if (user) { this._user = user; this._renderHead(user); }
   },
 };

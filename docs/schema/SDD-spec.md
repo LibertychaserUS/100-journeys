@@ -38,7 +38,7 @@
 | 游客 | 快速理解产品并浏览幻想旅程 | `journeys`、`GET /api/journeys`、`#/`、`#/explore` |
 | 注册用户 | 保存身份、钱包、积分、订单和流水 | `users`、`orders`、`transactions`、JWT 路由 |
 | 管理员 | 查看真实指标并导出证据 | `admin_repo.go`、`analytics_events`、`audit_logs` |
-| 审阅者 | 审计开发过程、测试和交付物 | `docs/generated/`、`docs/testing/`、`app.xlsx` |
+| 维护者 / 代码审阅者 | 理解架构、测试证据和生成文档 | `docs/generated/`、`docs/testing/`、`app.xlsx` |
 | 维护者 | 本地运行、部署、备份、恢复 | `deploy/nginx.conf`、`scripts/backup-sqlite.sh`、`docs/ops/` |
 
 ## 3. 系统需求
@@ -60,6 +60,12 @@
 | `FR-SDD-011` | API 错误、panic、前端错误必须持久化审计。 | Must | `middleware/audit.go`、`AuditHandler` |
 | `FR-SDD-012` | 管理员必须能查看真实统计并导出 CSV/JSON。 | Must | `AdminRoutes`、`AdminRepository` |
 | `FR-SDD-013` | 管理员统计中的列表字段必须稳定返回 JSON array，不得因空结果变成 `null`。 | Must | `TestAdmin_Stats_EmptyMetricListsReturnArrays` |
+| `FR-SDD-014` | 旅程内容必须支持中英双语：`?lang=en` 返回英文标题、故事、地区与情绪词，并可用英文搜索。 | Must | `journey_translations`、`IT-API-I18N-001..004` |
+| `FR-SDD-015` | 登录用户必须能收藏/取消收藏旅程并在个人页查看。 | Must | `/api/auth/saved`、`IT-API-SAVED-001..003` |
+| `FR-SDD-016` | 用户选择或测出的 MBTI 必须保存到账户。 | Should | `PUT /api/auth/mbti`、`IT-API-MBTI-001` |
+| `FR-SDD-017` | 档位充值必须实际入账赠送，并在流水中单独记录。 | Must | `GET /api/payments/tiers`、`IT-API-PAY-001..003` |
+| `FR-SDD-018` | 每日登录奖励同一 UTC 日只发放一次。 | Should | `IT-API-AUTH-POINTS-001` |
+| `FR-SDD-019` | `index.html` 中的 CSS/JS 链接必须带资源版本号，避免 immutable 缓存导致新旧资源混用。 | Must | `internal/webapp`、`UT-WEB-001..003` |
 
 ### 3.2 非功能需求
 
@@ -83,7 +89,7 @@
 
 当前核心表：
 
-- 内容域：`journeys`、`tags`、`journey_tags`、`mbti_types`、`journey_mbti`
+- 内容域：`journeys`、`journey_translations`、`tags`、`journey_tags`、`mbti_types`、`journey_mbti`
 - 用户域：`users`、`user_points_history`、`user_saved_journeys`
 - 交易域：`orders`、`order_items`、`transactions`
 - 观测域：`analytics_events`、`audit_logs`
@@ -93,7 +99,9 @@
 - `transactions` 是 P0 财务审计账本。
 - `analytics_events` 是 P2，可降级，不能影响订单/支付。
 - `audit_logs` 是 P1 运维证据，当前全量写入会带来 SQLite 写压力，后续可归档或异步化。
-- `user_saved_journeys` 表已存在，但收藏 API/UX 尚未完成，不能在文档中写成完整功能。
+- `journeys` 保存基础语言（中文）内容；`journey_translations` 按 `(journey_id, locale)` 覆盖其他语言，空字段回退到基础内容。英文译文在 `db/seed.sql` 中以 upsert 写入，已有数据库启动时也会同步。
+- 每段旅程一张封面（`image_path`），卡片与详情页共用；seed 中的幂等 `UPDATE` 让已有数据库同步新封面。
+- `user_saved_journeys` 由 `/api/auth/saved` 读写。
 
 ## 5. 接口契约
 
@@ -118,23 +126,18 @@ JSON envelope:
 
 ## 6. 部署与环境约束
 
-当前交付路径：
+生产路径（详见 `docs/ops/AWS_LIGHTSAIL_RUNBOOK.md`）：
 
 ```text
 外部浏览器
--> Tencent Cloud CVM public IP: 49.232.207.220
--> Nginx reverse proxy / static cache
--> Go Gin API
--> SQLite WAL on persistent disk
--> backup-sqlite.sh
+-> AWS Lightsail (HTTPS, Nginx reverse proxy / static cache)
+-> Go Gin API (systemd)
+-> SQLite WAL on a separate data disk
+-> nightly backups
 ```
 
-中国大陆访问：
-
-- 当前已提供腾讯云公网 IP 演示，不使用未备案域名解析到中国大陆服务器。
-- 正式域名访问需完成 ICP 备案后再解析到腾讯云 CVM，并配置 HTTPS。
-- 阿里云中国大陆正式公网域名部署同样通常需要 ICP 备案；未备案不作为正式域名交付路线。
-- 非大陆地域可部署全栈，但大陆访问仍需实测，不等于国内优化。
+- `main` 上每次推送先跑 CI（Go、Playwright、k6 smoke），全绿后自动部署。
+- 中国大陆正式域名访问需要 ICP 备案；非大陆地域部署不等于国内访问优化，需要实测。
 
 ## 7. 验证要求
 
@@ -166,10 +169,9 @@ JSON envelope:
 
 ## 9. SDD 准入结论
 
-当前 SDD 基线可以支撑“中型独立站 MVP，具备明确生产边界”的提交口径。不得声称：
+当前 SDD 基线对应“中型独立站 MVP，具备明确生产边界”。不得声称：
 
 - 已接入真实支付。
 - 已保证中国大陆高速访问。
-- 已完成收藏全链路。
 - 已达到无限生产级。
 - 本地 HTTP 压测等于生产 HTTPS 部署。

@@ -1,110 +1,134 @@
 /**
- * api.js — Centralized HTTP client
- * All fetch calls go through here; base URLs from APP_CONFIG.
+ * api.js — HTTP client. Every call goes through request(); base URLs come from APP_CONFIG.
+ * Errors carry { status, apiError } from the { data, error } envelope; pages turn them into
+ * readable copy with I18n.error(err). Journey reads pass the UI language (?lang=).
  */
-
 const API = (() => {
   const base = () => window.APP_CONFIG.apiBase;
+  const TOKEN_KEY = 'auth_token';
+
+  function storedToken() {
+    try { return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY); } catch { return null; }
+  }
 
   async function request(path, options = {}) {
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    const headers = { ...(isFormData ? {} : { 'Content-Type': 'application/json' }), ...options.headers };
+    let res;
     try {
-      const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
-      const headers = {
-        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        ...options.headers,
-      };
-      const res = await fetch(`${base()}${path}`, {
-        ...options,
-        headers,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ message: res.statusText }));
-        const e = new Error(err.message || `HTTP ${res.status}`);
-        e.status = res.status;
-        throw e;
-      }
-      return res.json();
-    } catch (err) {
-      if (err.name === 'TypeError' || err.message.includes('fetch') || err.message.includes('Failed')) {
-        Pages.Error?.render(0, '网络断开，无法连接到服务器。');
-      } else if (err.status === 403) {
-        Pages.Error?.render(403);
-      } else if (err.status === 503) {
-        Pages.Error?.render(503);
-      }
-      throw err;
+      res = await fetch(`${base()}${path}`, { ...options, headers });
+    } catch (cause) {
+      const e = new Error('network error');
+      e.network = true;
+      e.cause = cause;
+      throw e;
     }
+    let body = null;
+    try { body = await res.json(); } catch {}
+    if (!res.ok) {
+      const e = new Error((body && (body.error || body.message)) || `HTTP ${res.status}`);
+      e.status = res.status;
+      e.apiError = body && body.error;
+      if (res.status === 401 && storedToken() && path.startsWith('/auth/')) {
+        // Expired or revoked token: drop it so the UI shows the signed-out state.
+        clearToken();
+        window.dispatchEvent(new CustomEvent('auth:changed'));
+      }
+      throw e;
+    }
+    return body;
   }
 
-  // Auth helpers
-  function authRequest(path, body) {
-    return request(path, { method: 'POST', body: JSON.stringify(body) });
-  }
+  const withLang = (params = {}) => ({ ...params, lang: I18n.apiLang });
+  const qs = (params) => {
+    const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== ''));
+    const s = new URLSearchParams(clean).toString();
+    return s ? `?${s}` : '';
+  };
 
   function authHeader() {
-    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    const token = storedToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
-
-  function authedRequest(path, options = {}) {
+  function authed(path, options = {}) {
     return request(path, { ...options, headers: { ...authHeader(), ...options.headers } });
+  }
+  const post = (path, body) => authed(path, { method: 'POST', body: JSON.stringify(body || {}) });
+
+  function setToken(token, remember = true) {
+    try {
+      if (remember) {
+        localStorage.setItem(TOKEN_KEY, token);
+        sessionStorage.removeItem(TOKEN_KEY);
+      } else {
+        sessionStorage.setItem(TOKEN_KEY, token);
+        localStorage.removeItem(TOKEN_KEY);
+      }
+    } catch {}
+  }
+  function clearToken() {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(TOKEN_KEY);
+    } catch {}
   }
 
   return {
     // Journeys
-    getJourneys: (params = {}) => {
-      const qs = new URLSearchParams(params).toString();
-      return request(`/journeys${qs ? '?' + qs : ''}`);
-    },
-    getJourney: (slug) => request(`/journeys/${slug}`),
-
-    // Tags
+    getJourneys: (params = {}) => request(`/journeys${qs(withLang(params))}`),
+    getJourney: (slug) => request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`),
     getTags: () => request('/tags'),
 
-    // Captcha
-    getCaptcha: () => request('/captcha'),
-
     // Auth
-    register: (data) => authRequest('/auth/register', data),
-    login: (data) => authRequest('/auth/login', data),
-    me: () => authedRequest('/auth/me'),
-    uploadAvatar: async (file) => {
+    getCaptcha: () => request('/captcha'),
+    register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+    login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+    me: () => authed('/auth/me'),
+    uploadAvatar: (file) => {
       const form = new FormData();
       form.append('avatar', file);
-      return authedRequest('/auth/avatar', { method: 'POST', body: form });
+      return authed('/auth/avatar', { method: 'POST', body: form });
     },
+    updateMBTI: (code) => authed('/auth/mbti', { method: 'PUT', body: JSON.stringify({ mbti_type: code }) }),
+
+    // Saved journeys
+    listSaved: () => authed(`/auth/saved${qs(withLang())}`),
+    saveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'PUT' }),
+    unsaveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'DELETE' }),
 
     // Orders
-    createOrder: (items) => authedRequest('/orders', { method: 'POST', body: JSON.stringify({ items }) }),
-    listOrders: () => authedRequest('/orders'),
-    payOrder: (id) => authedRequest(`/orders/${id}/pay`, { method: 'POST' }),
+    createOrder: (items) => post('/orders', { items }),
+    listOrders: () => authed('/orders'),
+    getOrder: (id) => authed(`/orders/${encodeURIComponent(id)}`),
+    payOrder: (id) => post(`/orders/${encodeURIComponent(id)}/pay`),
 
     // Payments
-    recharge: (amount) => authedRequest('/payments/recharge', { method: 'POST', body: JSON.stringify({ amount }) }),
-    listTransactions: () => authedRequest('/payments/transactions'),
+    rechargeTiers: () => request('/payments/tiers'),
+    recharge: (amount) => post('/payments/recharge', { amount }),
+    listTransactions: () => authed('/payments/transactions'),
 
     // Admin
-    adminStats: () => authedRequest('/admin/stats'),
-    adminUsers: () => authedRequest('/admin/users'),
+    adminStats: () => authed('/admin/stats'),
+    adminUsers: () => authed('/admin/users'),
+    adminExport: (format = 'csv') => fetch(`${base()}/admin/export?format=${format}`, { headers: authHeader() }),
+
+    // Analytics (fire-and-forget)
+    track: (type, slug) => {
+      try {
+        const payload = JSON.stringify({ type, journey_slug: slug || '' });
+        const url = `${base()}/analytics/events`;
+        if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }))) return;
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});
+      } catch {}
+    },
 
     // Media URL helper — CDN-aware
     mediaUrl: (path) => `${window.APP_CONFIG.mediaBase}/${path}`,
 
     // Auth state
-    isLoggedIn: () => !!(localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
-    getToken: () => localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'),
-    setToken: (t, remember = true) => {
-      if (remember) {
-        localStorage.setItem('auth_token', t);
-        sessionStorage.removeItem('auth_token');
-      } else {
-        sessionStorage.setItem('auth_token', t);
-        localStorage.removeItem('auth_token');
-      }
-    },
-    clearToken: () => {
-      localStorage.removeItem('auth_token');
-      sessionStorage.removeItem('auth_token');
-    },
+    isLoggedIn: () => !!storedToken(),
+    getToken: storedToken,
+    setToken,
+    clearToken,
   };
 })();

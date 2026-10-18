@@ -253,11 +253,11 @@ func TestOrderHandler_Pay_Success(t *testing.T) {
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &payRes))
 	assert.Equal(t, true, payRes["data"].(map[string]interface{})["paid"])
 
-	// Verify balance deducted
+	// Verify balance deducted (10,000 is a preset tier, so its bonus is credited too)
 	uid := int64(createRes["data"].(map[string]interface{})["user_id"].(float64))
 	user, err := userRepo.GetByID(t.Context(), uid)
 	require.NoError(t, err)
-	assert.Equal(t, 10000-2939, user.Balance)
+	assert.Equal(t, 10000+rechargeBonus(10000)-2939, user.Balance)
 }
 
 // UT-HANDLER-ORDER-005: Pay order insufficient balance

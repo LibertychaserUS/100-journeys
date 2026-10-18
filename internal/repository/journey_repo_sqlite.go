@@ -224,8 +224,24 @@ func (r *sqliteJourneyRepo) buildWhere(filter model.JourneyFilter) (string, []in
 
 	if strings.TrimSpace(filter.Query) != "" {
 		query := "%" + strings.ToLower(escapeLikeWildcards(strings.TrimSpace(filter.Query))) + "%"
-		conds = append(conds, `(LOWER(j.title) LIKE ? ESCAPE '\' OR LOWER(j.subtitle) LIKE ? ESCAPE '\' OR LOWER(j.story_hook) LIKE ? ESCAPE '\' OR LOWER(j.story) LIKE ? ESCAPE '\' OR LOWER(j.region) LIKE ? ESCAPE '\' OR LOWER(j.mood_keywords) LIKE ? ESCAPE '\')`)
+		match := `(LOWER(j.title) LIKE ? ESCAPE '\' OR LOWER(j.subtitle) LIKE ? ESCAPE '\' OR LOWER(j.story_hook) LIKE ? ESCAPE '\' OR LOWER(j.story) LIKE ? ESCAPE '\' OR LOWER(j.region) LIKE ? ESCAPE '\' OR LOWER(j.mood_keywords) LIKE ? ESCAPE '\')`
 		args = append(args, query, query, query, query, query, query)
+		if filter.Locale != "" {
+			// Also match the translation the user is reading, so English queries find English copy.
+			match = `(` + match + ` OR EXISTS (SELECT 1 FROM journey_translations tr WHERE tr.journey_id = j.id AND tr.locale = ?
+				AND (LOWER(tr.title) LIKE ? ESCAPE '\' OR LOWER(tr.subtitle) LIKE ? ESCAPE '\' OR LOWER(tr.story_hook) LIKE ? ESCAPE '\'
+				  OR LOWER(tr.story) LIKE ? ESCAPE '\' OR LOWER(tr.region) LIKE ? ESCAPE '\' OR LOWER(tr.mood_keywords) LIKE ? ESCAPE '\')))`
+			args = append(args, filter.Locale, query, query, query, query, query, query)
+		}
+		conds = append(conds, match)
+	}
+	if len(filter.IDs) > 0 {
+		placeholders := make([]string, len(filter.IDs))
+		for i, id := range filter.IDs {
+			placeholders[i] = "?"
+			args = append(args, id)
+		}
+		conds = append(conds, "j.id IN ("+strings.Join(placeholders, ",")+")")
 	}
 	if filter.TagSlug != "" {
 		conds = append(conds, "t.slug = ?")
@@ -330,6 +346,7 @@ func (r *sqliteJourneyRepo) preloadMBTI(ctx context.Context, journeys []model.Jo
 		FROM journey_mbti jm
 		INNER JOIN mbti_types m ON m.id = jm.mbti_id
 		WHERE jm.journey_id IN (%s)
+		ORDER BY jm.journey_id, jm.compatibility_score DESC, m.id
 	`, strings.Join(placeholders, ","))
 
 	rows, err := r.db.QueryContext(ctx, query, ids...)
@@ -348,6 +365,66 @@ func (r *sqliteJourneyRepo) preloadMBTI(ctx context.Context, journeys []model.Jo
 		jm.MBTIType.Description = desc.String
 		if idx, ok := idMap[journeyID]; ok {
 			journeys[idx].MBTITypes = append(journeys[idx].MBTITypes, jm)
+		}
+	}
+	return rows.Err()
+}
+
+// ApplyTranslations replaces base-language copy with the requested locale where a translation exists.
+func (r *sqliteJourneyRepo) ApplyTranslations(ctx context.Context, journeys []model.Journey, locale string) error {
+	if len(journeys) == 0 || locale == "" {
+		return nil
+	}
+	args := []interface{}{locale}
+	idMap := make(map[int64]int, len(journeys))
+	placeholders := make([]string, len(journeys))
+	for i, j := range journeys {
+		placeholders[i] = "?"
+		args = append(args, j.ID)
+		idMap[j.ID] = i
+	}
+	rows, err := r.db.QueryContext(ctx, fmt.Sprintf(`
+		SELECT journey_id, title, subtitle, story_hook, story, region, mood_keywords
+		FROM journey_translations
+		WHERE locale = ? AND journey_id IN (%s)`, strings.Join(placeholders, ",")), args...)
+	if err != nil {
+		return fmt.Errorf("load translations: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int64
+		var title string
+		var subtitle, storyHook, story, region, moods sql.NullString
+		if err := rows.Scan(&id, &title, &subtitle, &storyHook, &story, &region, &moods); err != nil {
+			return fmt.Errorf("scan translation: %w", err)
+		}
+		idx, ok := idMap[id]
+		if !ok {
+			continue
+		}
+		j := &journeys[idx]
+		j.Locale = locale
+		if title != "" {
+			j.Title = title
+		}
+		if subtitle.String != "" {
+			j.Subtitle = subtitle.String
+		}
+		if storyHook.String != "" {
+			j.StoryHook = storyHook.String
+		}
+		if story.String != "" {
+			j.Story = story.String
+		}
+		if region.String != "" {
+			j.Region = region.String
+		}
+		if moods.String != "" {
+			var keywords []string
+			if err := json.Unmarshal([]byte(moods.String), &keywords); err == nil && len(keywords) > 0 {
+				j.MoodKeywords = keywords
+			}
 		}
 	}
 	return rows.Err()

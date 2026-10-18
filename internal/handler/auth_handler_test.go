@@ -356,3 +356,34 @@ func TestAuth_UploadAvatar_BindsFileToUserID(t *testing.T) {
 func stringNumber(id int64) string {
 	return strconv.FormatInt(id, 10)
 }
+
+// IT-API-AUTH-POINTS-001: the login reward is granted once per day, not on every login.
+func TestAuth_Login_AwardsPointsOncePerDay(t *testing.T) {
+	r, userRepo, captchaStore := setupAuthTestRouter(t)
+	ctx := t.Context()
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte("mypassword"), bcrypt.DefaultCost)
+	user := &model.User{Username: "daily", Email: "daily@example.com", PasswordHash: string(hash), Role: model.RoleUser, Level: 1}
+	require.NoError(t, userRepo.Create(ctx, user))
+
+	login := func() {
+		cid, _, ans := captchaStore.Generate()
+		body, _ := json.Marshal(model.LoginRequest{Email: "daily@example.com", Password: "mypassword", CaptchaID: cid, CaptchaAnswer: ans})
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		r.ServeHTTP(w, req)
+		require.Equal(t, http.StatusOK, w.Code)
+	}
+
+	login()
+	afterFirst, err := userRepo.GetByID(ctx, user.ID)
+	require.NoError(t, err)
+	login()
+	login()
+	afterThird, err := userRepo.GetByID(ctx, user.ID)
+	require.NoError(t, err)
+
+	assert.Equal(t, 10, afterFirst.Points-user.Points, "first login of the day earns the reward")
+	assert.Equal(t, afterFirst.Points, afterThird.Points, "later logins the same day earn nothing")
+}

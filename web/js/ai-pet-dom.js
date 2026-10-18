@@ -1,304 +1,163 @@
 /**
- * AI Pet DOM Controller
- * Renders floating widget, setup modal, chat panel, MBTI quiz
- * Handles triggers: idle 10s, 3 page views
+ * AI pet widget — floating guide button + chat panel (non-modal dialog).
+ * Exposes window.Pet = { open, close, startQuiz } for other pages (e.g. the profile quiz link).
  */
-
-(function() {
+(function () {
   const container = document.getElementById('ai-pet');
   if (!container) return;
-
-  let profile = AIPet.getProfile();
-  if (profile.firstVisit) {
-    profile = { ...profile, name: profile.name || '小旅', type: profile.type || 'light', firstVisit: false };
-    AIPet.saveProfile(profile);
-  }
-  let chatOpen = false;
-  let pageViewCount = 0;
-  let idleTimer = null;
+  const esc = UI.esc;
+  let open = false;
   let quizAnswers = [];
   let quizStep = 0;
+  const history = []; // { who: 'pet'|'user', html }
 
-  // ── Render ──
   function render() {
     container.innerHTML = `
-      ${renderChat()}
-      ${renderAvatar()}
-    `;
-    bindEvents();
+      <section class="ai-pet__chat" id="ai-pet-chat" role="dialog" aria-modal="false" aria-labelledby="ai-pet-title" ${open ? '' : 'hidden'}>
+        <header class="ai-pet__header">
+          <img class="ai-pet__face" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="36" height="36">
+          <div><h2 class="ai-pet__name" id="ai-pet-title">${esc(AIPet.name())}</h2><p class="ai-pet__status">${esc(t('pet.status'))}</p></div>
+          <button class="icon-btn ai-pet__close" id="ai-pet-close" type="button" aria-label="${esc(t('pet.close'))}">${UI.icon('close')}</button>
+        </header>
+        <div class="ai-pet__messages" id="ai-pet-messages" aria-live="polite"></div>
+        <form class="ai-pet__input-area" id="ai-pet-form">
+          <label class="sr-only" for="ai-pet-input">${esc(t('pet.inputLabel'))}</label>
+          <input class="ai-pet__input" id="ai-pet-input" autocomplete="off" placeholder="${esc(t('pet.inputPh'))}">
+          <button class="btn btn--primary btn--sm ai-pet__send" id="ai-pet-send" type="submit">${esc(t('pet.send'))}</button>
+        </form>
+      </section>
+      <button class="ai-pet__avatar ${open ? '' : 'ai-pet__avatar--hint'}" id="ai-pet-avatar" type="button" aria-expanded="${open}" aria-controls="ai-pet-chat" aria-label="${esc(t('pet.open'))}">
+        <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="40" height="40">
+      </button>`;
+    const msgs = container.querySelector('#ai-pet-messages');
+    msgs.innerHTML = history.map((m) => `<div class="ai-pet__msg ai-pet__msg--${m.who}">${m.html}</div>`).join('');
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function renderSetup() {
-    return '';
-  }
-
-  function renderAvatar() {
-    return `
-      <div class="ai-pet__avatar ${chatOpen ? '' : 'ai-pet__avatar--bounce'}" id="ai-pet-avatar">
-        <img class="ai-pet__light" src="/static/assets/images/generated/guide-light.png" alt="旅行向导">
-      </div>
-    `;
-  }
-
-  function renderChat() {
-    return `
-      <div class="ai-pet__chat ${chatOpen ? 'ai-pet__chat--open' : ''}" id="ai-pet-chat">
-        <div class="ai-pet__header">
-          <div class="ai-pet__header-avatar">
-            <img class="ai-pet__light" src="/static/assets/images/generated/guide-light.png" alt="旅行向导">
-          </div>
-          <div>
-            <div class="ai-pet__header-name">${profile.name || '小旅'}</div>
-            <div class="ai-pet__header-status">在线</div>
-          </div>
-          <div class="ai-pet__close" id="ai-pet-close">✕</div>
-        </div>
-        <div class="ai-pet__messages" id="ai-pet-messages"></div>
-        <div class="ai-pet__input-area">
-          <input type="text" class="ai-pet__input" id="ai-pet-input" placeholder="和${profile.name || '小旅'}聊聊...">
-          <button class="ai-pet__send" id="ai-pet-send">发送</button>
-        </div>
-      </div>
-    `;
-  }
-
-  // ── Event Binding ──
-  function bindEvents() {
-    const avatar = document.getElementById('ai-pet-avatar');
-    const close = document.getElementById('ai-pet-close');
-    const send = document.getElementById('ai-pet-send');
-    const input = document.getElementById('ai-pet-input');
-
-    if (avatar) avatar.addEventListener('click', toggleChat);
-    if (close) close.addEventListener('click', closeChat);
-    if (send) send.addEventListener('click', sendMessage);
-    if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
-  }
-
-  // ── Setup ──
-  function openSetup() {
-    const modal = document.getElementById('ai-pet-setup');
-    if (modal) modal.classList.add('ai-pet__setup--open');
-  }
-
-  function closeSetup() {
-    const modal = document.getElementById('ai-pet-setup');
-    if (modal) modal.classList.remove('ai-pet__setup--open');
-  }
-
-  function completeSetup() {
-    const nameInput = document.getElementById('ai-pet-name');
-    const selectedType = document.querySelector('.ai-pet__type-option--selected');
-    const type = selectedType ? selectedType.dataset.type : 'dog';
-    const name = nameInput ? nameInput.value.trim() : '小旅';
-
-    profile = { ...profile, name: name || '小旅', type, firstVisit: false };
-    AIPet.saveProfile(profile);
-    closeSetup();
-    render();
-    openChat();
-    addPetMessage(`嗨~ 我是${profile.name}！🎉 以后我会陪你发现不可思议的旅行~ 你想先做个性格测试，还是让我直接推荐？`);
-  }
-
-  // ── Chat ──
-  function toggleChat() {
-    chatOpen = !chatOpen;
-    const chat = document.getElementById('ai-pet-chat');
-    const avatar = document.getElementById('ai-pet-avatar');
-    if (chat) chat.classList.toggle('ai-pet__chat--open', chatOpen);
-    if (avatar) avatar.classList.toggle('ai-pet__avatar--bounce', !chatOpen);
-  }
-
-  function openChat() {
-    chatOpen = true;
-    const chat = document.getElementById('ai-pet-chat');
-    const avatar = document.getElementById('ai-pet-avatar');
-    if (chat) chat.classList.add('ai-pet__chat--open');
-    if (avatar) avatar.classList.remove('ai-pet__avatar--bounce');
-  }
-
-  function closeChat() {
-    chatOpen = false;
-    const chat = document.getElementById('ai-pet-chat');
-    const avatar = document.getElementById('ai-pet-avatar');
-    if (chat) chat.classList.remove('ai-pet__chat--open');
-    if (avatar) avatar.classList.add('ai-pet__avatar--bounce');
-  }
-
-  function addUserMessage(text) {
-    const msgs = document.getElementById('ai-pet-messages');
+  function addMessage(who, html) {
+    history.push({ who, html });
+    const msgs = container.querySelector('#ai-pet-messages');
     if (!msgs) return;
     const div = document.createElement('div');
-    div.className = 'ai-pet__msg ai-pet__msg--user';
-    div.textContent = text;
+    div.className = `ai-pet__msg ai-pet__msg--${who}`;
+    div.innerHTML = html;
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function addPetMessage(text, actions = []) {
-    const msgs = document.getElementById('ai-pet-messages');
-    if (!msgs) return;
-    const div = document.createElement('div');
-    div.className = 'ai-pet__msg ai-pet__msg--pet';
-    div.innerHTML = escapeHtml(text);
-    if (actions && actions.length > 0) {
-      const actionsDiv = document.createElement('div');
-      actionsDiv.className = 'ai-pet__actions';
-      actions.forEach(a => {
-        const btn = document.createElement('button');
-        btn.className = 'ai-pet__action-btn';
-        btn.textContent = a.label;
-        btn.addEventListener('click', () => handleAction(a));
-        actionsDiv.appendChild(btn);
-      });
-      div.appendChild(actionsDiv);
+  function petSay(text, actions = []) {
+    const buttons = actions.length
+      ? `<div class="ai-pet__actions">${actions.map((a) => `<button class="chip chip--sm ai-pet__action-btn" type="button" data-pet-action="${esc(a.type)}" data-value="${esc(a.value || '')}">${esc(a.label)}</button>`).join('')}</div>`
+      : '';
+    addMessage('pet', `<p>${esc(text)}</p>${buttons}`);
+  }
+
+  function setOpen(next, { focus = true } = {}) {
+    open = next;
+    const chat = container.querySelector('#ai-pet-chat');
+    const avatar = container.querySelector('#ai-pet-avatar');
+    chat.hidden = !open;
+    avatar.setAttribute('aria-expanded', String(open));
+    avatar.classList.remove('ai-pet__avatar--hint');
+    if (open && !history.length) petSay(AIPet.copy().hello(), [{ type: 'recommend', label: AIPet.copy().btnRecommend }, { type: 'quiz', label: AIPet.copy().btnQuiz }]);
+    if (open && focus) container.querySelector('#ai-pet-input').focus();
+    if (!open && focus) avatar.focus();
+  }
+
+  async function recommend() {
+    const c = AIPet.copy();
+    const mbti = (Session.user && Session.user.mbti_type) || AIPet.getProfile().mbti;
+    petSay(c.finding);
+    try {
+      const res = await API.getJourneys(mbti ? { mbti, limit: 3 } : { limit: 3 });
+      const list = res.data || [];
+      if (!list.length) { petSay(c.none); return; }
+      addMessage('pet', `<p>${esc(c.found)}</p><ul class="ai-pet__links">${list.map((j) => `<li><a href="#/journey/${encodeURIComponent(j.slug)}">${esc(j.title)}</a></li>`).join('')}</ul>`);
+    } catch {
+      petSay(c.offline);
     }
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function sendMessage() {
-    const input = document.getElementById('ai-pet-input');
-    if (!input) return;
+  function startQuiz() {
+    if (!open) setOpen(true, { focus: false });
+    quizAnswers = [];
+    quizStep = 1;
+    askQuestion();
+  }
+
+  function askQuestion() {
+    const q = AIPet.question(quizStep);
+    if (!q) { finishQuiz(); return; }
+    const c = AIPet.copy();
+    addMessage('pet', `<p class="ai-pet__step">${esc(c.quizStep(quizStep, AIPet.quizLength))}</p><p><b>${esc(q.q)}</b></p>
+      <div class="ai-pet__quiz">${q.options.map((o, i) => `<button class="ai-pet__quiz-option" type="button" data-answer="${i}" data-step="${quizStep}">${esc(o.text)}</button>`).join('')}</div>`);
+    container.querySelector('.ai-pet__msg:last-child .ai-pet__quiz-option')?.focus();
+  }
+
+  async function finishQuiz() {
+    const c = AIPet.copy();
+    const { code } = AIPet.scoreMBTI(quizAnswers);
+    quizStep = 0;
+    AIPet.saveProfile({ ...AIPet.getProfile(), mbti: code });
+    let note = c.quizLogin;
+    if (API.isLoggedIn()) {
+      try {
+        await API.updateMBTI(code);
+        await Session.refresh();
+        note = c.quizSaved;
+        window.dispatchEvent(new CustomEvent('mbti:updated', { detail: code }));
+      } catch {}
+    }
+    petSay(`${c.quizDone(code)} ${note}`, [{ type: 'recommend', label: c.btnRecommend }]);
+  }
+
+  container.addEventListener('click', (e) => {
+    if (e.target.closest('#ai-pet-avatar')) { setOpen(!open); return; }
+    if (e.target.closest('#ai-pet-close')) { setOpen(false); return; }
+    const answer = e.target.closest('[data-answer]');
+    if (answer && Number(answer.dataset.step) === quizStep) {
+      answer.closest('.ai-pet__quiz').querySelectorAll('button').forEach((b) => { b.disabled = true; b.classList.toggle('is-chosen', b === answer); });
+      addMessage('user', esc(answer.textContent));
+      quizAnswers.push(Number(answer.dataset.answer));
+      quizStep++;
+      setTimeout(askQuestion, 250);
+      return;
+    }
+    const action = e.target.closest('[data-pet-action]');
+    if (action) {
+      const type = action.dataset.petAction;
+      if (type === 'recommend') recommend();
+      else if (type === 'quiz') startQuiz();
+      else if (type === 'filter') {
+        const range = action.dataset.value === 'hard' ? 'adventure_min=8&adventure_max=10' : 'adventure_min=1&adventure_max=4';
+        Router.navigate(`/explore?${range}`);
+      }
+      return;
+    }
+    if (e.target.closest('.ai-pet__links a') && window.matchMedia('(max-width: 760px)').matches) setOpen(false, { focus: false });
+  });
+
+  container.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = container.querySelector('#ai-pet-input');
     const text = input.value.trim();
     if (!text) return;
     input.value = '';
-    addUserMessage(text);
-
-    const result = AIPet.generateReply(text, profile);
-    setTimeout(() => {
-      addPetMessage(result.text, result.actions);
-    }, 400 + Math.random() * 300);
-  }
-
-  function handleAction(action) {
-    if (action.action === 'recommend' || action.type === 'recommend') {
-      addPetMessage('让我为你找找... 🔍', []);
-      // Trigger recommendation API
-      API.getJourneys({ limit: 3 }).then(data => {
-        const journeys = data.data || [];
-        if (journeys.length > 0) {
-          const msgs = document.getElementById('ai-pet-messages');
-          if (msgs) {
-            const div = document.createElement('div');
-            div.className = 'ai-pet__msg ai-pet__msg--pet';
-            let html = '为你找到了这些不可思议的旅行：✨<br>';
-            journeys.forEach(j => {
-              html += `<a href="#/journey/${encodeURIComponent(j.slug)}" class="ai-pet__journey-link" data-slug="${escapeHtml(j.slug)}">「${escapeHtml(j.title)}」</a><br>`;
-            });
-            html += '<br>点击名称查看详情哦！';
-            div.innerHTML = html;
-            msgs.appendChild(div);
-            msgs.scrollTop = msgs.scrollHeight;
-
-            // Bind router navigation
-            div.querySelectorAll('.ai-pet__journey-link').forEach(link => {
-              link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const slug = link.dataset.slug;
-                if (slug) Router.navigate(`#/journey/${encodeURIComponent(slug)}`);
-              });
-            });
-          }
-        } else {
-          addPetMessage('抱歉，暂时没有符合条件的旅行推荐... 换个条件试试？');
-        }
-      }).catch(() => {
-        addPetMessage('哎呀，网络有点问题... 等下再试试好吗？');
-      });
-    } else if (action.action === 'mbti_quiz' || action.type === 'mbti_quiz') {
-      startQuiz();
-    } else if (action.type === 'filter') {
-      const params = new URLSearchParams();
-      if (action.data?.risk_max != null) params.set('adventure_max', String(action.data.risk_max * 2));
-      if (action.data?.risk_min != null) params.set('adventure_min', String(action.data.risk_min * 2));
-      Router.navigate(`#/explore${params.toString() ? '?' + params.toString() : ''}`);
-      closeChat();
-    }
-  }
-
-  // ── MBTI Quiz ──
-  function startQuiz() {
-    quizAnswers = [];
-    quizStep = 1;
-    showQuizQuestion();
-  }
-
-  function showQuizQuestion() {
-    const q = AIPet.getQuizQuestion(quizStep);
-    if (!q) {
-      finishQuiz();
-      return;
-    }
-    const msgs = document.getElementById('ai-pet-messages');
-    if (!msgs) return;
-
-    const div = document.createElement('div');
-    div.className = 'ai-pet__msg ai-pet__msg--pet';
-    div.innerHTML = `
-      <div>问题 ${quizStep}/${AIPet.quizLength}：</div>
-      <div style="margin: 8px 0; font-weight: 600;">${escapeHtml(q.q)}</div>
-      <div class="ai-pet__quiz-options"></div>
-    `;
-    const optionsDiv = div.querySelector('.ai-pet__quiz-options');
-    q.options.forEach((opt, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'ai-pet__quiz-option';
-      btn.textContent = opt.text;
-      btn.addEventListener('click', () => answerQuiz(idx));
-      optionsDiv.appendChild(btn);
-    });
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-
-  function answerQuiz(answerIdx) {
-    quizAnswers.push(answerIdx);
-    quizStep++;
-    showQuizQuestion();
-  }
-
-  function finishQuiz() {
-    const result = AIPet.scoreMBTI(quizAnswers);
-    profile.mbti = result.code;
-    AIPet.saveProfile(profile);
-
-    addPetMessage(
-      `🎉 测试完成！你的旅行人格是 ${result.code}！\n\n` +
-      `让我为你推荐最适合 ${result.code} 型旅行者的不可思议体验~ ✨`,
-      [{ type: 'recommend', label: '查看推荐' }]
-    );
-  }
-
-  // ── Triggers ──
-  function onPageView() {
-    pageViewCount++;
-  }
-
-  function resetIdleTimer() {
-    if (idleTimer) clearTimeout(idleTimer);
-  }
-
-  // ── Utilities ──
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML.replace(/\n/g, '<br>');
-  }
-
-  // ── Init ──
-  document.addEventListener('mousemove', resetIdleTimer);
-  document.addEventListener('keydown', resetIdleTimer);
-  document.addEventListener('touchstart', resetIdleTimer);
-
-  window.addEventListener('hashchange', () => {
-    onPageView();
-    resetIdleTimer();
+    addMessage('user', esc(text));
+    const r = AIPet.reply(text);
+    setTimeout(() => petSay(r.text, r.actions), 300);
   });
 
-  // Count initial page load
-  onPageView();
-  resetIdleTimer();
+  container.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false); }
+  });
+
+  // Close on navigation on small screens, where the panel covers the page.
+  window.addEventListener('route:changed', () => {
+    if (open && window.matchMedia('(max-width: 760px)').matches) setOpen(false, { focus: false });
+  });
+  I18n.onChange(() => { history.length = 0; render(); });
 
   render();
+  window.Pet = { open: () => setOpen(true), close: () => setOpen(false), startQuiz };
 })();

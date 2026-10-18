@@ -1,1 +1,51 @@
-/* Hero Section — populated in DDD phase */
+/* =============================================================
+   HOME HERO — image-led, stays dark in both themes (it is a photo).
+   ============================================================= */
+
+.home-hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: min(92vh, 880px); display: flex; align-items: flex-end;
+  color: var(--color-on-media); background: #07080b;
+}
+.home-hero__img { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
+.home-hero__particles { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+/* Photo dissolves into the page instead of ending on a hard edge (matters most in the light theme). */
+.home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 72px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--color-bg)); }
+.home-hero__shade {
+  position: absolute; inset: 0; z-index: -2;
+  background:
+    linear-gradient(90deg, rgba(6, 7, 10, .86) 0%, rgba(6, 7, 10, .52) 45%, rgba(6, 7, 10, .06) 78%),
+    linear-gradient(0deg, rgba(6, 7, 10, .9) 0%, rgba(6, 7, 10, 0) 42%);
+}
+.home-hero__content { padding-block: calc(var(--nav-h) + var(--space-7)) clamp(48px, 10vh, 112px); }
+.home-hero__eyebrow { font-size: var(--text-sm); letter-spacing: .14em; color: rgba(246, 241, 232, .72); }
+.home-hero__title { margin-top: 14px; font-family: var(--font-story); font-weight: 700; font-size: clamp(3rem, 8vw, 6.25rem); line-height: 1.02; letter-spacing: .04em; }
+:lang(en) .home-hero__title { letter-spacing: 0; }
+.home-hero__lead { margin-top: 18px; max-width: 26em; font-size: clamp(1.125rem, 2.1vw, 1.5rem); line-height: 1.5; color: rgba(246, 241, 232, .92); text-wrap: balance; }
+
+.home-hero__search {
+  margin-top: var(--space-6); display: flex; align-items: center; gap: var(--space-2); max-width: 580px; min-height: 60px;
+  padding: 6px 6px 6px 20px; border-radius: 16px;
+  background: rgba(20, 22, 28, .62); border: 1px solid rgba(255, 255, 255, .18);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.home-hero__search:focus-within { border-color: #f2c46d; box-shadow: 0 0 0 3px rgba(242, 196, 109, .25); }
+.home-hero__search .icon { color: rgba(246, 241, 232, .6); }
+.home-hero__search input { flex: 1; min-width: 0; height: 46px; background: transparent; border: 0; outline: 0; font-size: var(--text-md); color: #f6f1e8; }
+.home-hero__search input::placeholder { color: rgba(246, 241, 232, .58); }
+.home-hero__search input::-webkit-search-cancel-button { filter: invert(1); }
+.home-hero__search .btn { min-height: 48px; border-radius: 12px; background: #f2c46d; color: #1d1405; }
+.home-hero__search .btn:hover { background: #f7d48c; }
+
+.home-hero__moods { margin-top: var(--space-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.home-hero__moods span { font-size: var(--text-sm); color: rgba(246, 241, 232, .66); margin-right: 4px; }
+.home-hero__moods .chip { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .2); color: #f6f1e8; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.home-hero__moods .chip:hover { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .34); }
+.home-hero :focus-visible { outline-color: #f2c46d; }
+
+@media (max-width: 760px) {
+  .home-hero { min-height: 88vh; }
+  .home-hero__shade { background: linear-gradient(0deg, rgba(6, 7, 10, .95) 0%, rgba(6, 7, 10, .55) 55%, rgba(6, 7, 10, .2) 100%); }
+  .home-hero__search { min-height: 54px; padding-left: 14px; }
+  .home-hero__search .btn { min-height: 42px; padding: 0 14px; }
+}

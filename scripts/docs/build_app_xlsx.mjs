@@ -299,7 +299,7 @@ const verificationRows = [
   ["k6 负载脚本", "tests/load/*.k6.js", "基线通过，auth/admin 重压边界已记录"],
   ["浏览器视觉审查", "tmp/visual-review/*.png", "已捕获桌面/移动、用户页、充值页和后台页；22 张截图，0 破图/溢出/控制台错误"],
   ["Playwright E2E", "cd e2e && npx playwright test", "通过，29/29"],
-  ["CI/CD", ".github/workflows/ci.yml", "workflow 已新增，远端运行待 push 后确认"],
+  ["CI/CD", ".github/workflows/ci.yml", "Go、Playwright E2E、k6 smoke；main 全绿后自动部署到 AWS Lightsail"],
 ];
 
 const sheetNames = ["Summary", "Test Cases", "Seed Samples", "Verification"];
