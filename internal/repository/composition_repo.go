@@ -18,6 +18,8 @@ var (
 	ErrCompositionTaken = errors.New("composition id already used")
 	// ErrCompositionLimit: the user already keeps the maximum number of tickets.
 	ErrCompositionLimit = errors.New("composition limit reached")
+	// ErrCompositionPosted: the ticket hangs on the station; take it down before changing it.
+	ErrCompositionPosted = errors.New("composition is on the station")
 )
 
 // CompositionRepository stores tickets kept in the compose game.
@@ -38,12 +40,12 @@ func NewCompositionRepository(db *sql.DB) CompositionRepository {
 	return &sqliteCompositionRepo{db: db}
 }
 
-const compositionColumns = `id, code, user_id, place, hour, season, stay, ritual, keepsake, created_at, updated_at`
+const compositionColumns = `id, code, user_id, place, hour, season, stay, ritual, keepsake, parent_code, created_at, updated_at`
 
 func scanComposition(row interface{ Scan(...interface{}) error }) (*model.Composition, error) {
 	var c model.Composition
 	p := &c.Picks
-	if err := row.Scan(&c.ID, &c.Code, &c.UserID, &p.Place, &p.Hour, &p.Season, &p.Stay, &p.Ritual, &p.Keepsake, &c.CreatedAt, &c.UpdatedAt); err != nil {
+	if err := row.Scan(&c.ID, &c.Code, &c.UserID, &p.Place, &p.Hour, &p.Season, &p.Stay, &p.Ritual, &p.Keepsake, &c.ParentCode, &c.CreatedAt, &c.UpdatedAt); err != nil {
 		return nil, err
 	}
 	c.CreatedAt = c.CreatedAt.UTC()
@@ -69,6 +71,13 @@ func (r *sqliteCompositionRepo) Upsert(ctx context.Context, c *model.Composition
 	case !created && owner != c.UserID:
 		return nil, false, ErrCompositionTaken
 	case !created:
+		var posted int
+		if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM ticket_posts p JOIN compositions c ON c.code = p.code WHERE c.id = ? AND p.status != 'removed'`, c.ID).Scan(&posted); err != nil {
+			return nil, false, fmt.Errorf("find post: %w", err)
+		}
+		if posted > 0 {
+			return nil, false, ErrCompositionPosted
+		}
 		if _, err := tx.ExecContext(ctx, `
 			UPDATE compositions SET place = ?, hour = ?, season = ?, stay = ?, ritual = ?, keepsake = ?, updated_at = ?
 			WHERE id = ? AND user_id = ?`,
@@ -94,9 +103,9 @@ func (r *sqliteCompositionRepo) Upsert(ctx context.Context, c *model.Composition
 				return nil, false, err
 			}
 			_, err = tx.ExecContext(ctx, `
-				INSERT INTO compositions (id, code, user_id, place, hour, season, stay, ritual, keepsake, created_at, updated_at)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-				c.ID, code, c.UserID, p.Place, p.Hour, p.Season, p.Stay, p.Ritual, p.Keepsake, createdAt.UTC(), now)
+				INSERT INTO compositions (id, code, user_id, place, hour, season, stay, ritual, keepsake, parent_code, created_at, updated_at)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+				c.ID, code, c.UserID, p.Place, p.Hour, p.Season, p.Stay, p.Ritual, p.Keepsake, parentFor(ctx, tx, c), createdAt.UTC(), now)
 			if err != nil && !strings.Contains(err.Error(), "compositions.code") {
 				return nil, false, fmt.Errorf("insert composition: %w", err)
 			}
@@ -104,6 +113,18 @@ func (r *sqliteCompositionRepo) Upsert(ctx context.Context, c *model.Composition
 		}
 		if !inserted {
 			return nil, false, errors.New("insert composition: could not find a free share code")
+		}
+		if parent := parentFor(ctx, tx, c); parent != "" {
+			// Setting out from a station ticket counts once per traveller towards its "often borrowed".
+			res, err := tx.ExecContext(ctx, `INSERT OR IGNORE INTO ticket_borrows (code, user_id, created_at) VALUES (?, ?, ?)`, parent, c.UserID, now)
+			if err != nil {
+				return nil, false, fmt.Errorf("borrow: %w", err)
+			}
+			if n, _ := res.RowsAffected(); n > 0 {
+				if _, err := tx.ExecContext(ctx, `UPDATE ticket_posts SET borrowed = borrowed + 1 WHERE code = ?`, parent); err != nil {
+					return nil, false, fmt.Errorf("borrow: %w", err)
+				}
+			}
 		}
 	}
 
@@ -168,4 +189,16 @@ func newShareCode() (string, error) {
 		b[i] = shareAlphabet[n.Int64()]
 	}
 	return string(b), nil
+}
+
+// parentFor keeps ParentCode only when it names a live station ticket of someone else.
+func parentFor(ctx context.Context, tx *sql.Tx, c *model.Composition) string {
+	if c.ParentCode == "" {
+		return ""
+	}
+	var owner int64
+	if err := tx.QueryRowContext(ctx, `SELECT user_id FROM ticket_posts WHERE code = ? AND status = 'live'`, c.ParentCode).Scan(&owner); err != nil || owner == c.UserID {
+		return ""
+	}
+	return c.ParentCode
 }

@@ -87,6 +87,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Level:        1,
 		Points:       0,
 		Gender:       req.Gender,
+		AgeBand:      req.AgeBand,
 	}
 
 	if err := h.userRepo.Create(c.Request.Context(), user); err != nil {

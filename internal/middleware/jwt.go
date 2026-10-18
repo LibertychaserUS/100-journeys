@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"net/http"
 	"os"
 	"strings"
@@ -17,6 +19,48 @@ func init() {
 	if len(jwtSecret) == 0 {
 		jwtSecret = []byte("100-journeys-dev-secret-change-in-production")
 	}
+}
+
+// DeriveKey returns a key for purpose derived from the signing secret, so other HMACs (author
+// hashes on the Ticket Road) need no secret of their own and never equal the token key.
+func DeriveKey(purpose string) []byte {
+	m := hmac.New(sha256.New, jwtSecret)
+	m.Write([]byte(purpose))
+	return m.Sum(nil)
+}
+
+// OptionalJWT reads a valid Bearer token when there is one and carries on either way: public
+// reads use it to leave out what a signed-in traveller asked not to see.
+func OptionalJWT() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		parts := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
+		if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+			if id, role, ok := parseToken(parts[1]); ok {
+				c.Set("user_id", id)
+				c.Set("role", role)
+			}
+		}
+		c.Next()
+	}
+}
+
+func parseToken(tokenStr string) (int64, string, bool) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return jwtSecret, nil
+	})
+	if err != nil || !token.Valid {
+		return 0, "", false
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, "", false
+	}
+	userID, _ := claims["user_id"].(float64)
+	role, _ := claims["role"].(string)
+	return int64(userID), role, userID > 0
 }
 
 // JWTAuth validates Bearer token and injects user info into context.

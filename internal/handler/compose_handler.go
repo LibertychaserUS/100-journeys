@@ -121,10 +121,14 @@ func (h *ComposeHandler) Keep(c *gin.Context) {
 		return
 	}
 	createdAt, _ := time.Parse(time.RFC3339, req.CreatedAt)
+	parent := req.ParentCode
+	if !compositionCode.MatchString(parent) {
+		parent = ""
+	}
 
-	saved, created, err := h.repo.Upsert(c.Request.Context(), &model.Composition{ID: req.ID, UserID: uid, Picks: req.Picks, CreatedAt: createdAt}, maxCompositions)
+	saved, created, err := h.repo.Upsert(c.Request.Context(), &model.Composition{ID: req.ID, UserID: uid, Picks: req.Picks, ParentCode: parent, CreatedAt: createdAt}, maxCompositions)
 	switch {
-	case errors.Is(err, repository.ErrCompositionTaken):
+	case errors.Is(err, repository.ErrCompositionTaken), errors.Is(err, repository.ErrCompositionPosted):
 		c.JSON(http.StatusConflict, newErrorEnvelope(err.Error()))
 	case errors.Is(err, repository.ErrCompositionLimit):
 		c.JSON(http.StatusBadRequest, newErrorEnvelope(err.Error()))

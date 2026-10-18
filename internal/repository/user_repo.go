@@ -44,9 +44,9 @@ func NewUserRepository(db *sql.DB) UserRepository {
 func (r *sqliteUserRepo) Create(ctx context.Context, user *model.User) error {
 	return retryBusy(ctx, func() error {
 		res, err := r.db.ExecContext(ctx,
-			`INSERT INTO users (username, email, password_hash, role, level, points, balance, mbti_type, gender, avatar_url)
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			user.Username, user.Email, user.PasswordHash, user.Role, user.Level, user.Points, user.Balance, user.MBTIType, normalizedGender(user.Gender), user.AvatarURL)
+			`INSERT INTO users (username, email, password_hash, role, level, points, balance, mbti_type, gender, avatar_url, age_band)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			user.Username, user.Email, user.PasswordHash, user.Role, user.Level, user.Points, user.Balance, user.MBTIType, normalizedGender(user.Gender), user.AvatarURL, user.AgeBand)
 		if err != nil {
 			return fmt.Errorf("create user: %w", err)
 		}
@@ -60,10 +60,10 @@ func (r *sqliteUserRepo) GetByEmail(ctx context.Context, email string) (*model.U
 	var u model.User
 	var mbtiType, gender, avatarURL sql.NullString
 	err := r.db.QueryRowContext(ctx,
-		`SELECT id, username, email, password_hash, role, level, points, balance, mbti_type, gender, avatar_url, created_at, updated_at
+		`SELECT id, username, email, password_hash, role, level, points, balance, mbti_type, gender, avatar_url, age_band, created_at, updated_at
 		 FROM users WHERE email = ?`, email).Scan(
 		&u.ID, &u.Username, &u.Email, &u.PasswordHash, &u.Role, &u.Level, &u.Points, &u.Balance,
-		&mbtiType, &gender, &avatarURL, &u.CreatedAt, &u.UpdatedAt)
+		&mbtiType, &gender, &avatarURL, &u.AgeBand, &u.CreatedAt, &u.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -80,10 +80,10 @@ func (r *sqliteUserRepo) GetByID(ctx context.Context, id int64) (*model.User, er
 	var u model.User
 	var mbtiType, gender, avatarURL sql.NullString
 	err := r.db.QueryRowContext(ctx,
-		`SELECT id, username, email, password_hash, role, level, points, balance, mbti_type, gender, avatar_url, created_at, updated_at
+		`SELECT id, username, email, password_hash, role, level, points, balance, mbti_type, gender, avatar_url, age_band, created_at, updated_at
 		 FROM users WHERE id = ?`, id).Scan(
 		&u.ID, &u.Username, &u.Email, &u.PasswordHash, &u.Role, &u.Level, &u.Points, &u.Balance,
-		&mbtiType, &gender, &avatarURL, &u.CreatedAt, &u.UpdatedAt)
+		&mbtiType, &gender, &avatarURL, &u.AgeBand, &u.CreatedAt, &u.UpdatedAt)
 	u.MBTIType = mbtiType.String
 	u.Gender = normalizedGender(gender.String)
 	u.AvatarURL = avatarURL.String

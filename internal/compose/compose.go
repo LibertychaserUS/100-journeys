@@ -34,7 +34,17 @@ type Fragment struct {
 	Realm string `json:"realm,omitempty"` // optional, used to suggest slips that belong together
 	ZH    Text   `json:"zh"`
 	EN    Text   `json:"en"`
+
+	// Filled by Build, never read from fragments.json.
+	Unlock     string `json:"-"` // UnlockStarter, UnlockOpen, UnlockFinish or UnlockFork+option
+	Doors      []int  `json:"-"` // entrance numbers this slip is rubbed at
+	EntranceNo int    `json:"-"` // the one door a place or keepsake belongs to; 0 otherwise
+	Derived    bool   `json:"-"` // made from an entrance file rather than written in fragments.json
+	door       *Door
 }
+
+// ID is the slip's id across groups, as rubbings store it ("keepsake:keep-1-postcard").
+func (f Fragment) ID() string { return f.Group + ":" + f.Key }
 
 // Text is the copy of a slip in one language.
 type Text struct {
@@ -53,6 +63,9 @@ type Localized struct {
 	Realm    string `json:"realm,omitempty"`
 	Slug     string `json:"slug,omitempty"`
 	ImageURL string `json:"image_url,omitempty"`
+	Unlock   string `json:"unlock,omitempty"`
+	No       int    `json:"no,omitempty"`   // the door it belongs to (place, keepsake)
+	Door     *Door  `json:"door,omitempty"` // where to rub it, for the tray's outlines
 }
 
 // Load reads the embedded slips in file order.
@@ -91,6 +104,9 @@ func Validate(fragments []Fragment) []string {
 		if f.Realm != "" && !content.Contains(content.Realms, f.Realm) {
 			add("%s: unknown realm %q", id, f.Realm)
 		}
+		if f.Derived && f.Group == "keepsake" && f.EntranceNo == 0 {
+			add("%s: a keepsake from a fork needs its door", id)
+		}
 		if f.Slug != "" && (f.Group != "place" || !kebab.MatchString(f.Slug)) {
 			add("%s: only places link to an entrance slug", id)
 		}
@@ -99,6 +115,9 @@ func Validate(fragments []Fragment) []string {
 			t    Text
 			max  int
 		}{{"zh", f.ZH, 14}, {"en", f.EN, 40}} {
+			if f.Derived && f.Group == "keepsake" {
+				lang.max = map[string]int{"zh": maxDerivedZH, "en": maxDerivedEN}[lang.name]
+			}
 			if strings.TrimSpace(lang.t.Text) == "" {
 				add("%s: %s.text is required", id, lang.name)
 				continue
@@ -126,7 +145,11 @@ func (f Fragment) Localize(lang string) Localized {
 	if phrase == "" {
 		phrase = t.Text
 	}
-	return Localized{Group: f.Group, Key: f.Key, Text: t.Text, Sub: t.Sub, Phrase: phrase, Realm: f.Realm, Slug: f.Slug}
+	l := Localized{Group: f.Group, Key: f.Key, Text: t.Text, Sub: t.Sub, Phrase: phrase, Realm: f.Realm, Slug: f.Slug, Unlock: f.Unlock, No: f.EntranceNo}
+	if f.door != nil {
+		l.Door = f.door.localize(lang)
+	}
+	return l
 }
 
 // Set answers whether a group has a key, for validating kept tickets.
