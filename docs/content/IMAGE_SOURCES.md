@@ -11,6 +11,8 @@ step are in [COVER_PROMPTS.md](COVER_PROMPTS.md).
 The covers for entrances 6–48 were generated at 1120 × 1400 and resized to 720 × 900. Each was
 checked at full size for text, logos and recognisable faces; on `spain-camino-finisterre` a
 small made-up wordmark on the backpack was painted out.
+All 42 share a light grade to match the site: about 16% less saturation, slightly lifted and
+cooled shadows, a little fine grain.
 
 | File | Used by |
 |---|---|
