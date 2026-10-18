@@ -289,27 +289,6 @@ def mermaid_user_cases() -> str:
 """
 
 
-def mermaid_gantt() -> str:
-    return """gantt
-    title 100 Journeys Delivery Timeline / 交付时间线
-    dateFormat  YYYY-MM-DD
-    axisFormat  %m-%d
-    section Foundation
-    Skeleton and governance        :done, p0, 2026-05-13, 1d
-    SDD schema and API contract    :done, p1, 2026-05-13, 1d
-    DDD vanilla SPA implementation :done, p2, 2026-05-13, 1d
-    TDD and E2E baseline           :done, p3, 2026-05-13, 1d
-    section Feature Expansion
-    Auth, profile, order, payment  :done, p4, 2026-05-13, 1d
-    v1.2 UX and operations pass    :done, p5, 2026-05-13, 1d
-    section Production Readiness
-    Taoyuan frontend redesign      :done, p6, 2026-05-14, 1d
-    Admin analytics and audit      :done, p7, 2026-05-14, 1d
-    Stress matrix and runbooks     :done, p8, 2026-05-14, 1d
-    k6 and Nginx verification      :done, p9, 2026-05-14, 1d
-"""
-
-
 def source_alignment_markdown(tables: list[Table], routes_: list[Route], frontend: list[str], groups: dict[str, list[str]]) -> str:
     lines = [
         "# 生成文档来源对齐 / Generated Artifact Source Alignment",
@@ -326,7 +305,6 @@ def source_alignment_markdown(tables: list[Table], routes_: list[Route], fronten
         "| `sample-journeys.md` | `db/schema.sql`, `db/seed.sql` | Same generated seed data as CSV, formatted as a reviewer-readable table. |",
         "| `user-cases.mmd` | `web/js/router.js`, auth/admin/order/payment handlers | Actors only cover implemented routes and role gates. |",
         "| `system-dag.mmd` | `cmd/server/main.go`, repository/service/handler wiring | Nodes reflect instantiated runtime dependencies. |",
-        "| `delivery-gantt.mmd` | `git log`, maintained trace docs | Timeline reflects committed phase progression. |",
         "",
         "## 当前计数 / Current Counts",
         "",
@@ -546,7 +524,6 @@ def main() -> None:
     write(OUT / "database-er.mmd", mermaid_er(tables))
     write(OUT / "system-dag.mmd", mermaid_system_dag())
     write(OUT / "user-cases.mmd", mermaid_user_cases())
-    write(OUT / "delivery-gantt.mmd", mermaid_gantt())
     write(OUT / "api-routes.md", api_markdown(routes_))
     write(OUT / "frontend-routes.md", route_markdown(frontend))
     write(OUT / "test-evidence.md", test_markdown(tests))
@@ -564,7 +541,6 @@ def main() -> None:
         "- `database-er.mmd` - SQLite ER 图源。",
         "- `system-dag.mmd` - 运行时系统 DAG 图源。",
         "- `user-cases.mmd` - 角色/用例图源。",
-        "- `delivery-gantt.mmd` - 交付 Gantt 图源。",
         "- `api-routes.md` - 生成 API 路由矩阵。",
         "- `frontend-routes.md` - 生成 SPA 路由矩阵。",
         "- `test-evidence.md` - 生成测试文件证据矩阵。",

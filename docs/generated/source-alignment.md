@@ -12,7 +12,6 @@
 | `sample-journeys.md` | `db/schema.sql`, `db/seed.sql` | Same generated seed data as CSV, formatted as a reviewer-readable table. |
 | `user-cases.mmd` | `web/js/router.js`, auth/admin/order/payment handlers | Actors only cover implemented routes and role gates. |
 | `system-dag.mmd` | `cmd/server/main.go`, repository/service/handler wiring | Nodes reflect instantiated runtime dependencies. |
-| `delivery-gantt.mmd` | `git log`, maintained trace docs | Timeline reflects committed phase progression. |
 
 ## 当前计数 / Current Counts
 
