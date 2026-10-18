@@ -56,9 +56,25 @@ const Router = (() => {
     document.body.dataset.page = found ? found.route.pattern.split('/')[1] || 'home' : 'notfound';
     current = { route: found && found.route, key };
 
-    if (!force) window.scrollTo(0, 0);
-    if (found) found.route.page.render(ctx);
-    else Pages.Error.render(404);
+    const page = found ? found.route.page : null;
+    const name = document.body.dataset.page;
+    const run = () => {
+      if (!force) window.scrollTo(0, 0);
+      UI.setMeta({ title: name === 'home' ? '' : (t(`meta.page.${name}`) !== `meta.page.${name}` ? t(`meta.page.${name}`) : '') });
+      const out = page ? page.render(ctx) : Pages.Error.render(404);
+      // Wait briefly for an async page (detail) so the transition captures the new state.
+      return out && typeof out.then === 'function' ? Promise.race([out, new Promise((r) => setTimeout(r, 700))]) : undefined;
+    };
+    const animate = !firstRender && !force && document.startViewTransition && document.visibilityState === 'visible'
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (animate) {
+      // The update must run exactly once even if the browser never paints the old state
+      // (an occluded window): fall back to a plain swap after a short wait.
+      let ran = false;
+      const once = () => { if (ran) return undefined; ran = true; return run(); };
+      const vt = document.startViewTransition(once);
+      setTimeout(() => { if (!ran) { if (vt.skipTransition) vt.skipTransition(); once(); } }, 350);
+    } else run();
 
     window.dispatchEvent(new CustomEvent('route:changed', { detail: ctx }));
     if (!firstRender && !force) {

@@ -73,10 +73,24 @@ const API = (() => {
     } catch {}
   }
 
+  // Journey details are cached for a minute so a hover or press can prefetch them and the
+  // page (and its shared-image transition) can render without waiting on the network.
+  const journeyCache = new Map();
+  function cachedJourney(slug) {
+    const key = `${slug}|${(window.I18n && I18n.lang) || ''}`;
+    const hit = journeyCache.get(key);
+    if (hit && Date.now() - hit.at < 60000) return hit.promise;
+    const promise = request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`);
+    journeyCache.set(key, { at: Date.now(), promise });
+    promise.catch(() => journeyCache.delete(key));
+    return promise;
+  }
+
   return {
     // Journeys
     getJourneys: (params = {}) => request(`/journeys${qs(withLang(params))}`),
-    getJourney: (slug) => request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`),
+    getJourney: (slug) => cachedJourney(slug),
+    prefetchJourney: (slug) => { cachedJourney(slug).catch(() => {}); },
     getTags: () => request('/tags'),
 
     // Auth

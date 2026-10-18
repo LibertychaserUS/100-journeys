@@ -66,3 +66,17 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
 }
+
+/* Route transitions (View Transitions API): the nav stays put, pages cross-fade, and a clicked
+   journey card's image grows into the journey's opening. */
+#main-nav { view-transition-name: site-nav; }
+.scene__media--hero img { view-transition-name: journey-hero; }
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) { animation: vt-out 240ms var(--ease-in-out) both; }
+  ::view-transition-new(root) { animation: vt-in 420ms var(--ease-out) both; }
+  ::view-transition-group(journey-hero) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(journey-hero), ::view-transition-new(journey-hero) { animation-duration: 640ms; height: 100%; object-fit: cover; }
+}
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+@keyframes vt-out { to { opacity: 0; filter: blur(4px); } }
+@keyframes vt-in { from { opacity: 0; transform: translate3d(0, 14px, 0); } }

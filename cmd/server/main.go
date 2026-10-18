@@ -184,10 +184,52 @@ func main() {
 		handler.PaymentRoutes(api, paymentH)
 	}
 
+	assetVersion := os.Getenv("ASSET_VERSION")
+
+	// Journey share links: the same SPA shell, with the journey's title, hook and cover as
+	// Open Graph tags (crawlers don't run JS); the page itself redirects into #/journey/:slug.
+	r.GET("/j/:slug", func(c *gin.Context) {
+		content, err := os.ReadFile("./web/index.html")
+		if err != nil {
+			c.String(http.StatusInternalServerError, "index.html not found")
+			return
+		}
+		version := assetVersion
+		if version == "" {
+			version = webapp.AssetVersion("./web")
+		}
+		page := webapp.RenderIndex(string(content), webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version})
+		lang := service.NormalizeLocale(c.Query("lang"))
+		j, err := svc.GetJourneyLocalized(c.Request.Context(), c.Param("slug"), lang)
+		if err == nil && j != nil {
+			scheme := "http"
+			if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+				scheme = "https"
+			}
+			origin := scheme + "://" + c.Request.Host
+			image := j.ImageURL
+			if j.Scene != nil && j.Scene.Images.Hero != "" {
+				image = j.Scene.Images.Hero
+			}
+			if strings.HasPrefix(image, "/") {
+				image = origin + image
+			}
+			locale, brand := "zh_CN", "桃源百旅"
+			if lang == "en" {
+				locale, brand = "en_US", "100 Journeys"
+			}
+			page = webapp.RenderShare(page, webapp.ShareMeta{
+				Title: j.Title + " · " + brand, Description: j.StoryHook, Image: image,
+				URL: origin + "/j/" + j.Slug, Locale: locale,
+			})
+		}
+		c.Header("Cache-Control", "no-cache")
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(page))
+	})
+
 	// SPA fallback: serve index.html for non-API, non-static routes.
 	// Injects window.APP_CONFIG and versions CSS/JS links (ASSET_VERSION env pins it; otherwise
 	// it is fingerprinted from web/ so edits and deploys bust the immutable /static cache).
-	assetVersion := os.Getenv("ASSET_VERSION")
 	r.NoRoute(func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
 			c.JSON(http.StatusNotFound, gin.H{"data": nil, "error": "not found"})

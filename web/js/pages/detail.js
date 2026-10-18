@@ -29,10 +29,11 @@ Pages.Detail = {
         </div></header>
       </article>`;
 
-    API.getJourney(ctx.params.slug)
+    return API.getJourney(ctx.params.slug)
       .then((res) => {
         if (seq !== this._seq) return;
         this._journey = res.data;
+        UI.setMeta({ title: res.data.title, description: res.data.story_hook });
         this._renderPage(res.data);
         if (res.data.content) {
           Guest.markOpened(res.data.slug);
@@ -451,7 +452,7 @@ Pages.Detail = {
   },
 
   async _share(j, btn) {
-    const url = window.location.href.split('?')[0];
+    const url = `${window.location.origin}/j/${encodeURIComponent(j.slug)}${I18n.lang === 'en' ? '?lang=en' : ''}`;
     btn.dataset.copied = 'true';
     setTimeout(() => { delete btn.dataset.copied; }, 1500);
     if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {

@@ -6,13 +6,25 @@
   <title>桃源百旅 · 一百种不可思议的旅行</title>
   <meta name="description" content="桃源百旅 · 100 Journeys — 按心情、MBTI 和幻想类型进入的故事化旅行灵感。Story-driven fantasy travel by mood and personality." />
   <meta name="theme-color" content="#0d0f13" />
-  <link rel="icon" type="image/png" href="/static/assets/images/generated/brand-mark-128.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="桃源百旅 · 100 Journeys" />
+  <meta property="og:title" content="桃源百旅 · 一百种不可思议的旅行" />
+  <meta property="og:description" content="一百个藏在真实地方的入口，各自只在一个季节、一个时辰打开。" />
+  <meta property="og:image" content="/static/assets/images/generated/hero-taoyuan-1600.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/static/assets/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/static/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/static/assets/icons/manifest.json" />
   <link rel="preload" as="image" href="/static/assets/images/generated/hero-taoyuan-1600.jpg"
         imagesrcset="/static/assets/images/generated/hero-taoyuan-960.jpg 960w, /static/assets/images/generated/hero-taoyuan-1600.jpg 1600w" imagesizes="100vw" fetchpriority="high" />
 
   <!-- Theme before first paint: saved choice, else the OS preference. -->
   <script>
     (function () {
+      // Share links (/j/<slug>) open the journey inside the app.
+      var share = /^\/j\/([a-z0-9-]+)\/?$/.exec(location.pathname);
+      if (share) history.replaceState(null, '', '/' + location.search + '#/journey/' + share[1]);
       var saved = null;
       try { saved = localStorage.getItem('theme'); } catch (e) {}
       var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;

@@ -93,6 +93,29 @@ const UI = (() => {
     card.style.setProperty('--my', `${e.clientY - r.top}px`);
   }, { passive: true });
 
+  /** Page title and description (the server renders share tags for /j/:slug). */
+  function setMeta({ title, description } = {}) {
+    document.title = title ? `${title} · ${t('brand')}` : t('meta.title');
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', description || t('meta.description'));
+  }
+
+  // Journey cards prefetch on hover, focus or press, and lend their image to the detail page's
+  // opening (a shared-element view transition) when clicked.
+  const cardSel = 'a[href^="#/journey/"]';
+  const slugOf = (a) => decodeURIComponent((a.getAttribute('href') || '').replace('#/journey/', '').split('?')[0]);
+  ['pointerover', 'focusin', 'pointerdown'].forEach((type) => document.addEventListener(type, (e) => {
+    const a = e.target.closest && e.target.closest(cardSel);
+    if (a) API.prefetchJourney(slugOf(a));
+  }, { passive: true }));
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest(cardSel);
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+    document.querySelectorAll('[style*="view-transition-name"]').forEach((el) => { el.style.viewTransitionName = ''; });
+    const img = a.querySelector('img');
+    if (img) img.style.viewTransitionName = 'journey-hero';
+  });
+
   function trackCardClicks(root) {
     root.addEventListener('click', (e) => {
       const card = e.target.closest('[data-slug]');
@@ -163,7 +186,7 @@ const UI = (() => {
 
   return {
     icon, esc, fantasyTypes, fantasyLabel, tagLabel, region, topMbti, coins, meter,
-    journeyCard, skeletonCards, trackCardClicks, toast, sheet,
+    journeyCard, skeletonCards, trackCardClicks, toast, sheet, setMeta,
   };
 })();
 

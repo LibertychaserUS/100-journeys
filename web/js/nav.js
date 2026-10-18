@@ -173,7 +173,6 @@ const Nav = (() => {
     window.addEventListener('session:updated', render);
     window.addEventListener('route:changed', () => { menuOpen = false; drawerOpen = false; render(); });
     const applyStatic = () => {
-      document.title = t('meta.title');
       const skip = document.getElementById('skip-link');
       if (skip) skip.textContent = t('skip');
     };
