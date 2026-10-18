@@ -5,7 +5,7 @@
 [![CodeRabbit](https://img.shields.io/badge/CodeRabbit-review%20actioned-orange)](https://github.com/LibertychaserUS/100-journeys/pull/1)
 [![Stress](https://img.shields.io/badge/stress-target%20profile%20passing-green)](docs/ops/LOAD_TEST_RESULTS.md)
 [![k6](https://img.shields.io/badge/k6-baseline%20recorded-blue)](docs/ops/LOAD_TEST_RESULTS.md)
-[![E2E Tests](https://img.shields.io/badge/E2E%20tests-Playwright%2029%2F29%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
+[![E2E Tests](https://img.shields.io/badge/E2E%20tests-Playwright%2063%2F63%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
 
 中文：**100种不可思议的旅行** 是一个轻量级全栈 Web App MVP，以“情绪 / MBTI / 隐藏身份 / 奇幻旅程”为入口，把旅行内容做成故事卡片、AI 宠物陪伴、WonderCoin 模拟下单和后台统计证据闭环。
 
@@ -37,9 +37,9 @@ English: The domain filing is not complete yet, so the public demo uses the Tenc
 | Hidden admin login | <http://49.232.207.220/#/admin-login> |
 | Admin account | `[DEMO_ADMIN]` / `[DEMO_ADMIN_PASSWORD]` |
 
-中文：建议使用夜间模式查看，整体视觉观感最佳。
+中文：深色与浅色两套主题都已适配（WCAG AA 对比度，axe 自动扫描），界面可在中文 / English 之间切换，12 段旅程均有英文内容。
 
-English: Dark mode is recommended for the best visual experience.
+English: Both dark and light themes are supported (WCAG AA contrast, checked by automated axe scans), and the UI switches between Chinese and English, including English copy for all 12 journeys.
 
 中文：公网演示账号属于临时演示凭据，演示结束后可轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
 
@@ -64,8 +64,10 @@ English: The app is not a generic travel listing site. It is a compact content M
 
 - **情绪 / MBTI / 人设探索 | Mood / MBTI / persona discovery**: 搜索、情绪 chips、MBTI、幻想标签进入旅程。
 - **故事卡片浏览 | Story-card browsing**: 图片卡片进入角色、任务、线索、风险和准备建议。
-- **AI 宠物旅伴 | AI travel companion**: 像素宠物提供 MBTI 问答和推荐引导。
-- **模拟交易 | Simulated commerce**: 注册、充值 WonderCoin、创建订单、钱包支付、交易流水。
+- **AI 宠物旅伴 | AI travel companion**: 规则引擎向导提供 5 题 MBTI 测验和按人格推荐，结果保存到账户。
+- **收藏与旅行人格 | Saved journeys & travel personality**: 收藏旅程、在「我的」中查看；MBTI 保存到账户并用于推荐与后台统计。
+- **模拟交易 | Simulated commerce**: 注册、档位充值（真实赠送入账）、页内下单确认、余额不足补差额后回到订单、钱包支付、交易流水。
+- **中英双语 | Bilingual**: 界面与旅程内容支持中文 / English（`?lang=en`），默认跟随浏览器语言。
 - **后台证据闭环 | Admin evidence loop**: 管理员查看真实统计、点击、购买、性别/MBTI、审计日志，并导出 CSV/JSON。
 
 ---
@@ -81,7 +83,7 @@ English: The app is not a generic travel listing site. It is a compact content M
 | Analytics | Buffered P2 event queue | Drops are allowed only for non-critical analytics |
 | Audit | Persistent `audit_logs` | API errors, panic, and frontend errors |
 | Static media | Local-first JPG/SVG assets, CDN-ready fallback | Nginx/CDN recommended; `CDN_BASE_URL` is fallback for missing local media |
-| Tests | Go tests, Go stress, k6, Playwright | k6/Nginx baseline verified; visual browser audit captured; Playwright 29/29 passing |
+| Tests | Go tests, Go stress, k6, Playwright | k6/Nginx baseline verified; Playwright 63/63 passing (desktop + Pixel 7, axe WCAG scans in both themes) |
 | CI/CD | GitHub Actions | Full-stack smoke added; remote run pending after push |
 | Image assets | image2 + local JPG/SVG assets | image2 was used as an image generation/material tool; it is not the core code-development tool |
 
@@ -392,10 +394,12 @@ BASE_URL=http://127.0.0.1:18080 VUS=80 DURATION=30s k6 run tests/load/order-paym
 BASE_URL=http://127.0.0.1:18080 VUS=300 DURATION=30s k6 run tests/load/image-static-cache.k6.js
 ```
 
-Playwright E2E:
+Playwright E2E (desktop Chromium + Pixel 7, including axe accessibility scans):
 
 ```bash
 cd e2e
+npm install
+npx playwright install chromium
 npx playwright test
 ```
 
@@ -409,7 +413,7 @@ Current evidence status | 当前证据状态:
 | Go stress target profile | Passing: `ok .../tests/stress 1.660s` |
 | k6 | Local Nginx baseline recorded; post-fix smoke passed through one-click Nginx URL with trailing slash; Tencent Cloud public-IP smoke passed within Nginx rate limit |
 | Browser visual audit | Captured real desktop/mobile pages, profile, recharge, and admin dashboard screenshots from local Nginx |
-| Playwright | Passing: `29 passed` on 2026-05-14 |
+| Playwright | Passing: `63 passed` on 2026-10-18 (desktop + mobile projects, axe WCAG 2.1 AA in dark and light themes) |
 | Nginx/CDN | Local Nginx verified; Tencent Cloud Nginx reverse proxy deployed at `http://49.232.207.220/`; public API is rate-limited; HTTPS waits for filed domain |
 | CI/CD | `.github/workflows/ci.yml` added; remote GitHub Actions result pending after push |
 

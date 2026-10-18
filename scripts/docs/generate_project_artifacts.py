@@ -69,6 +69,11 @@ API_ROUTE_OVERRIDES = [
     Route("POST", "/api/orders/:id/pay", "JWT", "internal/handler/order_handler.go"),
     Route("POST", "/api/payments/recharge", "JWT", "internal/handler/payment_handler.go"),
     Route("GET", "/api/payments/transactions", "JWT", "internal/handler/payment_handler.go"),
+    Route("GET", "/api/payments/tiers", "Public", "internal/handler/payment_handler.go"),
+    Route("GET", "/api/auth/saved", "JWT", "internal/handler/me_handler.go"),
+    Route("PUT", "/api/auth/saved/:slug", "JWT", "internal/handler/me_handler.go"),
+    Route("DELETE", "/api/auth/saved/:slug", "JWT", "internal/handler/me_handler.go"),
+    Route("PUT", "/api/auth/mbti", "JWT", "internal/handler/me_handler.go"),
 ]
 
 

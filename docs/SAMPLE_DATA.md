@@ -44,7 +44,7 @@ flowchart LR
 - 类型/视觉风格：solitude / surreal
 - 冒险/小众/风险：7/8/3
 - 价格：15999 不思议币
-- 本地图片：`bolivia-salt-flat.jpg`
+- 本地图片：`generated/card-salt-mirror.jpg`
 - 预订链接：NULL，当前 MVP 不接真实交易
 - 情绪关键词：["孤独";"无限感";"镜面世界";"极简主义"]
 - 标签：孤独感(solitude);视觉奇观(visual);隐秘小众(hidden)
@@ -61,7 +61,7 @@ flowchart LR
 - 类型/视觉风格：extreme / dramatic
 - 冒险/小众/风险：9/9/4
 - 价格：19999 不思议币
-- 本地图片：`iceland-lava-tunnel.jpg`
+- 本地图片：`generated/card-lava-tunnel.jpg`
 - 预订链接：NULL，当前 MVP 不接真实交易
 - 情绪关键词：["黑暗";"回声";"原始";"恐惧";"自由"]
 - 标签：极限挑战(extreme);隐秘小众(hidden);自然原始(nature)
@@ -78,7 +78,7 @@ flowchart LR
 - 类型/视觉风格：spiritual / minimal
 - 冒险/小众/风险：4/7/2
 - 价格：8999 不思议币
-- 本地图片：`japan-temple-onsen.jpg`
+- 本地图片：`generated/card-temple-onsen.jpg`
 - 预订链接：NULL，当前 MVP 不接真实交易
 - 情绪关键词：["冥想";"沉默";"蒸汽";"冷却";"纯净"]
 - 标签：孤独感(solitude);文化沉浸(culture);精神体验(spiritual)
@@ -95,7 +95,7 @@ flowchart LR
 - 类型/视觉风格：night / dramatic
 - 冒险/小众/风险：6/6/3
 - 价格：12999 不思议币
-- 本地图片：`morocco-sahara-camp.jpg`
+- 本地图片：`generated/card-sahara-stars.jpg`
 - 预订链接：NULL，当前 MVP 不接真实交易
 - 情绪关键词：["星空";"辽阔";"游牧";"银河";"夜晚"]
 - 标签：视觉奇观(visual);自然原始(nature);夜晚魔法(night)
@@ -112,7 +112,7 @@ flowchart LR
 - 类型/视觉风格：extreme / raw
 - 冒险/小众/风险：10/10/5
 - 价格：29999 不思议币
-- 本地图片：`greenland-dog-sled.jpg`
+- 本地图片：`generated/card-greenland-sled.jpg`
 - 预订链接：NULL，当前 MVP 不接真实交易
 - 情绪关键词：["极寒";"孤独";"犬队";"生存";"北极"]
 - 标签：极限挑战(extreme);孤独感(solitude);自然原始(nature)
@@ -129,7 +129,7 @@ flowchart LR
 - 类型/视觉风格：night / dramatic
 - 冒险/小众/风险：6/5/3
 - 价格：18999 不思议币
-- 本地图片：`norway-aurora.jpg`
+- 本地图片：`norway-aurora-2.jpg`
 - 预订链接：NULL，当前 MVP 不接真实交易
 - 情绪关键词：["极光";"寒冷";"等待";"爆发";"夜空"]
 - 标签：视觉奇观(visual);自然原始(nature);夜晚魔法(night)

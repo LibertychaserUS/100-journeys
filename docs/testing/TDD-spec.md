@@ -153,16 +153,31 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `IT-ORDER-001` | 订单创建/列表/支付 | 覆盖创建、折扣、列表、支付成功、余额不足 | 订单、余额、交易流水一致 |
 | `IT-PAYMENT-001` | 充值与流水 | 覆盖充值成功、未授权、充值后 transactions | 钱包余额和交易记录正确 |
 | `IT-API-HEALTH-001` | 健康检查 | 覆盖 `/api/health` | 返回健康状态 |
+| `IT-API-I18N-001..004` | 双语内容 | `?lang=en` 列表/详情为英文、默认中文、英文与中文搜索 | 12 段旅程全部有英文，`locale` 字段正确 |
+| `IT-API-MEDIA-001` | 封面 | 每段旅程封面唯一 | 不再出现多段旅程共用一张图 |
+| `IT-API-MBTI-ORDER-001` | MBTI 匹配顺序 | `mbti_types` 按匹配度降序 | 「最匹配」取第一项 |
+| `IT-API-SAVED-001..003` | 收藏 | 收藏/幂等/取消/本地化/未登录/不存在 | `/api/auth/saved` 往返一致 |
+| `IT-API-MBTI-001` | 保存人格 | 合法与非法代码 | `/auth/me` 返回保存的 `mbti_type` |
+| `IT-API-PAY-001..003` | 充值档位与赠送 | 档位公开、档位赠送入账两条流水、自定义金额无赠送 | 余额 = 本金 + 赠送 |
+| `IT-API-AUTH-POINTS-001` | 每日登录奖励 | 同日多次登录 | 只奖励一次 |
+| `UT-WEB-001..003` | `internal/webapp` | 配置注入与转义、资源版本号、文件变化后版本变化 | 不残留占位符，不可注入 script |
+| `UT-SVC-LOCALE-001` | 语言归一化 | `en-US`、`zh-CN`、未知语言 | 归一到 `en` / `zh` |
 
 ### 4.3 E2E 测试矩阵
 
 | ID | 文件 | 当前脚本事实 | 本轮状态 |
 |---|---|---|---|
-| `E2E-HOME-001` | `e2e/tests/home.spec.js` | 首页 hero、featured journeys、MBTI chips、CTA、卡片跳转、MBTI tag 跳转 | 通过 |
-| `E2E-EXPLORE-001` | `e2e/tests/explore.spec.js` | 卡片加载、fantasy type、搜索、adventure slider、详情跳转、load more | 通过 |
-| `E2E-DETAIL-001` | `e2e/tests/detail.spec.js` | 详情内容、返回、分享、404、收藏按钮状态 | 通过 |
-| `E2E-AUTH-001` | `e2e/tests/auth.spec.js` | 注册页、登录页、注册跳转、有效登录、错误密码、导航登录态、登出、profile 跳转 | 通过 |
-| `E2E-ORDER-001` | `e2e/tests/orders.spec.js` | 充值页、充值余额、详情下单、profile 订单/流水、10 用户顺序注册 | 通过 |
+| `E2E-HOME-001..005` | `e2e/tests/home.spec.js` | hero、5 个精选、心情入口带筛选跳转、搜索带 query、卡片跳转、封面不重复 | 通过 |
+| `E2E-EXPLORE-001..008` | `e2e/tests/explore.spec.js` | 加载 12 张卡；幻想类型筛选后结果数与 API 一致（旧版停在骨架屏）；搜索框可点击、输入时保持焦点（旧版被导航遮住）；筛选面板组合与移除；空状态清除；卡片跳转；从导航重新进入不残留筛选；带参链接还原 | 通过 |
+| `E2E-DETAIL-001..007` | `e2e/tests/detail.spec.js` | 本地化徽章、匹配度 5/5、章节默认可见；返回；分享写入剪贴板；404；访客收藏提示登录；收藏持久化并出现在「我的」；未知路由 404 | 通过 |
+| `E2E-AUTH-*` | `e2e/tests/auth.spec.js` | 表单与 label；注册跳转；字段级校验；有效登录；错误密码显示中文提示（旧版为 `HTTP 401`）；验证码错误落在验证码字段；账户菜单 Esc 还原焦点；登出；`?next=` 回跳 | 通过 |
+| `E2E-ORDER-001..006` | `e2e/tests/orders.spec.js` | 档位与赠送；赠送到账；页内确认支付；余额不足 → 充值 → 回到订单支付；「我的」中继续支付待支付订单；访客下单引导登录；10 用户顺序注册；出现原生 `confirm/alert` 即失败 | 通过 |
+| `E2E-I18N-001..002` | `e2e/tests/i18n.spec.js` | 切换英文后界面与旅程内容均为英文并记住；英文浏览器默认英文，英文搜索命中 | 通过 |
+| `E2E-A11Y-*` | `e2e/tests/a11y.spec.js` | 深浅两套主题 × 7 个页面 axe WCAG 2.1 A/AA 零违规；主题切换持久化；跳到正文 | 通过 |
+| `E2E-PERSONA-001..002`、`E2E-PET-001` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；向导 5 题测验保存；向导推荐与 Esc 关闭还原焦点 | 通过 |
+| `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
+
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 63 个用例）。
 
 ### 4.4 Go Stress 矩阵
 
