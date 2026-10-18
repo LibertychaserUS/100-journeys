@@ -36,10 +36,12 @@ if [ ! -x "$RELEASES/$target/bin/server" ]; then
   exit 1
 fi
 
+# Returns non-zero if the release's config fails to install (e.g. nginx -t), so the
+# caller rolls back instead of leaving `current` switched with the old process running.
 switch_to() {
   ln -sfn "releases/$1" "$BASE/current.next"
   mv -Tf "$BASE/current.next" "$BASE/current"
-  "$RELEASES/$1/deploy/aws/server/install-config.sh"
+  "$RELEASES/$1/deploy/aws/server/install-config.sh" || return 1
   systemctl restart 100-journeys.service
 }
 
@@ -59,11 +61,10 @@ if [ -f "$DB_PATH" ]; then
 fi
 
 echo "activating $target (was $current)"
-switch_to "$target"
-if healthy; then
+if switch_to "$target" && healthy; then
   echo "healthy: $target"
 else
-  echo "health check failed for $target" >&2
+  echo "activation or health check failed for $target" >&2
   journalctl -u 100-journeys.service -n 30 --no-pager >&2 || true
   if [ "$current" != "none" ] && [ -d "$RELEASES/$current" ]; then
     echo "rolling back to $current" >&2

@@ -252,7 +252,9 @@ aws lightsail put-instance-public-ports --instance-name 100-journeys --port-info
 
 **Logs.** `h sudo journalctl -u 100-journeys -f`; Nginx: `/var/log/nginx/100-journeys.{access,error}.log`.
 
-**Rate limits.** `/api/auth/` allows 5 requests/minute per IP (burst 10), `/api/` 10 r/s (burst 20). For an
+**Rate limits.** `/api/auth/` allows 5 requests/minute per IP (burst 10), `/api/ai/` (the AI guide, which may
+call the paid DeepSeek API) 6 requests/minute (burst 4), and the rest of `/api/` 10 r/s (burst 20). Excess
+requests get HTTP 429. For an
 operator test run (e.g. Playwright, which registers many users), exempt your IP temporarily and clear it afterwards:
 
 ```bash
