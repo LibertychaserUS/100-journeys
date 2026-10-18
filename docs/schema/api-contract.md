@@ -279,29 +279,31 @@ JWT 用户接口要求已登录；管理员接口还要求 `role = "admin"`。
 
 ### 3.8 `POST /api/ai/chat`
 
-AI 宠物/推荐对话接口。当前实现使用 mock provider。
+向导小旅的对话接口。配置了 `DEEPSEEK_API_KEY` 时由 DeepSeek 回答：系统提示词以旅程目录为依据，推荐只能来自目录（按 slug 校验，最多 3 个），不会把类型说出来；超时（8 秒）、上游出错、回复无法解析或并发已满时，回退到规则引擎，`source` 为 `mock`，前端此时使用本地中英规则。服务端不记录密钥、请求或回复正文，只记录状态码。
 
 **请求 JSON**
 
 ```json
 {
   "message": "我想去安静一点的地方",
-  "session_id": "optional-session-id"
+  "session_id": "anonymous-visitor-id",
+  "lang": "zh",
+  "mbti_type": "INFP"
 }
 ```
+
+`message` 最多 1000 字（超出 `400` + `message too long`），发往模型时截取前 500 字；`lang` 为 `zh`（默认）或 `en`；`mbti_type` 可选，只用于挑选旅程。
 
 **响应 `200`**
 
 ```json
 {
   "data": {
-    "reply": "回复文本",
+    "reply": "天亮前一刻钟，盐沼会把天空借给你。",
     "actions": [
-      {
-        "type": "recommend",
-        "data": {}
-      }
-    ]
+      { "type": "recommend", "data": { "journeys": [ { "slug": "bolivia-salt-flat-trek", "title": "镜面 · 乌尤尼盐沼" } ] } }
+    ],
+    "source": "deepseek"
   },
   "error": null
 }

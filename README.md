@@ -2,7 +2,7 @@
 
 [![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
 [![Live demo](https://img.shields.io/badge/live%20demo-AWS%20Lightsail-f2c46d)](https://52-203-52-72.sslip.io/)
-[![E2E](https://img.shields.io/badge/Playwright-88%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
+[![E2E](https://img.shields.io/badge/Playwright-90%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
 
 中文：**桃源百旅** 是一个故事化的旅行灵感产品。用户不是从地图选目的地，而是从一种心情、一个 MBTI 人格或一类幻想世界出发，读一段带有临时身份、任务和线索的“旅行剧本”，再用虚拟币领取它。
 
@@ -31,12 +31,14 @@ More screenshots, before and after the 2026-10 redesign: [docs/design/redesign-2
 ## Features | 功能
 
 - **按心情、人格、幻想类型探索 | Discover by mood, MBTI or fantasy type**: search, mood shortcuts, fantasy-type facets and a filter panel (MBTI, adventure level, tags, visual style). Filters live in the URL, so a filtered view can be shared.
-- **旅行剧本 | Travel scripts**: every journey has a role, a mission and four clues (local guide, gear, risk, best-matched personalities), plus a booking "ticket".
+- **找到你的入口 | Find your entrance**: pick one of sixteen type cards or walk six small scenes with the guide (resumable); land in your own space with the entrances that open for you. Guest progress moves into the account on sign-up.
+- **桃源入口 | Authored entrances**: journeys are bilingual JSON files (`internal/content/entrances/`) with a role, a mission, chapters, a fork whose choice you keep, an ending and a sourced "what is real, what is not" note; a test lint keeps the copy showing rather than telling. Contract: [docs/content/SCHEMA.md](docs/content/SCHEMA.md).
+- **旅行剧本 | Travel scripts**: every journey still has a role and practical clues (gear, risk), plus a booking "ticket".
 - **中英双语 | Bilingual**: UI strings in zh/en catalogs; journey content comes from the API in either language (`?lang=en`), and English searches match English copy.
-- **收藏与旅行人格 | Saved journeys and travel personality**: save journeys to your account; pick an MBTI type (or take a 5-question quiz with the guide) and get recommendations.
+- **收藏与旅行人格 | Saved journeys and travel personality**: save journeys and your type to your account; fork choices are kept per journey.
 - **模拟交易 | Simulated commerce**: tiered top-ups with a real bonus, in-page checkout with a points discount, a shortfall flow that tops up and returns you to the order, and a full ledger.
-- **向导 | Guide widget**: a rule-based travel guide (小旅 / Lumi) for recommendations and the personality quiz.
-- **后台 | Admin dashboard**: live metrics, most clicked and best-selling journeys, MBTI and gender distributions, audit counts, CSV export.
+- **小旅 · 灯灵 | Lumi, the guide**: an SVG lantern sprite that condenses into one of sixteen forms when your type is found. With `DEEPSEEK_API_KEY` set, free-text questions are answered by DeepSeek, grounded in the journey catalogue (only real journeys can be recommended, the type is never named back to you); without a key, on timeout (8 s), error or overload, the rule-based guide answers in zh/en.
+- **后台 | Admin dashboard**: core-flow funnel by anonymous visitor, live metrics, most clicked and best-selling journeys, MBTI and gender distributions, audit counts, CSV export.
 - **两套主题都可读 | Accessible in both themes**: semantic colour tokens, WCAG AA contrast checked by axe in dark and light, keyboard navigation, skip link, `prefers-reduced-motion`.
 
 ---
@@ -49,7 +51,8 @@ More screenshots, before and after the 2026-10 redesign: [docs/design/redesign-2
 | Database | SQLite via `modernc.org/sqlite`, WAL mode, single-writer connection with busy retry |
 | Frontend | Vanilla HTML / CSS / JS hash SPA, no framework, no web fonts |
 | Auth | JWT + bcrypt + math captcha; public sign-up cannot create admins |
-| Analytics | Buffered, droppable event queue for non-critical events |
+| Analytics | Buffered, droppable event queue for non-critical events; funnel counted by an anonymous visitor id |
+| AI guide | DeepSeek chat API (OpenAI-compatible) behind a timeout, token cap and concurrency limit, with a rule-based fallback; key from the environment only (AWS Secrets Manager in production) |
 | Audit | Persistent `audit_logs` for API errors, panics and frontend errors |
 | Media | Local static files, CDN-ready through `CDN_BASE_URL`; CSS/JS are fingerprinted (`?v=`) so long-lived caching is safe |
 | Tests | Go unit/integration, Go stress, k6, Playwright (desktop + mobile, axe) |

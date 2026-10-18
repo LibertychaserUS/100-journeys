@@ -139,6 +139,10 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `UT-MW-001` | JWT middleware | 覆盖缺失、格式错误、无效、有效、过期、admin 权限 | JWT 与 admin gate 行为正确 |
 | `UT-MW-002` | CORS / RequestID | 覆盖允许源、拒绝源、预检、暴露头、request id 生成/保留 | 中间件响应头符合预期 |
 | `UT-CONTENT-001..004` | `internal/content` | 每个入口文件：结构、词表、封面存在、编号与 slug 唯一；文案不出现类型代码与说教词 | 全部入口可上线，lint 能抓到「因为你是 INFP」类句子 |
+| `UT-AI-DS-001` | `DeepSeek.Guide` 正常回复 | 假上游返回含未知与重复 slug 的 JSON | 只保留目录里的旅程并带本地化标题；Bearer 鉴权；`max_tokens` 320、JSON 输出；系统提示词含目录、类型（仅用于挑选）与不说出类型的规则 |
+| `UT-AI-DS-002` | 回退 | 超时、500、非 JSON、空回复、错误地址 | 都回退到规则引擎（`source: mock`），1 秒内返回 |
+| `UT-AI-DS-003` | 并发上限 | 唯一的槽位被占用 | 立即回退，不排队 |
+| `UT-AI-DS-004` | 日志 | 上游 400 | 日志只有状态码，没有密钥、用户消息或回复 |
 | `UT-ANALYTICS-002` | 漏斗事件类型 | 每个漏斗步骤都是已登记事件，未知类型被丢弃 | 后台漏斗不会因为事件被拒而缺步 |
 | `UT-REPO-MIGRATE-001` | `Migrate` | 旧库的 analytics_events CHECK 只有 5 种类型 | 重建表后接受新类型，旧数据与 4 个索引保留，再次迁移不变 |
 | `UT-REPO-USER-CHOICE-001` | `UserRepository.SetChoice/ListChoices` | 同一入口重复选择 | 后一次覆盖，按 slug 返回 |
@@ -166,6 +170,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `IT-API-MERGE-001` | 访客合并 | 类型 + 选择（含不存在的入口），重复两次；空请求；非法类型 | 幂等；跳过项列在 `skipped`；空请求保留账户类型；非法类型 400 |
 | `IT-API-FUNNEL-001` | 后台漏斗 | 4 位访客各走到不同步骤，重复到达 | 按访客去重、按步骤顺序、比例相对到达 |
 | `IT-API-EVENT-002` | 事件大小 | metadata 超过 512 字符 | 400 `event too large` |
+| `IT-API-AI-002` | 向导接口 + DeepSeek | 英文、带类型；超长消息 | `source: deepseek`，只推荐真实旅程且标题为英文，提示词为英文并带类型；1001 字 400 |
 | `IT-API-SAVED-001..003` | 收藏 | 收藏/幂等/取消/本地化/未登录/不存在 | `/api/auth/saved` 往返一致 |
 | `IT-API-MBTI-001` | 保存人格 | 合法与非法代码 | `/auth/me` 返回保存的 `mbti_type` |
 | `IT-API-PAY-001..003` | 充值档位与赠送 | 档位公开、档位赠送入账两条流水、自定义金额无赠送 | 余额 = 本金 + 赠送 |
@@ -188,10 +193,10 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-ORDER-001..006` | `e2e/tests/orders.spec.js` | 档位与赠送；赠送到账；页内确认支付；余额不足 → 充值 → 回到订单支付；「我的」中继续支付待支付订单；访客下单引导登录；10 用户顺序注册；出现原生 `confirm/alert` 即失败 | 通过 |
 | `E2E-I18N-001..002` | `e2e/tests/i18n.spec.js` | 切换英文后界面与旅程内容均为英文并记住；英文浏览器默认英文，英文搜索命中 | 通过 |
 | `E2E-A11Y-*` | `e2e/tests/a11y.spec.js` | 深浅两套主题 × 13 个页面/状态（含类型牌、小旅对话三种状态、你的空间与空状态） axe WCAG 2.1 A/AA 零违规；运行时切换主题后再次扫描对比度并保持焦点；主题切换持久化；跳到正文 | 通过 |
-| `E2E-PERSONA-001..002`、`E2E-PET-001` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；从向导窗口进入小旅的六步对话并保存到账户；向导推荐与 Esc 关闭还原焦点 | 通过 |
+| `E2E-PERSONA-001..002`、`E2E-PET-001..003` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；从向导窗口进入小旅的六步对话并保存到账户；向导推荐与 Esc 关闭还原焦点；模型回复显示文字与真实旅程链接；没有模型回复时用本地规则回答且不残留输入中提示 | 通过 |
 | `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
 
-运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 88 个用例）。
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 90 个用例）。
 
 ### 4.4 Go Stress 矩阵
 

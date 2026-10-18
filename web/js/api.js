@@ -91,6 +91,9 @@ const API = (() => {
     },
     updateMBTI: (code) => authed('/auth/mbti', { method: 'PUT', body: JSON.stringify({ mbti_type: code }) }),
 
+    // The guide: a model reply (source "deepseek") or the server's fallback (source "mock")
+    aiChat: (data) => request('/ai/chat', { method: 'POST', body: JSON.stringify(data) }),
+
     // Fork picks and the one-time guest merge
     listChoices: () => authed('/auth/choices'),
     setChoice: (slug, key) => authed(`/auth/choices/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify({ key }) }),

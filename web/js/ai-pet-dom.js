@@ -100,16 +100,53 @@
     if (e.target.closest('.ai-pet__links a') && window.matchMedia('(max-width: 760px)').matches) setOpen(false, { focus: false });
   });
 
-  container.addEventListener('submit', (e) => {
+  // Free text goes to the model first; without a model reply in time, the local rules answer.
+  const MODEL_WAIT = 10000;
+  let asking = false;
+  container.addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = container.querySelector('#ai-pet-input');
     const text = input.value.trim();
-    if (!text) return;
+    if (!text || asking) return;
     input.value = '';
     addMessage('user', esc(text));
-    const r = AIPet.reply(text);
-    setTimeout(() => petSay(r.text, r.actions), 300);
+    asking = true;
+    addMessage('pet', `<p class="ai-pet__typing" aria-label="${esc(AIPet.copy().finding)}"><i></i><i></i><i></i></p>`);
+    let answer = null;
+    try {
+      const res = await Promise.race([
+        API.aiChat({ message: text, lang: I18n.lang, mbti_type: Guest.mbti(), session_id: Guest.vid() }),
+        new Promise((resolve) => setTimeout(() => resolve(null), MODEL_WAIT)),
+      ]);
+      const d = res && res.data;
+      if (d && d.source === 'deepseek' && d.reply) answer = d;
+    } catch {}
+    replaceLast(answer ? modelHtml(answer) : null);
+    if (!answer) {
+      const r = AIPet.reply(text);
+      petSay(r.text, r.actions);
+    }
+    asking = false;
   });
+
+  function modelHtml(d) {
+    const rec = (d.actions || []).find((a) => a.type === 'recommend' && a.data && Array.isArray(a.data.journeys));
+    const links = rec ? `<ul class="ai-pet__links">${rec.data.journeys.map((j) => `<li><a href="#/journey/${encodeURIComponent(j.slug)}">${esc(j.title)}</a></li>`).join('')}</ul>` : '';
+    return `<p>${esc(d.reply)}</p>${links}`;
+  }
+
+  // Swaps the typing dots for the answer, or removes them when the rules will answer instead.
+  function replaceLast(html) {
+    const msgs = container.querySelector('#ai-pet-messages');
+    const last = msgs && msgs.lastElementChild;
+    if (html == null) {
+      history.pop();
+      if (last) last.remove();
+      return;
+    }
+    history[history.length - 1].html = html;
+    if (last) last.innerHTML = html;
+  }
 
   container.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false); }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/100-journeys/app/internal/ai"
@@ -228,6 +229,88 @@ func TestHandler_AIChat(t *testing.T) {
 	data := resp["data"].(map[string]interface{})
 	if data["reply"] == nil || data["reply"].(string) == "" {
 		t.Error("expected non-empty reply")
+	}
+	if data["source"] != "mock" {
+		t.Errorf("expected source mock without a model, got %v", data["source"])
+	}
+}
+
+// IT-API-AI-002: with a model configured the guide answers in the reader's language and only
+// recommends real journeys; overlong messages are rejected.
+func TestHandler_AIChat_DeepSeek(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	var system string
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Messages []struct{ Content string } `json:"messages"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&req)
+		system = req.Messages[0].Content
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{"choices": []map[string]interface{}{{"message": map[string]string{
+			"content": `{"reply":"Before dawn the salt turns to sky.","slugs":["bolivia-salt-flat-trek","nowhere"]}`,
+		}}}})
+	}))
+	defer upstream.Close()
+
+	projectRoot, _ := filepath.Abs("../..")
+	db, err := repository.NewDB(":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { db.Close() })
+	if err := repository.Migrate(db, filepath.Join(projectRoot, "db/schema.sql")); err != nil {
+		t.Fatal(err)
+	}
+	if err := repository.Seed(db, filepath.Join(projectRoot, "db/seed.sql")); err != nil {
+		t.Fatal(err)
+	}
+	if err := content.Sync(context.Background(), db); err != nil {
+		t.Fatal(err)
+	}
+	repo := repository.NewJourneyRepository(db)
+	svc := service.NewJourneyService(repo, &service.LocalProvider{BaseURL: "http://cdn"})
+	catalog := func(ctx context.Context, lang string) ([]ai.CatalogEntry, error) {
+		js, _, err := svc.ListJourneys(ctx, model.JourneyFilter{Page: 1, Limit: 100, Locale: lang})
+		out := make([]ai.CatalogEntry, 0, len(js))
+		for _, j := range js {
+			out = append(out, ai.CatalogEntry{Slug: j.Slug, Title: j.Title})
+		}
+		return out, err
+	}
+	guide := ai.NewDeepSeek(ai.DeepSeekConfig{APIKey: "test-key-not-real", BaseURL: upstream.URL}, catalog, ai.NewMockAI())
+	h := NewJourneyHandler(svc, guide, ai.NewRecommendEngine(repo))
+	r := gin.New()
+	r.POST("/api/ai/chat", h.AIChat)
+
+	post := func(body interface{}) (*httptest.ResponseRecorder, map[string]interface{}) {
+		raw, _ := json.Marshal(body)
+		req, _ := http.NewRequest("POST", "/api/ai/chat", bytes.NewReader(raw))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+		var resp map[string]interface{}
+		_ = json.Unmarshal(w.Body.Bytes(), &resp)
+		return w, resp
+	}
+	w, resp := post(model.AIChatRequest{Message: "somewhere quiet", Lang: "en-US", MBTIType: "infp"})
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+	data := resp["data"].(map[string]interface{})
+	if data["source"] != "deepseek" {
+		t.Fatalf("expected a model reply, got %v", data)
+	}
+	picks := data["actions"].([]interface{})[0].(map[string]interface{})["data"].(map[string]interface{})["journeys"].([]interface{})
+	if len(picks) != 1 || picks[0].(map[string]interface{})["title"] != authored(t, "bolivia-salt-flat-trek").EN.Title {
+		t.Errorf("expected only the real journey with its English title, got %v", picks)
+	}
+	if !strings.Contains(system, "Speak English") || !strings.Contains(system, "INFP") {
+		t.Errorf("system prompt should be English and carry the type for choosing")
+	}
+
+	w, _ = post(model.AIChatRequest{Message: strings.Repeat("长", 1001)})
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("expected 400 for an overlong message, got %d", w.Code)
 	}
 }
 

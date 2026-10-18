@@ -49,4 +49,32 @@ test.describe('Travel personality', () => {
     await expect(page.locator('#ai-pet-chat')).toBeHidden();
     await expect(avatar).toBeFocused();
   });
+
+  // E2E-PET-002: a model reply shows its text and links only to real journeys
+  test('guide shows a model reply with journey links', async ({ page }) => {
+    await page.route('**/api/ai/chat', async (route) => {
+      const body = route.request().postDataJSON();
+      expect(body.lang).toBe('zh');
+      await route.fulfill({ json: { data: { reply: '天亮前一刻钟，盐沼会把天空借给你。', source: 'deepseek', actions: [{ type: 'recommend', data: { journeys: [{ slug: 'bolivia-salt-flat-trek', title: '镜面 · 乌尤尼盐沼' }] } }] }, error: null } });
+    });
+    await page.goto('/#/');
+    await page.locator('#ai-pet-avatar').click();
+    await page.locator('#ai-pet-input').fill('想找个安静的地方');
+    await page.keyboard.press('Enter');
+    const last = page.locator('#ai-pet-messages .ai-pet__msg--pet').last();
+    await expect(last).toContainText('盐沼会把天空借给你');
+    await expect(last.locator('a[href="#/journey/bolivia-salt-flat-trek"]')).toHaveText('镜面 · 乌尤尼盐沼');
+  });
+
+  // E2E-PET-003: without a model reply the local rules answer in the reader's language
+  test('guide falls back to its own rules', async ({ page }) => {
+    await page.route('**/api/ai/chat', (route) => route.fulfill({ json: { data: { reply: 'server rules', source: 'mock' }, error: null } }));
+    await page.goto('/#/');
+    await page.locator('#ai-pet-avatar').click();
+    await page.locator('#ai-pet-input').fill('推荐旅行');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#ai-pet-chat [data-pet-action="recommend"]').last()).toBeVisible();
+    await expect(page.locator('#ai-pet-messages')).not.toContainText('server rules');
+    await expect(page.locator('.ai-pet__typing')).toHaveCount(0);
+  });
 });

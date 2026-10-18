@@ -10,11 +10,12 @@ import (
 	"time"
 
 	"github.com/100-journeys/app/internal/ai"
-	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/analytics"
+	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/handler"
 	"github.com/100-journeys/app/internal/middleware"
+	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/100-journeys/app/internal/webapp"
@@ -95,7 +96,17 @@ func main() {
 	}()
 	media := &service.LocalProvider{BaseURL: mediaBase}
 	svc := service.NewJourneyService(repo, media)
-	aiProvider := ai.NewMockAI()
+	var aiProvider ai.Provider = ai.NewMockAI()
+	// The DeepSeek guide is used when a key is present (injected from Secrets Manager in
+	// production); every failure falls back to the rule-based guide, so the demo never breaks.
+	if key := os.Getenv("DEEPSEEK_API_KEY"); key != "" {
+		aiProvider = ai.NewDeepSeek(ai.DeepSeekConfig{
+			APIKey:  key,
+			BaseURL: os.Getenv("DEEPSEEK_BASE_URL"),
+			Model:   os.Getenv("DEEPSEEK_MODEL"),
+		}, journeyCatalog(svc), ai.NewMockAI())
+		log.Printf("ai: DeepSeek guide enabled")
+	}
 	engine := ai.NewRecommendEngine(repo)
 	captchaStore := service.NewCaptchaStore()
 	h := handler.NewJourneyHandler(svc, aiProvider, engine, analyticsBuffer)
@@ -202,4 +213,25 @@ func main() {
 
 	log.Printf("Server starting on %s  mediaBase=%s  db=%s\n", bindAddr, mediaBase, dbPath)
 	log.Fatal(r.Run(bindAddr))
+}
+
+// journeyCatalog lists journeys for the guide in the reader's language, with their best types.
+func journeyCatalog(svc *service.JourneyService) ai.CatalogFunc {
+	return func(ctx context.Context, lang string) ([]ai.CatalogEntry, error) {
+		journeys, _, err := svc.ListJourneys(ctx, model.JourneyFilter{Page: 1, Limit: 100, Locale: lang})
+		if err != nil {
+			return nil, err
+		}
+		out := make([]ai.CatalogEntry, 0, len(journeys))
+		for _, j := range journeys {
+			e := ai.CatalogEntry{Slug: j.Slug, Title: j.Title, Hook: j.StoryHook, Region: j.Region, Moods: j.MoodKeywords}
+			for _, m := range j.MBTITypes {
+				if m.CompatibilityScore >= 4 {
+					e.Types = append(e.Types, m.MBTIType.Code)
+				}
+			}
+			out = append(out, e)
+		}
+		return out, nil
+	}
 }

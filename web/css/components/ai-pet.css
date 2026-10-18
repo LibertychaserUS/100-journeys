@@ -54,3 +54,13 @@ body[data-bookbar] .ai-pet { bottom: calc(20px + env(safe-area-inset-bottom, 0px
 
 /* Stay out of the way of bottom sheets that own the screen edge. */
 body.explore-panel-open .ai-pet { display: none; }
+
+/* Typing dots while the guide thinks */
+.ai-pet__typing { display: inline-flex; gap: 4px; padding: 4px 0; }
+.ai-pet__typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-3); }
+@media (prefers-reduced-motion: no-preference) {
+  .ai-pet__typing i { animation: pet-typing 1s ease-in-out infinite; }
+  .ai-pet__typing i:nth-child(2) { animation-delay: .15s; }
+  .ai-pet__typing i:nth-child(3) { animation-delay: .3s; }
+}
+@keyframes pet-typing { 50% { opacity: .3; transform: translateY(-2px); } }
