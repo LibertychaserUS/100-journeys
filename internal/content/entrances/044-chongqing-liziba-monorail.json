@@ -22,7 +22,7 @@
       { "title": "一个圆点", "paragraphs": ["天刚黑，雨歇了一会儿，灯笼的光落在湿漉漉的石板上。纸质地图上，李子坝只是一个小圆点。可你脚下这条巷子，一头和别人家的屋顶一样高，另一头拐个弯，就往下钻进了黑里。你把地图转了三圈，还是对不上。"] },
       { "title": "问路", "paragraphs": ["巷口传来塑料袋窸窸窣窣的声音。一位拎着菜的阿姨瞄了一眼你的地图，笑了：“看这个没得用。你先上去，再下来。”她用手在空中比画：上，下，再往前。你没听懂，但决定照她说的走。"] },
       { "title": "楼的腰", "paragraphs": ["车厢里的灯很白，窗外是湿漉漉的夜。2 号线跨在一根梁上往前滑，安静得出奇。报站声响起，窗外的灯火忽然换成了墙，你已经在楼里面了。在李子坝下车，站台四面都是墙，一点也看不出这是谁家的六七楼。"] },
-      { "title": "下来", "paragraphs": ["电梯往下走的时候很安静，你按的是一楼。门一开，雨声先涌了进来，外面就是马路。上，下，再往前——阿姨那个手势，现在你看懂了。"] },
+      { "title": "先进门的雨声", "paragraphs": ["电梯往下走的时候很安静，你按的是一楼。门一开，雨声先涌了进来，外面就是马路。上，下，再往前——阿姨那个手势，现在你看懂了。"] },
       { "title": "下一班", "paragraphs": ["路灯下，雨丝斜斜地落。你过马路，站到对面，抬起头。楼上亮着几扇窗，有人在阳台上收衣服。一道灯光从黑处慢慢滑过来，钻进楼的腰里，又从另一边出来，声音比你想的轻得多。旁边一个小孩在数它在楼里待了几秒：“一、二、三……”你也跟着数。"] }
     ],
     "choice": {
@@ -55,7 +55,7 @@
       { "title": "A dot", "paragraphs": ["Just after dark the rain has paused, and lantern light lies on the wet flagstones. On the paper map Liziba is a small circle. But the lane under your feet runs level with somebody's roof at one end, and at the other it turns a corner and dives down into the dark. You turn the map round three times. It still doesn't match."] },
       { "title": "Asking", "paragraphs": ["A plastic bag rustles at the mouth of the lane. A woman carrying vegetables glances at your map and laughs. “That's no use here. Go up first, then come down.” She draws it in the air: up, down, straight on. You don't follow, but you decide to do exactly that."] },
       { "title": "The middle of the building", "paragraphs": ["Hard white light in the carriage, a wet night outside. Line 2 glides along astride its beam, oddly quiet. The announcement comes, the city lights in the window turn suddenly into wall, and you're inside the building. At Liziba you step out onto a platform walled in on every side; nothing tells you this is somebody's sixth or seventh floor."] },
-      { "title": "Coming down", "paragraphs": ["The lift is quiet on the way down; you've pressed for the ground floor. The doors open and the sound of rain comes in first. Outside is the street. Up, down, straight on: now you can read her hands."] },
+      { "title": "Rain at the lift door", "paragraphs": ["The lift is quiet on the way down; you've pressed for the ground floor. The doors open and the sound of rain comes in first. Outside is the street. Up, down, straight on: now you can read her hands."] },
       { "title": "The next one", "paragraphs": ["Under the streetlight the rain falls slantwise. You cross the road, stand on the far side and look up. A few windows are lit; someone is bringing in washing from a balcony. A light comes sliding out of the dark, slips into the middle of the building and out the other side, much quieter than you expected. A kid beside you counts the seconds it spends inside, “One, two, three…”, and you count along."] }
     ],
     "choice": {

@@ -19,10 +19,10 @@
     "premise": "卡帕多奇亚的软岩，来自埃尔吉耶斯、哈桑等古火山在约 900 万到 300 万年前的喷发。风和水把它削成一根根“仙女烟囱”，顶上那块更硬的岩石像一顶帽子，替下面的软石挡住侵蚀。人们在这片软石里凿出了教堂和住处。热气球要看天气，这里平均一年大约有 220 天能飞。",
     "mission": "落地之前，让篮子里的每一个人都至少笑出声一次。",
     "chapters": [
-      { "title": "能不能飞", "paragraphs": ["天还黑着。起飞场上，球皮一只只侧躺在地上，大风扇呼呼地往里灌冷风。所有人都在等一句话。驾驶员拿着对讲机听了一会儿，转过身来：“今天能飞。”你旁边那位阿姨第一个叫出了声，你跟着就笑了。"] },
-      { "title": "离地", "paragraphs": ["燃烧器一响，热浪扑到脸上，篮子轻轻一晃，就不在地上了。没有颠簸，只是地面自己往下退。四周的气球多得数不过来，红的，条纹的，还有一只画着笑脸，正从一条条山谷里冒出来。你朝最近的那只挥手，那边篮子里一个小孩抢先挥了回来。"] },
+      { "title": "对讲机", "paragraphs": ["天还黑着。起飞场上，球皮一只只侧躺在地上，大风扇呼呼地往里灌冷风。所有人都在等一句话。驾驶员拿着对讲机听了一会儿，转过身来：“今天能飞。”你旁边那位阿姨第一个叫出了声，你跟着就笑了。"] },
+      { "title": "隔壁的篮子", "paragraphs": ["燃烧器一响，热浪扑到脸上，篮子轻轻一晃，就不在地上了。没有颠簸，只是地面自己往下退。四周的气球多得数不过来，红的，条纹的，还有一只画着笑脸，正从一条条山谷里冒出来。你朝最近的那只挥手，那边篮子里一个小孩抢先挥了回来。"] },
       { "title": "帽子", "paragraphs": ["太阳从山脊上冒出来，斜斜的光把每根烟囱的影子拉得老长。你开始数帽子：一根烟囱顶着一块深色的石头，歪着，像把帽子推到了后脑勺；一根已经丢了帽子，尖顶被雨水磨圆了；一扇凿在岩壁上的小窗，窗口晾着一块布。你把那顶歪帽子指给大家看，篮子里笑成一片，连驾驶员也笑了。"] },
-      { "title": "落地", "paragraphs": ["燃烧器停了，四周一下子安静下来，只听得见篮底擦过干草的沙沙声。驾驶员让大家按起飞前练过的姿势站好。篮子停稳，地面又有了分量。你把手里的暖宝宝塞给自己篮子里那个一路都在发抖的小孩，他攥着它，终于笑了。"] }
+      { "title": "篮底的干草", "paragraphs": ["燃烧器停了，四周一下子安静下来，只听得见篮底擦过干草的沙沙声。驾驶员让大家按起飞前练过的姿势站好。篮子停稳，地面又有了分量。你把手里的暖宝宝塞给自己篮子里那个一路都在发抖的小孩，他攥着它，终于笑了。"] }
     ],
     "choice": {
       "prompt": "最后一分钟，篮子快要碰到地面，你做什么？",
@@ -52,10 +52,10 @@
     "premise": "Cappadocia's soft rock was laid down by eruptions of Erciyes, Hasan and other ancient volcanoes some nine to three million years ago. Wind and water have carved it into fairy chimneys, each topped by a harder stone that works like a hat, keeping erosion off the softer rock below. People cut churches and homes into it. Balloons fly only when the weather allows: on average around 220 days a year.",
     "mission": "Before you land, get every person in your basket to laugh out loud at least once.",
     "chapters": [
-      { "title": "Will we fly?", "paragraphs": ["It's still dark. On the launch field the envelopes lie on their sides while big fans push cold air into them. Everyone is waiting for one sentence. The pilot listens to his radio for a while, then turns round: “We fly today.” The woman beside you whoops first, and you're laughing straight after."] },
-      { "title": "Up", "paragraphs": ["The burner roars, heat slaps your face, the basket gives a small shrug and the ground is no longer under it. There's no lurch; the earth just backs away. There are more balloons around you than you can count, red ones, striped ones, one with a painted grin, rising out of the valleys one after another. You wave at the nearest. A kid in that basket beats you to it."] },
+      { "title": "The radio", "paragraphs": ["It's still dark. On the launch field the envelopes lie on their sides while big fans push cold air into them. Everyone is waiting for one sentence. The pilot listens to his radio for a while, then turns round: “We fly today.” The woman beside you whoops first, and you're laughing straight after."] },
+      { "title": "The next basket", "paragraphs": ["The burner roars, heat slaps your face, the basket gives a small shrug and the ground is no longer under it. There's no lurch; the earth just backs away. There are more balloons around you than you can count, red ones, striped ones, one with a painted grin, rising out of the valleys one after another. You wave at the nearest. A kid in that basket beats you to it."] },
       { "title": "Hats", "paragraphs": ["The sun clears the ridge, and the low light stretches every chimney's shadow across the valley floor. You start counting hats. A chimney with a dark stone sitting on it at an angle, like a cap pushed back. One that has lost its hat, its tip worn round by rain. A small window cut into a rock face, a cloth hung out of it to dry. You point out the cap pushed back, and the whole basket cracks up, the pilot included."] },
-      { "title": "Down", "paragraphs": ["The burner goes quiet, and all you can hear is the basket hissing through dry grass. The pilot has everyone take the landing position he showed you on the ground. The basket settles and the ground is heavy again. You press your hand warmer into the palm of the kid in your own basket who's been shivering since take-off, and he finally grins."] }
+      { "title": "Dry grass under the basket", "paragraphs": ["The burner goes quiet, and all you can hear is the basket hissing through dry grass. The pilot has everyone take the landing position he showed you on the ground. The basket settles and the ground is heavy again. You press your hand warmer into the palm of the kid in your own basket who's been shivering since take-off, and he finally grins."] }
     ],
     "choice": {
       "prompt": "In the last minute, as the basket drops toward the ground, what do you do?",

@@ -27,7 +27,7 @@
         "到了观景的地方，寺就在山谷对面，白墙贴在黑色的岩壁上，看上去随时会被风吹走，却一直都在。下面一道瀑布，落差六十米。你想起那个传说：一头飞来的老虎，一个山洞，一个人在里面坐了很久。",
         "“经幡不是送给神的，”向导说，“是交给风的。风把好意吹到每个地方，吹到谁身上都算数。”"
       ] },
-      { "title": "风来了", "paragraphs": ["你们等风。太阳照上对面的寺墙时，风从谷底翻上来，满坡的经幡一下子全响了。向导点头：“就现在。”你把绳子一头系在松树上，另一头交给他。绳子拉直的那一刻，五种颜色一齐鼓起来，朝着同一个方向。"] }
+      { "title": "五种颜色", "paragraphs": ["你们等风。太阳照上对面的寺墙时，风从谷底翻上来，满坡的经幡一下子全响了。向导点头：“就现在。”你把绳子一头系在松树上，另一头交给他。绳子拉直的那一刻，五种颜色一齐鼓起来，朝着同一个方向。"] }
     ],
     "choice": {
       "prompt": "最后一个结由你来打。你怎么打？",
@@ -63,7 +63,7 @@
         "At the lookout the monastery is right across the gorge, white walls pinned to black rock, looking as if the wind could take it any minute and never quite doing it. Below, a waterfall drops sixty metres. You think of the story: a tigress, a cave, a man who sat in there a long time.",
         "“The flags aren't for the gods,” the guide says. “They're for the wind. It carries the good wishes everywhere. Whoever it touches, that counts.”"
       ] },
-      { "title": "Here's the wind", "paragraphs": ["You wait for it. When the sun reaches the monastery walls, the wind comes up out of the valley and every flag on the slope cracks at once. The guide nods. “Now.” You tie one end to a pine and hand him the other. As the cord pulls tight, all five colours fill at the same moment and lean the same way."] }
+      { "title": "Five colours", "paragraphs": ["You wait for it. When the sun reaches the monastery walls, the wind comes up out of the valley and every flag on the slope cracks at once. The guide nods. “Now.” You tie one end to a pine and hand him the other. As the cord pulls tight, all five colours fill at the same moment and lean the same way."] }
     ],
     "choice": {
       "prompt": "The last knot is yours. How do you tie it?",

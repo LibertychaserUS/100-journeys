@@ -23,7 +23,7 @@
         "天刚亮，平原上的雾还没退，一根根石柱浮在白色上面，像一群不打算靠岸的岛。你沿着凿出来的台阶往上走，在一座伸出悬崖的塔楼下停住。塔楼里有一架绞盘，一根绳子从里面垂下去，没进雾里。从前，粮食、木料和人，都是装在网里这样被摇上去的。有个老说法：绳子什么时候换？等主让它断的时候。",
         "你忍不住在心里把这套设计过了一遍。梯子可以收上去；网，得有人在上面摇。路一直都在，钥匙却在已经上去的人手里。不是没来得及修路，是没人想修。"
       ] },
-      { "title": "门开之前", "paragraphs": ["雾退到了石柱的半腰，太阳照在门上，门还关着。你坐在台阶上，把本子翻到最后一页，写下一件以后不再让人随手够到的东西：一个下午，一个计划，或者一扇门。你把外套穿好，盖住肩膀。风从石柱之间穿过去，带来一点焚香和湿石头的味道。门里有人在敲一块木板，一下，又一下，轻重不一。"] }
+      { "title": "最后一页", "paragraphs": ["雾退到了石柱的半腰，太阳照在门上，门还关着。你坐在台阶上，把本子翻到最后一页，写下一件以后不再让人随手够到的东西：一个下午，一个计划，或者一扇门。你把外套穿好，盖住肩膀。风从石柱之间穿过去，带来一点焚香和湿石头的味道。门里有人在敲一块木板，一下，又一下，轻重不一。"] }
     ],
     "choice": {
       "prompt": "门开了。你先做哪一件事？",
@@ -57,7 +57,7 @@
         "First light. The plain is still under mist, and the pillars float on it like islands with no plans to come ashore. You climb the cut steps and stop beneath a tower that juts out over the drop. Inside is a windlass, and a rope runs down from it into the white. Grain, timber and people once came up this way, in a net. The old line goes: when do you change the rope? When the Lord lets it break.",
         "You find yourself working the design through. The ladder could be pulled up. The net needed someone at the top to turn the handle. There was always a way up, but the key stayed with whoever was already there. Nobody forgot to build a road. Nobody wanted one."
       ] },
-      { "title": "Before the gate", "paragraphs": ["The mist has sunk to halfway down the pillars and the sun is on the gate, but it's still shut. You sit on the step, open your notebook at the last page and write down one thing you won't let just anyone reach any more: an afternoon, a plan, a door. You pull your jacket on over your shoulders. Wind threads between the pillars, carrying a little incense and wet stone. Inside, someone is striking a wooden board, once, then again, never quite evenly."] }
+      { "title": "The last page", "paragraphs": ["The mist has sunk to halfway down the pillars and the sun is on the gate, but it's still shut. You sit on the step, open your notebook at the last page and write down one thing you won't let just anyone reach any more: an afternoon, a plan, a door. You pull your jacket on over your shoulders. Wind threads between the pillars, carrying a little incense and wet stone. Inside, someone is striking a wooden board, once, then again, never quite evenly."] }
     ],
     "choice": {
       "prompt": "The gate opens. What do you do first?",

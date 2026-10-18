@@ -22,7 +22,7 @@
       { "title": "屋顶", "paragraphs": ["下午，风一阵一阵推着你的背包。角峰在路边陪了你几个小时：中间一段是浅色的花岗岩，顶上压着一层黑。向导停下来指给大家看：三座塔原来也有这样一层屋顶，后来被冰和风雨一点一点揭掉了。你把这层黑记在本子上，旁边写了一行：明天看没有屋顶的。"] },
       { "title": "倒推", "paragraphs": ["夜里，山屋的灯熄了，只剩你的头灯照着地图背面。你把第二天倒着排一遍：日出时间，减去上山要走的时间，再留二十分钟余量。又数了一遍人头，四个。闹钟定在 3:40，你把手机放在枕头边，屏幕朝下。"] },
       { "title": "头灯", "paragraphs": ["凌晨，风从山口灌下来，声音比脚步还响。四盏头灯排成一列，你走第二个，替所有人数着节奏：两步吸气，两步呼气。向导一抬手，大家就地蹲低，等这一阵风过去再起身。越往上石头越大，你不再看表，只看前面那盏灯照亮的下一块石头。"] },
-      { "title": "准时", "paragraphs": ["湖边还是灰的，你们比日出早到了十一分钟。湖水乳绿，比天色还暗。大家坐好，你最后一个坐下。然后它来了：先是一座塔的尖顶变红，像刚从炉子里夹出来，再一寸一寸往下走。上面什么也没剩下的花岗岩，把这点光整个接住了。你看了一眼表，又用袖子把它盖上。"] }
+      { "title": "早到的十一分钟", "paragraphs": ["湖边还是灰的，你们比日出早到了十一分钟。湖水乳绿，比天色还暗。大家坐好，你最后一个坐下。一座塔的尖顶先红了，像刚从炉子里夹出来，再一寸一寸往下走。上面什么也没剩下的花岗岩，把这点光整个接住了。你看了一眼表，又用袖子把它盖上。"] }
     ],
     "choice": {
       "prompt": "光走到塔脚之前，你做哪一件事？",
@@ -54,7 +54,7 @@
       { "title": "The roof", "paragraphs": ["Afternoon, and the wind keeps shoving at your pack. The Cuernos have been beside the trail for hours: pale granite in the middle, a dark band pressed down on top. The guide stops and points. The towers once had the same roof, he says, and ice and weather took it off a little at a time. You note the dark band in your notebook, and beside it: tomorrow, the ones without."] },
       { "title": "Backwards", "paragraphs": ["Night in the hut. The lights are out and your headlamp is on the back of the map. You lay tomorrow out backwards: sunrise, minus the climb, minus twenty minutes of slack. You count heads again. Four. The alarm goes on for 3:40, and the phone goes by your pillow, face down."] },
       { "title": "Headlamps", "paragraphs": ["Before dawn the wind coming down from the pass is louder than your boots. Four headlamps in a line. You walk second and keep the rhythm for everyone: two steps in, two steps out. The guide raises a hand and you all crouch where you are until the gust has gone through, then stand and carry on. The rocks get bigger as you climb, and you stop checking the time and watch only the next stone the lamp ahead is lighting."] },
-      { "title": "On time", "paragraphs": ["The tarn is still grey when you reach it, eleven minutes before sunrise. The water is milky green and darker than the sky. Everyone sits; you take the last rock. Then it comes: the tip of one tower turns red, as if it had just been lifted out of a forge, and the colour works its way down inch by inch. With nothing left on top of it, the granite catches every bit of the light. You glance at your watch, then pull your sleeve down over it."] }
+      { "title": "Eleven minutes early", "paragraphs": ["The tarn is still grey when you reach it, eleven minutes before sunrise. The water is milky green and darker than the sky. Everyone sits; you take the last rock. The tip of one tower turns red, as if it had just been lifted out of a forge, and the colour works its way down inch by inch. With nothing left on top of it, the granite catches every bit of the light. You glance at your watch, then pull your sleeve down over it."] }
     ],
     "choice": {
       "prompt": "Before the light reaches the foot of the towers, what do you do?",
