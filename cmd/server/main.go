@@ -185,20 +185,67 @@ func main() {
 	}
 
 	assetVersion := os.Getenv("ASSET_VERSION")
+	// CSS and JS are served as two bundles built from the files index.html lists (BUNDLE_ASSETS=0
+	// serves them one by one, for debugging).
+	bundled := os.Getenv("BUNDLE_ASSETS") != "0"
+	bundles := &webapp.BundleCache{}
+	currentVersion := func() string {
+		if assetVersion != "" {
+			return assetVersion
+		}
+		return webapp.AssetVersion("./web")
+	}
+	shell := func() (string, error) {
+		content, err := os.ReadFile("./web/index.html")
+		if err != nil {
+			return "", err
+		}
+		version := currentVersion()
+		page := string(content)
+		if bundled {
+			if page, _, err = bundles.Get(page, "./web", version); err != nil {
+				return "", err
+			}
+		}
+		return webapp.RenderIndex(page, webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version}), nil
+	}
+	serveBundle := func(kind string) gin.HandlerFunc {
+		return func(c *gin.Context) {
+			content, err := os.ReadFile("./web/index.html")
+			if err != nil {
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+			_, b, err := bundles.Get(string(content), "./web", currentVersion())
+			if err != nil {
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+			body, zipped, ctype := b.CSS, b.CSSGz, "text/css; charset=utf-8"
+			if kind == "js" {
+				body, zipped, ctype = b.JS, b.JSGz, "text/javascript; charset=utf-8"
+			}
+			c.Header("Cache-Control", "public, max-age=31536000, immutable")
+			c.Header("Vary", "Accept-Encoding")
+			if webapp.AcceptsGzip(c.GetHeader("Accept-Encoding")) {
+				c.Header("Content-Encoding", "gzip")
+				c.Data(http.StatusOK, ctype, zipped)
+				return
+			}
+			c.Data(http.StatusOK, ctype, body)
+		}
+	}
+	r.GET("/bundle/app.css", serveBundle("css"))
+	r.GET("/bundle/app.js", serveBundle("js"))
 
 	// Journey share links: the same SPA shell, with the journey's title, hook and cover as
 	// Open Graph tags (crawlers don't run JS); the page itself redirects into #/journey/:slug.
 	r.GET("/j/:slug", func(c *gin.Context) {
-		content, err := os.ReadFile("./web/index.html")
+		page, err := shell()
 		if err != nil {
 			c.String(http.StatusInternalServerError, "index.html not found")
 			return
 		}
-		version := assetVersion
-		if version == "" {
-			version = webapp.AssetVersion("./web")
-		}
-		page := webapp.RenderIndex(string(content), webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version})
 		lang := service.NormalizeLocale(c.Query("lang"))
 		j, err := svc.GetJourneyLocalized(c.Request.Context(), c.Param("slug"), lang)
 		if err == nil && j != nil {
@@ -220,7 +267,7 @@ func main() {
 			}
 			page = webapp.RenderShare(page, webapp.ShareMeta{
 				Title: j.Title + " · " + brand, Description: j.StoryHook, Image: image,
-				URL: origin + "/j/" + j.Slug, Locale: locale,
+				URL: origin + "/j/" + j.Slug, Locale: locale, Preload: webapp.PreloadCover(j.ImageURL),
 			})
 		}
 		c.Header("Cache-Control", "no-cache")
@@ -236,18 +283,11 @@ func main() {
 			return
 		}
 
-		indexPath := "./web/index.html"
-		content, err := os.ReadFile(indexPath)
+		html, err := shell()
 		if err != nil {
 			c.String(http.StatusInternalServerError, "index.html not found")
 			return
 		}
-
-		version := assetVersion
-		if version == "" {
-			version = webapp.AssetVersion("./web")
-		}
-		html := webapp.RenderIndex(string(content), webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version})
 
 		c.Header("Cache-Control", "no-cache")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))

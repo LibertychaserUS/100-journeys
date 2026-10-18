@@ -14,7 +14,7 @@ Pages.Home = {
   // The opening rotates through three entrances; each can be stepped into. Images fall back to
   // what exists until the per-journey scene images arrive.
   _scenes: [
-    { key: 'taoyuan', img: 'generated/hero-taoyuan-1600.jpg', set: 'generated/hero-taoyuan-960.jpg 960w, generated/hero-taoyuan-1600.jpg 1600w' },
+    { key: 'taoyuan', img: 'generated/hero-taoyuan.jpg' },
     { key: 'mirror', img: 'generated/card-salt-mirror.jpg', slug: 'bolivia-salt-flat-trek' },
     { key: 'night', img: 'generated/card-sahara-stars.jpg', slug: 'morocco-sahara-camel-camp' },
   ],
@@ -35,7 +35,8 @@ Pages.Home = {
     main.innerHTML = `
       <section class="home-hero scene-${this._scenes[0].key}" aria-labelledby="hero-title" aria-roledescription="${esc(t('home.scenes.role'))}">
         <div class="home-hero__slides" aria-hidden="true">
-          ${this._scenes.map((sc, i) => `<img class="home-hero__img ${i === 0 ? 'is-active' : ''}" data-scene="${i}" src="${API.mediaUrl(sc.img)}" ${sc.set ? `srcset="${sc.set.split(', ').map((x) => `${API.mediaUrl(x.split(' ')[0])} ${x.split(' ')[1]}`).join(', ')}" sizes="100vw"` : ''} alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`).join('')}
+          ${UI.picture(API.mediaUrl(this._scenes[0].img), { sizes: '100vw', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"' })}
+          ${this._scenes.slice(1).map((sc, i) => `<img class="home-hero__img" data-scene="${i + 1}" data-src="${UI.esc(API.mediaUrl(sc.img))}" alt="" decoding="async">`).join('')}
         </div>
         <canvas class="home-hero__particles" aria-hidden="true"></canvas>
         <div class="home-hero__shade" aria-hidden="true"></div>
@@ -110,6 +111,7 @@ Pages.Home = {
     if (this._particles) this._particles.stop();
     this._particles = null;
     clearTimeout(this._timer);
+    clearTimeout(this._warmTimer);
     this._timer = null;
     if (this._onVisibility) document.removeEventListener('visibilitychange', this._onVisibility);
     this._onVisibility = null;
@@ -134,8 +136,16 @@ Pages.Home = {
     if (!reduce) { hero.classList.add('is-playing'); this._schedule(hero); }
   },
 
+  // Later scenes load shortly before they are due, so they never compete with the first one.
+  _warm(hero, i) {
+    const img = hero.querySelector(`.home-hero__img[data-scene="${i}"][data-src]`);
+    if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
+  },
+
   _schedule(hero) {
     clearTimeout(this._timer);
+    clearTimeout(this._warmTimer);
+    this._warmTimer = setTimeout(() => this._warm(hero, (this._scene + 1) % this._scenes.length), Math.max(0, this.SCENE_MS - 2500));
     if (this._paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     this._timer = setTimeout(() => this._show(hero, (this._scene + 1) % this._scenes.length), this.SCENE_MS);
   },
@@ -143,6 +153,7 @@ Pages.Home = {
   _show(hero, i, { user = false } = {}) {
     if (!hero.isConnected) return;
     const sc = this._scenes[i];
+    this._warm(hero, i);
     this._scene = i;
     hero.className = hero.className.replace(/scene-\S+/, `scene-${sc.key}`);
     hero.querySelectorAll('.home-hero__img').forEach((img) => img.classList.toggle('is-active', Number(img.dataset.scene) === i));

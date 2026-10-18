@@ -14,6 +14,7 @@ type ShareMeta struct {
 	Image       string // absolute URL
 	URL         string // canonical absolute URL
 	Locale      string // og:locale, e.g. zh_CN or en_US
+	Preload     string // optional <link rel="preload"> for the page's opening image
 }
 
 var (
@@ -44,8 +45,25 @@ func RenderShare(page string, m ShareMeta) string {
 	if m.Image != "" {
 		tags = append(tags, `<meta property="og:image" content="`+esc(m.Image)+`" />`, `<meta name="twitter:image" content="`+esc(m.Image)+`" />`)
 	}
+	if m.Preload != "" {
+		tags = append(tags, m.Preload)
+	}
 	if m.Locale != "" {
 		tags = append(tags, `<meta property="og:locale" content="`+esc(m.Locale)+`" />`)
 	}
 	return strings.Replace(page, "</head>", "  "+strings.Join(tags, "\n  ")+"\n</head>", 1)
+}
+
+var coverJPEG = regexp.MustCompile(`/generated/[^/]+/cover\.jpg$`)
+
+// PreloadCover is a typed AVIF preload for a generated cover's derivatives (browsers that can't
+// decode AVIF skip it), or "" when the image has none.
+func PreloadCover(src string) string {
+	if !coverJPEG.MatchString(src) {
+		return ""
+	}
+	base := strings.TrimSuffix(src, ".jpg")
+	set := base + ".480.avif 480w, " + base + ".720.avif 720w, " + base + ".1120.avif 1120w"
+	return `<link rel="preload" as="image" type="image/avif" fetchpriority="high" href="` + html.EscapeString(base+".1120.avif") +
+		`" imagesrcset="` + html.EscapeString(set) + `" imagesizes="100vw" />`
 }

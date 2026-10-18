@@ -29,16 +29,20 @@ WIDTHS = {
     'ending': [960, 1600],
     'fork': [600, 1024],
     'texture': [600, 1024],
+    'home': [960, 1600],
 }
 AVIF_Q, WEBP_Q = 52, 78
+AVIF_Q_LARGE, WEBP_Q_LARGE = 46, 72  # 1000px and wider: the openings, where bytes matter most for LCP
 
 
 def kind_of(name):
     base = os.path.splitext(name)[0]
     if base.startswith('card-'):
         return 'card'
+    if base == 'hero-taoyuan':
+        return 'home'
     if base.startswith('hero-taoyuan'):
-        return None  # the home hero already ships 960 and 1600 JPEGs
+        return None  # the 960/1600 JPEGs are the fallbacks for the home opening
     for k in WIDTHS:
         if base == k or base.startswith(k + '-'):
             return k
@@ -49,8 +53,9 @@ def save(img, path_base, width):
     w = min(width, img.width)
     h = round(img.height * w / img.width)
     out = img if w == img.width else img.resize((w, h), Image.LANCZOS)
-    out.save(f'{path_base}.{width}.avif', 'AVIF', quality=AVIF_Q)
-    out.save(f'{path_base}.{width}.webp', 'WEBP', quality=WEBP_Q, method=6)
+    large = width >= 1000
+    out.save(f'{path_base}.{width}.avif', 'AVIF', quality=AVIF_Q_LARGE if large else AVIF_Q)
+    out.save(f'{path_base}.{width}.webp', 'WEBP', quality=WEBP_Q_LARGE if large else WEBP_Q, method=6)
 
 
 def fingerprint(img):

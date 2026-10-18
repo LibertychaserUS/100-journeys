@@ -24,26 +24,27 @@ Test,TEST-017,Go unit/integration / Go 单元集成,order_repo_test,File exists 
 Test,TEST-018,Go unit/integration / Go 单元集成,user_repo_test,File exists and is part of repo,internal/repository/user_repo_test.go,Specified
 Test,TEST-019,Go unit/integration / Go 单元集成,journey_service_test,File exists and is part of repo,internal/service/journey_service_test.go,Specified
 Test,TEST-020,Go unit/integration / Go 单元集成,locale_test,File exists and is part of repo,internal/service/locale_test.go,Specified
-Test,TEST-021,Go unit/integration / Go 单元集成,index_test,File exists and is part of repo,internal/webapp/index_test.go,Specified
-Test,TEST-022,Go unit/integration / Go 单元集成,share_test,File exists and is part of repo,internal/webapp/share_test.go,Specified
-Test,TEST-023,Playwright E2E,a11y.spec,File exists and is part of repo,e2e/tests/a11y.spec.js,Specified
-Test,TEST-024,Playwright E2E,auth.spec,File exists and is part of repo,e2e/tests/auth.spec.js,Specified
-Test,TEST-025,Playwright E2E,detail.spec,File exists and is part of repo,e2e/tests/detail.spec.js,Specified
-Test,TEST-026,Playwright E2E,explore.spec,File exists and is part of repo,e2e/tests/explore.spec.js,Specified
-Test,TEST-027,Playwright E2E,home.spec,File exists and is part of repo,e2e/tests/home.spec.js,Specified
-Test,TEST-028,Playwright E2E,i18n.spec,File exists and is part of repo,e2e/tests/i18n.spec.js,Specified
-Test,TEST-029,Playwright E2E,mobile.spec,File exists and is part of repo,e2e/tests/mobile.spec.js,Specified
-Test,TEST-030,Playwright E2E,orders.spec,File exists and is part of repo,e2e/tests/orders.spec.js,Specified
-Test,TEST-031,Playwright E2E,persona.spec,File exists and is part of repo,e2e/tests/persona.spec.js,Specified
-Test,TEST-032,Playwright E2E,space.spec,File exists and is part of repo,e2e/tests/space.spec.js,Specified
-Test,TEST-033,Playwright support / E2E 支撑文件,helpers,File exists and is part of repo,e2e/tests/helpers.js,Specified
-Test,TEST-034,Go stress,stress_test,File exists and is part of repo,tests/stress/stress_test.go,Specified
-Test,TEST-035,k6 load / k6 负载,admin-analytics-export.k6,File exists and is part of repo,tests/load/admin-analytics-export.k6.js,Specified
-Test,TEST-036,k6 load / k6 负载,auth-register-login.k6,File exists and is part of repo,tests/load/auth-register-login.k6.js,Specified
-Test,TEST-037,k6 load / k6 负载,image-static-cache.k6,File exists and is part of repo,tests/load/image-static-cache.k6.js,Specified
-Test,TEST-038,k6 load / k6 负载,order-payment-audit.k6,File exists and is part of repo,tests/load/order-payment-audit.k6.js,Specified
-Test,TEST-039,k6 load / k6 负载,pet-chat-analytics.k6,File exists and is part of repo,tests/load/pet-chat-analytics.k6.js,Specified
-Test,TEST-040,k6 load / k6 负载,public-content-flow.k6,File exists and is part of repo,tests/load/public-content-flow.k6.js,Specified
+Test,TEST-021,Go unit/integration / Go 单元集成,bundle_test,File exists and is part of repo,internal/webapp/bundle_test.go,Specified
+Test,TEST-022,Go unit/integration / Go 单元集成,index_test,File exists and is part of repo,internal/webapp/index_test.go,Specified
+Test,TEST-023,Go unit/integration / Go 单元集成,share_test,File exists and is part of repo,internal/webapp/share_test.go,Specified
+Test,TEST-024,Playwright E2E,a11y.spec,File exists and is part of repo,e2e/tests/a11y.spec.js,Specified
+Test,TEST-025,Playwright E2E,auth.spec,File exists and is part of repo,e2e/tests/auth.spec.js,Specified
+Test,TEST-026,Playwright E2E,detail.spec,File exists and is part of repo,e2e/tests/detail.spec.js,Specified
+Test,TEST-027,Playwright E2E,explore.spec,File exists and is part of repo,e2e/tests/explore.spec.js,Specified
+Test,TEST-028,Playwright E2E,home.spec,File exists and is part of repo,e2e/tests/home.spec.js,Specified
+Test,TEST-029,Playwright E2E,i18n.spec,File exists and is part of repo,e2e/tests/i18n.spec.js,Specified
+Test,TEST-030,Playwright E2E,mobile.spec,File exists and is part of repo,e2e/tests/mobile.spec.js,Specified
+Test,TEST-031,Playwright E2E,orders.spec,File exists and is part of repo,e2e/tests/orders.spec.js,Specified
+Test,TEST-032,Playwright E2E,persona.spec,File exists and is part of repo,e2e/tests/persona.spec.js,Specified
+Test,TEST-033,Playwright E2E,space.spec,File exists and is part of repo,e2e/tests/space.spec.js,Specified
+Test,TEST-034,Playwright support / E2E 支撑文件,helpers,File exists and is part of repo,e2e/tests/helpers.js,Specified
+Test,TEST-035,Go stress,stress_test,File exists and is part of repo,tests/stress/stress_test.go,Specified
+Test,TEST-036,k6 load / k6 负载,admin-analytics-export.k6,File exists and is part of repo,tests/load/admin-analytics-export.k6.js,Specified
+Test,TEST-037,k6 load / k6 负载,auth-register-login.k6,File exists and is part of repo,tests/load/auth-register-login.k6.js,Specified
+Test,TEST-038,k6 load / k6 负载,image-static-cache.k6,File exists and is part of repo,tests/load/image-static-cache.k6.js,Specified
+Test,TEST-039,k6 load / k6 负载,order-payment-audit.k6,File exists and is part of repo,tests/load/order-payment-audit.k6.js,Specified
+Test,TEST-040,k6 load / k6 负载,pet-chat-analytics.k6,File exists and is part of repo,tests/load/pet-chat-analytics.k6.js,Specified
+Test,TEST-041,k6 load / k6 负载,public-content-flow.k6,File exists and is part of repo,tests/load/public-content-flow.k6.js,Specified
 Route,ROUTE-001,Admin,GET /api/admin/export,Route is registered,internal/handler/admin_handler.go,Implemented
 Route,ROUTE-002,Admin,GET /api/admin/stats,Route is registered,internal/handler/admin_handler.go,Implemented
 Route,ROUTE-003,Admin,GET /api/admin/users,Route is registered,internal/handler/admin_handler.go,Implemented

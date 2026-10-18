@@ -270,6 +270,8 @@ func TestImages_HaveDerivatives(t *testing.T) {
 			return []int{960, 1600}
 		case base == "fork.jpg" || base == "texture.jpg":
 			return []int{600, 1024}
+		case base == "hero-taoyuan.jpg":
+			return []int{960, 1600}
 		}
 		return nil
 	}

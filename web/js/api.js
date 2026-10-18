@@ -77,9 +77,17 @@ const API = (() => {
   // page (and its shared-image transition) can render without waiting on the network.
   const journeyCache = new Map();
   function cachedJourney(slug) {
-    const key = `${slug}|${(window.I18n && I18n.lang) || ''}`;
+    const lang = typeof I18n !== 'undefined' ? I18n.lang : ''; // a top-level const, not on window
+    const key = `${slug}|${lang}`;
     const hit = journeyCache.get(key);
     if (hit && Date.now() - hit.at < 60000) return hit.promise;
+    const early = window.__journeyPrefetch;
+    if (early && early.slug === slug && early.lang === lang) {
+      window.__journeyPrefetch = null;
+      const promise = early.promise.catch(() => request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`));
+      journeyCache.set(key, { at: Date.now(), promise });
+      return promise;
+    }
     const promise = request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`);
     journeyCache.set(key, { at: Date.now(), promise });
     promise.catch(() => journeyCache.delete(key));

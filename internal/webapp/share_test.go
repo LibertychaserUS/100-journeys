@@ -26,3 +26,14 @@ func TestRenderShare(t *testing.T) {
 		t.Errorf("unsafe or duplicated output:\n%s", got)
 	}
 }
+
+// UT-WEB-006: a journey share page preloads its cover's AVIF set; other images get nothing.
+func TestPreloadCover(t *testing.T) {
+	got := PreloadCover("/static/assets/images/generated/norway-aurora-hunt/cover.jpg")
+	if !strings.Contains(got, `type="image/avif"`) || !strings.Contains(got, "cover.720.avif 720w") {
+		t.Errorf("unexpected preload: %s", got)
+	}
+	if PreloadCover("/static/assets/images/norway-aurora-2.jpg") != "" {
+		t.Error("images without derivatives get no preload")
+	}
+}

@@ -4,7 +4,7 @@
 
 | 测试层 Test layer | 文件 Files | 数量 Count |
 |---|---:|---:|
-| Go unit/integration / Go 单元集成 | `internal/ai/deepseek_test.go`, `internal/ai/mock_ai_test.go`, `internal/ai/recommend_engine_test.go`, `internal/analytics/buffer_test.go`, `internal/content/content_test.go`, `internal/handler/admin_handler_test.go` ... | 22 |
+| Go unit/integration / Go 单元集成 | `internal/ai/deepseek_test.go`, `internal/ai/mock_ai_test.go`, `internal/ai/recommend_engine_test.go`, `internal/analytics/buffer_test.go`, `internal/content/content_test.go`, `internal/handler/admin_handler_test.go` ... | 23 |
 | Playwright E2E | `e2e/tests/a11y.spec.js`, `e2e/tests/auth.spec.js`, `e2e/tests/detail.spec.js`, `e2e/tests/explore.spec.js`, `e2e/tests/home.spec.js`, `e2e/tests/i18n.spec.js` ... | 10 |
 | Playwright support / E2E 支撑文件 | `e2e/tests/helpers.js` | 1 |
 | Go stress | `tests/stress/stress_test.go` | 1 |

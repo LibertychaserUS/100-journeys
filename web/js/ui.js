@@ -61,6 +61,7 @@ const UI = (() => {
     [/\/generated\/card-[^/]+\.jpg$/, [480, 720]],
     [/\/generated\/[^/]+\/(hero|scene-\d|ending)\.jpg$/, [960, 1600]],
     [/\/generated\/[^/]+\/(fork|texture)\.jpg$/, [600, 1024]],
+    [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600]],
   ];
   function picture(src, { sizes = '100vw', alt = '', cls = '', eager = false, width, height, attrs = '' } = {}) {
     const rule = DERIVED.find(([re]) => re.test(String(src || '')));
