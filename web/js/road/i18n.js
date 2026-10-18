@@ -116,10 +116,9 @@ I18n.extend('zh', {
   'rack.open': '把「{title}」从绳上取下来看看',
 
   'drift.eyebrow': '风吹来的票',
-  'drift.lead': '它们借过的门，正好会为你打开。',
 
-  'compose.outline.where': '这张纸笺在第 {n} 号入口 · {realm} · {opens}',
-  'compose.outline.go': '去那扇门',
+  'compose.outline.where': '№{n} · {realm} · {opens}',
+  'compose.outline.go': '走过去',
   'compose.outline.more': '还有 {n} 扇门后面有',
   'compose.outline.aria': '一张还没拓到的纸笺，在第 {n} 号入口',
   'compose.outline.close': '收起',
@@ -132,7 +131,7 @@ I18n.extend('zh', {
   'compose.hiddenTag': '站务在看',
   'compose.removedTag': '站务撤下了',
   'compose.ledger': '灯下账本',
-  'compose.toast.posted': '挂上去了。夜站和它借过的门边都能看见。',
+  'compose.toast.posted': '挂上去了。',
   'compose.toast.unposted': '取下来了。',
   'compose.toast.from': '带着这张票的纸笺出发了。',
   'compose.post.title': '挂上票台',
@@ -307,10 +306,9 @@ I18n.extend('en', {
   'rack.open': 'Take “{title}” off the line',
 
   'drift.eyebrow': 'Blown in on the wind',
-  'drift.lead': 'The doors they borrowed from are ones that open for you.',
 
-  'compose.outline.where': 'This slip waits at entrance {n} · {realm} · {opens}',
-  'compose.outline.go': 'Go to that door',
+  'compose.outline.where': '№{n} · {realm} · {opens}',
+  'compose.outline.go': 'Walk there',
   'compose.outline.more': '{n} more doors hold slips',
   'compose.outline.aria': 'A slip you have not rubbed yet, at entrance {n}',
   'compose.outline.close': 'Close',
@@ -323,7 +321,7 @@ I18n.extend('en', {
   'compose.hiddenTag': 'With the station staff',
   'compose.removedTag': 'Taken down by the station',
   'compose.ledger': 'Ledger under the lamp',
-  'compose.toast.posted': 'It’s up: at the Night Station and by every door it borrowed from.',
+  'compose.toast.posted': 'It’s up.',
   'compose.toast.unposted': 'Taken down.',
   'compose.toast.from': 'You set out with this ticket’s slips.',
   'compose.post.title': 'Hang it at the station',

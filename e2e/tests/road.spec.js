@@ -39,7 +39,7 @@ test.describe('The Ticket Road', () => {
     await expect(slip(page, 'place', 'uyuni')).toHaveCount(0);
     const outline = page.locator('.slips[data-group="place"] .slip-outline').first();
     await outline.click();
-    await expect(page.locator('.outline-pop')).toContainText('第 1 号入口');
+    await expect(page.locator('.outline-pop')).toContainText('№1 · 镜与盐');
     await expect(page.locator('.outline-pop a')).toHaveAttribute('href', '#/journey/bolivia-salt-flat-trek');
     for (const [g, k] of [['place', 'tromso'], ['hour', 'night'], ['season', 'polar-night'], ['stay', 'day'], ['keepsake', 'keep-6-pencil']]) await slip(page, g, k).click();
     await expect(page.locator('#compose-ticket .cline[data-group="place"] .cline__mark')).toContainText('№6');
@@ -103,7 +103,7 @@ test.describe('The Ticket Road', () => {
     await page.keyboard.press('End');
     await page.locator('.stamp[data-stamp="stopped"]').click();
     await page.locator('.lantern__release').click();
-    await expect(page.locator('.lantern__status')).toHaveText('你的灯升上去了。');
+    await expect(page.locator('.lantern [data-lit-status]')).toHaveText('你的灯升上去了。'); // heard, not shown: the light says it
     await expect(page.locator('.lantern__verdict')).toContainText('灯还没点满'); // nothing public before five travellers
     const mine = await page.evaluate(async (c) => (await API.myLamp('ticket', c)).data.mine, code);
     expect(mine).toMatchObject({ real: 4, moved: 5, fit: 0, stamp: 'stopped' });

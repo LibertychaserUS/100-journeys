@@ -32,8 +32,7 @@ const Rack = (() => {
       if (!n && kind === 'drift') { el.innerHTML = ''; return; } // the wind brings nothing yet: no empty line in the space
       el.innerHTML = `
         <section class="rack${n ? '' : ' is-empty'}" aria-labelledby="rack-title-${esc(slug)}">
-          <p class="rack__eyebrow" id="rack-title-${esc(slug)}">${esc(t(eyebrow))}</p>
-          ${kind === 'drift' ? `<p class="rack__lead">${esc(t('drift.lead'))}</p>` : ''}
+          <h2 class="sr-only" id="rack-title-${esc(slug)}">${esc(t(eyebrow))}</h2>
           <div class="rack__line">
             <svg class="rack__thread" viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 14 Q 500 ${n ? 74 : 54} 1010 14"/></svg>
             ${n ? `<ul class="rack__tickets" style="--n:${n}">${items.map((v, i) => `

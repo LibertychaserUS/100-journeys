@@ -241,6 +241,7 @@ Pages.Detail = {
           <h2 id="prep-title">${esc(t(c ? 'detail.prep' : 'detail.ch3.title'))}</h2>
           <div class="clues">${clues}</div>
         </section>
+        ${c ? '<div class="road-end" id="road-end"></div>' : ''}
         <p class="detail-fine">${esc(t('detail.fine'))}</p>
       </div>`;
   },
@@ -372,8 +373,6 @@ Pages.Detail = {
             </div>
           </aside>
         </div>
-
-        ${c ? '<div class="road-end container" id="road-end"></div>' : ''}
 
         <div class="bookbar" id="detail-bookbar">
           <div class="bookbar__price"><b class="num">${esc(UI.coins(j.price))}</b><span class="num" data-balance>${user ? esc(t('detail.balance', { n: I18n.num(user.balance) })) : ''}</span></div>

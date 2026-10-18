@@ -31,7 +31,7 @@ const RoadEnd = (() => {
     host.innerHTML = `
       <div class="road-end__rub" id="road-rub"></div>
       <section class="road-end__lamp" aria-labelledby="road-lamp-title">
-        <h2 class="road-end__title" id="road-lamp-title">${esc(t('lamp.title'))}</h2>
+        <h2 class="sr-only" id="road-lamp-title">${esc(t('lamp.title'))}</h2>
         <div id="road-lamp"></div>
       </section>
       <div class="road-end__rack" id="road-rack"></div>`;

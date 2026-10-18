@@ -45,10 +45,8 @@ const Rubbing = (() => {
       done = already;
       el.innerHTML = `
         <section class="rubbing${already ? ' is-done is-settled' : ''}" aria-labelledby="rub-title">
-          <header class="rubbing__head">
-            <h2 id="rub-title">${esc(t('rub.title'))}</h2>
-            ${already ? '' : `<p>${esc(t(motion() ? 'rub.lead' : 'rub.leadHold'))}</p>`}
-          </header>
+          <h2 class="sr-only" id="rub-title">${esc(t('rub.title'))}</h2>
+          ${already ? '' : `<p class="sr-only" id="rub-lead">${esc(t(motion() ? 'rub.lead' : 'rub.leadHold'))}</p>`}
           <div class="rubbing__stone" data-realm="${esc(journey.entrance.realm)}">
             <div class="rubbing__relief">
               <p class="rubbing__no num"><span>№</span>${no}</p>
@@ -58,7 +56,7 @@ const Rubbing = (() => {
                 ${forkHTML(forkSlip)}
               </ul>
             </div>
-            ${already ? '' : `<canvas class="rubbing__paper" aria-label="${esc(t('rub.paper', { n: no }))}" role="img"></canvas>`}
+            ${already ? '' : `<canvas class="rubbing__paper" aria-label="${esc(t('rub.paper', { n: no }))}" aria-describedby="rub-lead" role="img"></canvas>`}
           </div>
           ${already ? '' : `<div class="rubbing__controls"><button type="button" class="btn btn--ghost rubbing__hold" aria-describedby="rub-hold-help">${esc(t('rub.hold'))}<span class="rubbing__meter" aria-hidden="true"><b></b></span></button><span class="sr-only" id="rub-hold-help">${esc(t('rub.holdAria'))}</span></div>`}
           <div class="rubbing__box${already ? ' is-full' : ''}">
@@ -116,7 +114,26 @@ const Rubbing = (() => {
           ctx.stroke();
         }
       };
+      // A short swipe already worn into one corner shows what the paper is for, without a word.
+      const hint = () => {
+        const w = canvas.width;
+        const hgt = canvas.height;
+        ctx.globalCompositeOperation = 'destination-out';
+        for (let i = 0; i <= 14; i++) {
+          const x = w * (0.06 + i * 0.012);
+          const y = hgt * (0.86 - i * 0.012);
+          const g = ctx.createRadialGradient(x, y, 0, x, y, 16 * dpr);
+          g.addColorStop(0, 'rgba(0,0,0,.22)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(x, y, 16 * dpr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      };
       drawPaper();
+      hint();
       const grid = new Uint8Array(COLS * ROWS);
       let covered = 0;
       const mark = (x, y, r) => {

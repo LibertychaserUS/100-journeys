@@ -105,7 +105,7 @@ const Lantern = (() => {
           <div class="lantern__body" style="--flame:${flame()}" aria-hidden="true">
             <span class="lantern__cap"></span><span class="lantern__paper"><span class="lantern__flame"></span></span><span class="lantern__foot"></span>
           </div>
-          ${dwell && !ready ? `<div class="lantern__dwell" role="timer" aria-live="off"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/></svg><span>${esc(t('lamp.dwell'))}</span></div>` : ''}
+          ${dwell && !ready ? `<div class="lantern__dwell" role="timer" aria-live="off"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/></svg><span class="sr-only">${esc(t('lamp.dwell'))}</span></div>` : ''}
           <div class="lantern__cords">${AXES.map(cordHTML).join('')}</div>
         </div>
         <fieldset class="lantern__stamps">
@@ -120,6 +120,7 @@ const Lantern = (() => {
         <div class="lantern__go">
           <button type="button" class="btn btn--primary lantern__release" ${settled ? 'disabled' : ''}>${esc(t(lit ? 'lamp.adjust' : 'lamp.release'))}</button>
           <p class="lantern__status" role="status" aria-live="polite">${settled ? esc(t('lamp.settled')) : ''}</p>
+          <p class="sr-only" role="status" aria-live="polite" data-lit-status></p>
         </div>`;
       bind(box);
       syncRelease();
@@ -259,8 +260,9 @@ const Lantern = (() => {
         if (destroyed) return;
         lit = true;
         render();
-        const status = el.querySelector('.lantern__status');
-        if (status) status.textContent = res.local ? t(res.held ? 'lamp.kept' : 'lamp.local') : t('lamp.lit');
+        // The light says it; only screen readers hear the words.
+        const said = el.querySelector('[data-lit-status]');
+        if (said) said.textContent = res.local ? t(res.held ? 'lamp.kept' : 'lamp.local') : t('lamp.lit');
         if (res.local && !res.held && !API.isLoggedIn()) {
           UI.toast(t('lamp.local'), { href: `#/login?next=${encodeURIComponent(window.location.hash.slice(1) || '/')}`, label: t('nav.login') });
         }
@@ -294,7 +296,7 @@ const Lantern = (() => {
         if (destroyed || !API.isLoggedIn()) return;
         try {
           const res = await Road.light(lamp);
-          if (!res.local && !destroyed) { light = res.light; lit = true; render(); el.querySelector('.lantern__status').textContent = t('lamp.lit'); }
+          if (!res.local && !destroyed) { light = res.light; lit = true; render(); const said = el.querySelector('[data-lit-status]'); if (said) said.textContent = t('lamp.lit'); }
         } catch {}
       }, Math.max(1, wait) * 1000 + 600));
     }
