@@ -162,3 +162,6 @@ body[data-bookbar] .toast-region { bottom: calc(92px + env(safe-area-inset-botto
   .sheet, .sheet--wide { width: 100%; max-height: 88vh; border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px)); border-bottom: 0; }
   @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
 }
+
+/* Small letter-spaced label above a page or section title */
+.eyebrow { font-size: var(--text-xs); letter-spacing: .14em; color: var(--color-text-3); }

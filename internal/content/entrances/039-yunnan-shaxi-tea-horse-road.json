@@ -1,0 +1,87 @@
+{
+  "slug": "yunnan-shaxi-tea-horse-road",
+  "entrance": { "no": 39, "realm": "old-roads", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "afternoon" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "raw",
+    "adventure_index": 2, "obscurity_level": 6, "risk_level": 1, "price": 4999,
+    "tags": ["culture", "hidden"],
+    "mbti": { "ESFJ": 5, "ISFP": 4, "ENFP": 3 }
+  },
+  "cover": { "path": "generated/yunnan-shaxi-tea-horse-road/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "戏台 · 沙溪寺登街",
+    "subtitle": "第 39 号入口：戏台对着寺门唱",
+    "hook": "戏台对着寺门，戏是唱给佛和人一起看的",
+    "region": "亚洲 · 中国",
+    "moods": ["赶集", "古戏台", "午后", "热乎"],
+    "opens": "春天的星期五，集市散场后的下午",
+    "role": "多搬一张凳子的人",
+    "premise": "沙溪在云南大理州剑川县，寺登街是茶马古道上的老集镇。世界纪念性建筑基金会说，这里的集市区是茶马古道上保存最完整的贸易集镇，并把它列入 2002 年度的世界建筑遗产观察名录；后来，瑞士苏黎世联邦理工学院和剑川县政府一起把它修复。四方街一头是古戏台，另一头是明代的兴教寺，两者隔着广场面对面。",
+    "mission": "开戏之前，多搬一张凳子到广场上，给那个还站着的人。",
+    "chapters": [
+      { "title": "星期五", "paragraphs": ["星期五一早，附近村子的人都背着东西来了，把寺登街摆得满满的：腊肉、青菜、旧闹钟、一筐小猪仔，还有一个摊子只卖假牙。没走多远，你手里就多了一串烤乳扇、半斤核桃，和一块大妈硬塞给你尝的烤饵块。"] },
+      { "title": "吃不完", "paragraphs": [
+        "你买得太多了。你在四方街的石阶上坐下，把乳扇掰成两半，一半递给旁边歇脚的老人，又掰一块给背着空背篓等人的小男孩。男孩想了想，从兜里掏出一把松子塞回给你。",
+        "老人吃得很慢，一边吃一边指给你看：哪间铺子以前是马店，哪个院子以前住过赶马的人。"
+      ] },
+      { "title": "戏台对着寺门", "paragraphs": [
+        "下午，集散了，四方街空了出来。广场一头的古戏台上有人在挂幕布，正对面，兴教寺的大门开着。“戏也是唱给佛听的，”老人说，“佛跟我们一起看。”",
+        "大家从家里搬出小板凳，面朝戏台坐下，背对着寺门，佛就在所有人身后。你数了一遍。还有一个人站着。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "凳子递出去以后，你做什么？",
+      "options": [
+        { "key": "share", "label": "把最后一块饵块掰成两半，分给旁边的人", "keeps": "指尖上一点烤米的香味" },
+        { "key": "stand", "label": "自己站到最后一排，和寺门一起看戏", "keeps": "后背上被夕阳晒暖的一块" },
+        { "key": "hum", "label": "跟着前排的老人小声哼一句", "keeps": "一句听不懂、却记住了调子的唱词" }
+      ]
+    },
+    "ending": "回到城里，有一回朋友聚餐，菜都上齐了，还有人站着找位子。你起身去隔壁桌借了一把椅子，放下的时候，想起了那个下午广场上的小板凳。",
+    "facts": [
+      { "text": "世界纪念性建筑基金会称沙溪集市区是茶马古道上保存最完整的贸易集镇，有完整的戏台、商人客栈和寺院；它列入了 2002 年度的世界建筑遗产观察名录。", "source": "https://www.wmf.org/monuments/shaxi-market-area" },
+      { "text": "沙溪的寺和戏台面对面，是当地的习俗：佛要和人们一起看戏。广场的修复由瑞士苏黎世联邦理工学院与剑川县政府组成的团队完成。", "source": "https://gulfnews.com/amp/story/entertainment%2Farts-culture%2Fan-ancient-caravan-town-in-china-is-reborn-1.1710653" },
+      { "text": "每逢星期五，附近村子的人都到寺登街赶集，从假牙到牲口，什么都卖。", "source": "https://www.gokunming.com/en/blog/item/306/get_off_the_beaten_path_in_shaxi" },
+      { "text": "沙溪位于云南大理州剑川县；兴教寺是明代的白族佛寺。", "source": "https://en.wikipedia.org/wiki/Shaxi,_Yunnan" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。星期五的集市是真的；散集后戏台开演、大家搬凳子看戏的场面，以及文中的人物和对话，都是虚构的。"
+  },
+  "en": {
+    "title": "The Stage · Shaxi",
+    "subtitle": "Entrance No. 39: a stage that plays to the temple door",
+    "hook": "The stage faces the temple, so the Buddha watches with everyone",
+    "region": "Asia · China",
+    "moods": ["Market day", "Old stage", "Afternoon", "Shared food"],
+    "opens": "On a Friday afternoon in spring, as the market packs up",
+    "role": "The one with the extra stool",
+    "premise": "Shaxi lies in Jianchuan County in Yunnan's Dali prefecture, and its Sideng market was a stop on the old Tea Horse Road. The World Monuments Fund calls it the most complete surviving trading centre on the Tea and Horse Caravan Trail, and put it on its 2002 Watch; a team from ETH Zurich and the county government later restored it. At one end of the square stands the old theatre stage, at the other the Ming-dynasty Xingjiao Temple, and they face each other across the stones.",
+    "mission": "Before the play starts, carry one extra stool out to the square and give it to whoever is still standing.",
+    "chapters": [
+      { "title": "Friday", "paragraphs": ["Early on Friday, people come in from all the villages around with their goods and fill Sideng's street: cured pork, greens, old alarm clocks, a basket of piglets, and one stall that sells nothing but false teeth. Before you've gone far you're holding a stick of grilled rushan, the local milk cheese, half a pound of walnuts, and a toasted rice cake a woman insisted you try."] },
+      { "title": "Too much", "paragraphs": [
+        "You've bought far too much. You sit down on the steps of the square, break the rushan in two and give half to the old man resting next to you, then another piece to a boy waiting with an empty basket on his back. The boy thinks about it, digs in his pocket, and hands you a fistful of pine nuts.",
+        "The old man eats slowly and points things out as he goes: which shop used to be a caravan inn, which courtyard used to put up the muleteers."
+      ] },
+      { "title": "Facing the temple", "paragraphs": [
+        "In the afternoon the market packs up and the square empties. On the old stage at one end, someone is hanging a curtain. Straight across, the doors of Xingjiao Temple stand open. “The plays are for the Buddha too,” the old man says. “He watches with us.”",
+        "People bring out their own low stools and sit facing the stage, backs to the temple, the Buddha just behind them all. You count heads. One person is still standing."
+      ] }
+    ],
+    "choice": {
+      "prompt": "The stool's handed over. What next?",
+      "options": [
+        { "key": "share", "label": "Break your last rice cake in two and pass half along", "keeps": "The smell of toasted rice on your fingers" },
+        { "key": "stand", "label": "Stand at the back yourself, watching alongside the temple", "keeps": "A patch of late sun, warm on your back" },
+        { "key": "hum", "label": "Hum along under your breath with the old men in front", "keeps": "A line you don't understand but can't stop humming" }
+      ]
+    },
+    "ending": "Back home, at a crowded dinner with friends, someone's still looking for a seat when the food arrives. You get up and borrow a chair from the next table, and as you set it down you think of the stools in the square.",
+    "facts": [
+      { "text": "The World Monuments Fund describes the Shaxi Market Area as the most complete surviving trading centre on the Tea and Horse Caravan Trail, with an intact theatre, merchants' guesthouses and a temple precinct; it was on the 2002 World Monuments Watch.", "source": "https://www.wmf.org/monuments/shaxi-market-area" },
+      { "text": "In Shaxi it is a local custom for the temple and the theatre to face each other, so the Buddha watches the performances with the people. The square was restored by a team from ETH Zurich and the Jianchuan County government.", "source": "https://gulfnews.com/amp/story/entertainment%2Farts-culture%2Fan-ancient-caravan-town-in-china-is-reborn-1.1710653" },
+      { "text": "On Fridays people from the surrounding villages fill the streets of Sideng for a market selling everything from dentures to livestock.", "source": "https://www.gokunming.com/en/blog/item/306/get_off_the_beaten_path_in_shaxi" },
+      { "text": "Shaxi is in Jianchuan County, Dali Prefecture, Yunnan; Xingjiao Temple is a Ming-dynasty Buddhist temple of the Bai people.", "source": "https://en.wikipedia.org/wiki/Shaxi,_Yunnan" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The Friday market is real; the play after the market, the stools in the square, and the people and conversations here are fiction."
+  }
+}

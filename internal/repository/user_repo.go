@@ -20,6 +20,10 @@ type UserRepository interface {
 	SaveJourney(ctx context.Context, userID, journeyID int64) error
 	UnsaveJourney(ctx context.Context, userID, journeyID int64) error
 	ListSavedJourneys(ctx context.Context, userID int64) ([]int64, error)
+	// SetChoice records the option picked at a journey's fork (last pick wins).
+	SetChoice(ctx context.Context, userID, journeyID int64, optionKey string) error
+	// ListChoices returns the user's fork picks keyed by journey slug.
+	ListChoices(ctx context.Context, userID int64) (map[string]string, error)
 	ListPointsHistory(ctx context.Context, userID int64) ([]model.PointsHistory, error)
 	UpdateAvatar(ctx context.Context, userID int64, avatarURL string) error
 	GetBalance(ctx context.Context, userID int64) (int, error)
@@ -166,6 +170,38 @@ func (r *sqliteUserRepo) ListSavedJourneys(ctx context.Context, userID int64) ([
 		ids = append(ids, id)
 	}
 	return ids, rows.Err()
+}
+
+func (r *sqliteUserRepo) SetChoice(ctx context.Context, userID, journeyID int64, optionKey string) error {
+	return retryBusy(ctx, func() error {
+		_, err := r.db.ExecContext(ctx, `
+			INSERT INTO journey_choices (user_id, journey_id, option_key) VALUES (?, ?, ?)
+			ON CONFLICT(user_id, journey_id) DO UPDATE SET option_key = excluded.option_key, updated_at = CURRENT_TIMESTAMP`,
+			userID, journeyID, optionKey)
+		if err != nil {
+			return fmt.Errorf("set choice: %w", err)
+		}
+		return nil
+	})
+}
+
+func (r *sqliteUserRepo) ListChoices(ctx context.Context, userID int64) (map[string]string, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT j.slug, c.option_key FROM journey_choices c JOIN journeys j ON j.id = c.journey_id
+		WHERE c.user_id = ?`, userID)
+	if err != nil {
+		return nil, fmt.Errorf("list choices: %w", err)
+	}
+	defer rows.Close()
+	out := map[string]string{}
+	for rows.Next() {
+		var slug, key string
+		if err := rows.Scan(&slug, &key); err != nil {
+			return nil, err
+		}
+		out[slug] = key
+	}
+	return out, rows.Err()
 }
 
 func (r *sqliteUserRepo) ListPointsHistory(ctx context.Context, userID int64) ([]model.PointsHistory, error) {

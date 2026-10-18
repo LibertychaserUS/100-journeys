@@ -1,0 +1,41 @@
+{
+  "slug": "usa-bonneville-salt-flats",
+  "motif": "track",
+  "texture": "salt",
+  "arc": [
+    {
+      "h": 210,
+      "s": 25
+    },
+    {
+      "h": 45,
+      "s": 15
+    },
+    {
+      "h": 50,
+      "s": 10
+    },
+    {
+      "h": 35,
+      "s": 25
+    },
+    {
+      "h": 25,
+      "s": 35
+    }
+  ],
+  "accent": "#f2e6c9",
+  "beats": [
+    "",
+    "grey",
+    "flare",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

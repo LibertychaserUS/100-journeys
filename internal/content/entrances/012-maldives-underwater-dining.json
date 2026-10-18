@@ -1,0 +1,85 @@
+{
+  "slug": "maldives-underwater-dining",
+  "entrance": { "no": 12, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "surreal",
+    "adventure_index": 1, "obscurity_level": 3, "risk_level": 1, "price": 35999,
+    "tags": ["visual", "hidden"],
+    "mbti": { "ESFJ": 5, "ENFJ": 5, "ISFP": 4 }
+  },
+  "cover": { "path": "generated/maldives-underwater-dining/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "水下正午 · 伊塔海底餐厅",
+    "subtitle": "第 12 号入口：海底的十四个座位",
+    "hook": "正午的阳光穿过五米海水，落在你们的桌布上",
+    "region": "亚洲 · 马尔代夫",
+    "moods": ["正午", "水光", "款待", "小小的庆祝"],
+    "opens": "全年，中午十二点半前后",
+    "role": "订座的人",
+    "premise": "伊塔海底餐厅在马尔代夫兰加利岛外，海面以下约五米，2005 年开放。弯曲的亚克力墙把整间屋子包住，每一轮只坐 14 个人。这间屋子是在新加坡造好的，用驳船在海上运了 16 天，再压上沙子沉到海底。",
+    "mission": "让你带来的那个人成为第一个“发现”鳐鱼的人，至少让 TA 以为是。",
+    "chapters": [
+      { "title": "凉的扶手", "paragraphs": [
+        "你走在后面。午饭是你订的，所以一路上你都比 TA 先看见：栈桥上有一块木板松了，楼梯扶手是凉的，下面的屋子比外面凉快得多。你把披肩搭在 TA 的椅背上，没说话。",
+        "服务生领你们到中间那张桌子。你没急着坐，先绕过去，把正对着弧顶的那把椅子拉开。头顶、左边、右边，全是海。"
+      ] },
+      { "title": "十二点半", "paragraphs": [
+        "太阳差不多在头顶。光穿过五米海水落下来，在白沙上织出一张一直在晃的网，也织在桌布上，织在 TA 的手背上。你看了一会儿那张网，才去找鱼。",
+        "一条鳐鱼贴着沙面飞过来。你先看见了，没出声，只把水杯往那边推了推。TA 顺着杯子看过去，“啊”了一声，抓住你的手腕：“你看！”你说：“看见了。”",
+        "TA 问这间屋子是怎么放到海底的。这个你早就查好了，就等 TA 问：它在新加坡造好，用驳船在海上走了十六天，再压上沙子，沉下来。TA 听完，伸手按了按那面弯弯的墙，像在摸一条船的船舷。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "甜点上来之前，你还想做哪一件小事？",
+      "options": [
+        { "key": "card", "label": "把提前写好的小卡片，压在 TA 的甜点盘下面", "keeps": "一张被海水光照过的卡片" },
+        { "key": "seat", "label": "起身和 TA 换位子，让 TA 离那面墙最近", "keeps": "墙上 TA 按下的一个手印" },
+        { "key": "toast", "label": "举起杯子，说一句“敬那十六天的海路”", "keeps": "一句只有你们俩听得懂的祝酒词" }
+      ]
+    },
+    "ending": "回家以后，某个中午你在厨房洗杯子，太阳照进水池，水面晃出一张小小的网。你停下手，想起 TA 抓住你手腕的那一下。然后先把 TA 常用的那只杯子洗干净。",
+    "facts": [
+      { "text": "伊塔在海面以下约五米，2005 年开放，每一轮只接待 14 位客人，午餐在 12:30 开始。", "source": "https://www.conradmaldives.com/dining/ithaa-undersea-restaurant/" },
+      { "text": "餐厅四周是弯曲的亚克力墙，礁鱼、鳐鱼和海龟会从外面游过。", "source": "https://www.conradmaldives.com/dining/ithaa-undersea-restaurant/" },
+      { "text": "整座餐厅在新加坡建造，用驳船运了 16 天到马尔代夫，再用沙子压载沉到海底，固定在钢桩上。", "source": "https://en.wikipedia.org/wiki/Ithaa" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。伊塔确实有午餐时段；文中同去的人、服务生、那条鳐鱼和那张卡片都是虚构的。"
+  },
+  "en": {
+    "title": "Noon Underwater · Ithaa",
+    "subtitle": "Entrance No. 12: fourteen seats on the seabed",
+    "hook": "Noon light comes down through five metres of sea onto your tablecloth",
+    "region": "Asia · Maldives",
+    "moods": ["Noon", "Water light", "Hosting", "A small celebration"],
+    "opens": "Any time of year, around half past twelve",
+    "role": "The one who booked",
+    "premise": "Ithaa sits about five metres below the surface off Rangali Island in the Maldives, and has been open since 2005. Curved acrylic walls wrap the whole room, and each sitting takes only 14 guests. It was built in Singapore, carried across the ocean on a barge for 16 days, and sunk into place with sand ballast.",
+    "mission": "Make sure the person you brought is the one who spots the first stingray, or at least thinks they are.",
+    "chapters": [
+      { "title": "A cold handrail", "paragraphs": [
+        "You walk behind. You booked this lunch, so all the way out you notice things a step before they do: a loose board on the jetty, the cold handrail on the stairs, how much cooler it is down here. You drape your wrap over the back of their chair and say nothing.",
+        "The waiter shows you to the middle table. You don't sit straight away. You go round and pull out the chair that faces the top of the curve. Overhead, to the left, to the right: only sea."
+      ] },
+      { "title": "Half past twelve", "paragraphs": [
+        "The sun is almost straight overhead. Its light comes down through five metres of water and throws a trembling net across the white sand, across the tablecloth, across the back of their hand. You watch the net for a while before you look for fish.",
+        "A stingray glides in low over the sand. You see it first and don't say a word; you just slide your glass a little in its direction. They follow the glass, gasp, and grab your wrist. “Look!” “I see it,” you say.",
+        "They ask how anyone gets a room to the bottom of the sea. You looked this up weeks ago and have been waiting for the question: built in Singapore, sixteen days on a barge, then weighed down with sand and sunk. When you finish, they lay a palm on the curved wall, the way you'd touch the side of a boat."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before dessert arrives, which small thing will you do?",
+      "options": [
+        { "key": "card", "label": "Tuck the card you wrote in advance under their dessert plate", "keeps": "A card that has been lit by seawater" },
+        { "key": "seat", "label": "Get up and swap seats, so they're closest to the wall", "keeps": "Their handprint on the curved wall" },
+        { "key": "toast", "label": "Raise your glass: “To sixteen days at sea”", "keeps": "A toast only the two of you understand" }
+      ]
+    },
+    "ending": "Back home, some noon, you're rinsing glasses and the sun through the window throws a small trembling net across the water in the sink. You stop for a moment and remember their hand on your wrist. Then you wash their favourite glass first.",
+    "facts": [
+      { "text": "Ithaa is about five metres below the surface, opened in 2005, seats only 14 guests per sitting, and serves lunch from 12:30.", "source": "https://www.conradmaldives.com/dining/ithaa-undersea-restaurant/" },
+      { "text": "The room is walled in curved acrylic; reef fish, stingrays and turtles pass outside.", "source": "https://www.conradmaldives.com/dining/ithaa-undersea-restaurant/" },
+      { "text": "It was built in Singapore, taken to the Maldives by barge in 16 days, sunk with sand ballast and fixed onto steel piles.", "source": "https://en.wikipedia.org/wiki/Ithaa" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Ithaa really does serve lunch; the person you bring, the waiter, the stingray and the card are fiction."
+  }
+}

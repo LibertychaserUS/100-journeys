@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math"
+	"strings"
 
 	"github.com/100-journeys/app/internal/model"
 )
@@ -75,8 +77,52 @@ func (r *sqliteAdminRepo) Stats(ctx context.Context) (*model.AdminStats, error) 
 	if err != nil {
 		return nil, err
 	}
+	stats.Funnel, err = r.funnel(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	return stats, nil
+}
+
+// funnel counts distinct visitors per step. Clients send an anonymous visitor id as metadata.vid;
+// events without one count once each.
+func (r *sqliteAdminRepo) funnel(ctx context.Context) ([]model.FunnelStep, error) {
+	steps := model.FunnelSteps
+	args := make([]interface{}, len(steps))
+	marks := make([]string, len(steps))
+	for i, s := range steps {
+		args[i], marks[i] = s, "?"
+	}
+	rows, err := r.db.QueryContext(ctx, fmt.Sprintf(`
+		SELECT event_type,
+		       COUNT(DISTINCT COALESCE(CASE WHEN json_valid(metadata) THEN json_extract(metadata, '$.vid') END, 'event:' || id))
+		  FROM analytics_events WHERE event_type IN (%s) GROUP BY event_type`, strings.Join(marks, ",")), args...)
+	if err != nil {
+		return nil, fmt.Errorf("admin funnel: %w", err)
+	}
+	defer rows.Close()
+	counts := map[string]int{}
+	for rows.Next() {
+		var step string
+		var n int
+		if err := rows.Scan(&step, &n); err != nil {
+			return nil, err
+		}
+		counts[step] = n
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	out := make([]model.FunnelStep, len(steps))
+	first := counts[steps[0]]
+	for i, s := range steps {
+		out[i] = model.FunnelStep{Step: s, Visitors: counts[s]}
+		if first > 0 {
+			out[i].Rate = math.Round(float64(counts[s])/float64(first)*1000) / 10
+		}
+	}
+	return out, nil
 }
 
 func (r *sqliteAdminRepo) ListUsers(ctx context.Context) ([]model.User, error) {

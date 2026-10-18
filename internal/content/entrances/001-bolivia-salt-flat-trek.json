@@ -19,12 +19,12 @@
     "premise": "乌尤尼是世界上面积最大的盐沼，一万多平方公里，海拔约 3,650 米。它平得几乎没有起伏，曾被用来校准卫星测高。雨季时，一层很薄的雨水铺满盐壳，天空就落到了地上。",
     "mission": "太阳升起之前，找到天和地分不开的那条线；在它消失之前，做一件你一直没做的小事。",
     "chapters": [
-      { "title": "出发前的黑", "paragraphs": ["越野车凌晨出发，车灯只照得到前面一小块白。司机关掉了音乐。你把额头贴在冰凉的车窗上，想起出发前没回的那条消息。"] },
-      { "title": "入口", "paragraphs": [
+      { "title": "冰凉的车窗", "paragraphs": ["越野车凌晨出发，车灯只照得到前面一小块白。司机关掉了音乐。你把额头贴在冰凉的车窗上，想起出发前没回的那条消息。"] },
+      { "title": "脚尖上的云", "paragraphs": [
         "车停下，四周没有一个参照物。你脱掉鞋，踩进只没过脚踝的水里。东边的天先发灰，再发粉；你低头，水里也有一片天在变颜色。有一阵子你分不清自己是站着，还是悬着。",
         "你没有拍照。你蹲下去，看水里那朵云慢慢走过你的脚尖，想它知不知道自己被倒过来了。"
       ] },
-      { "title": "光进来", "paragraphs": ["太阳一出来，镜子碎成了无数个亮点。同车的人开始跳、开始笑、开始摆姿势。你站得稍远一点，把刚才那句话又在心里过了一遍，觉得它轻了一点。"] }
+      { "title": "一千个亮点", "paragraphs": ["太阳一出来，镜子碎成了无数个亮点。同车的人开始跳、开始笑、开始摆姿势。你站得稍远一点，把刚才那句话又在心里过了一遍，觉得它轻了一点。"] }
     ],
     "choice": {
       "prompt": "在镜子消失之前，你会做哪一件小事？",
@@ -33,7 +33,7 @@
         { "key": "whisper", "label": "对着盐和水，小声说出一句没对任何人说过的话", "keeps": "一句说出口的话" }
       ]
     },
-    "ending": "回到城市以后，会有某个很吵的下午，你突然想起脚底那层薄薄的天空。那时你会知道，入口一直都在，只是要等到安静下来才会打开。",
+    "ending": "回到城市以后，会有某个很吵的下午，你突然想起脚底那层薄薄的天空。你把手机扣在桌上，把那句话又在心里过了一遍，它还是那么轻。",
     "facts": [
       { "text": "乌尤尼盐沼是世界上面积最大的盐沼，约一万多平方公里，海拔约 3,650 米。", "source": "https://en.wikipedia.org/wiki/Salar_de_Uyuni" },
       { "text": "盐沼极其平坦，曾被用来校准地球观测卫星的高度计。", "source": "https://en.wikipedia.org/wiki/Salar_de_Uyuni" },
@@ -52,12 +52,12 @@
     "premise": "Uyuni is the largest salt flat on Earth: more than 10,000 square kilometres, about 3,650 metres up. It is so flat it has been used to calibrate satellite altimeters. In the rains a thin sheet of water spreads over the crust and the sky comes down to the ground.",
     "mission": "Before sunrise, find the line where sky and ground stop being two things. Before it disappears, do one small thing you've been putting off.",
     "chapters": [
-      { "title": "The dark before", "paragraphs": ["The jeep leaves in the small hours; its headlights find only a patch of white. The driver turns the music off. You rest your forehead on the cold window and think of the message you never answered."] },
-      { "title": "The entrance", "paragraphs": [
+      { "title": "A cold window", "paragraphs": ["The jeep leaves in the small hours; its headlights find only a patch of white. The driver turns the music off. You rest your forehead on the cold window and think of the message you never answered."] },
+      { "title": "A cloud past your toes", "paragraphs": [
         "The jeep stops. There is nothing to measure anything against. You take your shoes off and step into water that barely reaches your ankles. The east turns grey, then pink, and the sky at your feet turns with it. For a while you can't tell whether you're standing or floating.",
         "You don't take a photo. You crouch and watch a cloud drift past your toes, and wonder whether it knows it's upside down."
       ] },
-      { "title": "Light comes in", "paragraphs": ["The moment the sun clears the edge, the mirror breaks into a thousand bright points. The others jump, laugh, pose. You stand a little apart and turn the sentence over once more. It feels lighter."] }
+      { "title": "A thousand bright points", "paragraphs": ["The moment the sun clears the edge, the mirror breaks into a thousand bright points. The others jump, laugh, pose. You stand a little apart and turn the sentence over once more. It feels lighter."] }
     ],
     "choice": {
       "prompt": "Before the mirror disappears, which small thing will you do?",
@@ -66,7 +66,7 @@
         { "key": "whisper", "label": "Tell the salt and the water, very quietly, something you've never told anyone", "keeps": "A sentence said out loud" }
       ]
     },
-    "ending": "Back in the city, on some loud afternoon, you'll suddenly remember the thin sky under your feet. You'll know then that the entrance is still there. It only opens when things go quiet.",
+    "ending": "Back in the city, on some loud afternoon, you'll suddenly remember the thin sky under your feet. You'll turn your phone face down and say that sentence over to yourself once more. It's still light.",
     "facts": [
       { "text": "Salar de Uyuni is the world's largest salt flat, over 10,000 km², at about 3,650 m.", "source": "https://en.wikipedia.org/wiki/Salar_de_Uyuni" },
       { "text": "It is flat enough to have been used to calibrate the altimeters of Earth-observation satellites.", "source": "https://en.wikipedia.org/wiki/Salar_de_Uyuni" },

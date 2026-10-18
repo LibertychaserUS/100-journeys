@@ -7,15 +7,13 @@
   if (!container) return;
   const esc = UI.esc;
   let open = false;
-  let quizAnswers = [];
-  let quizStep = 0;
   const history = []; // { who: 'pet'|'user', html }
 
   function render() {
     container.innerHTML = `
       <section class="ai-pet__chat" id="ai-pet-chat" role="dialog" aria-modal="false" aria-labelledby="ai-pet-title" ${open ? '' : 'hidden'}>
         <header class="ai-pet__header">
-          <img class="ai-pet__face" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="36" height="36">
+          <span class="ai-pet__face" data-lumi-slot="36">${Lumi.svg(Guest.mbti(), { size: 36 })}</span>
           <div><h2 class="ai-pet__name" id="ai-pet-title">${esc(AIPet.name())}</h2><p class="ai-pet__status">${esc(t('pet.status'))}</p></div>
           <button class="icon-btn ai-pet__close" id="ai-pet-close" type="button" aria-label="${esc(t('pet.close'))}">${UI.icon('close')}</button>
         </header>
@@ -27,7 +25,7 @@
         </form>
       </section>
       <button class="ai-pet__avatar ${open ? '' : 'ai-pet__avatar--hint'}" id="ai-pet-avatar" type="button" aria-expanded="${open}" aria-controls="ai-pet-chat" aria-label="${esc(t('pet.open'))}">
-        <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="40" height="40">
+        <span data-lumi-slot="44">${Lumi.svg(Guest.mbti(), { size: 44 })}</span>
       </button>`;
     const msgs = container.querySelector('#ai-pet-messages');
     msgs.innerHTML = history.map((m) => `<div class="ai-pet__msg ai-pet__msg--${m.who}">${m.html}</div>`).join('');
@@ -66,7 +64,7 @@
 
   async function recommend() {
     const c = AIPet.copy();
-    const mbti = (Session.user && Session.user.mbti_type) || AIPet.getProfile().mbti;
+    const mbti = Guest.mbti();
     petSay(c.finding);
     try {
       const res = await API.getJourneys(mbti ? { mbti, limit: 3 } : { limit: 3 });
@@ -78,51 +76,16 @@
     }
   }
 
+  // The guide's walk lives on its own page (#/guide) so it can be resumed and measured.
   function startQuiz() {
-    if (!open) setOpen(true, { focus: false });
-    quizAnswers = [];
-    quizStep = 1;
-    askQuestion();
-  }
-
-  function askQuestion() {
-    const q = AIPet.question(quizStep);
-    if (!q) { finishQuiz(); return; }
-    const c = AIPet.copy();
-    addMessage('pet', `<p class="ai-pet__step">${esc(c.quizStep(quizStep, AIPet.quizLength))}</p><p><b>${esc(q.q)}</b></p>
-      <div class="ai-pet__quiz">${q.options.map((o, i) => `<button class="ai-pet__quiz-option" type="button" data-answer="${i}" data-step="${quizStep}">${esc(o.text)}</button>`).join('')}</div>`);
-    container.querySelector('.ai-pet__msg:last-child .ai-pet__quiz-option')?.focus();
-  }
-
-  async function finishQuiz() {
-    const c = AIPet.copy();
-    const { code } = AIPet.scoreMBTI(quizAnswers);
-    quizStep = 0;
-    AIPet.saveProfile({ ...AIPet.getProfile(), mbti: code });
-    let note = c.quizLogin;
-    if (API.isLoggedIn()) {
-      try {
-        await API.updateMBTI(code);
-        await Session.refresh();
-        note = c.quizSaved;
-        window.dispatchEvent(new CustomEvent('mbti:updated', { detail: code }));
-      } catch {}
-    }
-    petSay(`${c.quizDone(code)} ${note}`, [{ type: 'recommend', label: c.btnRecommend }]);
+    if (open) setOpen(false, { focus: false });
+    API.track('path_pick', '', { path: 'pet', from: 'widget' });
+    Router.navigate('/guide');
   }
 
   container.addEventListener('click', (e) => {
     if (e.target.closest('#ai-pet-avatar')) { setOpen(!open); return; }
     if (e.target.closest('#ai-pet-close')) { setOpen(false); return; }
-    const answer = e.target.closest('[data-answer]');
-    if (answer && Number(answer.dataset.step) === quizStep) {
-      answer.closest('.ai-pet__quiz').querySelectorAll('button').forEach((b) => { b.disabled = true; b.classList.toggle('is-chosen', b === answer); });
-      addMessage('user', esc(answer.textContent));
-      quizAnswers.push(Number(answer.dataset.answer));
-      quizStep++;
-      setTimeout(askQuestion, 250);
-      return;
-    }
     const action = e.target.closest('[data-pet-action]');
     if (action) {
       const type = action.dataset.petAction;
@@ -137,16 +100,53 @@
     if (e.target.closest('.ai-pet__links a') && window.matchMedia('(max-width: 760px)').matches) setOpen(false, { focus: false });
   });
 
-  container.addEventListener('submit', (e) => {
+  // Free text goes to the model first; without a model reply in time, the local rules answer.
+  const MODEL_WAIT = 10000;
+  let asking = false;
+  container.addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = container.querySelector('#ai-pet-input');
     const text = input.value.trim();
-    if (!text) return;
+    if (!text || asking) return;
     input.value = '';
     addMessage('user', esc(text));
-    const r = AIPet.reply(text);
-    setTimeout(() => petSay(r.text, r.actions), 300);
+    asking = true;
+    addMessage('pet', `<p class="ai-pet__typing" aria-label="${esc(AIPet.copy().finding)}"><i></i><i></i><i></i></p>`);
+    let answer = null;
+    try {
+      const res = await Promise.race([
+        API.aiChat({ message: text, lang: I18n.lang, mbti_type: Guest.mbti(), session_id: Guest.vid() }),
+        new Promise((resolve) => setTimeout(() => resolve(null), MODEL_WAIT)),
+      ]);
+      const d = res && res.data;
+      if (d && d.source === 'deepseek' && d.reply) answer = d;
+    } catch {}
+    replaceLast(answer ? modelHtml(answer) : null);
+    if (!answer) {
+      const r = AIPet.reply(text);
+      petSay(r.text, r.actions);
+    }
+    asking = false;
   });
+
+  function modelHtml(d) {
+    const rec = (d.actions || []).find((a) => a.type === 'recommend' && a.data && Array.isArray(a.data.journeys));
+    const links = rec ? `<ul class="ai-pet__links">${rec.data.journeys.map((j) => `<li><a href="#/journey/${encodeURIComponent(j.slug)}">${esc(j.title)}</a></li>`).join('')}</ul>` : '';
+    return `<p>${esc(d.reply)}</p>${links}`;
+  }
+
+  // Swaps the typing dots for the answer, or removes them when the rules will answer instead.
+  function replaceLast(html) {
+    const msgs = container.querySelector('#ai-pet-messages');
+    const last = msgs && msgs.lastElementChild;
+    if (html == null) {
+      history.pop();
+      if (last) last.remove();
+      return;
+    }
+    history[history.length - 1].html = html;
+    if (last) last.innerHTML = html;
+  }
 
   container.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(false); }
@@ -159,5 +159,16 @@
   I18n.onChange(() => { history.length = 0; render(); });
 
   render();
+  // Lumi takes the traveller's form as soon as their type is known (or changes).
+  let shownCode = Guest.mbti();
+  function refreshLumi() {
+    const code = Guest.mbti();
+    if (code === shownCode) return;
+    shownCode = code;
+    container.querySelectorAll('[data-lumi-slot]').forEach((slot) => { slot.innerHTML = Lumi.svg(code, { size: Number(slot.dataset.lumiSlot) }); });
+  }
+  window.addEventListener('guest:updated', refreshLumi);
+  window.addEventListener('session:updated', refreshLumi);
+
   window.Pet = { open: () => setOpen(true), close: () => setOpen(false), startQuiz };
 })();

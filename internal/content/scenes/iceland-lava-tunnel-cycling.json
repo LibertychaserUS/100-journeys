@@ -1,0 +1,45 @@
+{
+  "slug": "iceland-lava-tunnel-cycling",
+  "motif": "descent",
+  "texture": "ember",
+  "arc": [
+    {
+      "h": 210,
+      "s": 10
+    },
+    {
+      "h": 28,
+      "s": 55
+    },
+    {
+      "h": 18,
+      "s": 60
+    },
+    {
+      "h": 0,
+      "s": 0
+    },
+    {
+      "h": 38,
+      "s": 70
+    },
+    {
+      "h": 200,
+      "s": 12
+    }
+  ],
+  "accent": "#ff9a4d",
+  "beats": [
+    "",
+    "",
+    "dark",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

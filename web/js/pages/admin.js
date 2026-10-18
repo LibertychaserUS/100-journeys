@@ -19,7 +19,7 @@ Pages.Admin = {
 
     const esc = UI.esc;
     const metric = (key, id) => `<div class="admin-metric"><p>${esc(t(key))}</p><b class="num" id="${id}">—</b></div>`;
-    const panel = (key, id) => `<section class="admin-panel"><h2>${esc(t(key))}</h2><div class="admin-list" id="${id}">${esc(t('common.loading'))}</div></section>`;
+    const panel = (key, id, extra = '') => `<section class="admin-panel ${extra}"><h2>${esc(t(key))}</h2><div class="admin-list" id="${id}">${esc(t('common.loading'))}</div></section>`;
     document.getElementById('main-content').innerHTML = `
       <div class="page admin">
         <div class="container">
@@ -44,6 +44,7 @@ Pages.Admin = {
             ${metric('admin.m.events', 'admin-stat-events')}
           </div>
           <div class="admin-panels">
+            ${panel('admin.p.funnel', 'admin-funnel', 'admin-panel--funnel')}
             ${panel('admin.p.clicked', 'admin-top-clicked')}
             ${panel('admin.p.purchased', 'admin-top-purchased')}
             ${panel('admin.p.mbti', 'admin-mbti')}
@@ -84,6 +85,7 @@ Pages.Admin = {
       set('admin-stat-audit-errors', `${I18n.num(s.audit_errors)} / ${I18n.num(s.audit_logs)}`);
       set('admin-stat-events', I18n.num(s.analytics_events));
       set('admin-updated', t('admin.synced', { time: I18n.time(new Date()) }));
+      this._funnel(s.funnel);
       this._bars('admin-top-clicked', s.top_clicked_journeys, 'admin.noClicks', false);
       this._bars('admin-top-purchased', s.top_purchased_journeys, 'admin.noPaid', true);
       this._tiles('admin-mbti', s.mbti_distribution);
@@ -94,6 +96,15 @@ Pages.Admin = {
       const el = document.getElementById('admin-updated');
       if (el) el.textContent = `${t('admin.syncFailed')} · ${I18n.error(err)}`;
     }
+  },
+
+  // Distinct visitors per step of the core flow; the bar is relative to arrivals.
+  _funnel(steps) {
+    const el = document.getElementById('admin-funnel');
+    if (!el) return;
+    if (!steps || !steps.length || !steps[0].visitors) { el.innerHTML = `<p class="admin-empty">${UI.esc(t('admin.empty'))}</p>`; return; }
+    el.innerHTML = steps.map((s) => `
+      <div class="admin-bar" data-step="${UI.esc(s.step)}"><div class="admin-bar__top"><span>${UI.esc(t(`admin.funnel.${s.step}`))}</span><em class="num">${UI.esc(t('admin.funnel.visitors', { n: I18n.num(s.visitors) }))} · ${Math.round(s.rate || 0)}%</em></div><div class="bar"><b style="width:${Math.max(3, Math.round(s.rate || 0))}%"></b></div></div>`).join('');
   },
 
   _gender(label) {

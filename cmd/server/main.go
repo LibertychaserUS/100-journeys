@@ -4,17 +4,20 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/100-journeys/app/internal/ai"
-	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/analytics"
+	"github.com/100-journeys/app/internal/compose"
+	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/handler"
 	"github.com/100-journeys/app/internal/middleware"
+	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/100-journeys/app/internal/webapp"
@@ -71,6 +74,15 @@ func main() {
 		log.Fatalf("sync content: %v", err)
 	}
 
+	// Paper slips of the compose game (internal/compose/fragments.json).
+	fragments, err := compose.Load()
+	if err != nil {
+		log.Fatalf("load compose fragments: %v", err)
+	}
+	if problems := compose.Validate(fragments); len(problems) > 0 {
+		log.Fatalf("compose fragments are invalid: %s", strings.Join(problems, "; "))
+	}
+
 	// Event bus subscribers
 	eventbus.Default.Subscribe(eventbus.UserRegistered, func(evt eventbus.Event) {
 		log.Printf("[Event] user registered: uid=%v username=%s", evt.Data["user_id"], evt.Data["username"])
@@ -95,7 +107,17 @@ func main() {
 	}()
 	media := &service.LocalProvider{BaseURL: mediaBase}
 	svc := service.NewJourneyService(repo, media)
-	aiProvider := ai.NewMockAI()
+	var aiProvider ai.Provider = ai.NewMockAI()
+	// The DeepSeek guide is used when a key is present (injected from Secrets Manager in
+	// production); every failure falls back to the rule-based guide, so the demo never breaks.
+	if key := os.Getenv("DEEPSEEK_API_KEY"); key != "" {
+		aiProvider = ai.NewDeepSeek(ai.DeepSeekConfig{
+			APIKey:  key,
+			BaseURL: os.Getenv("DEEPSEEK_BASE_URL"),
+			Model:   os.Getenv("DEEPSEEK_MODEL"),
+		}, journeyCatalog(svc), ai.NewMockAI())
+		log.Printf("ai: DeepSeek guide enabled")
+	}
 	engine := ai.NewRecommendEngine(repo)
 	captchaStore := service.NewCaptchaStore()
 	h := handler.NewJourneyHandler(svc, aiProvider, engine, analyticsBuffer)
@@ -106,6 +128,7 @@ func main() {
 	captchaH := handler.NewCaptchaHandler(captchaStore)
 	auditH := handler.NewAuditHandler(db)
 	meH := handler.NewMeHandler(userRepo, svc)
+	composeH := handler.NewComposeHandler(repository.NewCompositionRepository(db), fragments, svc)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -163,6 +186,9 @@ func main() {
 		// Saved journeys + travel personality (protected)
 		handler.MeRoutes(api, meH)
 
+		// Compose game: slips and share links (public), kept tickets (protected)
+		handler.ComposeRoutes(api, composeH)
+
 		// Admin (protected + admin role)
 		handler.AdminRoutes(api, adminH)
 
@@ -173,28 +199,140 @@ func main() {
 		handler.PaymentRoutes(api, paymentH)
 	}
 
+	assetVersion := os.Getenv("ASSET_VERSION")
+	// CSS and JS are served as two bundles built from the files index.html lists (BUNDLE_ASSETS=0
+	// serves them one by one, for debugging).
+	bundled := os.Getenv("BUNDLE_ASSETS") != "0"
+	bundles := &webapp.BundleCache{}
+	currentVersion := func() string {
+		if assetVersion != "" {
+			return assetVersion
+		}
+		return webapp.AssetVersion("./web")
+	}
+	shell := func() (string, error) {
+		content, err := os.ReadFile("./web/index.html")
+		if err != nil {
+			return "", err
+		}
+		version := currentVersion()
+		page := string(content)
+		if bundled {
+			if page, _, err = bundles.Get(page, "./web", version); err != nil {
+				return "", err
+			}
+		}
+		return webapp.RenderIndex(page, webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version}), nil
+	}
+	serveBundle := func(kind string) gin.HandlerFunc {
+		return func(c *gin.Context) {
+			content, err := os.ReadFile("./web/index.html")
+			if err != nil {
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+			_, b, err := bundles.Get(string(content), "./web", currentVersion())
+			if err != nil {
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+			body, zipped, ctype := b.CSS, b.CSSGz, "text/css; charset=utf-8"
+			if kind == "js" {
+				body, zipped, ctype = b.JS, b.JSGz, "text/javascript; charset=utf-8"
+			}
+			c.Header("Cache-Control", "public, max-age=31536000, immutable")
+			c.Header("Vary", "Accept-Encoding")
+			if webapp.AcceptsGzip(c.GetHeader("Accept-Encoding")) {
+				c.Header("Content-Encoding", "gzip")
+				c.Data(http.StatusOK, ctype, zipped)
+				return
+			}
+			c.Data(http.StatusOK, ctype, body)
+		}
+	}
+	// Crawlers: a real robots.txt, and a sitemap of every journey's share page (the SPA's hash
+	// routes are invisible to them; /j/:slug carries each journey's title, hook and image).
+	originOf := func(c *gin.Context) string {
+		scheme := "http"
+		if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		return scheme + "://" + c.Request.Host
+	}
+	r.GET("/robots.txt", func(c *gin.Context) {
+		c.Header("Cache-Control", "public, max-age=3600")
+		c.String(http.StatusOK, "User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: %s/sitemap.xml\n", originOf(c))
+	})
+	r.GET("/sitemap.xml", func(c *gin.Context) {
+		journeys, _, err := svc.ListJourneys(c.Request.Context(), model.JourneyFilter{Page: 1, Limit: 100})
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		origin := originOf(c)
+		var b strings.Builder
+		b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n")
+		b.WriteString("  <url><loc>" + origin + "/</loc></url>\n")
+		for _, j := range journeys {
+			b.WriteString("  <url><loc>" + origin + "/j/" + url.PathEscape(j.Slug) + "</loc><lastmod>" + j.UpdatedAt.UTC().Format("2006-01-02") + "</lastmod></url>\n")
+		}
+		b.WriteString("</urlset>\n")
+		c.Header("Cache-Control", "public, max-age=3600")
+		c.Data(http.StatusOK, "application/xml; charset=utf-8", []byte(b.String()))
+	})
+	r.GET("/bundle/app.css", serveBundle("css"))
+	r.GET("/bundle/app.js", serveBundle("js"))
+
+	// Journey share links: the same SPA shell, with the journey's title, hook and cover as
+	// Open Graph tags (crawlers don't run JS); the page itself redirects into #/journey/:slug.
+	r.GET("/j/:slug", func(c *gin.Context) {
+		page, err := shell()
+		if err != nil {
+			c.String(http.StatusInternalServerError, "index.html not found")
+			return
+		}
+		lang := service.NormalizeLocale(c.Query("lang"))
+		j, err := svc.GetJourneyLocalized(c.Request.Context(), c.Param("slug"), lang)
+		if err == nil && j != nil {
+			scheme := "http"
+			if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+				scheme = "https"
+			}
+			origin := scheme + "://" + c.Request.Host
+			image := j.ImageURL
+			if j.Scene != nil && j.Scene.Images.Hero != "" {
+				image = j.Scene.Images.Hero
+			}
+			if strings.HasPrefix(image, "/") {
+				image = origin + image
+			}
+			locale, brand := "zh_CN", "桃源百旅"
+			if lang == "en" {
+				locale, brand = "en_US", "100 Journeys"
+			}
+			page = webapp.RenderShare(page, webapp.ShareMeta{
+				Title: j.Title + " · " + brand, Description: j.StoryHook, Image: image,
+				URL: origin + "/j/" + j.Slug, Locale: locale, Preload: webapp.PreloadCover(j.ImageURL),
+			})
+		}
+		c.Header("Cache-Control", "no-cache")
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(page))
+	})
+
 	// SPA fallback: serve index.html for non-API, non-static routes.
 	// Injects window.APP_CONFIG and versions CSS/JS links (ASSET_VERSION env pins it; otherwise
 	// it is fingerprinted from web/ so edits and deploys bust the immutable /static cache).
-	assetVersion := os.Getenv("ASSET_VERSION")
 	r.NoRoute(func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
 			c.JSON(http.StatusNotFound, gin.H{"data": nil, "error": "not found"})
 			return
 		}
 
-		indexPath := "./web/index.html"
-		content, err := os.ReadFile(indexPath)
+		html, err := shell()
 		if err != nil {
 			c.String(http.StatusInternalServerError, "index.html not found")
 			return
 		}
-
-		version := assetVersion
-		if version == "" {
-			version = webapp.AssetVersion("./web")
-		}
-		html := webapp.RenderIndex(string(content), webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version})
 
 		c.Header("Cache-Control", "no-cache")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
@@ -202,4 +340,25 @@ func main() {
 
 	log.Printf("Server starting on %s  mediaBase=%s  db=%s\n", bindAddr, mediaBase, dbPath)
 	log.Fatal(r.Run(bindAddr))
+}
+
+// journeyCatalog lists journeys for the guide in the reader's language, with their best types.
+func journeyCatalog(svc *service.JourneyService) ai.CatalogFunc {
+	return func(ctx context.Context, lang string) ([]ai.CatalogEntry, error) {
+		journeys, _, err := svc.ListJourneys(ctx, model.JourneyFilter{Page: 1, Limit: 100, Locale: lang})
+		if err != nil {
+			return nil, err
+		}
+		out := make([]ai.CatalogEntry, 0, len(journeys))
+		for _, j := range journeys {
+			e := ai.CatalogEntry{Slug: j.Slug, Title: j.Title, Hook: j.StoryHook, Region: j.Region, Moods: j.MoodKeywords}
+			for _, m := range j.MBTITypes {
+				if m.CompatibilityScore >= 4 {
+					e.Types = append(e.Types, m.MBTIType.Code)
+				}
+			}
+			out = append(out, e)
+		}
+		return out, nil
+	}
 }

@@ -1,0 +1,95 @@
+{
+  "slug": "new-zealand-milford-kayak",
+  "entrance": { "no": 7, "realm": "water-deep", "pace": "day", "scale": "far", "seasons": ["any"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "raw",
+    "adventure_index": 7, "obscurity_level": 4, "risk_level": 3, "price": 22999,
+    "tags": ["extreme", "nature", "visual"],
+    "mbti": { "ESTP": 5, "ISTP": 5, "ENTP": 4 }
+  },
+  "cover": { "path": "generated/new-zealand-milford-kayak/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "茶色水面 · 米尔福德峡湾",
+    "subtitle": "第 7 号入口：大雨过后，海上浮着一条河",
+    "hook": "雨下了一整夜，海面上多出一层河",
+    "region": "大洋洲 · 新西兰",
+    "moods": ["暴雨之后", "轰鸣", "用力", "峭壁"],
+    "opens": "一年四季都可能，只要前一夜下过大雨：第二天早晨",
+    "role": "读水的人",
+    "premise": "米尔福德峡湾（毛利语叫 Piopiotahi）从塔斯曼海向内陆伸进约 15 公里，一年的雨量超过 6 米，一天之内能下到 250 毫米。大雨过后，峭壁上挂满临时的瀑布。从森林里冲下来的淡水带着单宁，浮在海水上面，颜色像泡淡了的茶。",
+    "mission": "掬一捧水，看清它是茶色的；然后跟着向导，划进一道昨天还不存在的瀑布的水雾里。",
+    "chapters": [
+      { "title": "雨停了", "paragraphs": [
+        "天刚亮，雨停了。夜里它把你吵醒过两次，像有人一铲一铲往铁皮屋顶上倒石子；现在码头上听得见的第一个声音不是鸟，是水：整个峡湾都在往下淌。",
+        "向导把皮划艇一条条推进水里，抬头看了一眼峭壁：“平常这里常年不断的瀑布只有两条。今天你自己数。”你数到三十几，就数乱了。"
+      ] },
+      { "title": "两层水", "paragraphs": [
+        "水面平得像一块深色的玻璃，雾还贴在崖腰上。划出去不远，你把桨横在膝盖上，掬起一捧水。在手心里，它是淡淡的褐色，像谁忘了喝完的一杯茶。向导说，这层淡水薄的时候只有几厘米，厚的时候超过十米；昨晚那样的雨，今天它一定很厚。真正的海在下面。",
+        "“它把大部分光挡在外面，”她说，“所以本该住在深海的东西，在浅处就能活。你下面十来米，就有黑珊瑚。活着的时候是白的，只有骨头是黑的。”你低头看，什么也看不见，只有自己的影子贴在水面上。"
+      ] },
+      { "title": "冲进水雾", "paragraphs": [
+        "轰鸣声先到，盖过了其他所有声音。向导指着前面一道新出现的瀑布，它从高得看不见源头的崖上摔下来，落到一半就散成了雾。“跟着我的船尾，别超过我。听到我喊，就往后划。”",
+        "你比她早一步感觉到风转了，水雾横着扫过来；你把船头偏了一点，跟着她滑了进去。冷水砸在头盔和肩膀上，声音大得听不见自己在笑。",
+        "出来的时候，米特峰从云里露出了一截：1,692 米，从水面直直地立起来。你甩掉桨上的水，已经在找下一道。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "回到码头之前，你还剩一点力气，用在哪儿？",
+      "options": [
+        { "key": "count", "label": "把瀑布再数一遍，这次一直数到底", "keeps": "一个只有你知道的数字" },
+        { "key": "spray", "label": "等向导点头，再冲一次那道瀑布", "keeps": "从头盔里倒出来的一捧冷水" },
+        { "key": "drift", "label": "停下桨，让船跟着那层淡水漂一会儿", "keeps": "船底下那片你没看见的白珊瑚" }
+      ]
+    },
+    "ending": "回到城里，某个下大雨的早晨，你站在公交站，看雨水从天桥边一道一道挂下来。你开始数，数到第七道，车来了。",
+    "facts": [
+      { "text": "米尔福德峡湾从塔斯曼海向内陆延伸约 15 公里，年均降雨量约 6,400 毫米，24 小时内可达 250 毫米；大雨后峭壁上会出现许多临时瀑布。", "source": "https://en.wikipedia.org/wiki/Milford_Sound" },
+      { "text": "米特峰从峡湾水面拔起 1,692 米；毛利语名 Piopiotahi 来自一种已灭绝的鸟 piopio，tahi 意为“一”。", "source": "https://en.wikipedia.org/wiki/Milford_Sound" },
+      { "text": "峡湾表面有一层被植物单宁染成“淡茶色”的淡水，厚度从 5 厘米到 10 米以上不等，会削弱进入海水的光线。", "source": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-marine-reserves" },
+      { "text": "黑珊瑚因深色的骨骼得名，峡湾里的种类活着时通常是白色的，在峡湾地区最浅可见于约 10 米深处。", "source": "https://www.doc.govt.nz/nature/native-animals/invertebrates/protected-coral/" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。米尔福德峡湾有向导带领的皮划艇行程，能否出发、离瀑布多近都由向导根据天气和水况决定；文中的向导、她的话和冲进水雾的路线都是虚构的。"
+  },
+  "en": {
+    "title": "Tea-Dark Water · Milford Sound",
+    "subtitle": "Entrance No. 7: after the rain, a river floats on the sea",
+    "hook": "After a night of rain, a river lies on top of the sea",
+    "region": "Oceania · New Zealand",
+    "moods": ["After the storm", "Roar", "Effort", "Sheer walls"],
+    "opens": "Any time of year, so long as it poured all night: the next morning",
+    "role": "The water reader",
+    "premise": "Milford Sound, Piopiotahi in Māori, runs about 15 kilometres in from the Tasman Sea. It gets more than six metres of rain a year, and up to 250 mm can fall in a single day. After heavy rain the cliffs are hung with temporary waterfalls, and fresh water stained with tannins from the forest floats on top of the sea, the colour of weak tea.",
+    "mission": "Scoop up a handful and see that it's tea-coloured; then follow the guide into the spray of a waterfall that didn't exist yesterday.",
+    "chapters": [
+      { "title": "The rain stops", "paragraphs": [
+        "First light, and the rain has stopped. Twice in the night it woke you, like gravel being shovelled onto a tin roof. Now the first thing you hear on the jetty isn't birds. It's water: the whole sound is running downhill.",
+        "The guide slides the kayaks in one by one and glances up at the cliffs. “Most days there are two waterfalls in here that never stop. Today, you count.” Somewhere past thirty you lose track."
+      ] },
+      { "title": "Two waters", "paragraphs": [
+        "The water is as flat as dark glass, and the mist is still clinging halfway up the cliffs. Not far out, you lay the paddle across your knees and scoop up a handful. In your palm it's faintly brown, like tea someone forgot to finish. The guide says a fresh layer like this can be a few centimetres thick or more than ten metres, and after a night like last night it'll be deep. The real sea is underneath.",
+        "“It keeps most of the light out,” she says, “so things that ought to live in the deep can live up here. Ten metres or so under you there's black coral. Alive, it's white. Only the skeleton's black.” You look down and see nothing but your own shadow lying on the surface."
+      ] },
+      { "title": "Into the spray", "paragraphs": [
+        "You hear it before anything else, a roar that drowns out every other sound. The guide points ahead to a waterfall that wasn't there yesterday. It drops from somewhere so high you can't see where it starts, and comes apart into spray halfway down. “Stay on my stern. Don't pass me. When I shout, back-paddle.”",
+        "You feel the wind swing a moment before she does. The spray sweeps sideways; you nudge the bow round and slide in after her. Cold water hammers your helmet and shoulders, so loud you can't hear yourself laughing.",
+        "When you come out, Mitre Peak has pushed a piece of itself out of the cloud: 1,692 metres, standing straight up out of the water. You shake the water off your paddle. You're already looking for the next one."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before the jetty, you've got a bit of strength left. Where does it go?",
+      "options": [
+        { "key": "count", "label": "Count the waterfalls again, all the way to the end this time", "keeps": "A number only you know" },
+        { "key": "spray", "label": "Wait for the guide's nod, then take that waterfall once more", "keeps": "A handful of cold water tipped out of your helmet" },
+        { "key": "drift", "label": "Rest the paddle and let the fresh layer carry you a while", "keeps": "The white coral under the hull that you never saw" }
+      ]
+    },
+    "ending": "Back in the city, one morning of hard rain, you stand at the bus stop watching water pour off the edge of the overpass in strings. You start counting. You get to seven before the bus comes.",
+    "facts": [
+      { "text": "Milford Sound runs about 15 km inland from the Tasman Sea; mean annual rainfall is about 6,400 mm, up to 250 mm can fall in 24 hours, and heavy rain brings temporary waterfalls down the rock faces.", "source": "https://en.wikipedia.org/wiki/Milford_Sound" },
+      { "text": "Mitre Peak rises 1,692 m above the sound; the Māori name Piopiotahi refers to the piopio, an extinct bird, with tahi meaning “one”.", "source": "https://en.wikipedia.org/wiki/Milford_Sound" },
+      { "text": "The fiords carry a surface layer of fresh water, stained by tannins “the colour of weakly brewed tea”, from 5 cm to over 10 m deep, which cuts down the light entering the sea.", "source": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-marine-reserves" },
+      { "text": "Black corals are named for their dark skeletons; the Fiordland species typically looks white when alive and may occur as shallow as 10 m there.", "source": "https://www.doc.govt.nz/nature/native-animals/invertebrates/protected-coral/" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Guided kayak trips run on Milford Sound, and the guide decides whether to go out and how close to any waterfall, depending on weather and water. The guide, what she says and the run into the spray are fiction."
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "greenland-dog-sled-solo",
+  "motif": "track",
+  "texture": "snow",
+  "arc": [
+    {
+      "h": 205,
+      "s": 30
+    },
+    {
+      "h": 215,
+      "s": 35
+    },
+    {
+      "h": 225,
+      "s": 40
+    },
+    {
+      "h": 260,
+      "s": 30
+    },
+    {
+      "h": 200,
+      "s": 20
+    }
+  ],
+  "accent": "#bfe6ff",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

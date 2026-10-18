@@ -1,0 +1,36 @@
+{
+  "slug": "maldives-underwater-dining",
+  "motif": "tide",
+  "texture": "caustics",
+  "arc": [
+    {
+      "h": 190,
+      "s": 60
+    },
+    {
+      "h": 200,
+      "s": 65
+    },
+    {
+      "h": 212,
+      "s": 70
+    },
+    {
+      "h": 222,
+      "s": 60
+    },
+    {
+      "h": 185,
+      "s": 45
+    }
+  ],
+  "accent": "#8ef1ff",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

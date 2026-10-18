@@ -73,10 +73,32 @@ const API = (() => {
     } catch {}
   }
 
+  // Journey details are cached for a minute so a hover or press can prefetch them and the
+  // page (and its shared-image transition) can render without waiting on the network.
+  const journeyCache = new Map();
+  function cachedJourney(slug) {
+    const lang = typeof I18n !== 'undefined' ? I18n.lang : ''; // a top-level const, not on window
+    const key = `${slug}|${lang}`;
+    const hit = journeyCache.get(key);
+    if (hit && Date.now() - hit.at < 60000) return hit.promise;
+    const early = window.__journeyPrefetch;
+    if (early && early.slug === slug && early.lang === lang) {
+      window.__journeyPrefetch = null;
+      const promise = early.promise.catch(() => request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`));
+      journeyCache.set(key, { at: Date.now(), promise });
+      return promise;
+    }
+    const promise = request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`);
+    journeyCache.set(key, { at: Date.now(), promise });
+    promise.catch(() => journeyCache.delete(key));
+    return promise;
+  }
+
   return {
     // Journeys
     getJourneys: (params = {}) => request(`/journeys${qs(withLang(params))}`),
-    getJourney: (slug) => request(`/journeys/${encodeURIComponent(slug)}${qs(withLang())}`),
+    getJourney: (slug) => cachedJourney(slug),
+    prefetchJourney: (slug) => { cachedJourney(slug).catch(() => {}); },
     getTags: () => request('/tags'),
 
     // Auth
@@ -91,10 +113,25 @@ const API = (() => {
     },
     updateMBTI: (code) => authed('/auth/mbti', { method: 'PUT', body: JSON.stringify({ mbti_type: code }) }),
 
+    // The guide: a model reply (source "deepseek") or the server's fallback (source "mock")
+    aiChat: (data) => request('/ai/chat', { method: 'POST', body: JSON.stringify(data) }),
+
+    // Fork picks and the one-time guest merge
+    listChoices: () => authed('/auth/choices'),
+    setChoice: (slug, key) => authed(`/auth/choices/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify({ key }) }),
+    mergeGuest: (state) => authed('/auth/guest/merge', { method: 'POST', body: JSON.stringify(state) }),
+
     // Saved journeys
     listSaved: () => authed(`/auth/saved${qs(withLang())}`),
     saveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'PUT' }),
     unsaveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'DELETE' }),
+
+    // Compose game: slips, kept tickets (signed in) and share links (public)
+    composeFragments: () => request(`/compose/fragments${qs(withLang())}`),
+    listCompositions: () => authed('/auth/compositions'),
+    keepComposition: (ticket) => post('/auth/compositions', ticket),
+    deleteComposition: (id) => authed(`/auth/compositions/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+    getComposition: (code) => request(`/compositions/${encodeURIComponent(code)}`),
 
     // Orders
     createOrder: (items) => post('/orders', { items }),
@@ -113,9 +150,11 @@ const API = (() => {
     adminExport: (format = 'csv') => fetch(`${base()}/admin/export?format=${format}`, { headers: authHeader() }),
 
     // Analytics (fire-and-forget)
-    track: (type, slug) => {
+    // meta lands in analytics_events.metadata with the anonymous visitor id used by the funnel.
+    track: (type, slug, meta = {}) => {
       try {
-        const payload = JSON.stringify({ type, journey_slug: slug || '' });
+        const vid = window.Guest ? Guest.vid() : '';
+        const payload = JSON.stringify({ type, journey_slug: slug || '', metadata: JSON.stringify({ vid, ...meta }) });
         const url = `${base()}/analytics/events`;
         if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }))) return;
         fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});

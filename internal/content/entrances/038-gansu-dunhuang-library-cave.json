@@ -1,0 +1,79 @@
+{
+  "slug": "gansu-dunhuang-library-cave",
+  "entrance": { "no": 38, "realm": "old-roads", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "minimal",
+    "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 6999,
+    "tags": ["culture", "hidden"],
+    "mbti": { "ISTJ": 5, "INTJ": 4, "INFJ": 4 }
+  },
+  "cover": { "path": "generated/gansu-dunhuang-library-cave/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "封上的小屋 · 敦煌藏经洞",
+    "subtitle": "第 38 号入口：一间只够两个人站的书库",
+    "hook": "这间屋子被封了快九百年，最晚的日期是 1002",
+    "region": "亚洲 · 中国",
+    "moods": ["安静", "旧纸", "编号", "清晨"],
+    "opens": "春天的上午，第一批参观的人进窟之前",
+    "role": "编目的人",
+    "premise": "莫高窟在敦煌东南约 25 公里，已确认的洞窟有 735 个，其中 492 个保存着壁画或彩塑。第 17 窟开在第 16 窟的甬道旁，原是纪念僧人洪辩的影窟，11 世纪初被砌墙封住，1900 年才被王圆箓发现。里面的文书估计多达五万件，年代从 406 年到 1002 年，其中有一卷印于 868 年的《金刚经》，是已知最早的有明确纪年的印刷书籍。",
+    "mission": "离开窟区之前，给这间屋子写一张目录卡：编号、大小、件数、最早和最晚的年份。",
+    "chapters": [
+      { "title": "甬道", "paragraphs": ["上午，讲解员的手电光扫过第 16 窟的甬道，停在侧壁上一个小门口。你探头进去：一间方方的小屋。当年经卷还堆在里面的时候，斯坦因记下：屋里剩下的空地，只够两个人站。你在心里给它量了量尺寸，把“只够两个人站”记进了“备注”那一栏。"] },
+      { "title": "406 到 1002", "paragraphs": [
+        "手电光移开以后，那扇小门又暗了下去，甬道里很凉。你在门口站着，开始在脑子里给它排架。最早的一件：406 年。最晚的一件：1002 年。大多是汉文，也有藏文、回鹘文、梵文、粟特文、于阗文。估计总数：五万件上下。",
+        "封存原因：没有人写下来。有人说是怕战乱，有人说印本流行以后，旧的手抄经用不上了，也有人说只是书库装满了。你在“原因”那一栏写下“不详”，后面又补了个问号。"
+      ] },
+      { "title": "敬造普施", "paragraphs": ["上午快结束时，你走出窟区，春天的风卷着细沙打在脸上。你在崖前的树荫下坐下，掏出卡片。讲解员在里面讲过：1900 年 6 月 25 日，王圆箓在那条甬道里发现了墙后的这间屋子；1907 年，那卷印本《金刚经》被卖给斯坦因，如今收藏在大英图书馆。卷尾有一行题记，说这是王玠为父母“敬造普施”。你把这四个字抄在卡片背面：印出来，就是为了让人拿走的。"] }
+    ],
+    "choice": {
+      "prompt": "参观结束前，你在卡片上补的最后一笔是什么？",
+      "options": [
+        { "key": "range", "label": "在右上角写下两个数：406—1002", "keeps": "一张写着两个年份的卡片" },
+        { "key": "note", "label": "在“备注”栏写：剩下的地方只够两个人站", "keeps": "一句抄来的备注" },
+        { "key": "colophon", "label": "在背面写下“敬造普施”", "keeps": "四个字的题记" }
+      ]
+    },
+    "ending": "回到单位，你把一摞旧文件装进档案盒，在侧面写上起止年份。封箱之前，你又多写了一行：封存原因。",
+    "facts": [
+      { "text": "莫高窟已确认洞窟 735 个，其中 492 个有壁画或彩塑，壁画约 4.5 万平方米。", "source": "https://govt.chinadaily.com.cn/s/202305/12/WS645dac1a498ea274927ba666/dunhuang-research-academy.html" },
+      { "text": "藏经洞（第 17 窟）在第 16 窟入口旁，最初是僧人洪辩的影窟，约在 11 世纪初被封闭；1900 年 6 月 25 日由王圆箓发现。文书年代从 406 年到 1002 年，估计多达五万件；斯坦因记录说，堆满经卷后屋里剩下的空地只够两个人站。", "source": "https://en.wikipedia.org/wiki/Mogao_Caves" },
+      { "text": "其中一卷《金刚经》印于 868 年，被认为是现存最早的有明确纪年的印刷书籍，长约五米，题记说由王玠为父母“敬造普施”；它于 1907 年被卖给斯坦因，现藏大英图书馆。", "source": "https://en.wikipedia.org/wiki/Diamond_Sutra" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。文中的讲解员、目录卡和你写下的条目都是虚构的。"
+  },
+  "en": {
+    "title": "The Sealed Room · Mogao Library Cave",
+    "subtitle": "Entrance No. 38: a book store with room for two people to stand",
+    "hook": "Sealed for nearly nine hundred years; the latest date inside reads 1002",
+    "region": "Asia · China",
+    "moods": ["Quiet", "Old paper", "Shelf marks", "Morning"],
+    "opens": "Spring mornings, before the first visitors go into the caves",
+    "role": "The cataloguer",
+    "premise": "The Mogao Caves lie about 25 km southeast of Dunhuang; 735 caves have been identified, 492 of them with murals or sculpture. Cave 17 opens off the passage of Cave 16. It began as a memorial cave for the monk Hongbian, was walled up early in the 11th century and was found by Wang Yuanlu in 1900. It held perhaps 50,000 documents dated from 406 to 1002, among them a Diamond Sutra printed in 868, the earliest dated printed book known.",
+    "mission": "Before you leave the site, write a catalogue card for the room: number, size, item count, earliest and latest year.",
+    "chapters": [
+      { "title": "The passage", "paragraphs": ["Mid-morning, the guide's torch slides along the passage of Cave 16 and stops on a small doorway in the side wall. You lean in: a small square room. When the scrolls were still piled inside, Aurel Stein noted that the floor left clear was just enough for two people to stand on. You size the room up in your head, and file “room for two to stand” under Remarks."] },
+      { "title": "406 to 1002", "paragraphs": [
+        "The torch moves on and the doorway goes dark again; the passage is cool. You stay by the door and start shelving it in your head. Earliest item: 406. Latest: 1002. Mostly Chinese, but also Tibetan, Uighur, Sanskrit, Sogdian, Khotanese. Estimated total: around fifty thousand.",
+        "Reason for sealing: nobody wrote it down. Some say fear of invasion; some say the old handwritten sutras were no longer needed once printing spread; some say the store was simply full. Under Reason you write “unknown”, then add a question mark."
+      ] },
+      { "title": "For free distribution", "paragraphs": ["Late morning, outside, a spring wind throws fine sand in your face. You sit in the shade below the cliff and take out the card. The guide told the rest inside: on 25 June 1900 Wang Yuanlu found the room behind the wall of that passage, and in 1907 the printed Diamond Sutra was sold to Stein; it is now in the British Library. At the end of the scroll a line says it was reverently made for universal free distribution by Wang Jie, on behalf of his two parents. You copy the phrase onto the back of your card: printed so that people could take it away."] }
+    ],
+    "choice": {
+      "prompt": "Before the tour ends, what's the last thing you add to the card?",
+      "options": [
+        { "key": "range", "label": "Two numbers in the top right corner: 406–1002", "keeps": "A card with two years on it" },
+        { "key": "note", "label": "Under Remarks: room left for two people to stand", "keeps": "A remark copied out by hand" },
+        { "key": "colophon", "label": "On the back: for universal free distribution", "keeps": "One line of colophon" }
+      ]
+    },
+    "ending": "Back at work you pack a stack of old files into an archive box and write the first and last years on its side. Before you close it, you add one more line: reason for sealing.",
+    "facts": [
+      { "text": "735 caves have been identified at Mogao, 492 of them containing artwork, with about 45,000 square metres of murals.", "source": "https://govt.chinadaily.com.cn/s/202305/12/WS645dac1a498ea274927ba666/dunhuang-research-academy.html" },
+      { "text": "The Library Cave (Cave 17), off the entrance to Cave 16, was first a memorial cave for the monk Hongbian and was walled off early in the 11th century; Wang Yuanlu found it on 25 June 1900. Its documents date from 406 to 1002, perhaps 50,000 in all, and Stein recorded that the space left clear was just enough for two people to stand in.", "source": "https://en.wikipedia.org/wiki/Mogao_Caves" },
+      { "text": "Its Diamond Sutra, dated 868, is broadly considered the oldest extant dated printed book; about five metres long, its colophon says it was made for universal free distribution by Wang Jie on behalf of his two parents. It was sold to Aurel Stein in 1907 and is held by the British Library.", "source": "https://en.wikipedia.org/wiki/Diamond_Sutra" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The guide, the catalogue card and what you write on it are fiction."
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "slug": "korea-jeju-haenyeo",
+  "motif": "tide",
+  "texture": "ember",
+  "arc": [
+    {
+      "h": 200,
+      "s": 30
+    },
+    {
+      "h": 220,
+      "s": 10
+    },
+    {
+      "h": 25,
+      "s": 65
+    },
+    {
+      "h": 28,
+      "s": 80
+    },
+    {
+      "h": 210,
+      "s": 25
+    }
+  ],
+  "accent": "#ff8c42",
+  "beats": [
+    "",
+    "grey",
+    "",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

@@ -3,6 +3,8 @@ const { freshPage } = require('./helpers');
 
 const cards = (page) => page.locator('#explore-grid .journey-card[data-slug]');
 const skeletons = (page) => page.locator('#explore-grid .journey-card--skeleton');
+const PAGE_SIZE = 12; // explore.js PAGE_SIZE: the first page shows at most this many cards
+const shown = (total) => Math.min(total, PAGE_SIZE);
 
 async function apiCount(page, params) {
   return page.evaluate(async (p) => {
@@ -20,8 +22,9 @@ test.describe('Explore Page', () => {
 
   // E2E-EXPLORE-001: browse all journeys
   test('shows journey cards on load', async ({ page }) => {
-    await expect(cards(page)).toHaveCount(12);
-    await expect(page.locator('#explore-results')).toHaveText('共 12 段旅程');
+    const total = await apiCount(page, {});
+    await expect(cards(page)).toHaveCount(shown(total));
+    await expect(page.locator('#explore-results')).toHaveText(`共 ${total} 段旅程`);
     await expect(cards(page).first().locator('.journey-card__title')).toBeVisible();
     await expect(cards(page).first().locator('img')).toBeVisible();
   });
@@ -33,7 +36,7 @@ test.describe('Explore Page', () => {
     await expect(page).toHaveURL(/fantasy_type=night/);
     await expect(page.locator('#filter-fantasy [data-value="night"]')).toHaveClass(/explore-chip--active/);
     await expect(skeletons(page)).toHaveCount(0);
-    await expect(cards(page)).toHaveCount(expected);
+    await expect(cards(page)).toHaveCount(shown(expected));
     await expect(page.locator('#explore-results')).toHaveText(`共 ${expected} 段旅程`);
   });
 
@@ -42,8 +45,10 @@ test.describe('Explore Page', () => {
     const search = page.locator('#explore-search');
     await expect(search).toBeInViewport();
     await search.click(); // fails if another element covers the input
+    const expected = await apiCount(page, { q: '极光' });
+    expect(expected).toBeGreaterThan(0);
     await page.keyboard.type('极光', { delay: 80 });
-    await expect(cards(page)).toHaveCount(1);
+    await expect(cards(page)).toHaveCount(shown(expected));
     await expect(search).toBeFocused();
     await expect(page).toHaveURL(/q=%E6%9E%81%E5%85%89/);
   });
@@ -53,19 +58,19 @@ test.describe('Explore Page', () => {
     await page.locator('#explore-filter-btn').click();
     await page.locator('#filter-mbti [data-value="INFP"]').click();
     const infp = await apiCount(page, { mbti: 'INFP' });
-    await expect(cards(page)).toHaveCount(infp);
+    await expect(cards(page)).toHaveCount(shown(infp));
     await expect(page.locator('#explore-filter-count')).toHaveText('1');
 
     await page.locator('#filter-adventure [data-value="easy"]').click();
     const both = await apiCount(page, { mbti: 'INFP', adventure_min: 1, adventure_max: 4 });
     await expect(page).toHaveURL(/adventure_max=4/);
-    await expect(cards(page).or(page.locator('.explore-empty'))).toHaveCount(Math.max(both, 1));
+    await expect(cards(page).or(page.locator('.explore-empty'))).toHaveCount(Math.max(shown(both), 1));
 
     await page.locator('#explore-panel-done').click();
     await expect(page.locator('#explore-panel')).toBeHidden();
     await page.locator('#explore-active [data-remove="mbti"]').click();
     await page.locator('#explore-active [data-remove="adventure"]').click();
-    await expect(cards(page)).toHaveCount(12);
+    await expect(cards(page)).toHaveCount(PAGE_SIZE);
     await expect(page.locator('#explore-active')).toBeHidden();
   });
 
@@ -74,7 +79,7 @@ test.describe('Explore Page', () => {
     await page.locator('#explore-search').fill('zzzz-no-such-journey');
     await expect(page.locator('.explore-empty')).toBeVisible();
     await page.locator('.explore-empty [data-action="clear"]').click();
-    await expect(cards(page)).toHaveCount(12);
+    await expect(cards(page)).toHaveCount(PAGE_SIZE);
     await expect(page.locator('#explore-search')).toHaveValue('');
   });
 
@@ -91,7 +96,7 @@ test.describe('Explore Page', () => {
     await expect(page).toHaveURL(/fantasy_type=extreme/);
     await page.goto('/#/');
     await page.locator('.nav__links a[href="#/explore"]').click();
-    await expect(cards(page)).toHaveCount(12);
+    await expect(cards(page)).toHaveCount(PAGE_SIZE);
     await expect(page.locator('#filter-fantasy [data-value=""]')).toHaveAttribute('aria-pressed', 'true');
   });
 
@@ -100,6 +105,6 @@ test.describe('Explore Page', () => {
     await page.goto('/#/explore?mbti=INFJ&visual_style=dramatic');
     const expected = await apiCount(page, { mbti: 'INFJ', visual_style: 'dramatic' });
     await expect(page.locator('#explore-active [data-remove="mbti"]')).toBeVisible();
-    await expect(cards(page).or(page.locator('.explore-empty'))).toHaveCount(Math.max(expected, 1));
+    await expect(cards(page).or(page.locator('.explore-empty'))).toHaveCount(Math.max(shown(expected), 1));
   });
 });

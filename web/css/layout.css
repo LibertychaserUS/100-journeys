@@ -4,7 +4,7 @@
    ============================================================= */
 
 #app { display: flex; flex-direction: column; min-height: 100vh; }
-#main-content { flex: 1; }
+#main-content { flex: 1; min-height: 100svh; } /* the footer never starts inside the first screen, so rendering a page can't shift it */
 
 .container {
   width: 100%;

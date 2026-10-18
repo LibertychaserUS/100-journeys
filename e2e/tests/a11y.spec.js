@@ -1,27 +1,43 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
-const { freshPage, registerAndLogin } = require('./helpers');
+const { freshPage, registerAndLogin, settle } = require('./helpers');
 
 // Pages scanned in both themes. Hero imagery is excluded only from contrast checks over photos.
 const PAGES = [
   ['home', '/#/', '.home-hero__title'],
   ['explore', '/#/explore', '.journey-card[data-slug]'],
   ['detail', '/#/journey/bolivia-salt-flat-trek', '.detail-hero__title'],
+  ['detail (descent)', '/#/journey/iceland-lava-tunnel-cycling', '.detail-hero__title'],
+  ['detail (aurora)', '/#/journey/norway-aurora-hunt', '.detail-hero__title'],
+  ['compose', '/#/compose', '#compose-tray .slip'],
   ['login', '/#/login', '#login-form'],
   ['register', '/#/register', '#register-form'],
   ['about', '/#/about', '.about-head'],
   ['404', '/#/nowhere', '.error-code'],
+  ['find', '/#/find', '.type-card'],
+  ['guide', '/#/guide', '#guide-start'],
+  ['guide step', '/#/guide', '.guide__option', { dialog: { step: 2, answers: ['a', 'b'] } }],
+  ['guide reveal', '/#/guide', '.guide__reveal', { dialog: { step: 6, answers: ['a', 'b', 'c', 'a', 'b', 'c'] } }],
+  ['space', '/#/space', '#space-picks .journey-card', { mbti: 'INFP', mbti_source: 'self' }],
+  ['space (empty)', '/#/space', '.space__empty'],
 ];
 
 for (const theme of ['dark', 'light']) {
   test.describe(`Accessibility (${theme})`, () => {
-    for (const [name, url, ready] of PAGES) {
+    for (const [name, url, ready, guest] of PAGES) {
       test(`${name} has no WCAG A/AA violations`, async ({ page }) => {
         await freshPage(page);
         await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+        if (guest) await page.addInitScript((g) => localStorage.setItem('guest_state', JSON.stringify({ v: 1, ...g })), guest);
         await page.goto(url);
         await expect(page.locator(ready).first()).toBeVisible();
         await page.waitForLoadState('networkidle');
+        await settle(page);
+        // Scroll scenes reveal on entry; scan them as a reader who has scrolled through sees them.
+        if (await page.locator('.scenes').count()) {
+          await page.evaluate(() => document.querySelectorAll('.scene').forEach((s) => s.classList.add('is-in')));
+          await page.waitForTimeout(1400);
+        }
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
           .exclude('.home-hero__particles')
@@ -30,6 +46,35 @@ for (const theme of ['dark', 'light']) {
         expect(summary, summary.join('\n')).toEqual([]);
       });
     }
+  });
+}
+
+// E2E-A11Y-COMPOSE-001: the compose game mid-play (placed and blank lines, stamp, kept list) and the share view, both themes
+for (const theme of ['dark', 'light']) {
+  test(`compose with a kept ticket and its share view have no WCAG A/AA violations (${theme})`, async ({ page, context }) => {
+    await freshPage(page);
+    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await registerAndLogin(page, { prefix: `axecompose${theme}`, next: '/compose' });
+    for (const id of ['place-back-alley', 'hour-blue-hour', 'ritual-postcard']) await page.locator(`#slip-${id}`).click();
+    await page.locator('#compose-share').click();
+    await expect(page.locator('#compose-mine .kept')).toHaveCount(1);
+    await expect(page.locator('#compose-ticket .cticket__stamp')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await settle(page);
+    const scan = async () => {
+      const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+      return results.violations.map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`);
+    };
+    let summary = await scan();
+    expect(summary, summary.join('\n')).toEqual([]);
+
+    await page.goto(await page.evaluate(() => navigator.clipboard.readText()));
+    await expect(page.locator('#shared-ticket-title')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await settle(page);
+    summary = await scan();
+    expect(summary, summary.join('\n')).toEqual([]);
   });
 }
 

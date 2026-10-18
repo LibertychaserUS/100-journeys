@@ -19,6 +19,17 @@ type AdminStats struct {
 	MBTIDistribution           []DistributionItem `json:"mbti_distribution"`
 	GenderDistribution         []DistributionItem `json:"gender_distribution"`
 	PurchaseGenderDistribution []DistributionItem `json:"purchase_gender_distribution"`
+	Funnel                     []FunnelStep       `json:"funnel"`
+}
+
+// FunnelSteps is the order the admin funnel reports (event types in internal/analytics).
+var FunnelSteps = []string{"arrive", "path_pick", "type_found", "space_enter", "entrance_open", "register"}
+
+// FunnelStep counts distinct visitors who reached a step; Rate is relative to the first step.
+type FunnelStep struct {
+	Step     string  `json:"step"`
+	Visitors int     `json:"visitors"`
+	Rate     float64 `json:"rate"`
 }
 
 type JourneyMetric struct {

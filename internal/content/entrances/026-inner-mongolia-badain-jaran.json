@@ -1,0 +1,79 @@
+{
+  "slug": "inner-mongolia-badain-jaran",
+  "entrance": { "no": 26, "realm": "sand-stars", "pace": "multi-day", "scale": "near", "seasons": ["autumn"], "time": "night" },
+  "journey": {
+    "fantasy_type": "solitude", "visual_style": "surreal",
+    "adventure_index": 6, "obscurity_level": 7, "risk_level": 3, "price": 7999,
+    "tags": ["solitude", "nature", "night"],
+    "mbti": { "ISFP": 5, "INFP": 4, "INTP": 4 }
+  },
+  "cover": { "path": "generated/inner-mongolia-badain-jaran/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "会唱的沙 · 巴丹吉林",
+    "subtitle": "第 26 号入口：沙山中间的湖",
+    "hook": "沙山脚下有一汪湖，怎么也晒不干",
+    "region": "亚洲 · 中国",
+    "moods": ["沙山", "湖", "夜", "独处", "嗡鸣"],
+    "opens": "秋天，天黑透以后，湖面没有风的时候",
+    "role": "守着一汪湖的人",
+    "premise": "巴丹吉林沙漠在中国西北，2024 年以“巴丹吉林沙漠—沙山湖泊群”列入世界自然遗产。这里有世界上最高的固定沙山，相对高差约 460 米；沙山之间藏着 144 个湖，九成以上的补给来自地下水，其中不少是很古老的水。这里也是世界上面积最大的鸣沙区。",
+    "mission": "睡前在湖边插一根枯枝，在水线的位置划一道；天亮前回来看它。",
+    "chapters": [
+      { "title": "鸣沙", "paragraphs": ["下午的风停了，沙山顶上静得能听见自己的心跳。向导让你坐在坡顶，用手往下推一把沙。沙子流下去，脚底先是一阵发麻，接着整面坡嗡嗡地响起来，像远处有架看不见的飞机在低飞，响了好一阵才停。你又推了一把。"] },
+      { "title": "湖", "paragraphs": [
+        "傍晚的光斜过来，把沙山脚下那汪湖照成了深蓝，岸边一圈芦苇。四面全是沙，看不出这里下过雨。你蹲下去，把手指插进岸边的沙里，往下一点就是湿的、凉的。",
+        "向导说，这一带有一百多个这样的湖，水大多是从地底下来的，有的在地下走了很久很久。你想象那些水在沙山底下慢慢地挪，从你看不见的地方，一直挪到你的指尖底下。"
+      ] },
+      { "title": "一个人的夜", "paragraphs": ["夜里一点风也没有。向导回帐篷睡了，你一个人坐在湖边。湖面把星星原样又照了一遍，沙山的黑影倒过来插进水里。偶尔有一小股沙自己从坡上滑下来，嗡的一声，又没了。你在水边插下一根枯枝，用指甲在水线的位置划了一道。"] }
+    ],
+    "choice": {
+      "prompt": "天快亮了，你回到那根枯枝前。看它之前，你先——",
+      "options": [
+        { "key": "guess", "label": "先猜：水线是高了、低了，还是没动", "keeps": "一个写在手心里的猜测" },
+        { "key": "sing", "label": "爬上坡顶，再推一把沙，让它最后唱一次", "keeps": "胸口里一阵低低的嗡鸣" },
+        { "key": "stay", "label": "什么都不做，坐着等第一缕光落到水面上", "keeps": "湖水由黑变蓝的那几分钟" }
+      ]
+    },
+    "ending": "回家以后，你拧开水龙头接了一杯水，举起来对着灯看了一会儿。你不知道它在地底下走了多久才到这儿。",
+    "facts": [
+      { "text": "“巴丹吉林沙漠—沙山湖泊群”于 2024 年列入世界遗产名录。", "source": "https://en.wikipedia.org/wiki/Badain_Jaran_Desert" },
+      { "text": "这里有世界上最高的固定沙山，相对高差约 460 米；沙山之间有 144 个湖泊，湖水九成以上的补给依赖地下水，其中很多是古老的水；这里也是面积最大的鸣沙区。", "source": "https://worldheritageoutlook.iucn.org/node/2575" },
+      { "text": "干燥的沙子沿陡坡滑落时会发出响亮的声音，有时能持续一分多钟。", "source": "https://en.wikipedia.org/wiki/Badain_Jaran_Desert" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。跟着当地向导乘越野车进沙漠、在湖边扎营过夜是常见的行程；文中的向导和插枯枝看水线的情节是虚构的。"
+  },
+  "en": {
+    "title": "Singing Sand · Badain Jaran",
+    "subtitle": "Entrance No. 26: lakes between the dunes",
+    "hook": "At the foot of a giant dune, a lake that never dries",
+    "region": "Asia · China",
+    "moods": ["Dunes", "Lake", "Night", "Alone", "Hum"],
+    "opens": "In autumn, once it's fully dark and there's no wind on the lake",
+    "role": "The one keeping watch on a lake",
+    "premise": "The Badain Jaran Desert in north-west China became a World Heritage Site in 2024 as “Badain Jaran Desert – Towers of Sand and Lakes”. It holds the tallest stabilised dune on Earth, with about 460 metres of relief, and 144 lakes tucked between the dunes; more than 90 per cent of their water comes from underground, much of it very old. It is also the largest expanse of singing sand in the world.",
+    "mission": "Before you sleep, push a dry stick into the shore and scratch a mark at the waterline. Come back to it before dawn.",
+    "chapters": [
+      { "title": "Singing sand", "paragraphs": ["The afternoon wind has dropped, and up on the dune it's so quiet you can hear your own pulse. Your guide sits you at the top and has you push an armful of sand down the slope. It runs, and first the soles of your feet tingle, then the whole face of the dune starts to hum, like a plane flying low somewhere out of sight. It goes on a long time before it stops. You push another armful."] },
+      { "title": "The lake", "paragraphs": [
+        "Evening light slants across the lake at the foot of the dune and turns it a deep blue. Reeds ring the shore. Sand in every direction, and no sign it has ever rained. You crouch and push your fingers into the sand at the edge. A little way down it's cool and wet.",
+        "There are more than a hundred lakes like this out here, your guide says, and most of the water comes up from underground, some of it after a very long time on the way. You picture it creeping along under the dunes, from somewhere you can't see, all the way to your fingertips."
+      ] },
+      { "title": "A night alone", "paragraphs": ["There's no wind at all tonight. Your guide goes off to sleep in the tent and you sit by the water alone. The lake copies the stars exactly, and the black shape of the dune hangs upside down in it. Now and then a trickle of sand slips down the slope by itself, hums, and goes quiet. You push a dry stick into the shore and scratch a line at the water's edge with your thumbnail."] }
+    ],
+    "choice": {
+      "prompt": "It's nearly dawn and you're back at the stick. Before you look, you—",
+      "options": [
+        { "key": "guess", "label": "Make a guess first: higher, lower, or just the same", "keeps": "A guess written on your palm" },
+        { "key": "sing", "label": "Climb the slope and push the sand once more, to hear it sing", "keeps": "A low hum somewhere in your chest" },
+        { "key": "stay", "label": "Do nothing. Sit and wait for the first light to reach the water", "keeps": "The few minutes when the lake turns from black to blue" }
+      ]
+    },
+    "ending": "At home you fill a glass at the tap and hold it up to the light for a while. You have no idea how long it travelled underground to get here.",
+    "facts": [
+      { "text": "“Badain Jaran Desert – Towers of Sand and Lakes” was inscribed on the World Heritage List in 2024.", "source": "https://en.wikipedia.org/wiki/Badain_Jaran_Desert" },
+      { "text": "The site has the world's tallest stabilised mega-dune (about 460 m of relative relief) and 144 lakes between the dunes; more than 90% of their recharge depends on groundwater, much of it ancient, and it has the largest expanse of singing sands.", "source": "https://worldheritageoutlook.iucn.org/node/2575" },
+      { "text": "Dry sand sliding down a steep slope here can make a loud sound that lasts for more than a minute.", "source": "https://en.wikipedia.org/wiki/Badain_Jaran_Desert" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Going into the desert by 4×4 with a local guide and camping by a lake is a common trip; the guide and the stick at the waterline are fiction."
+  }
+}

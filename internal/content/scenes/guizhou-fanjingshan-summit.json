@@ -1,0 +1,41 @@
+{
+  "slug": "guizhou-fanjingshan-summit",
+  "motif": "rise",
+  "texture": "fog",
+  "arc": [
+    {
+      "h": 10,
+      "s": 40
+    },
+    {
+      "h": 200,
+      "s": 12
+    },
+    {
+      "h": 30,
+      "s": 10
+    },
+    {
+      "h": 210,
+      "s": 35
+    },
+    {
+      "h": 130,
+      "s": 25
+    }
+  ],
+  "accent": "#ff8f7a",
+  "beats": [
+    "grey",
+    "still",
+    "vast",
+    ""
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

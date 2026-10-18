@@ -1,0 +1,40 @@
+{
+  "slug": "japan-sakurajima-ash-city",
+  "motif": "mist",
+  "texture": "dust",
+  "arc": [
+    {
+      "h": 210,
+      "s": 12
+    },
+    {
+      "h": 30,
+      "s": 8
+    },
+    {
+      "h": 40,
+      "s": 35
+    },
+    {
+      "h": 220,
+      "s": 10
+    },
+    {
+      "h": 200,
+      "s": 20
+    }
+  ],
+  "accent": "#d9c7a7",
+  "beats": [
+    "grey",
+    "",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

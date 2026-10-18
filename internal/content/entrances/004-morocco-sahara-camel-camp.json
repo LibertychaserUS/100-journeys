@@ -1,0 +1,85 @@
+{
+  "slug": "morocco-sahara-camel-camp",
+  "entrance": { "no": 4, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["autumn", "spring"], "time": "night" },
+  "journey": {
+    "fantasy_type": "night", "visual_style": "dramatic",
+    "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 12999,
+    "tags": ["night", "visual", "nature"],
+    "mbti": { "ENFP": 5, "ESFP": 4, "ENFJ": 4 }
+  },
+  "cover": { "path": "generated/card-sahara-stars.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "铁响板 · 切比沙丘",
+    "subtitle": "第 4 号入口：沙丘脚下，铁在打拍子",
+    "hook": "篝火边，有人递给你一副铁响板",
+    "region": "非洲 · 摩洛哥",
+    "moods": ["篝火", "鼓点", "星空", "加入"],
+    "opens": "秋天和春天，天黑以后，篝火点起来的时候",
+    "role": "接过铁响板的人",
+    "premise": "切比沙丘在摩洛哥东南，南北绵延约 28 公里，有些地方高出周围的石漠约 150 米，梅尔祖卡就在它西侧。沙丘边上的小村哈姆利亚每年夏天办三个晚上的格纳瓦音乐节。格纳瓦首先是一种苏菲兄弟会的音乐，2019 年列入联合国教科文组织人类非物质文化遗产代表作名录；它的拍子来自大鼓和一种沉甸甸的铁响板。",
+    "mission": "等鼓手朝你点头，接过铁响板，跟完一整首歌，中间不停。",
+    "chapters": [
+      { "title": "凉下来的沙", "paragraphs": ["太阳一落，营地后面那道沙脊上的沙子很快就凉了，凉得像刚从井里打上来的水。你站在脊上，看星星先是一颗一颗冒出来，然后一下子多得数不过来。下去的时候你没走原路，直接坐下，顺着沙坡滑回了营地。"] },
+      { "title": "铁的声音", "paragraphs": [
+        "咔嚓，咔嚓。火堆那边先传过来的是铁的声音。三个从村里来的乐手围火坐着：一个抱着方琴身的长颈三弦琴，一个膝上横着大鼓，第三个两只手各握一副铁响板，一开一合，像有人在黑暗里飞快地剪着什么。",
+        "第二首唱到一半，拿响板的人看了你一眼，把一副塞进你手里。比你想的沉，还带着他手心的温度。"
+      ] },
+      { "title": "跟上", "paragraphs": ["鼓点又沉又稳，你的铁片却总快半拍，撞得乱七八糟。旁边的人笑了，可没人让你停。打鼓的那位用下巴指了指自己的脚：“别数，看我脚后跟。”你盯着那只脚后跟在沙地上一下一下地点，手腕慢慢松开。忽然有一下，你的铁片和他的鼓落在了同一个地方。"] },
+      { "title": "圈子大了", "paragraphs": ["有人开始拍手，火星跟着往上飘。你回过头，朝坐在帐篷边上的那对客人招手。他们犹豫了一下，还是挪过来坐进沙里，跟着拍起来，圈子一下大了一倍。手腕发酸，你不想停。"] },
+      { "title": "火小下去", "paragraphs": ["歌停的时候，火只剩一堆红炭。你指缝里全是铁的味道，耳朵还在嗡嗡响。头顶的星星密得能衬出沙丘的轮廓。"] }
+    ],
+    "choice": {
+      "prompt": "最后一首歌停了，响板还在你手里。你会——",
+      "options": [
+        { "key": "return", "label": "用两只手把响板还给他，说一声谢谢", "keeps": "手心里一股洗不掉的铁味" },
+        { "key": "rhythm", "label": "敲一段你家乡的拍子，看他们接不接得住", "keeps": "一段被铁片和大鼓接住的家乡节拍" },
+        { "key": "encore", "label": "光着脚站起来，求他们再来一首", "keeps": "一只怎么也倒不干净的、装着沙的鞋" }
+      ]
+    },
+    "ending": "回到城里，某天夜里你坐地铁，车轮压过铁轨接缝，咔嚓、咔嚓。你的手指在膝盖上动起来，先快了半拍，又慢慢对上了。",
+    "facts": [
+      { "text": "切比沙丘南北绵延约 28 公里，有些地方高出周围的石漠约 150 米；梅尔祖卡位于沙丘西侧。", "source": "https://en.wikipedia.org/wiki/Erg_Chebbi" },
+      { "text": "格纳瓦于 2019 年列入联合国教科文组织人类非物质文化遗产代表作名录；它首先是一种苏菲兄弟会的音乐，乡村乐队用大鼓和响板。", "source": "https://ich.unesco.org/en/RL/gnawa-01170" },
+      { "text": "格纳瓦音乐里那种沉重的铁响板叫 qraqeb（也写作 krakeb）。", "source": "https://en.wikipedia.org/wiki/Gnawa_music" },
+      { "text": "沙丘边的哈姆利亚村每年夏天举办为期三晚的格纳瓦音乐节。", "source": "https://en.wikipedia.org/wiki/Khamlia" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。骑骆驼去沙丘营地过夜、在篝火边听传统音乐是当地常见的行程；文中的乐手、把响板递给你的情节和其他人物都是虚构的。"
+  },
+  "en": {
+    "title": "Iron Castanets · Erg Chebbi",
+    "subtitle": "Entrance No. 4: at the foot of the dunes, iron keeps the time",
+    "hook": "By the fire, someone hands you a pair of iron castanets",
+    "region": "Africa · Morocco",
+    "moods": ["Firelight", "Drums", "Stars", "Joining in"],
+    "opens": "In autumn and spring, after dark, once the fire is lit",
+    "role": "The one handed the castanets",
+    "premise": "Erg Chebbi, in south-eastern Morocco, runs about 28 kilometres north to south and in places rises some 150 metres above the stony plain; Merzouga sits on its western side. Khamlia, a village at the edge of the dunes, holds three nights of Gnawa music every summer. Gnawa is first of all the music of a Sufi brotherhood, added to UNESCO's list of the intangible heritage of humanity in 2019, and its pulse comes from big drums and heavy iron castanets.",
+    "mission": "When the drummer nods at you, take the castanets and stay with one whole song without stopping.",
+    "chapters": [
+      { "title": "Cold sand", "paragraphs": ["The moment the sun goes, the sand on the ridge behind the camp turns cool, cool as water drawn from a well. You stand up there and watch the stars come out one at a time, then all at once. You don't take the path back down. You sit and slide."] },
+      { "title": "The sound of iron", "paragraphs": [
+        "Clack-clack, clack-clack. The first thing that reaches you from the fire is the sound of iron. Three musicians from the village sit round it: one holds a long-necked lute with a box for a body, one has a big drum across his knees, and the third has a pair of iron castanets in each hand, snapping them open and shut like someone cutting at the dark with shears.",
+        "Halfway through the second song he catches your eye and presses one pair into your hands. They're heavier than you expected, and still warm from his palm."
+      ] },
+      { "title": "Keeping up", "paragraphs": ["The drum is slow and steady; your iron keeps landing half a beat ahead, all clatter. People laugh; nobody tells you to stop. The drummer tips his chin at his own foot. “Don't count. Watch my heel.” You watch it tap the sand, your wrists loosen, and then, once, your iron lands exactly where his drum does."] },
+      { "title": "The circle grows", "paragraphs": ["Someone starts to clap, and the sparks lift with it. You turn and wave at the couple sitting back by the tents. They hesitate, then come over, drop into the sand and clap along, and all at once the circle is twice the size. Your wrists ache. You don't want to stop."] },
+      { "title": "The fire goes low", "paragraphs": ["When the song ends there's only a bed of red coals. Your fingers smell of iron and your ears are still ringing. Overhead the stars are so thick you can see the edge of the dune against them."] }
+    ],
+    "choice": {
+      "prompt": "The last song is over and the castanets are still in your hands. What do you do?",
+      "options": [
+        { "key": "return", "label": "Hand them back with both hands and say thank you", "keeps": "A smell of iron on your palms that won't wash out" },
+        { "key": "rhythm", "label": "Tap out a rhythm from home and see if they can pick it up", "keeps": "A rhythm from home, played back to you on iron and drum" },
+        { "key": "encore", "label": "Get up barefoot and ask for one more song", "keeps": "A shoe you'll never quite empty of sand" }
+      ]
+    },
+    "ending": "Back in the city, some night on the metro, the wheels click over the rail joints. Your fingers start moving on your knee, half a beat ahead at first, then settling in.",
+    "facts": [
+      { "text": "Erg Chebbi runs about 28 km north to south and in places rises about 150 m above the surrounding stony plain; Merzouga lies on its western side.", "source": "https://en.wikipedia.org/wiki/Erg_Chebbi" },
+      { "text": "Gnawa was inscribed on UNESCO's Representative List of the Intangible Cultural Heritage of Humanity in 2019; it is first of all Sufi brotherhood music, and rural groups play large drums and castanets.", "source": "https://ich.unesco.org/en/RL/gnawa-01170" },
+      { "text": "The large, heavy iron castanets of Gnawa music are called qraqeb (or krakeb).", "source": "https://en.wikipedia.org/wiki/Gnawa_music" },
+      { "text": "Khamlia, a village at the edge of Erg Chebbi, holds a three-night Gnawa festival every summer.", "source": "https://en.wikipedia.org/wiki/Khamlia" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Camel treks to overnight dune camps with traditional music round the fire are common there; the musicians, the moment the castanets are handed to you and everyone else here are fiction."
+  }
+}

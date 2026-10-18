@@ -1,0 +1,77 @@
+{
+  "slug": "turkey-cappadocia-balloon",
+  "entrance": { "no": 9, "realm": "fire-stone", "pace": "hour", "scale": "far", "seasons": ["spring", "autumn"], "time": "dawn" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "surreal",
+    "adventure_index": 3, "obscurity_level": 2, "risk_level": 2, "price": 16999,
+    "tags": ["visual", "culture"],
+    "mbti": { "ESFP": 5, "ENFP": 4, "ESFJ": 4 }
+  },
+  "cover": { "path": "generated/turkey-cappadocia-balloon/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "石头的帽子 · 卡帕多奇亚",
+    "subtitle": "第 9 号入口：允许起飞的那个早晨",
+    "hook": "满天气球一起升起，你先朝隔壁篮子挥手",
+    "region": "亚洲 · 土耳其",
+    "moods": ["热闹", "日出", "火焰声", "一起"],
+    "opens": "春天和秋天，能飞的早晨，天亮前后",
+    "role": "朝隔壁篮子挥手的人",
+    "premise": "卡帕多奇亚的软岩，来自埃尔吉耶斯、哈桑等古火山在约 900 万到 300 万年前的喷发。风和水把它削成一根根“仙女烟囱”，顶上那块更硬的岩石像一顶帽子，替下面的软石挡住侵蚀。人们在这片软石里凿出了教堂和住处。热气球要看天气，这里平均一年大约有 220 天能飞。",
+    "mission": "落地之前，让篮子里的每一个人都至少笑出声一次。",
+    "chapters": [
+      { "title": "对讲机", "paragraphs": ["天还黑着。起飞场上，球皮一只只侧躺在地上，大风扇呼呼地往里灌冷风。所有人都在等一句话。驾驶员拿着对讲机听了一会儿，转过身来：“今天能飞。”你旁边那位阿姨第一个叫出了声，你跟着就笑了。"] },
+      { "title": "隔壁的篮子", "paragraphs": ["燃烧器一响，热浪扑到脸上，篮子轻轻一晃，就不在地上了。没有颠簸，只是地面自己往下退。四周的气球多得数不过来，红的，条纹的，还有一只画着笑脸，正从一条条山谷里冒出来。你朝最近的那只挥手，那边篮子里一个小孩抢先挥了回来。"] },
+      { "title": "帽子", "paragraphs": ["太阳从山脊上冒出来，斜斜的光把每根烟囱的影子拉得老长。你开始数帽子：一根烟囱顶着一块深色的石头，歪着，像把帽子推到了后脑勺；一根已经丢了帽子，尖顶被雨水磨圆了；一扇凿在岩壁上的小窗，窗口晾着一块布。你把那顶歪帽子指给大家看，篮子里笑成一片，连驾驶员也笑了。"] },
+      { "title": "篮底的干草", "paragraphs": ["燃烧器停了，四周一下子安静下来，只听得见篮底擦过干草的沙沙声。驾驶员让大家按起飞前练过的姿势站好。篮子停稳，地面又有了分量。你把手里的暖宝宝塞给自己篮子里那个一路都在发抖的小孩，他攥着它，终于笑了。"] }
+    ],
+    "choice": {
+      "prompt": "最后一分钟，篮子快要碰到地面，你做什么？",
+      "options": [
+        { "key": "wave", "label": "朝地上追着跑的人使劲挥手", "keeps": "地上传来的一声“嗨！”" },
+        { "key": "photo", "label": "举起手机，把篮子里被火光照亮的每一张脸都拍进一张", "keeps": "一张挤满了脸的照片" },
+        { "key": "count", "label": "和那个小孩一起，大声数天上还剩几只气球", "keeps": "一个喊破了嗓子的数字" }
+      ]
+    },
+    "ending": "回到家，某个早上楼下有人打着了燃气灶，“呼”的一声，你差点抬头去找天上的气球。你想起那些顶着石头帽子的烟囱：帽子还在，它们就还站着。",
+    "facts": [
+      { "text": "卡帕多奇亚的地貌来自埃尔吉耶斯山、哈桑山和 Göllüdağ 等古火山的喷发物，形成于约 900 万到 300 万年前；风和水把这些软岩削成了仙女烟囱。", "source": "https://en.wikipedia.org/wiki/Cappadocia" },
+      { "text": "凝灰岩上方的一层硬岩像保护帽，减缓下面软岩的侵蚀；“格雷梅国家公园和卡帕多奇亚岩石遗址”于 1985 年列入世界遗产。", "source": "https://en.wikipedia.org/wiki/G%C3%B6reme_Historical_National_Park" },
+      { "text": "热气球飞行受天气限制：当地平均每年约 220 天能飞，大雨和强风会让气球停飞。", "source": "https://www.hurriyetdailynews.com/250-000-take-cappadocia-balloon-rides-in-first-half-224683" },
+      { "text": "每天早上，由土耳其民航主管部门根据风速和能见度，为整个地区作出能飞或不能飞的决定。", "source": "https://www.inyourpocket.com/turkey/articles/cappadocia-travel-guide-balloons-valleys-cave" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。日出时乘热气球是当地很受欢迎的游览方式；驾驶员、同篮的人、对话和那只画着笑脸的气球都是虚构的。"
+  },
+  "en": {
+    "title": "Stone Hats · Cappadocia",
+    "subtitle": "Entrance No. 9: the morning the balloons are cleared to fly",
+    "hook": "The whole sky lifts at once, and you wave at the next basket",
+    "region": "Asia · Turkey",
+    "moods": ["Crowded sky", "Sunrise", "Burner roar", "Together"],
+    "opens": "In spring and autumn, on mornings fit to fly, around first light",
+    "role": "The one waving at the next basket",
+    "premise": "Cappadocia's soft rock was laid down by eruptions of Erciyes, Hasan and other ancient volcanoes some nine to three million years ago. Wind and water have carved it into fairy chimneys, each topped by a harder stone that works like a hat, keeping erosion off the softer rock below. People cut churches and homes into it. Balloons fly only when the weather allows: on average around 220 days a year.",
+    "mission": "Before you land, get every person in your basket to laugh out loud at least once.",
+    "chapters": [
+      { "title": "The radio", "paragraphs": ["It's still dark. On the launch field the envelopes lie on their sides while big fans push cold air into them. Everyone is waiting for one sentence. The pilot listens to his radio for a while, then turns round: “We fly today.” The woman beside you whoops first, and you're laughing straight after."] },
+      { "title": "The next basket", "paragraphs": ["The burner roars, heat slaps your face, the basket gives a small shrug and the ground is no longer under it. There's no lurch; the earth just backs away. There are more balloons around you than you can count, red ones, striped ones, one with a painted grin, rising out of the valleys one after another. You wave at the nearest. A kid in that basket beats you to it."] },
+      { "title": "Hats", "paragraphs": ["The sun clears the ridge, and the low light stretches every chimney's shadow across the valley floor. You start counting hats. A chimney with a dark stone sitting on it at an angle, like a cap pushed back. One that has lost its hat, its tip worn round by rain. A small window cut into a rock face, a cloth hung out of it to dry. You point out the cap pushed back, and the whole basket cracks up, the pilot included."] },
+      { "title": "Dry grass under the basket", "paragraphs": ["The burner goes quiet, and all you can hear is the basket hissing through dry grass. The pilot has everyone take the landing position he showed you on the ground. The basket settles and the ground is heavy again. You press your hand warmer into the palm of the kid in your own basket who's been shivering since take-off, and he finally grins."] }
+    ],
+    "choice": {
+      "prompt": "In the last minute, as the basket drops toward the ground, what do you do?",
+      "options": [
+        { "key": "wave", "label": "Wave hard at the people running along below", "keeps": "A “hey!” shouted up from the ground" },
+        { "key": "photo", "label": "Fit every face in the basket, lit by the burner, into one picture", "keeps": "One photo crowded with faces" },
+        { "key": "count", "label": "Count the balloons still in the sky, out loud, with the kid", "keeps": "A number shouted at the top of your voice" }
+      ]
+    },
+    "ending": "Back home, one morning someone downstairs lights the gas with a whump and you nearly look up for balloons. You think of the chimneys in their stone hats, still standing for as long as the hats stay on.",
+    "facts": [
+      { "text": "Cappadocia's landscape formed from the eruptions of ancient volcanoes including Mount Erciyes, Mount Hasan and Göllüdağ, roughly nine to three million years ago; wind and water carved the soft rock into fairy chimneys.", "source": "https://en.wikipedia.org/wiki/Cappadocia" },
+      { "text": "A hard layer on top of the soft tuff acts as a protective cap that slows erosion. Göreme National Park and the Rock Sites of Cappadocia became a UNESCO World Heritage Site in 1985.", "source": "https://en.wikipedia.org/wiki/G%C3%B6reme_Historical_National_Park" },
+      { "text": "Ballooning depends on the weather: the region typically sees flights on about 220 days a year, and heavy rain and strong winds ground them.", "source": "https://www.hurriyetdailynews.com/250-000-take-cappadocia-balloon-rides-in-first-half-224683" },
+      { "text": "Each morning Turkey's civil aviation authority makes the go or no-go call for the whole region, based on wind speed and visibility.", "source": "https://www.inyourpocket.com/turkey/articles/cappadocia-travel-guide-balloons-valleys-cave" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Sunrise balloon flights are popular there; the pilot, the people in the basket, the dialogue and the balloon with the painted grin are fiction."
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "slug": "shanxi-yuncheng-salt-lake",
+  "entrance": { "no": 14, "realm": "mirror-salt", "pace": "hour", "scale": "near", "seasons": ["summer"], "time": "afternoon" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "surreal",
+    "adventure_index": 2, "obscurity_level": 6, "risk_level": 1, "price": 3999,
+    "tags": ["visual", "culture", "hidden"],
+    "mbti": { "ISFP": 5, "INFJ": 4, "ISTJ": 4 }
+  },
+  "cover": { "path": "generated/shanxi-yuncheng-salt-lake/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "调色盘 · 运城盐湖",
+    "subtitle": "第 14 号入口：一格盐田，一种颜色",
+    "hook": "一格一格的盐田，每一格都是另一种颜色",
+    "region": "亚洲 · 中国",
+    "moods": ["色彩", "咸", "午后", "传说"],
+    "opens": "夏天，午后太阳最毒的时候",
+    "role": "数颜色的人",
+    "premise": "运城盐湖在山西南部，古称解池，采盐已有四千多年。夏天的强光和高温让盐田里的杜氏盐藻产生类胡萝卜素，一格格盐田变成紫、红、品红和翠绿。当地传说黄帝在这里诛杀了蚩尤，蚩尤的血化成了红色的卤水，“解”这个地名也由此而来。",
+    "mission": "数清你一眼能看到几种颜色，再把一只手伸进最红的那一格。",
+    "chapters": [
+      { "title": "一格一格", "paragraphs": [
+        "午后的太阳白得发烫。从堤上往下看，盐田被低低的土埂切成整整齐齐的格子。你一格一格数过去：一格淡粉，像剥了壳的虾；一格铁锈红；一格紫得发黑；一格绿，绿得不像是水；还有一格什么颜色都没有，白得晃眼，边上结着一圈盐花。",
+        "风吹过来，先是咸，再是一点苦。你舔了一下嘴唇，也是咸的。"
+      ] },
+      { "title": "不是血", "paragraphs": [
+        "堤那头传来铁锹铲泥的声音，一个老盐工在补土埂。你走过去，问他红的那格是什么。“小孩问，我就说是蚩尤的血，好记。”他把铁锹往泥里一插，“其实是一种藻，太阳越毒，它越红。”",
+        "他说老法子叫“垦畦浇晒”：在地上开出一畦一畦，把卤水引进去，剩下的交给太阳和风，盐自己就结出来。这法子唐代就成熟了。远处坡上那座池神庙，也是唐代就有的。"
+      ] },
+      { "title": "手", "paragraphs": ["近处的光很烈，最红的那一格亮得刺眼。你蹲到它边上，把手伸进去。卤水是温的，比你想的稠，滑滑的，像伸进一碗放凉了的汤。抽出来晾一会儿，手背上就起了一道一道的白，干得发紧。"] }
+    ],
+    "choice": {
+      "prompt": "太阳斜了，颜色开始变。你带走哪一样？",
+      "options": [
+        { "key": "jar", "label": "灌一小瓶红卤水带回家", "keeps": "窗台上一小瓶红色的水" },
+        { "key": "salt", "label": "等手背上的盐干透，不洗，一路带回去", "keeps": "手背上一道发痒的白印子" },
+        { "key": "story", "label": "记下老盐工那句话，回去讲给一个小孩听", "keeps": "一个关于红色卤水的故事" }
+      ]
+    },
+    "ending": "后来在家炒菜，你捏起一撮盐撒进锅里，手指停了一下。那么白的盐，是从那么多颜色里晒出来的。",
+    "facts": [
+      { "text": "运城盐湖有四千多年的采盐历史。", "source": "https://zh.wikipedia.org/wiki/运城盐湖" },
+      { "text": "夏天的强光和高温让杜氏盐藻产生类胡萝卜素，把盐田染成紫、红、品红和翠绿。", "source": "https://en.wikipedia.org/wiki/Yuncheng_Salt_Lake" },
+      { "text": "传说黄帝诛杀蚩尤后，蚩尤的血化为卤水，所以盐池的卤水发红，被称为“蚩尤血”；“解”这个地名也与蚩尤“尸解于此”的说法有关。", "source": "https://www.chinanews.com.cn/cul/2024/02-21/10166917.shtml" },
+      { "text": "“垦畦浇晒”是在地上开出田畦、把盐湖水引进畦中晾晒成盐的方法，唐代时已发展成熟；池神庙也建于唐代。", "source": "https://www.chinanews.com.cn/gn/2023/07-19/10046230.shtml" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。到盐湖边看彩色盐田是常见的游览；文中的老盐工和他说的话是虚构的，把手伸进盐田只是故事里的情节，实地请听从景区规定。"
+  },
+  "en": {
+    "title": "The Palette · Yuncheng Salt Lake",
+    "subtitle": "Entrance No. 14: every salt pan a different colour",
+    "hook": "A grid of salt pans, and every square a different colour",
+    "region": "Asia · China",
+    "moods": ["Colour", "Salt", "Afternoon", "Legend"],
+    "opens": "In summer, in the afternoon, when the sun is at its fiercest",
+    "role": "The colour counter",
+    "premise": "Yuncheng Salt Lake in southern Shanxi, known in old texts as Xiechi, has been worked for salt for some 4,000 years. In summer, strong light and heat make the alga Dunaliella salina produce carotenoids, and the pans turn violet, scarlet, magenta and emerald. Local legend says the Yellow Emperor killed the warrior Chi You here, that his blood became the red brine, and that the old name Xie comes from him.",
+    "mission": "Count how many colours you can see at a glance, then put one hand into the reddest pan.",
+    "chapters": [
+      { "title": "Square by square", "paragraphs": [
+        "The afternoon sun is white and scorching. From the embankment the pans are cut into neat squares by low earth walls. You count them off one by one. One is the pale pink of peeled shrimp. One is rust. One is a purple so deep it's nearly black. One is green, a green water has no business being. And one has no colour at all, a white that hurts to look at, ringed with a crust of salt flowers.",
+        "The wind brings a smell that's salty first, then faintly bitter. You lick your lips. Salt."
+      ] },
+      { "title": "Not blood", "paragraphs": [
+        "Further along the embankment there's the scrape of a spade in mud: an old salt worker is patching a wall. You walk over and ask him about the red one. “When kids ask, I tell them it's Chi You's blood. They remember that.” He drives his spade into the mud. “It's algae, really. The harder the sun, the redder it gets.”",
+        "The old way, he says, was to dig shallow beds, let the brine in and leave the rest to sun and wind until the salt comes up on its own. They had it worked out by the Tang dynasty. The temple to the god of the salt pond, up on the slope, goes back to the Tang too."
+      ] },
+      { "title": "Hands", "paragraphs": ["Up close the light is fierce, and the reddest pan glares. You crouch at its edge and put your hand in. The brine is warm and thicker than you expected, slippery, like reaching into soup that's gone cool. You lift it out and let it dry, and white streaks come up on the back of your hand and pull the skin tight."] }
+    ],
+    "choice": {
+      "prompt": "The sun is slanting and the colours are starting to shift. What do you take with you?",
+      "options": [
+        { "key": "jar", "label": "Fill a small bottle with red brine to take home", "keeps": "A small bottle of red water on your windowsill" },
+        { "key": "salt", "label": "Let the salt dry on the back of your hand and leave it there", "keeps": "An itchy white streak on the back of your hand" },
+        { "key": "story", "label": "Write down what the salt worker said, to tell a child later", "keeps": "A story about red brine" }
+      ]
+    },
+    "ending": "Later, cooking at home, you pinch some salt over the pan and your fingers stop for a moment. All that white, dried out of so many colours.",
+    "facts": [
+      { "text": "People have harvested salt from the Yuncheng lake for about 4,000 years; it is often called China's “Dead Sea”.", "source": "https://www.nationalgeographic.com/science/article/china-lake-colorful-algae-spd" },
+      { "text": "In summer, intense light and heat cause the alga Dunaliella salina to produce carotenoids, turning the salt pans violet, scarlet, magenta and emerald.", "source": "https://en.wikipedia.org/wiki/Yuncheng_Salt_Lake" },
+      { "text": "Legend holds that after the Yellow Emperor killed Chi You, his blood turned into the brine, which is why it runs red and is called “Chi You's blood”; the place name Xie is linked to the same story.", "source": "https://www.chinanews.com.cn/cul/2024/02-21/10166917.shtml" },
+      { "text": "The “dig beds and sun-dry” method (kenqi jiaoshai) — letting lake water into shallow beds to dry into salt — was mature by the Tang dynasty; the temple to the salt-pond god also dates from the Tang.", "source": "https://www.chinanews.com.cn/gn/2023/07-19/10046230.shtml" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Visiting the coloured salt pans is a common outing; the old salt worker and his words are fiction, and putting your hand into a pan is part of the story only: on site, follow the rules of the scenic area."
+  }
+}

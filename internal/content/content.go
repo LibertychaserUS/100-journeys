@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-//go:embed entrances/*.json
+//go:embed entrances/*.json scenes/*.json
 var files embed.FS
 
 // Entrance is one journey file.
@@ -160,7 +160,11 @@ func Load() ([]Entrance, error) {
 }
 
 var (
-	mbtiCode = regexp.MustCompile(`\b[EI][NS][FT][JP]\b`)
+	// Chapter titles name a concrete image, object, time or sensation — never a stage of the
+	// trip announced like a guide would ("the entrance", "the light comes in", "epilogue").
+	stageTitlesZH = []string{"入口", "进入", "出发", "抵达", "到达", "离开", "回程", "开始", "结束", "尾声", "结尾", "序章", "终章", "高潮", "光进来", "天亮了", "门开了"}
+	stageTitlesEN = []string{"the entrance", "entrance", "the way in", "the way out", "arrival", "departure", "leaving", "the return", "the beginning", "the end", "epilogue", "prologue", "the climax", "the light comes in", "light comes in", "dawn breaks", "the door opens"}
+	mbtiCode      = regexp.MustCompile(`\b[EI][NS][FT][JP]\b`)
 	// Copy must show why a journey fits, never tell: no type codes, no trait vocabulary, no lecturing.
 	bannedZH = []string{"MBTI", "人格", "性格", "内向", "外向", "理性", "感性", "直觉型", "因为你是", "作为一个", "适合你这种", "你天生", "你这样的人"}
 	bannedEN = []string{"mbti", "personality", "introvert", "extrovert", "because you are", "because you're", "your type", "people like you"}
@@ -233,10 +237,9 @@ func Validate(e Entrance) []string {
 	}
 
 	for _, lang := range []struct {
-		name   string
-		t      Text
-		banned []string
-	}{{"zh", e.ZH, bannedZH}, {"en", e.EN, bannedEN}} {
+		name string
+		t    Text
+	}{{"zh", e.ZH}, {"en", e.EN}} {
 		t := lang.t
 		for field, v := range map[string]string{"title": t.Title, "hook": t.Hook, "region": t.Region, "opens": t.Opens, "role": t.Role, "premise": t.Premise, "mission": t.Mission, "ending": t.Ending, "fiction": t.Fiction} {
 			if strings.TrimSpace(v) == "" {
@@ -249,9 +252,19 @@ func Validate(e Entrance) []string {
 		if n := len(t.Chapters); n < 2 || n > 5 {
 			add("%s needs 2-5 chapters, has %d", lang.name, n)
 		}
+		stages := stageTitlesZH
+		if lang.name == "en" {
+			stages = stageTitlesEN
+		}
 		for i, c := range t.Chapters {
 			if c.Title == "" || len(c.Paragraphs) == 0 {
 				add("%s chapter %d needs a title and paragraphs", lang.name, i+1)
+			}
+			title := strings.ToLower(strings.Trim(strings.TrimSpace(c.Title), "。.!！"))
+			for _, st := range stages {
+				if title == st {
+					add("%s chapter %d is titled like a guide's signpost (%q): name an image, object, time or sensation", lang.name, i+1, c.Title)
+				}
 			}
 		}
 		if t.Choice == nil || len(t.Choice.Options) < 2 || len(t.Choice.Options) > 3 {
@@ -266,15 +279,7 @@ func Validate(e Entrance) []string {
 			}
 		}
 		for _, s := range narrative(t) {
-			lower := strings.ToLower(s)
-			if m := mbtiCode.FindString(s); m != "" {
-				add("%s copy names a type (%s): %q", lang.name, m, short(s))
-			}
-			for _, w := range lang.banned {
-				if strings.Contains(lower, strings.ToLower(w)) {
-					add("%s copy tells instead of shows (%q): %q", lang.name, w, short(s))
-				}
-			}
+			p = append(p, Lint(lang.name, s)...)
 		}
 	}
 	if e.ZH.Choice != nil && e.EN.Choice != nil && !sameKeys(e.ZH.Choice.Options, e.EN.Choice.Options) {
@@ -282,6 +287,29 @@ func Validate(e Entrance) []string {
 	}
 	return p
 }
+
+// Lint applies the show-don't-tell rules to one piece of reader-facing copy in lang ("zh" or "en"):
+// no type codes and none of the trait or lecturing words. It returns readable problems, or nil.
+func Lint(lang, s string) []string {
+	var p []string
+	if m := mbtiCode.FindString(s); m != "" {
+		p = append(p, fmt.Sprintf("%s copy names a type (%s): %q", lang, m, short(s)))
+	}
+	banned := bannedEN
+	if lang == "zh" {
+		banned = bannedZH
+	}
+	lower := strings.ToLower(s)
+	for _, w := range banned {
+		if strings.Contains(lower, strings.ToLower(w)) {
+			p = append(p, fmt.Sprintf("%s copy tells instead of shows (%q): %q", lang, w, short(s)))
+		}
+	}
+	return p
+}
+
+// Contains reports whether v is one of the vocabulary values in list.
+func Contains(list []string, v string) bool { return contains(list, v) }
 
 // narrative is the reader-facing story copy that the show-don't-tell lint applies to.
 func narrative(t Text) []string {
@@ -299,8 +327,8 @@ func narrative(t Text) []string {
 	return out
 }
 
-// Sync upserts every entrance into the database. Unchanged files are skipped (content hash),
-// so restarts do not touch updated_at.
+// Sync upserts every entrance into the database on every start (after db/seed.sql). The content
+// hash is stored for reference only; it is never used to skip a file.
 func Sync(ctx context.Context, db *sql.DB) error {
 	entrances, err := Load()
 	if err != nil {
@@ -318,15 +346,9 @@ func Sync(ctx context.Context, db *sql.DB) error {
 }
 
 func syncOne(ctx context.Context, db *sql.DB, e Entrance) error {
-	var current string
-	err := db.QueryRowContext(ctx, `SELECT en.content_hash FROM journey_entrances en JOIN journeys j ON j.id = en.journey_id WHERE j.slug = ?`, e.Slug).Scan(&current)
-	if err == nil && current == e.hash {
-		return nil
-	}
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-
+	// Always re-apply: db/seed.sql runs on every start and rewrites the base rows, translations,
+	// covers, tags and MBTI pairs it knows, so skipping an unchanged file would let a restart
+	// revert the authored copy. Re-applying is idempotent and cheap (a few rows per entrance).
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

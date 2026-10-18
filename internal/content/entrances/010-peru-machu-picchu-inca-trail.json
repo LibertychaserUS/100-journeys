@@ -1,0 +1,95 @@
+{
+  "slug": "peru-machu-picchu-inca-trail",
+  "entrance": { "no": 10, "realm": "old-roads", "pace": "multi-day", "scale": "far", "seasons": ["dry"], "time": "dawn" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "minimal",
+    "adventure_index": 7, "obscurity_level": 4, "risk_level": 3, "price": 21999,
+    "tags": ["culture", "extreme", "hidden"],
+    "mbti": { "ISTJ": 5, "ISFJ": 5, "INFJ": 4 }
+  },
+  "cover": { "path": "generated/peru-machu-picchu-inca-trail/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "接力 · 印加古道",
+    "subtitle": "第 10 号入口：一句话，原样送到太阳门",
+    "hook": "一句克丘亚语，从营地一路传到太阳门",
+    "region": "南美洲 · 秘鲁",
+    "moods": ["石阶", "接力", "黎明", "稳当"],
+    "opens": "旱季（大约 5 月到 9 月），第四天的黎明，在太阳门",
+    "role": "传话的人",
+    "premise": "经典印加古道全长约 42 公里，一般要走四到五天，最高处是海拔 4,215 米的死女人山口（Warmiwañusca）。古道每年 2 月关闭清理；每天最多 500 人上路，其中徒步者只有 200 人，其余都是向导和背夫。最后一段陡峭的石阶通向太阳门（Inti Punku），站在那里，第一次能看见整座马丘比丘。",
+    "mission": "把一句克丘亚语从最后一晚的营地带到太阳门，一个音都不改。",
+    "chapters": [
+      { "title": "五百个人", "paragraphs": [
+        "检查站前，向导把规矩说了一遍：今天这条路上最多五百人，徒步的只有两百。你看看四周，像你这样只背一个小包的，确实不到一半。",
+        "其余的人早就走在前面了。背夫们背着帐篷、锅和所有人的晚饭，脚步比你快，经过时说一声“permiso”，你赶紧贴着石墙让开。你在本子上写下两个数：200，300。后一个数，是替前一个数背东西的人。"
+      ] },
+      { "title": "死女人山口", "paragraphs": [
+        "第二天是最长的上坡。“别看山口，”向导说，“看脚下。”你就数台阶，数到该歇的时候歇一下。脚下的石头边角都被磨圆了，踩过它的脚比你数得过来的多得多。",
+        "到了 4,215 米，风一下子把汗吹凉。你回头，山口另一边的下坡上，背夫们已经走成了一串移动的颜色。"
+      ] },
+      { "title": "炉子边", "paragraphs": [
+        "最后一晚，年纪最大的那位背夫坐在炉子边，听向导讲 chasqui：印加的信差沿着古道一站一站接力，快到下一站时吹响海螺，把口信说了又说，直到接班的人一字不差。",
+        "他听完笑了，教你一句克丘亚语：Allin p'unchay——早上好。你念一遍，他摇头；再念，还是摇头。第五遍，他点了一下头。明早他要收营地，等收完，太阳早就出来了。“你替我说。”"
+      ] },
+      { "title": "太阳门", "paragraphs": ["天没亮就出发，头灯连成一线往上爬。最后那段石阶陡得像梯子，你每上一级就在嘴里念一遍那句话，怕它半路掉了。天边发白的时候，你站进了太阳门。云从山谷里退开，整座马丘比丘第一次完整地出现在你下面。你张开嘴。"] }
+    ],
+    "choice": {
+      "prompt": "那句 Allin p'unchay，你说给谁听？",
+      "options": [
+        { "key": "valley", "label": "对着刚亮起来的山谷，照他教的样子说一遍", "keeps": "一句被山谷听见的克丘亚语" },
+        { "key": "relay", "label": "转身说给刚爬上来的下一个人，让它接着往下传", "keeps": "陌生人回给你的一声 Allin p'unchay" },
+        { "key": "back", "label": "先不说，下山后找到他，说给他本人听", "keeps": "背夫的一个点头" }
+      ]
+    },
+    "ending": "几个月后，在公司的电梯口，一个推着清洁车的人侧身让你先出去。你按住门，让他先走，那句话差一点就自己出了口。",
+    "facts": [
+      { "text": "经典印加古道全长约 42 公里，一般要走四到五天；最高点死女人山口海拔 4,215 米。", "source": "https://en.wikipedia.org/wiki/Inca_Trail_to_Machu_Picchu" },
+      { "text": "古道每年 2 月关闭清理；每天最多允许 500 人上路，其中徒步者只有 200 人，其余是向导和背夫。", "source": "https://en.wikipedia.org/wiki/Inca_Trail_to_Machu_Picchu" },
+      { "text": "印加的 chasqui 信差在驿站之间接力传信，到站时吹响海螺，并把口信反复复述，直到接班的人完全记住。", "source": "https://en.wikipedia.org/wiki/Chasqui" },
+      { "text": "在库斯科一带的克丘亚语里，“早上好”是 Allin p'unchay。", "source": "https://en.wikivoyage.org/wiki/Quechua_phrasebook" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。走经典印加古道、清晨抵达太阳门是真实的行程；营地里的背夫、他教你的那句话和“替他说”的约定都是虚构的。"
+  },
+  "en": {
+    "title": "The Relay · Inca Trail",
+    "subtitle": "Entrance No. 10: one sentence, carried to the Sun Gate",
+    "hook": "A Quechua greeting, carried from the last camp to the Sun Gate",
+    "region": "South America · Peru",
+    "moods": ["Stone steps", "Relay", "Dawn", "Steady"],
+    "opens": "In the dry season (roughly May to September), at dawn on the fourth day, at the Sun Gate",
+    "role": "The messenger",
+    "premise": "The Classic Inca Trail runs about 42 kilometres and usually takes four or five days. Its highest point is Warmiwañusca, Dead Woman's Pass, at 4,215 metres. The trail closes every February for cleaning, and no more than 500 people may set out on it in a day, only 200 of them trekkers; the rest are guides and porters. The last steep stairs lead to Inti Punku, the Sun Gate, the first place you can see the whole of Machu Picchu.",
+    "mission": "Carry one sentence of Quechua from the last camp to the Sun Gate without changing a sound.",
+    "chapters": [
+      { "title": "Five hundred", "paragraphs": [
+        "At the checkpoint the guide runs through the rules: five hundred people on the trail today at most, and only two hundred of them walkers. You look around. Walkers with nothing but a daypack and a water bottle, you among them, make up fewer than half.",
+        "The rest are already ahead. Porters go by with the tents, the pots and everyone's dinner on their backs, faster than you, saying “permiso” as they pass while you press yourself against the wall. In your notebook you write two numbers: 200, 300. The second is the people carrying for the first."
+      ] },
+      { "title": "Dead Woman's Pass", "paragraphs": [
+        "Day two is the long climb. “Don't look at the pass,” the guide says. “Look at your feet.” So you count steps instead, and rest when the count says rest. The stones are worn round at the edges by more feet than you could ever count.",
+        "At 4,215 metres the wind turns your sweat cold in a second. You look back. Down the far side of the pass, the porters are already a string of moving colours."
+      ] },
+      { "title": "By the stove", "paragraphs": [
+        "On the last night the oldest porter sits by the stove while the guide tells you about the chasquis: Inca messengers who ran the road in relays, blew a conch shell as they came into the next post, and repeated the message over and over until the next runner had it exactly.",
+        "He laughs and gives you two words to learn: Allin p'unchay. Good morning. You say them; he shakes his head. Again; he shakes his head. On the fifth try he nods. In the morning he'll be striking camp while you climb, and the sun will be up long before he's done. “You say it for me.”"
+      ] },
+      { "title": "Inti Punku", "paragraphs": ["You set off in the dark, head-torches climbing in a line. The last flight of stairs is so steep it feels like a ladder, and you say the two words under your breath at every step so you won't drop them on the way. When the sky goes pale you are standing in the Sun Gate. Cloud draws back out of the valley, and for the first time the whole of Machu Picchu is there below you. You open your mouth."] }
+    ],
+    "choice": {
+      "prompt": "Allin p'unchay. Who do you say it to?",
+      "options": [
+        { "key": "valley", "label": "Say it to the valley as the light comes in, exactly the way he taught you", "keeps": "Two words of Quechua the valley heard" },
+        { "key": "relay", "label": "Turn and say it to the next walker coming up the stairs, so it keeps travelling", "keeps": "A stranger's “Allin p'unchay” said back to you" },
+        { "key": "back", "label": "Hold on to it until you're down, find him, and say it to him", "keeps": "A porter's nod" }
+      ]
+    },
+    "ending": "Months later, at the office lifts, a man with a cleaning cart steps back to let you out first. You hold the door and let him go ahead, and the two words nearly come out on their own.",
+    "facts": [
+      { "text": "The Classic Inca Trail is about 42 km long and usually takes four or five days; its highest point, Dead Woman's Pass, is at 4,215 m.", "source": "https://en.wikipedia.org/wiki/Inca_Trail_to_Machu_Picchu" },
+      { "text": "The trail closes every February for cleaning. At most 500 people a day are allowed on it, only 200 of them trekkers; the rest are guides and porters.", "source": "https://en.wikipedia.org/wiki/Inca_Trail_to_Machu_Picchu" },
+      { "text": "Inca chasqui messengers ran in relays between posts, sounded a shell trumpet on arrival, and repeated the message until the next runner had it perfectly.", "source": "https://en.wikipedia.org/wiki/Chasqui" },
+      { "text": "In Cusco Quechua, “good morning” is Allin p'unchay.", "source": "https://en.wikivoyage.org/wiki/Quechua_phrasebook" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Walking the Classic Inca Trail and reaching the Sun Gate at dawn is a real itinerary; the porter at the camp, the words he teaches you and your promise to say them are fiction."
+  }
+}

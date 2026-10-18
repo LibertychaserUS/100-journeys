@@ -15,7 +15,24 @@ const (
 	EventPetReply     = "pet_reply"
 	EventSearch       = "search"
 	EventFilter       = "filter"
+
+	// Funnel (model.FunnelSteps): arrive → path_pick → type_found → space_enter → entrance_open → register.
+	EventArrive          = "arrive"
+	EventPathPick        = "path_pick"
+	EventTypeFound       = "type_found"
+	EventSpaceEnter      = "space_enter"
+	EventEntranceOpen    = "entrance_open"
+	EventForkChoose      = "fork_choose"
+	EventComposeStart    = "compose_start"
+	EventComposeComplete = "compose_complete"
+	EventRegister        = "register"
 )
+
+var allowedEvents = map[string]bool{
+	EventJourneyView: true, EventJourneyClick: true, EventPetReply: true, EventSearch: true, EventFilter: true,
+	EventArrive: true, EventPathPick: true, EventTypeFound: true, EventSpaceEnter: true, EventEntranceOpen: true,
+	EventForkChoose: true, EventComposeStart: true, EventComposeComplete: true, EventRegister: true,
+}
 
 type Event struct {
 	Type        string
@@ -190,10 +207,5 @@ func (b *Buffer) persist(ctx context.Context, events []Event) error {
 }
 
 func isAllowedEvent(eventType string) bool {
-	switch eventType {
-	case EventJourneyView, EventJourneyClick, EventPetReply, EventSearch, EventFilter:
-		return true
-	default:
-		return false
-	}
+	return allowedEvents[eventType]
 }

@@ -1,0 +1,95 @@
+{
+  "slug": "korea-haeinsa-woodblocks",
+  "entrance": { "no": 23, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "predawn" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "minimal",
+    "adventure_index": 2, "obscurity_level": 5, "risk_level": 1, "price": 4999,
+    "tags": ["spiritual", "culture", "solitude"],
+    "mbti": { "ISTJ": 5, "INFJ": 5, "ISFJ": 4 }
+  },
+  "cover": { "path": "generated/korea-haeinsa-woodblocks/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "刻工的名字 · 海印寺",
+    "subtitle": "第 23 号入口：经板的边上，刻着刻它的人",
+    "hook": "隔着木格窗，八万多块经板在黑里呼吸",
+    "region": "亚洲 · 韩国",
+    "moods": ["凌晨", "秩序", "旧木", "专注"],
+    "opens": "秋天，天亮之前，早课的时辰",
+    "role": "数拜的人",
+    "premise": "海印寺在韩国庆尚南道的伽倻山里，藏着 13 世纪雕成的《高丽大藏经》经板，一共 81,258 块。存放它们的藏经板殿建于 15 世纪：南北两面墙上的窗大小不一，泥地里填着木炭、石灰和盐，空气自己流动，湿度自己稳住。1995 年，它列入了世界遗产。",
+    "mission": "早课的一百零八拜，一拜不多，一拜不少。然后趁天还没亮，绕到藏经板殿外，比一比前墙和后墙的窗子哪里不一样。",
+    "chapters": [
+      { "title": "三点", "paragraphs": ["凌晨三点，法鼓先响，然后是钟。你在黑里摸到寺里借给你的那件灰外衣，叠得和你昨晚放下时一模一样。穿好，出门。秋天山里的冷是湿的，落叶一片一片贴在石阶上。"] },
+      { "title": "一百零八", "paragraphs": [
+        "大殿里只点着几盏灯，木地板凉得透过袜子。你跟着前面的人跪下，额头碰地，再起身。你决定不看别人，自己数。数到四十几，腿开始发抖；数到七十，汗顺着后颈往下流。旁边一位老太太从头到尾一个节奏，像钟摆。",
+        "最后一拜，你们同时站直。她朝你轻轻点了一下头，好像早就知道你一直在数。"
+      ] },
+      { "title": "木格窗", "paragraphs": [
+        "天还黑着。你绕到藏经板殿外面。殿门不对外开，只能隔着木格窗往里看。借着院子里的灯，你看见一排排木架从地面排到屋梁，经板一块挨着一块立着，像图书馆里合上的书；每块两头都装着木把手，板和板不会互相磨，风也能从中间过。",
+        "你先沿着前墙数窗，再绕到后面数：一排高，一排低，前后两面的窗子大小对不上。风从这一边进，从那一边出。脚下的泥地里埋着木炭、石灰和盐，下雨时把潮气吸进去，干燥的冬天又把水分留住。替这些木板管住潮气的不是机器，是窗和地。"
+      ] },
+      { "title": "名字", "paragraphs": [
+        "早饭后天亮了，屋檐下的光灰白而平。一位年轻的师父在廊下给你看一张从经板上印下来的纸。每面二十三行，每行十四个字，横平竖直。他指着页边一个小小的名字：“刻这一块的人。”",
+        "他说，经板上这样的名字一共有一千八百个左右。你没有问这一块刻了多久，只是又数了一遍：二十三行，十四个字。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "下山之前，你带走哪一样？",
+      "options": [
+        { "key": "name", "label": "征得师父同意，用铅笔把那个刻工的名字描进本子里", "keeps": "一个近八百年前的名字，用铅笔写着" },
+        { "key": "palm", "label": "把“108”写在手心，下山时把台阶也数一遍", "keeps": "手心里一个洗不太掉的数字" },
+        { "key": "draught", "label": "在前后两面墙之间站一会儿，感觉风往哪边走", "keeps": "后颈上一阵从山里来的风" }
+      ]
+    },
+    "ending": "回到城里，有一天你在办公室推开窗，顺手把对面那扇也推开了一点。风穿过去，桌上的纸掀起一角，又落回原处。",
+    "facts": [
+      { "text": "《高丽大藏经》刻在 81,258 块木板上，雕成于 13 世纪；每块两面各刻 23 行、每行 14 字，两端装有防止板与板摩擦、利于通风的木把手。", "source": "https://media.unesco.org/sites/default/files/webform/mow001/korea_tripitaka.pdf" },
+      { "text": "经板的页边刻着每块板刻工的名字，不同的僧俗名字多达约 1,800 个；藏经板殿不对公众开放，参观者只能隔着通风木格窗往里看。", "source": "https://media.unesco.org/sites/default/files/webform/mow001/korea_tripitaka.pdf" },
+      { "text": "海印寺藏经板殿的南北两侧开着大小不同的窗用于通风，泥地中填有木炭、石灰、盐和沙；1995 年列入世界遗产。", "source": "https://en.wikipedia.org/wiki/Haeinsa" },
+      { "text": "韩国寺院寄宿（Templestay）通常包括天亮前的礼佛，以及一百零八拜等拜佛修行。", "source": "https://en.wikipedia.org/wiki/Templestay" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。海印寺提供寺院寄宿，但日程以寺方安排为准；文中的老太太、年轻师父、给你看的印纸和描名字的事都是虚构的。"
+  },
+  "en": {
+    "title": "The Carvers' Names · Haeinsa",
+    "subtitle": "Entrance No. 23: on the margins of the woodblocks, the names of the people who cut them",
+    "hook": "Through the slats, eighty thousand woodblocks breathing in the dark",
+    "region": "Asia · South Korea",
+    "moods": ["Before dawn", "Order", "Old wood", "Attention"],
+    "opens": "In autumn, before dawn, at the hour of the morning service",
+    "role": "The one who counts the bows",
+    "premise": "Haeinsa stands on Gayasan in South Gyeongsang, South Korea, and keeps the Tripitaka Koreana: 81,258 woodblocks carved in the 13th century. The halls that hold them date from the 15th century. Their north and south walls have windows of different sizes, and the clay floor is packed with charcoal, lime and salt, so the air moves by itself and the humidity holds steady. They became a World Heritage Site in 1995.",
+    "mission": "A hundred and eight bows at the morning service, not one more, not one fewer. Then, while it's still dark, walk round the depositories and work out how the windows on the front wall differ from the ones at the back.",
+    "chapters": [
+      { "title": "Three o'clock", "paragraphs": ["Three in the morning. First the dharma drum, then the bell. In the dark you find the grey jacket the temple lent you, folded exactly as you left it last night. You put it on and step out. Autumn cold in the mountains is damp; wet leaves lie pasted flat on the stone steps."] },
+      { "title": "A hundred and eight", "paragraphs": [
+        "Only a few lamps are lit in the main hall, and the cold of the wooden floor comes up through your socks. You follow the person in front of you: kneel, forehead to the floor, up again. You decide not to watch anyone else; you'll keep your own count. In the forties your legs start to shake. By seventy, sweat is running down the back of your neck. An old woman beside you keeps the same pace from start to finish, like a pendulum.",
+        "On the last bow you both straighten at the same moment. She gives you the smallest nod, as if she'd known all along you were counting."
+      ] },
+      { "title": "The slatted windows", "paragraphs": [
+        "It's still dark when you walk round to the depositories. The doors aren't open to visitors; you can only look in through the slatted windows. By the light from the courtyard you can make out shelves running from the floor to the roof beams, the blocks standing side by side like closed books in a library. Each has a wooden handle at either end, so it never rubs against the next and the air can pass between them.",
+        "You count the windows along the front wall, then go round and count along the back: one row high, one row low, and the two walls don't match. Air comes in on one side and leaves by the other. Under the clay floor there is charcoal, lime and salt, soaking up the damp when it rains and holding on to moisture through the dry winter. What keeps the damp off these boards isn't a machine. It's the windows and the floor."
+      ] },
+      { "title": "Names", "paragraphs": [
+        "By the end of breakfast it's light, a flat grey light under the eaves. Out on the veranda a young monk shows you a sheet printed from one of the blocks. Twenty-three lines to a side, fourteen characters to a line, every one of them square and even. He points to a small name in the margin. “The one who carved this block.”",
+        "He says there are about eighteen hundred different names like that across the blocks. You don't ask how long this one took. You count it again instead: twenty-three lines, fourteen characters."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before you go down the mountain, what do you take with you?",
+      "options": [
+        { "key": "name", "label": "With the monk's permission, trace the carver's name into your notebook in pencil", "keeps": "A name from nearly eight hundred years ago, in pencil" },
+        { "key": "palm", "label": "Write 108 on your palm and count the steps on the way down too", "keeps": "A number on your palm that won't quite wash off" },
+        { "key": "draught", "label": "Stand between the two walls a while and feel which way the air goes", "keeps": "A draught of mountain air on the back of your neck" }
+      ]
+    },
+    "ending": "Back in the city, one day you open your office window and, without thinking, push the one across the room open a little too. The air goes through; a corner of paper on your desk lifts, and settles back.",
+    "facts": [
+      { "text": "The Tripitaka Koreana is carved on 81,258 woodblocks made in the 13th century; each carries 23 lines of 14 characters on both sides, with wooden end pieces that stop the boards rubbing and let air through.", "source": "https://media.unesco.org/sites/default/files/webform/mow001/korea_tripitaka.pdf" },
+      { "text": "The margins carry the name of the person who carved each block, as many as 1,800 different names; the public may not enter the halls and can only look in through the ventilation latticework.", "source": "https://media.unesco.org/sites/default/files/webform/mow001/korea_tripitaka.pdf" },
+      { "text": "Windows of different sizes on the north and south sides of the depositories provide ventilation, and the clay floors are filled with charcoal, lime, salt and sand; the halls became a World Heritage Site in 1995.", "source": "https://en.wikipedia.org/wiki/Haeinsa" },
+      { "text": "Korean Templestay programmes typically include the yebul ceremony before dawn and bowing practice such as 108 bows.", "source": "https://en.wikipedia.org/wiki/Templestay" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Haeinsa offers Templestay, though the schedule is the temple's own. The old woman, the young monk, the printed sheet and the tracing of the name are fiction."
+  }
+}

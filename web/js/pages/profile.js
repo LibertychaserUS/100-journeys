@@ -237,11 +237,13 @@ Pages.Profile = {
                 </button>`).join('')}</div>
             </div>`).join('')}
         </div>
-        <button class="btn btn--quiet" type="button" data-action="quiz">${esc(t('persona.quiz'))}</button>
+        <div class="persona__links">
+          <a class="btn btn--quiet" href="#/guide">${esc(t('persona.quiz'))}</a>
+          ${current ? `<a class="btn btn--ghost btn--sm" id="persona-space" href="#/space">${esc(t('persona.space'))}</a>` : ''}
+        </div>
         ${current ? `
           <div class="persona__result">
             <h3>${esc(current)} · ${esc(MBTI.name(current))}</h3>
-            <p>${esc(MBTI.trait(current))}</p>
             <h4>${esc(t('persona.picks', { code: current }))}</h4>
             <div class="grid-cards persona__picks" id="persona-picks">${UI.skeletonCards(3)}</div>
           </div>` : ''}
@@ -272,7 +274,6 @@ Pages.Profile = {
     if (reload) { this._loadPanel(reload.dataset.reload); return; }
     const code = e.target.closest('[data-code]');
     if (code) { this._saveMbti(code.dataset.code, code); return; }
-    if (e.target.closest('[data-action="quiz"]') && window.Pet) window.Pet.startQuiz();
   },
 
   async _saveMbti(code, btn) {

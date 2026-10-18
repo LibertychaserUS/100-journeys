@@ -54,6 +54,7 @@ RELATIONSHIPS = [
     ("USERS", "TRANSACTIONS", "has"),
     ("ORDERS", "TRANSACTIONS", "generates"),
     ("USERS", "ANALYTICS_EVENTS", "may_emit"),
+    ("USERS", "COMPOSITIONS", "keeps"),
 ]
 
 
@@ -74,6 +75,11 @@ API_ROUTE_OVERRIDES = [
     Route("PUT", "/api/auth/saved/:slug", "JWT", "internal/handler/me_handler.go"),
     Route("DELETE", "/api/auth/saved/:slug", "JWT", "internal/handler/me_handler.go"),
     Route("PUT", "/api/auth/mbti", "JWT", "internal/handler/me_handler.go"),
+    Route("GET", "/api/compose/fragments", "Public", "internal/handler/compose_handler.go"),
+    Route("GET", "/api/compositions/:code", "Public", "internal/handler/compose_handler.go"),
+    Route("GET", "/api/auth/compositions", "JWT", "internal/handler/compose_handler.go"),
+    Route("POST", "/api/auth/compositions", "JWT", "internal/handler/compose_handler.go"),
+    Route("DELETE", "/api/auth/compositions/:id", "JWT", "internal/handler/compose_handler.go"),
 ]
 
 

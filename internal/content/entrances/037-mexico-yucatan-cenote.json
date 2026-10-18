@@ -1,0 +1,89 @@
+{
+  "slug": "mexico-yucatan-cenote",
+  "entrance": { "no": 37, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "surreal",
+    "adventure_index": 4, "obscurity_level": 5, "risk_level": 2, "price": 14999,
+    "tags": ["spiritual", "nature", "hidden"],
+    "mbti": { "INFJ": 5, "ISTP": 4, "INFP": 4 }
+  },
+  "cover": { "path": "generated/mexico-yucatan-cenote/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "正午光柱 · 尤卡坦天然井",
+    "subtitle": "第 37 号入口：玛雅人说这里通往冥界，你只看见了光",
+    "hook": "正午，一束光从地面的破洞直直落进水里",
+    "region": "北美洲 · 墨西哥",
+    "moods": ["正午", "清凉", "幽深", "寂静"],
+    "opens": "一年四季，正午太阳最高的时候",
+    "role": "漂在光柱上的人",
+    "premise": "尤卡坦半岛几乎没有河流，雨水渗进石灰岩，在地下流动；岩层塌开的地方露出地下水，就是天然井，半岛上至少有六千个。玛雅人把它们看作通往冥界西巴尔巴的门，也是雨神恰克的家。其中有一圈分布格外密集，正好落在六千六百多万年前希克苏鲁伯撞击坑的边缘上。",
+    "mission": "只在水面上漂，不往下潜；在光柱移开之前，找到它在水里消失的那一点。",
+    "chapters": [
+      { "title": "井口下面", "paragraphs": [
+        "石阶最后一级下面就是水。地面上的热已经退得干干净净，凉气从水里往上冒。你抬头，井口缩成一块刺眼的圆，树根从井沿垂下来，一直垂到水面，有几根还在滴水。",
+        "向导是附近村子里的人，帮你系好救生衣，说话很轻：“这里以前不是用来游泳的。是取水的地方，也是把东西送下去的地方。”他没说送的是什么，你也没有问。"
+      ] },
+      { "title": "金色的手指", "paragraphs": [
+        "十二点，太阳走到井口正上方，一束光直直插进水里。你脸朝下漂着，隔着面镜看它往下走，越走越细，最后被黑色吞掉。你把一只手伸进光里，手指在水下变成了金色。",
+        "向导说，在有些天然井里，再往下很深的地方，淡水浮在一层咸水上面，两层水的交界会晃，像大热天马路上的空气，潜水的人管那叫盐跃层。你看不到那么深。你只看见光走到某个地方就停了，好像那里有一扇关着的门。",
+        "你漂了很久，直到光柱慢慢歪向岩壁。水又变回深绿色，什么也不肯告诉你。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "离开水面之前，你留下什么，或者带走什么？",
+      "options": [
+        { "key": "still", "label": "在水面上一动不动地漂满一分钟，只听树根滴水", "keeps": "一下，一下，水滴落进井里的声音" },
+        { "key": "mark", "label": "记下光斑落在岩壁上的位置，算一算明天正午它会落在哪儿", "keeps": "手机备忘录里一行：岩壁，第三道裂缝，偏左" },
+        { "key": "nothing", "label": "什么也不留下，只把手从光里慢慢抽回来", "keeps": "手背上慢慢晾干的水" }
+      ]
+    },
+    "ending": "回到城里，一个很热的中午，你走进地下通道，台阶一级一级往下，暑气一层一层退掉。走到底，你停了一下，回头看了看上面那块亮着的出口。",
+    "facts": [
+      { "text": "尤卡坦半岛至少有 6,000 个天然井；半岛几乎没有河流，天然井是当地唯一常年可用的饮用水源。", "source": "https://en.wikipedia.org/wiki/Cenote" },
+      { "text": "玛雅人相信天然井是通往西巴尔巴（冥界）的入口，也是雨神恰克的居所。", "source": "https://en.wikipedia.org/wiki/Cenote" },
+      { "text": "奇琴伊察的圣井直径约 60 米，从井沿到水面约 27 米；井中打捞出玉器、黄金、柯巴脂和人类遗骸。", "source": "https://en.wikipedia.org/wiki/Sacred_Cenote" },
+      { "text": "希克苏鲁伯撞击坑形成于六千六百多万年前，直径约 180–200 公里；它的内缘与陆地上的一圈天然井相吻合。", "source": "https://en.wikipedia.org/wiki/Chicxulub_crater" },
+      { "text": "尤卡坦的含水层中，雨水形成的淡水浮在海水之上；两者交界的盐跃层因折射呈现模糊晃动的效果，在海岸附近约深 10–20 米，在半岛中部可达 50–100 米。", "source": "https://en.wikipedia.org/wiki/Cenote" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。尤卡坦有不少天然井开放游泳和浮潜；正午是否有光柱直射水面，取决于井口形状和季节。文中的天然井没有指名，向导和他的话都是虚构的；潜入深处只属于受过训练的洞穴潜水员。"
+  },
+  "en": {
+    "title": "The Noon Shaft · Yucatán Cenote",
+    "subtitle": "Entrance No. 37: the Maya called it a door to the underworld; you find only light",
+    "hook": "At noon, a single shaft of light falls straight into the water",
+    "region": "North America · Mexico",
+    "moods": ["Noon", "Cool water", "Depth", "Hush"],
+    "opens": "Any time of year, at noon, when the sun is highest",
+    "role": "The one floating over the shaft of light",
+    "premise": "The Yucatán Peninsula has almost no rivers. Rain soaks into the limestone and moves underground, and where the rock has collapsed the groundwater shows through as a cenote: there are at least 6,000 of them. The Maya saw them as doorways to Xibalba, the underworld, and the home of the rain god Chaac. One unusually dense ring of them traces the rim of the Chicxulub crater, left by an impact a little over 66 million years ago.",
+    "mission": "Stay on the surface, no diving. Before the shaft of light moves on, find the point where it disappears.",
+    "chapters": [
+      { "title": "Under the opening", "paragraphs": [
+        "The last stone step goes straight into the water. The heat of the ground is gone entirely; cool air rises off the surface. You look up: the opening has shrunk to a dazzling disc, and tree roots hang from its rim all the way down to the water, a few of them still dripping.",
+        "Your guide is from the village nearby. He buckles you into a life jacket and keeps his voice low. “This wasn't for swimming, before. It was where you came for water. And where you sent things down.” He doesn't say what things. You don't ask."
+      ] },
+      { "title": "Gold fingers", "paragraphs": [
+        "At twelve the sun stands right over the opening and a single shaft of light drives straight into the water. You float face down and watch it through your mask as it goes down, thinner and thinner, until the dark swallows it. You put one hand into the beam, and underwater your fingers turn gold.",
+        "In some cenotes, the guide says, much further down, fresh water lies on top of salt water, and the line between them wavers like the air over a road on a hot day. Divers call it a halocline. You can't see that far. You only see the light reach a certain point and stop, as if there were a closed door down there.",
+        "You float a long time, until the shaft leans slowly toward the rock wall. The water goes back to dark green and gives nothing away."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before you leave the water, what will you leave, or take?",
+      "options": [
+        { "key": "still", "label": "Lie completely still on the surface for a full minute and listen to the roots drip", "keeps": "The sound of water dropping into the well, one drop at a time" },
+        { "key": "mark", "label": "Note where the light hits the rock and work out where it will land at noon tomorrow", "keeps": "A line in your phone: rock wall, third crack, a little left" },
+        { "key": "nothing", "label": "Leave nothing behind. Just draw your hand slowly back out of the light", "keeps": "Water drying slowly on the back of your hand" }
+      ]
+    },
+    "ending": "Back in the city, on a scorching noon, you take the steps down into an underpass and feel the heat fall away one step at a time. At the bottom you stop for a second and look back up at the bright square of the way out.",
+    "facts": [
+      { "text": "There are at least 6,000 cenotes in the Yucatán Peninsula, which has almost no rivers; the cenotes are the only perennial source of drinking water.", "source": "https://en.wikipedia.org/wiki/Cenote" },
+      { "text": "The Maya believed cenotes were portals to Xibalba, the afterlife, and home to the rain god Chaac.", "source": "https://en.wikipedia.org/wiki/Cenote" },
+      { "text": "The Sacred Cenote at Chichén Itzá is about 60 m across, with cliffs dropping some 27 m to the water; it has yielded jade, gold, copal and human skeletons.", "source": "https://en.wikipedia.org/wiki/Sacred_Cenote" },
+      { "text": "The Chicxulub crater formed a little over 66 million years ago and is about 180–200 km across; its inner rim correlates with a ring of cenotes onshore.", "source": "https://en.wikipedia.org/wiki/Chicxulub_crater" },
+      { "text": "In the Yucatán aquifer, fresh rainwater floats on denser salt water; the halocline between them looks blurry and swirling because of refraction, and lies about 10–20 m down near the coast and 50–100 m inland.", "source": "https://en.wikipedia.org/wiki/Cenote" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Many Yucatán cenotes are open for swimming and snorkelling; whether a beam falls straight in at noon depends on the opening and the season. The cenote here is unnamed, and the guide and his words are fiction. The deep water belongs to trained cave divers."
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "slug": "poland-wieliczka-salt-chapel",
+  "motif": "descent",
+  "texture": "salt",
+  "arc": [
+    {
+      "h": 210,
+      "s": 10
+    },
+    {
+      "h": 40,
+      "s": 35
+    },
+    {
+      "h": 30,
+      "s": 8
+    },
+    {
+      "h": 38,
+      "s": 60
+    },
+    {
+      "h": 220,
+      "s": 12
+    },
+    {
+      "h": 210,
+      "s": 15
+    }
+  ],
+  "accent": "#ffd59a",
+  "beats": [
+    "dark",
+    "flare",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

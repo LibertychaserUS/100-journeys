@@ -28,6 +28,7 @@ const Nav = (() => {
   function activeSection() {
     const path = (window.location.hash.replace(/^#/, '').split('?')[0]) || '/';
     if (path.startsWith('/explore') || path.startsWith('/journey')) return 'explore';
+    if (path.startsWith('/space') || path.startsWith('/find') || path.startsWith('/guide')) return 'space';
     if (path.startsWith('/profile') || path.startsWith('/recharge')) return 'me';
     if (path.startsWith('/admin')) return 'admin';
     if (path.startsWith('/about')) return 'about';
@@ -57,7 +58,7 @@ const Nav = (() => {
         </a>
         <nav class="nav__links" aria-label="${esc(t('nav.main'))}">
           ${link('#/explore', 'nav.explore', 'explore')}
-          ${link('#/profile', 'nav.me', 'me', 'id="nav-profile"')}
+          ${link('#/space', 'nav.space', 'space', 'id="nav-space"')}
           ${link('#/about', 'nav.about', 'about')}
           ${user && user.role === 'admin' ? link('#/admin', 'nav.admin', 'admin', 'id="nav-admin"') : ''}
         </nav>
@@ -79,7 +80,7 @@ const Nav = (() => {
       ${authed && menuOpen ? `
         <div class="menu" id="nav-menu-list" role="menu" aria-label="${esc(t('nav.account'))}">
           <p class="menu__meta">${esc(t('nav.signedInAs', { name: name || '…' }))}</p>
-          <a role="menuitem" href="#/profile">${UI.icon('user')}${esc(t('nav.me'))}</a>
+          <a role="menuitem" id="nav-profile" href="#/profile">${UI.icon('user')}${esc(t('nav.me'))}</a>
           ${user && user.role === 'admin' ? `<a role="menuitem" href="#/admin">${UI.icon('chart')}${esc(t('nav.admin'))}</a>` : ''}
           <hr>
           <button role="menuitem" type="button" id="nav-logout">${UI.icon('logout')}${esc(t('nav.logout'))}</button>
@@ -89,7 +90,8 @@ const Nav = (() => {
           <div class="container">
             <nav class="drawer__links" aria-label="${esc(t('nav.main'))}">
               ${link('#/explore', 'nav.explore', 'explore')}
-              ${link('#/profile', 'nav.me', 'me')}
+              ${link('#/space', 'nav.space', 'space')}
+              ${authed ? link('#/profile', 'nav.me', 'me') : ''}
               ${link('#/about', 'nav.about', 'about')}
               ${user && user.role === 'admin' ? link('#/admin', 'nav.admin', 'admin') : ''}
               ${authed ? `<button type="button" id="drawer-logout">${esc(t('nav.logout'))}${UI.icon('logout')}</button>` : ''}
@@ -171,7 +173,6 @@ const Nav = (() => {
     window.addEventListener('session:updated', render);
     window.addEventListener('route:changed', () => { menuOpen = false; drawerOpen = false; render(); });
     const applyStatic = () => {
-      document.title = t('meta.title');
       const skip = document.getElementById('skip-link');
       if (skip) skip.textContent = t('skip');
     };

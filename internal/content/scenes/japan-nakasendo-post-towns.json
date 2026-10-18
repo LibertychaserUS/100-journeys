@@ -1,0 +1,40 @@
+{
+  "slug": "japan-nakasendo-post-towns",
+  "motif": "track",
+  "texture": "fog",
+  "arc": [
+    {
+      "h": 150,
+      "s": 15
+    },
+    {
+      "h": 140,
+      "s": 25
+    },
+    {
+      "h": 30,
+      "s": 35
+    },
+    {
+      "h": 42,
+      "s": 55
+    },
+    {
+      "h": 210,
+      "s": 15
+    }
+  ],
+  "accent": "#e0b354",
+  "beats": [
+    "grey",
+    "still",
+    ""
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

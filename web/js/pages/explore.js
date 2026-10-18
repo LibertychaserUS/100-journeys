@@ -1,5 +1,5 @@
 /**
- * Explore — search + filters + journey grid.
+ * Explore — search + filters + journey grid, and an invitation to the compose game below it.
  * Filter changes update the URL with history.replaceState (no re-render, no hashchange),
  * and every request carries a sequence number so a slow response can never overwrite a newer one.
  */
@@ -61,6 +61,21 @@ Pages.Explore = {
           <div class="grid-cards explore-grid" id="explore-grid" aria-busy="true">${UI.skeletonCards(8)}</div>
           <div class="explore-more" id="explore-loadmore"></div>
         </section>
+        <aside class="container compose-invite-wrap" aria-labelledby="compose-invite-title">
+          <a class="compose-invite" href="#/compose" id="compose-invite">
+            <div class="compose-invite__text">
+              <p class="compose-invite__eyebrow">${esc(t('compose.invite.eyebrow'))}</p>
+              <h2 class="compose-invite__title" id="compose-invite-title">${esc(t('compose.invite.title'))}</h2>
+              <p class="compose-invite__lead">${esc(t('compose.invite.text'))}</p>
+              <span class="compose-invite__cta">${esc(t('compose.invite.cta'))}${UI.icon('arrow', 'icon--sm')}</span>
+            </div>
+            <span class="compose-invite__slips" aria-hidden="true">
+              <span class="slip" style="--r:-4deg">${esc(t('compose.invite.slip1'))}</span>
+              <span class="slip" style="--r:3deg">${esc(t('compose.invite.slip3'))}</span>
+              <span class="slip" style="--r:-1.5deg">${esc(t('compose.invite.slip2'))}</span>
+            </span>
+          </a>
+        </aside>
       </div>`;
 
     const search = main.querySelector('#explore-search');

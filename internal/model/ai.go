@@ -3,11 +3,16 @@ package model
 type AIChatRequest struct {
 	Message   string `json:"message" binding:"required"`
 	SessionID string `json:"session_id"`
+	Lang      string `json:"lang"`      // "zh" (default) or "en"
+	MBTIType  string `json:"mbti_type"` // optional; steers recommendations, never echoed
 }
 
 type AIChatResponse struct {
 	Reply   string     `json:"reply"`
 	Actions []AIAction `json:"actions,omitempty"`
+	// Source is "deepseek" for a model reply or "mock" for the rule-based fallback, so the
+	// client can use its own localized rules when the model is not available.
+	Source string `json:"source"`
 }
 
 type AIAction struct {

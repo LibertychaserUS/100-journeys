@@ -27,10 +27,14 @@
 .admin-users li { display: flex; justify-content: space-between; gap: 10px; }
 .admin-users span { min-width: 0; color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .admin-users em { font-style: normal; color: var(--color-text-3); white-space: nowrap; }
+.admin-panel--funnel { grid-column: 1 / -1; }
+.admin-panel--funnel .admin-list { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px 16px; }
+@media (max-width: 1080px) { .admin-panel--funnel .admin-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 1080px) { .admin-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) {
   .admin-head h1 { font-size: var(--text-2xl); }
   .admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-panels { grid-template-columns: minmax(0, 1fr); }
+  .admin-panel--funnel .admin-list { grid-template-columns: minmax(0, 1fr); }
   .admin-users li { flex-direction: column; gap: 2px; }
 }

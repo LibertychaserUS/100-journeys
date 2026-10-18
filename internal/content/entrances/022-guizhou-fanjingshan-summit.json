@@ -1,0 +1,83 @@
+{
+  "slug": "guizhou-fanjingshan-summit",
+  "entrance": { "no": 22, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "dramatic",
+    "adventure_index": 6, "obscurity_level": 6, "risk_level": 3, "price": 5999,
+    "tags": ["spiritual", "nature", "hidden"],
+    "mbti": { "ISTP": 5, "ENTJ": 4, "ISFP": 4 }
+  },
+  "cover": { "path": "generated/guizhou-fanjingshan-summit/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "裂开的山顶 · 梵净山",
+    "subtitle": "第 22 号入口：一块石头，两座殿",
+    "hook": "百米石柱从中间裂开，两半各托着一座殿",
+    "region": "亚洲 · 中国",
+    "moods": ["云雾", "石阶", "铁链", "专注"],
+    "opens": "春天，清晨红云还绕着山顶的时候",
+    "role": "一级一级往上的人",
+    "premise": "梵净山在贵州铜仁，是武陵山脉的最高峰，2018 年列入世界自然遗产，也被看作弥勒的道场。山上的红云金顶是一根垂直高近百米的石柱，中间一道裂缝把它一分为二，顶上有天桥相连，两边各有一座殿。黔金丝猴已确认的分布地只有梵净山，据估计不到 400 只。",
+    "mission": "手脚并用爬上金顶，走到天桥正中，站一会儿。",
+    "chapters": [
+      { "title": "红云", "paragraphs": ["清晨的云是从下往上走的。你站在金顶脚下，看它们贴着石壁往上爬，被低低的太阳从侧面一照，边上泛红。那根石柱就立在云里，像被谁特意竖起来的。"] },
+      { "title": "铁链", "paragraphs": [
+        "铁链碰在石头上，叮的一声。台阶凿在石壁上，窄得只放得下半只脚；旁边的链子被不知多少只手磨得发亮，早上的潮气让它凉得扎手。向导在你下面一级，只说了一句：“手先找，脚再上。”",
+        "你不往下看，也不往上看，只看眼前这一级台阶、这一节链子。左手，右脚，右手，左脚，呼吸跟着手走。你给自己定了个规矩：每五十级喝一口水，别的时候不停。"
+      ] },
+      { "title": "裂缝", "paragraphs": ["风从石缝里往上灌，呜呜地响。顶上的石头真的从中间裂开了：一边是释迦殿，一边是弥勒殿，中间一座小小的天桥。你走上桥，桥下那道缝很深，云从缝里往上涌，凉气扑到脸上。香客说，一边供的是现在，一边供的是将来。"] },
+      { "title": "林子里", "paragraphs": ["下山的林间小路上，高处的树冠里一阵窸窣。向导停下来听了听：“可能是猴子，也可能只是风。”你们谁也没看见。"] }
+    ],
+    "choice": {
+      "prompt": "站在天桥正中，你先转向哪一边？",
+      "options": [
+        { "key": "present", "label": "转向释迦殿，回头看清刚爬过的每一级", "keeps": "掌心里一股铁链的锈味" },
+        { "key": "future", "label": "转向弥勒殿，看云从下一道山梁后面升起来", "keeps": "一朵从脚下穿过去的云" },
+        { "key": "crack", "label": "哪边都不转，低头看那道缝", "keeps": "缝里往上吹的一口凉风" }
+      ]
+    },
+    "ending": "回到办公室，有一天事情一齐压过来，你把它们排成凿在石壁上的台阶。左手，右脚，先找好下一个能握的地方。",
+    "facts": [
+      { "text": "梵净山位于贵州铜仁，是武陵山脉的最高峰，2018 年列入世界遗产名录，在汉传佛教中被视为弥勒的道场。", "source": "https://en.wikipedia.org/wiki/Mount_Fanjing" },
+      { "text": "红云金顶垂直高近百米，中部有裂缝将其一分为二，顶部有天桥相连；因晨间常有红云环绕而得名。", "source": "https://cn.chinadaily.com.cn/a/202307/08/WS64a91894a310ba94c56156d4.html" },
+      { "text": "金顶上一边是供奉释迦牟尼的殿，代表现在；一边是弥勒殿，代表未来；两边由一座跨过“金刀峡”的石桥相连。", "source": "https://www.heritagedaily.com/2020/07/the-two-fanjingshan-temples/135119" },
+      { "text": "黔金丝猴已确认的分布地只有梵净山国家级自然保护区，总数估计不到 400 只，被列为极危物种。", "source": "https://en.wikipedia.org/wiki/Gray_snub-nosed_monkey" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。攀登红云金顶是梵净山的常规游览项目，最后一段要拉着铁链爬陡阶，需按景区安排在工作人员和向导的指引下进行；文中的向导和香客是虚构的。"
+  },
+  "en": {
+    "title": "The Split Summit · Fanjingshan",
+    "subtitle": "Entrance No. 22: one rock, two temples",
+    "hook": "A hundred-metre pillar split down the middle, a temple on each half",
+    "region": "Asia · China",
+    "moods": ["Cloud", "Stone steps", "Iron chains", "Focus"],
+    "opens": "In spring, early in the morning, while red cloud still wraps the summit",
+    "role": "The one who climbs step by step",
+    "premise": "Fanjingshan, in Tongren, Guizhou, is the highest peak of the Wuling Mountains; it became a World Heritage Site in 2018 and is held to be the seat of the Maitreya Buddha. Its Red Clouds Golden Summit is a pillar of rock nearly 100 metres high, split down the middle by a crack and joined at the top by a small bridge, with a temple on either side. The Guizhou snub-nosed monkey is confirmed only here, and fewer than 400 are thought to remain.",
+    "mission": "Climb the summit on hands and feet, walk to the middle of the bridge, and stand there a while.",
+    "chapters": [
+      { "title": "Red cloud", "paragraphs": ["In the early morning the cloud moves upward. You stand at the foot of the summit and watch it climb the rock face, catching the low sun side-on so its edges go red. The pillar stands in the middle of it as if someone had set it upright on purpose."] },
+      { "title": "Chains", "paragraphs": [
+        "The chain knocks against the rock with a small clink. The steps are cut into the rock face, barely wide enough for half a foot, and the chain beside them is polished by more hands than anyone could count and cold with the morning damp. Your guide climbs one step below you and says only, “Hands find it first. Then feet.”",
+        "You don't look down and you don't look up. Only this step, this link. Left hand, right foot, right hand, left foot; your breathing follows your hands. You set yourself a rule: a sip of water every fifty steps, and no other stops."
+      ] },
+      { "title": "The crack", "paragraphs": ["Wind moans up through the crack. Up here the rock really is split in two: on one side the temple of the Buddha Shakyamuni, on the other the temple of Maitreya, and between them a little bridge. You step onto it. The crack beneath is deep; cloud wells up through it and breathes cold on your face. Pilgrims say one side holds the present and the other the future."] },
+      { "title": "In the trees", "paragraphs": ["On the forest path down, something rustles high in the canopy. Your guide stops and listens. “Could be the monkeys. Could be wind.” Neither of you sees a thing."] }
+    ],
+    "choice": {
+      "prompt": "Standing in the middle of the bridge, which way do you turn first?",
+      "options": [
+        { "key": "present", "label": "Toward Shakyamuni, to look back down every step you climbed", "keeps": "The rusty smell of the chain on your palms" },
+        { "key": "future", "label": "Toward Maitreya, to watch cloud rise behind the next ridge", "keeps": "A cloud that passed beneath your feet" },
+        { "key": "crack", "label": "Neither way. You look down into the crack", "keeps": "A breath of cold air from the gap" }
+      ]
+    },
+    "ending": "Back at work, on a day when everything lands at once, you lay it out like steps cut into rock. Left hand, right foot. Find the next hold first.",
+    "facts": [
+      { "text": "Fanjingshan, in Tongren, Guizhou, is the highest peak of the Wuling Mountains; it became a UNESCO World Heritage Site in 2018 and is considered the bodhimaṇḍa of the Maitreya Buddha.", "source": "https://en.wikipedia.org/wiki/Mount_Fanjing" },
+      { "text": "The Red Clouds Golden Summit rises nearly 100 m, is split in the middle by a crack and joined at the top by a bridge; it is named for the red clouds that often wrap it in the morning.", "source": "https://cn.chinadaily.com.cn/a/202307/08/WS64a91894a310ba94c56156d4.html" },
+      { "text": "On the summit, the Temple of the Buddha (Shakyamuni) represents the present and the Maitreya Temple the future; they are joined by a stone bridge across the Gold Sword Gorge.", "source": "https://www.heritagedaily.com/2020/07/the-two-fanjingshan-temples/135119" },
+      { "text": "The Guizhou (gray) snub-nosed monkey is confirmed only in the Fanjingshan National Nature Reserve; fewer than 400 are thought to remain, and it is listed as Critically Endangered.", "source": "https://en.wikipedia.org/wiki/Gray_snub-nosed_monkey" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Climbing the Red Clouds Golden Summit is a regular part of a visit, and the last section uses iron chains on steep steps, done as the scenic area directs and with staff and guides on hand; the guide and pilgrims here are fiction."
+  }
+}

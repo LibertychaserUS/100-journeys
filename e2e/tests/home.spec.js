@@ -10,8 +10,9 @@ test.describe('Home Page', () => {
   // E2E-HOME-001: hero and five featured journeys from the API
   test('landing page shows hero and featured journeys', async ({ page }) => {
     await expect(page.locator('.home-hero__title')).toHaveText('桃源百旅');
+    const { total } = await (await page.request.get('/api/journeys')).json();
     await expect(page.locator('#featured-grid .feature-card[data-slug]')).toHaveCount(5);
-    await expect(page.locator('#featured-all')).toContainText('12');
+    await expect(page.locator('#featured-all')).toContainText(String(total));
   });
 
   // E2E-HOME-002: mood shortcuts open Explore with that filter applied
@@ -24,11 +25,13 @@ test.describe('Home Page', () => {
 
   // E2E-HOME-003: hero search submits the query to Explore
   test('hero search carries the query to explore', async ({ page }) => {
+    const { total } = await (await page.request.get(`/api/journeys?q=${encodeURIComponent('冰岛')}`)).json();
+    expect(total).toBeGreaterThan(0);
     await page.locator('#hero-q').fill('冰岛');
     await page.locator('.home-hero__search button[type="submit"]').click();
     await expect(page).toHaveURL(/#\/explore\?q=/);
     await expect(page.locator('#explore-search')).toHaveValue('冰岛');
-    await expect(page.locator('.journey-card[data-slug]')).toHaveCount(1);
+    await expect(page.locator('.journey-card[data-slug]')).toHaveCount(Math.min(total, 12));
   });
 
   // E2E-HOME-004: featured card opens its detail page

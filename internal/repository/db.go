@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -39,7 +40,108 @@ func Migrate(db *sql.DB, schemaPath string) error {
 	if err := ensureDuplicateUsernamesAllowed(ctx, db); err != nil {
 		return err
 	}
+	// v1.5.0 widened the analytics event CHECK; older databases rebuild the table to pick it up.
+	rebuilt, err := ensureTableMatchesSchema(ctx, db, string(schema), "analytics_events", "'space_enter'")
+	if err != nil {
+		return err
+	}
+	if rebuilt {
+		if _, err := db.Exec(string(schema)); err != nil { // recreate the table's indexes
+			return fmt.Errorf("exec schema after rebuild: %w", err)
+		}
+	}
 	return nil
+}
+
+// ensureTableMatchesSchema rebuilds table from its CREATE statement in schema when the live
+// definition lacks marker (SQLite cannot alter a CHECK constraint in place). Rows are copied
+// across for every column both definitions share.
+func ensureTableMatchesSchema(ctx context.Context, db *sql.DB, schema, table, marker string) (bool, error) {
+	if !isValidIdentifier(table) {
+		return false, fmt.Errorf("invalid table identifier %q", table)
+	}
+	var current string
+	if err := db.QueryRowContext(ctx, `SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?`, table).Scan(&current); err != nil {
+		return false, fmt.Errorf("inspect table %s: %w", table, err)
+	}
+	if strings.Contains(current, marker) {
+		return false, nil
+	}
+	head := "CREATE TABLE IF NOT EXISTS " + table + " ("
+	start := strings.Index(schema, head)
+	if start < 0 {
+		return false, fmt.Errorf("schema has no CREATE statement for %s", table)
+	}
+	end := strings.Index(schema[start:], "\n);")
+	if end < 0 {
+		return false, fmt.Errorf("unterminated CREATE statement for %s", table)
+	}
+	tmp := table + "_rebuild"
+	ddl := "CREATE TABLE " + quoteIdentifier(tmp) + " (" + schema[start+len(head):start+end] + "\n)"
+
+	oldCols, err := tableColumns(ctx, db, table)
+	if err != nil {
+		return false, err
+	}
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return false, err
+	}
+	defer func() { _ = tx.Rollback() }()
+	if _, err := tx.ExecContext(ctx, ddl); err != nil {
+		return false, fmt.Errorf("create %s: %w", tmp, err)
+	}
+	newCols, err := tableColumns(ctx, tx, tmp)
+	if err != nil {
+		return false, err
+	}
+	var shared []string
+	for _, c := range newCols {
+		for _, o := range oldCols {
+			if c == o {
+				shared = append(shared, quoteIdentifier(c))
+			}
+		}
+	}
+	cols := strings.Join(shared, ", ")
+	stmts := []string{
+		fmt.Sprintf("INSERT INTO %s (%s) SELECT %s FROM %s", quoteIdentifier(tmp), cols, cols, quoteIdentifier(table)),
+		"DROP TABLE " + quoteIdentifier(table),
+		fmt.Sprintf("ALTER TABLE %s RENAME TO %s", quoteIdentifier(tmp), quoteIdentifier(table)),
+	}
+	for _, stmt := range stmts {
+		if _, err := tx.ExecContext(ctx, stmt); err != nil {
+			return false, fmt.Errorf("rebuild %s: %w", table, err)
+		}
+	}
+	return true, tx.Commit()
+}
+
+type queryer interface {
+	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
+}
+
+func tableColumns(ctx context.Context, q queryer, table string) ([]string, error) {
+	rows, err := q.QueryContext(ctx, fmt.Sprintf("PRAGMA table_info(%s)", quoteIdentifier(table)))
+	if err != nil {
+		return nil, fmt.Errorf("inspect table %s: %w", table, err)
+	}
+	defer func() { _ = rows.Close() }()
+	var cols []string
+	for rows.Next() {
+		var (
+			cid       int
+			name, typ string
+			notNull   int
+			dflt      sql.NullString
+			pk        int
+		)
+		if err := rows.Scan(&cid, &name, &typ, &notNull, &dflt, &pk); err != nil {
+			return nil, err
+		}
+		cols = append(cols, name)
+	}
+	return cols, rows.Err()
 }
 
 func Seed(db *sql.DB, seedPath string) error {

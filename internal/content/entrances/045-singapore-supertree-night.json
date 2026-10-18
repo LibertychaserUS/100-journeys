@@ -1,0 +1,87 @@
+{
+  "slug": "singapore-supertree-night",
+  "entrance": { "no": 45, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "night" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "minimal",
+    "adventure_index": 1, "obscurity_level": 2, "risk_level": 1, "price": 3999,
+    "tags": ["culture", "night"],
+    "mbti": { "ESTJ": 5, "ENTJ": 4, "ESFJ": 4 }
+  },
+  "cover": { "path": "generated/singapore-supertree-night/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "准点 · 新加坡滨海湾花园",
+    "subtitle": "第 45 号入口：七点四十五分，一秒不差",
+    "hook": "七点四十五分整，擎天树一齐亮了",
+    "region": "亚洲 · 新加坡",
+    "moods": ["准点", "规矩", "夜", "灯"],
+    "opens": "一年四季，每晚七点四十五分",
+    "role": "掐着表走的人",
+    "premise": "新加坡从 1992 年起禁止进口和销售口香糖，起因之一是有人把口香糖粘在地铁车门的感应器上，车门关不上，列车跟着延误；2004 年起，治疗用的口香糖可以从医生或药剂师那里买到。榴莲气味太重，不许带上公共交通。滨海湾花园有 18 棵擎天树，高 25 到 50 米；每晚 7:45 和 8:45，擎天树林各有一场灯光音乐秀。",
+    "mission": "从地铁站走到擎天树下，赶上 7:45 那一场：不跑，也不早到超过五分钟。",
+    "chapters": [
+      { "title": "在这里吃", "paragraphs": ["六点刚过，你在熟食中心等一盘饭。隔壁摊的老板剖开一个榴莲，掰一瓣递给你：“在这里吃啊，不能带上地铁的。”你吃完，用他给的湿纸巾擦了手，又凑到鼻子底下闻了闻。还在。你看表：七点零五分。"] },
+      { "title": "车门", "paragraphs": [
+        "你在心里把路线排了一遍：两站，换乘一次，出站走八分钟。列车进站，站台门和车门一起滑开，又一起合上，干净得像一句话刚好说完。你想起 1992 年以前，有人把口香糖粘在车门感应器上，门关不上，整条线跟着晚点。后来，这个国家干脆不卖口香糖了。",
+        "门边贴着一排小图标，其中一个画着带刺的榴莲，上面打了一道红杠。你低头看了看自己的手指。"
+      ] },
+      { "title": "七点四十五分", "paragraphs": [
+        "你到的时候是七点四十一分。擎天树下已经坐满了人，很多人干脆躺在地上。最高的那棵有五十米，树干上爬满蕨类、兰花和凤梨科植物。白天，它们收集雨水，吸收阳光发电，还替旁边温室的冷却系统进气、排气。",
+        "你看着秒针走到十二。所有的灯一下子全亮了，音乐跟着响起来，一秒不差。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "灯灭以后，你做什么？",
+      "options": [
+        { "key": "again", "label": "留下来看 8:45 那一场，看它是不是也准时", "keeps": "笔记本上的两行字：7:45，8:45，都准" },
+        { "key": "guide", "label": "把一对找不到地铁口的游客带到正确的出口", "keeps": "一句用你听不懂的语言说的谢谢" },
+        { "key": "sign", "label": "回去的路上，拍下那个画着榴莲的禁止标志", "keeps": "手机里一张打着红杠的榴莲" }
+      ]
+    },
+    "ending": "回到自己的城市，早高峰的地铁门在你面前卡了一下，又弹开了。你看了一眼表，想起有个地方的车门，合上的时候像一句话刚好说完。",
+    "facts": [
+      { "text": "新加坡从 1992 年起禁止进口和销售口香糖（嚼本身不违法）。起因之一是有人把口香糖粘在地铁车门感应器上，导致车门失灵、列车延误；2004 年起，治疗用、牙科用和戒烟用口香糖可以从医生或注册药剂师处购买。", "source": "https://en.wikipedia.org/wiki/Chewing_gum_sales_ban_in_Singapore" },
+      { "text": "榴莲因为气味强烈，被禁止带上新加坡的公共交通，地铁里有专门的禁止标志。", "source": "https://en.wikipedia.org/wiki/Durian" },
+      { "text": "滨海湾花园有 18 棵擎天树，高 25–50 米，上面种着蕨类、兰花和凤梨科植物；它们装有太阳能板、收集雨水，还为温室的冷却系统进气和排气。", "source": "https://en.wikipedia.org/wiki/Gardens_by_the_Bay" },
+      { "text": "擎天树林的灯光音乐秀 Garden Rhapsody 每晚 7:45 和 8:45 各一场，免费观看。", "source": "https://www.gardensbythebay.com.sg/en/things-to-do/calendar-of-events/garden-rhapsody.html" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。灯光秀和这些规定都是真的；熟食中心的摊主、他说的话和你一路上的时间都是虚构的。"
+  },
+  "en": {
+    "title": "On the Dot · Gardens by the Bay",
+    "subtitle": "Entrance No. 45: 7:45 p.m., not a second late",
+    "hook": "At 7:45 exactly, the Supertrees light up together",
+    "region": "Asia · Singapore",
+    "moods": ["On time", "Order", "Night", "Lights"],
+    "opens": "Any time of year, every evening at 7:45",
+    "role": "The timekeeper",
+    "premise": "Singapore has banned the import and sale of chewing gum since 1992, partly because vandals kept sticking it on MRT door sensors, jamming the doors and holding up trains; since 2004 therapeutic gum has been sold through doctors and pharmacists. Durians are banned from public transport for their smell. Gardens by the Bay has 18 Supertrees, 25 to 50 metres tall, and every night at 7:45 and 8:45 the Supertree Grove puts on a light and music show.",
+    "mission": "Get from the train to the foot of the Supertrees in time for the 7:45 show, without running, and no more than five minutes early.",
+    "chapters": [
+      { "title": "Eat it here", "paragraphs": ["Just after six you're at a hawker centre, waiting on a plate of rice. At the next stall the uncle splits a durian and hands you a segment. “Eat here, ah. Cannot bring on the train.” You finish it, wipe your hands on the wet tissue he gives you, and sniff your fingers. Still there. You check the time: 7:05."] },
+      { "title": "The doors", "paragraphs": [
+        "You run the route once in your head: two stops, one change, an eight-minute walk from the exit. The train pulls in. The platform doors and the train doors slide open together and close together, neat as the end of a sentence. Back before 1992, you remember, people stuck gum on the door sensors, the doors wouldn't shut, and whole lines ran late. So the country simply stopped selling gum.",
+        "By the door is a row of little pictograms. One is a spiky durian with a red line through it. You glance down at your fingers."
+      ] },
+      { "title": "7:45", "paragraphs": [
+        "You arrive at 7:41. The ground under the Supertrees is already full of people, plenty of them lying flat on their backs. The tallest tree is fifty metres high, its trunk covered in ferns, orchids and bromeliads. By day these trees catch rain, turn sunlight into power, and breathe air in and out for the cooling of the conservatories next door.",
+        "You watch the second hand climb to twelve. Every light comes on at once, the music with it, not a second out."
+      ] }
+    ],
+    "choice": {
+      "prompt": "When the lights go down, what do you do?",
+      "options": [
+        { "key": "again", "label": "Stay for the 8:45 show to see if it's on time too", "keeps": "Two lines in your notebook: 7:45, 8:45, both on the dot" },
+        { "key": "guide", "label": "Walk a lost couple to the right MRT exit", "keeps": "A thank-you in a language you don't speak" },
+        { "key": "sign", "label": "Photograph the no-durians sign on your way home", "keeps": "A photo of a durian with a red line through it" }
+      ]
+    },
+    "ending": "Back home, in the morning rush, the train doors judder in front of you and slide open again. You look at your watch and think of a city where doors close like the end of a sentence.",
+    "facts": [
+      { "text": "Singapore has banned the import and sale of chewing gum (not chewing it) since 1992, after vandals stuck gum on MRT door sensors, stopping doors from working and disrupting trains. Since 2004 therapeutic, dental and nicotine gum can be bought from a doctor or registered pharmacist.", "source": "https://en.wikipedia.org/wiki/Chewing_gum_sales_ban_in_Singapore" },
+      { "text": "Durian's strong smell has led to its ban from public transport in Singapore; MRT stations carry signs forbidding it.", "source": "https://en.wikipedia.org/wiki/Durian" },
+      { "text": "Gardens by the Bay has 18 Supertrees, 25–50 m tall, planted with ferns, orchids and bromeliads; they carry solar cells, collect rainwater and handle air intake and exhaust for the conservatories' cooling systems.", "source": "https://en.wikipedia.org/wiki/Gardens_by_the_Bay" },
+      { "text": "Garden Rhapsody, the Supertree Grove light and sound show, runs daily at 7.45 pm and 8.45 pm with free admission.", "source": "https://www.gardensbythebay.com.sg/en/things-to-do/calendar-of-events/garden-rhapsody.html" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The light show and the rules are real; the hawker uncle, what he says and your timings along the way are fiction."
+  }
+}

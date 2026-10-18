@@ -1,0 +1,36 @@
+{
+  "slug": "namibia-deadvlei-stars",
+  "motif": "sky-rotate",
+  "texture": "dust",
+  "arc": [
+    {
+      "h": 18,
+      "s": 65
+    },
+    {
+      "h": 12,
+      "s": 60
+    },
+    {
+      "h": 235,
+      "s": 45
+    },
+    {
+      "h": 250,
+      "s": 40
+    },
+    {
+      "h": 22,
+      "s": 55
+    }
+  ],
+  "accent": "#ffb088",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

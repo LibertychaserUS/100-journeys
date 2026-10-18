@@ -81,4 +81,13 @@ async function recharge(page, amount) {
   await expect(page.locator('#nav-wallet b')).not.toHaveText(before || '');
 }
 
-module.exports = { freshPage, solveCaptcha, expectSignedIn, registerAndLogin, login, logout, recharge };
+/** Wait for choreographed animations (entrances, ink, stamps; under 3s) to finish, e.g. before an axe scan.
+ *  Ambient loops such as the lantern glow are ignored. */
+async function settle(page) {
+  await page.waitForFunction(() => document.getAnimations().every((a) => {
+    const end = a.effect && a.effect.getComputedTiming().endTime;
+    return a.playState !== 'running' || !(end < 3000);
+  }));
+}
+
+module.exports = { freshPage, solveCaptcha, expectSignedIn, registerAndLogin, login, logout, recharge, settle };

@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/100-journeys/app/internal/ai"
 	"github.com/100-journeys/app/internal/analytics"
@@ -111,25 +112,47 @@ func (h *JourneyHandler) AIChat(c *gin.Context) {
 		return
 	}
 
-	reply, actions, err := h.ai.Chat(c.Request.Context(), req.SessionID, req.Message)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, newErrorEnvelope(err.Error()))
+	if utf8.RuneCountInString(req.Message) > maxChatMessage {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope("message too long"))
 		return
 	}
 
-	resp := model.AIChatResponse{
-		Reply:   reply,
-		Actions: actions,
+	var resp model.AIChatResponse
+	if guide, ok := h.ai.(ai.Guide); ok {
+		r := guide.Guide(c.Request.Context(), ai.GuideInput{
+			SessionID: req.SessionID,
+			Message:   req.Message,
+			Lang:      service.NormalizeLocale(req.Lang),
+			MBTI:      strings.ToUpper(strings.TrimSpace(req.MBTIType)),
+		})
+		resp = model.AIChatResponse{Reply: r.Reply, Actions: r.Actions, Source: r.Source}
+	} else {
+		reply, actions, err := h.ai.Chat(c.Request.Context(), req.SessionID, req.Message)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorEnvelope(err.Error()))
+			return
+		}
+		resp = model.AIChatResponse{Reply: reply, Actions: actions, Source: "mock"}
 	}
 	h.trackEvent(analytics.Event{Type: analytics.EventPetReply})
 	c.JSON(http.StatusOK, newDataEnvelope(resp))
 }
+
+// maxChatMessage bounds one message to the guide (runes).
+const maxChatMessage = 1000
+
+// maxEventMetadata bounds the client-supplied metadata (visitor id plus a few short fields).
+const maxEventMetadata = 512
 
 // POST /api/analytics/events
 func (h *JourneyHandler) TrackAnalytics(c *gin.Context) {
 	var req model.AnalyticsEventRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, newErrorEnvelope(err.Error()))
+		return
+	}
+	if len(req.Metadata) > maxEventMetadata || len(req.JourneySlug) > 128 {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope("event too large"))
 		return
 	}
 	accepted := h.trackEvent(analytics.Event{

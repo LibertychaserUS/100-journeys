@@ -63,6 +63,11 @@
 
   /* --- Motion --- */
   --ease: cubic-bezier(.2, .7, .2, 1);
+  /* Motion system: out for arrivals, in-out for things that travel, a long settle for scenes */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --dur-scene: 1100ms;
+  --stagger: 90ms;
   --dur-fast: 150ms;
   --dur: 250ms;
   --dur-slow: 600ms;
@@ -88,6 +93,25 @@
   --color-on-action:    #1d1405;  /* 11.2:1 on action */
   --color-action-hover: #f7d48c;
   --color-action-soft:  rgba(242, 196, 109, .10);  /* selected option fill */
+  /* Lumi (illustration only, never UI roles): lamplight and the four lantern bodies */
+  --lumi-glow:      #ffc96b;
+  --lumi-glow-a:    .55;
+  --lumi-core:      #fff4d6;
+  --lumi-flame-1:   #ffd27e;
+  --lumi-flame-2:   #f08a3c;
+  --lumi-crystal-1: #e6f2fb;
+  --lumi-crystal-2: #8fb6da;
+  --lumi-blossom-1: #ffe3e9;
+  --lumi-blossom-2: #f09cb1;
+  --lumi-paper-1:   #ffc9b2;
+  --lumi-paper-2:   #e0684f;
+  --lumi-ink:       #2a1d12;
+  --lumi-line:      rgba(42, 29, 18, .32);
+  --lumi-edge:      transparent;
+  --lumi-ray:       #ffd27a;
+  --lumi-cheek:     rgba(236, 104, 120, .55);
+  --lumi-prop:      #ffe2a0;
+  --lumi-prop-line: #ffd27a;
   --color-focus:        #f2c46d;
   --color-mood:         #f3aebd;  /* blossom, 7.7:1 on its tint */
   --color-mood-bg:      rgba(243, 174, 189, .12);
@@ -118,6 +142,12 @@
   --color-on-action:    #fbe1a6;  /* 13.3:1 */
   --color-action-hover: #2b2e35;
   --color-action-soft:  rgba(26, 28, 33, .05);
+  --lumi-glow:      #f7b445;
+  --lumi-glow-a:    .32;
+  --lumi-ray:       #c4862a;
+  --lumi-edge:      rgba(42, 29, 18, .28);
+  --lumi-prop:      #ffd27a;
+  --lumi-prop-line: #5c3d14;
   --color-focus:        #a86a12;  /* 4.0:1 against bg (non-text ≥ 3:1) */
   --color-mood:         #a3384f;
   --color-mood-bg:      rgba(163, 56, 79, .08);

@@ -1,0 +1,44 @@
+{
+  "slug": "bhutan-tigers-nest",
+  "motif": "rise",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 150,
+      "s": 20
+    },
+    {
+      "h": 210,
+      "s": 12
+    },
+    {
+      "h": 0,
+      "s": 55
+    },
+    {
+      "h": 50,
+      "s": 60
+    },
+    {
+      "h": 210,
+      "s": 45
+    },
+    {
+      "h": 200,
+      "s": 25
+    }
+  ],
+  "accent": "#ffd166",
+  "beats": [
+    "",
+    "vast",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

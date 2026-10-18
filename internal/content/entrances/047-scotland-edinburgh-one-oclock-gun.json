@@ -1,0 +1,75 @@
+{
+  "slug": "scotland-edinburgh-one-oclock-gun",
+  "entrance": { "no": 47, "realm": "city-rules", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "minimal",
+    "adventure_index": 1, "obscurity_level": 4, "risk_level": 1, "price": 9999,
+    "tags": ["culture", "hidden"],
+    "mbti": { "ENTJ": 5, "ESTJ": 5, "ISTJ": 4 }
+  },
+  "cover": { "path": "generated/scotland-edinburgh-one-oclock-gun/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "晚到的炮声 · 爱丁堡一点钟炮",
+    "subtitle": "第 47 号入口：光先到，声音后到",
+    "hook": "球落下的那一刻是一点整，炮声还在路上",
+    "region": "欧洲 · 英国",
+    "moods": ["正点", "秒针", "风", "城市"],
+    "opens": "全年，除星期日、耶稣受难日和圣诞节外，每天中午一点整",
+    "role": "报秒的人",
+    "premise": "从 1861 年起，爱丁堡城堡每天下午一点鸣一响炮，星期日、耶稣受难日和圣诞节除外，最初是给约两英里外利斯港和福斯湾里的船对表用的。卡尔顿山纳尔逊纪念塔顶的报时球也在一点整落下——雾天看不见球，所以才加了炮。声音每秒只走约 343 米，1861 年还专门印过一张“报时炮地图”：离城堡每远一圈，就要从听见炮响的那一刻减去一秒。",
+    "mission": "在卡尔顿山上，用一块表、一只球和一声炮，替身边的人报出真正的一点整。",
+    "chapters": [
+      { "title": "差五分一点", "paragraphs": ["风很大，卡尔顿山上的草全往一个方向倒。你早早上了山，在纳尔逊纪念塔底下找了一个能同时看见塔顶和城堡的位置，把表摘下来托在掌心，表盘朝上。旁边一个带着孙子的老先生问你几点了，你说：“等一下，过几分钟告诉您准的。”"] },
+      { "title": "球升起来", "paragraphs": ["云缝里漏下一点太阳，正好照在塔顶。快到一点，那只球被慢慢升到杆顶，停住，在风里一动不动。你给三个人分了工：小孩盯球，老先生盯城堡，你盯秒针。“球一动，你就喊。”小孩攥着拳头，很认真地点头。"] },
+      { "title": "一点整", "paragraphs": ["“动了！”小孩的喊声刚出口，球就落了下去，你的秒针正好走到十二——你的表是准的。城堡那边，炮口冒出一小团白烟，马上被风扯散。可是山上，什么声音也没有。"] },
+      { "title": "路上的声音", "paragraphs": ["风里还是没有声音。你在心里数：一，二，三——“砰”。炮声这才翻过老城的屋顶到了山上，闷闷的。小孩吓了一跳，接着哈哈大笑。你跟老先生解释：光几乎一下子就到了，声音得在路上走，这儿离城堡一公里多，每三百四十来米就晚一秒。“所以，”你把表举给他看，“一点整是球落下的那一下，不是您听见炮的这一下。”"] },
+      { "title": "对表", "paragraphs": ["炮声的回音在屋顶上滚了一会儿，散了。老先生把手表拨了几秒，又替孙子把电话手表对上。旁边几个人凑过来问，你一个一个告诉他们差了多少。山下的城里，这一声还在一片一片地被人听见，越远越晚。你望着那片屋顶，好像能看见秒一圈一圈往外推。"] }
+    ],
+    "choice": {
+      "prompt": "下山之前，你带走哪一样？",
+      "options": [
+        { "key": "rings", "label": "在明信片上画一座城堡，围着它画几圈，每圈写上“减一秒”", "keeps": "一张画满同心圆的明信片" },
+        { "key": "call", "label": "跟小孩约好：明天一点，他在家里窗口听炮，打电话告诉你晚了几秒", "keeps": "一通约在明天一点的电话" }
+      ]
+    },
+    "ending": "回到家，某个下雨的晚上看见闪电，你会下意识地数，一直数到雷响。数到几，你就知道它离你有多远。",
+    "facts": [
+      { "text": "一点钟炮每天下午一点准时鸣放，星期日、耶稣受难日和圣诞节除外；它设立于 1861 年，为约两英里外利斯港和福斯湾的船只报时，用来弥补纳尔逊纪念塔报时球在雾天看不见的缺点。", "source": "https://en.wikipedia.org/wiki/Edinburgh_Castle" },
+      { "text": "纳尔逊纪念塔顶的报时球用木头制成、外包锌皮，一点前被升起，一点整落下，原本是让利斯港和福斯湾里的船只校准航海天文钟。", "source": "https://en.wikipedia.org/wiki/Nelson_Monument,_Edinburgh" },
+      { "text": "1861 和 1862 年，邮局名录地图上印过“报时炮地图”，以城堡为中心画出一圈圈距离环，注明：离城堡每多一圈，就从听到炮响的那一刻减去一秒，才是真正开炮的时间。", "source": "https://edinphoto.org.uk/0_MAPS_2/0_map_edinburgh_time-gun_1861_-_map_notes.htm" }
+    ],
+    "fiction": "“入口”和编号是桃源百旅的设定。一点钟炮和报时球都是真实的；文中的老先生、小孩和来对表的人是虚构的，“数到三”是按卡尔顿山到城堡的距离估算的。"
+  },
+  "en": {
+    "title": "The Late Report · Edinburgh's One O'Clock Gun",
+    "subtitle": "Entrance No. 47: the light arrives first, the sound after",
+    "hook": "The ball drops at one exactly; the gun's report is still on its way",
+    "region": "Europe · United Kingdom",
+    "moods": ["On the dot", "Second hand", "Wind", "City"],
+    "opens": "All year, every day except Sundays, Good Friday and Christmas Day, at one o'clock sharp",
+    "role": "The one who calls the second",
+    "premise": "Since 1861 Edinburgh Castle has fired a gun at one o'clock every day except Sundays, Good Friday and Christmas Day, first so that ships in Leith and the Firth of Forth, two miles off, could set their chronometers. On Calton Hill, the time ball on the Nelson Monument drops at the same moment; the gun was added because fog could hide the ball. Sound covers only about 343 metres a second, so an 1861 “time-gun map” drew rings around the castle: for each ring further out, subtract one second from the moment you hear the bang.",
+    "mission": "On Calton Hill, with one watch, one ball and one gun, call the true one o'clock for the people around you.",
+    "chapters": [
+      { "title": "Five to one", "paragraphs": ["The wind is up, and all the grass on Calton Hill leans one way. You came up early and found a spot under the Nelson Monument where you can see both the top of the tower and the castle. You take off your watch and hold it face up on your palm. An old man with his grandson asks you the time. “Hang on,” you say. “Give me a few minutes and I'll give you the exact one.”"] },
+      { "title": "The ball goes up", "paragraphs": ["A gap in the cloud lets a little sun onto the top of the tower. Close to one, the ball is hauled slowly to the head of its mast and stops, dead still in the wind. You hand out jobs: the boy watches the ball, his grandfather watches the castle, you watch the second hand. “The moment the ball moves, shout.” The boy clenches his fists and nods, very serious."] },
+      { "title": "One o'clock", "paragraphs": ["“It's moving!” The shout is barely out before the ball drops, and your second hand lands on the twelve. Your watch is right. Over at the castle a small puff of white smoke appears, and the wind tears it apart at once. Up here, no sound at all."] },
+      { "title": "Sound in transit", "paragraphs": ["Still nothing on the wind. You count under your breath. One, two, three, and then the boom, rolling over the Old Town roofs and up the hill, muffled. The boy jumps, then laughs his head off. You explain to his grandfather: the light gets here almost at once, but the sound has to make the trip, a bit over a kilometre from the castle, a second late for every three hundred and forty metres or so. “So,” you say, holding up your watch, “one o'clock was when the ball dropped. Not when you heard the gun.”"] },
+      { "title": "Setting the watches", "paragraphs": ["The echo rolls around the rooftops for a while, then breaks up. The old man adjusts his watch by a few seconds, then sets his grandson's phone watch too. A few others drift over to ask, and one by one you tell them how far out they are. Down in the city, that bang is still being heard in instalments, the further out the later. Looking over the roofs, you can almost see the seconds spreading outwards, ring after ring."] }
+    ],
+    "choice": {
+      "prompt": "Before you head down, what do you take?",
+      "options": [
+        { "key": "rings", "label": "Draw the castle on a postcard with rings around it, each one marked “minus one second”", "keeps": "A postcard full of concentric rings" },
+        { "key": "call", "label": "Make a pact with the boy: tomorrow at one he listens from his window and rings to tell you how late it was", "keeps": "A phone call booked for one o'clock tomorrow" }
+      ]
+    },
+    "ending": "Back home, when lightning flashes on some wet night, you'll start counting without meaning to and keep going until the thunder. Whatever number you reach, you'll know how far away it is.",
+    "facts": [
+      { "text": "The One O'Clock Gun is fired at precisely 1 pm every day except Sunday, Good Friday and Christmas Day. It was established in 1861 as a time signal for ships in Leith harbour and the Firth of Forth, two miles away, complementing the Nelson Monument's time ball, which was useless in fog.", "source": "https://en.wikipedia.org/wiki/Edinburgh_Castle" },
+      { "text": "The time ball on the Nelson Monument, made of wood covered in zinc, is raised just before 1 pm and dropped at precisely 1 pm; it was installed so that ships at Leith and in the Firth of Forth could set their marine chronometers.", "source": "https://en.wikipedia.org/wiki/Nelson_Monument,_Edinburgh" },
+      { "text": "Time-gun maps printed for the Post Office Directory in 1861 and 1862 drew rings of distance around the castle, with a note: for every additional circle from the castle, subtract one second from the instant you hear the report to get the exact moment of firing.", "source": "https://edinphoto.org.uk/0_MAPS_2/0_map_edinburgh_time-gun_1861_-_map_notes.htm" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The One O'Clock Gun and the time ball are real; the old man, the boy and the people setting their watches are invented, and the count of three is an estimate from the distance between Calton Hill and the castle."
+  }
+}

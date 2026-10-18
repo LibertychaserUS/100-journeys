@@ -1,0 +1,87 @@
+{
+  "slug": "mongolia-flaming-cliffs",
+  "entrance": { "no": 27, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["summer"], "time": "dusk" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "raw",
+    "adventure_index": 5, "obscurity_level": 7, "risk_level": 2, "price": 14999,
+    "tags": ["hidden", "nature", "culture"],
+    "mbti": { "ENTP": 5, "INTP": 5, "ENFP": 4 }
+  },
+  "cover": { "path": "generated/mongolia-flaming-cliffs/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "偷蛋贼 · 火焰崖",
+    "subtitle": "第 27 号入口：一个被叫错了一百年的名字",
+    "hook": "它明明趴在自己的蛋上，却被叫了一百年小偷",
+    "region": "亚洲 · 蒙古",
+    "moods": ["落日", "红岩", "争论", "荒野"],
+    "opens": "夏天，太阳落山前的那半个小时",
+    "role": "替它翻案的人",
+    "premise": "巴彦扎格在蒙古南戈壁省，蒙古语的意思是“梭梭很多”。上世纪 20 年代，罗伊·查普曼·安德鲁斯给这里的红色砂岩起名“火焰崖”；1923 年，他的考察队在这里发现了世界上第一批被认出来的恐龙蛋。和那窝蛋一起出土的一只恐龙，被命名为 Oviraptor：偷蛋贼。",
+    "mission": "太阳落山之前，替那只被叫作“偷蛋贼”的恐龙，想出一句能让所有人都服气的辩护词。",
+    "chapters": [
+      { "title": "红", "paragraphs": ["太阳开始往下走的时候，你们还躲在梭梭稀稀拉拉的影子里，一下午的热气从地面往上蒸。你坐着不动，看对面的崖壁从土黄变成橙，又变成红，像刚从窑里夹出来的砖。风里是干草和晒烫了的石头的味道。"] },
+      { "title": "罪名", "paragraphs": [
+        "风停了一阵，崖脚下静得能听见沙子从坡上往下滑。司机会说一点英语，他指着脚下：“就是这里。他们找到蛋，旁边有一只恐龙，就说它在偷。”他咧嘴一笑，“它全名的后半截，意思是‘喜欢角龙的蛋’。”",
+        "你想起在飞机上读到的：它的头骨和那窝蛋之间，只隔着十厘米的沙土。七十年后，在戈壁的另一处，人们挖出它的一个近亲，正趴在一窝蛋上，两条后腿对称地收在两边，前肢张开护着蛋窝的边，跟今天的鸟孵蛋一个样子。当年那窝被当成原角龙的蛋，其实是它们自己的。"
+      ] },
+      { "title": "辩护词", "paragraphs": [
+        "太阳贴到地平线上，崖壁红到了最深。你蹲下来，靴子边的沙里露着一小片像是蛋壳的碎片。你没有碰它，只是看着。",
+        "你开始在脑子里起草辩护词，又一句一句划掉：太长；太像论文；太像在骂人。司机靠在车门上说：“你知道吧，它现在还叫这个名字。”你说：“那就给它加一条注释。”"
+      ] }
+    ],
+    "choice": {
+      "prompt": "天黑之前，你的辩护词放在哪儿？",
+      "options": [
+        { "key": "sand", "label": "用手指写在沙地上，让夜里的风去读", "keeps": "指甲缝里的一点红沙" },
+        { "key": "postcard", "label": "写在明信片背面，寄给总说你想太多的那个朋友", "keeps": "一张写着“它在孵蛋”的明信片" },
+        { "key": "argue", "label": "在回营地的车上讲出来，一直讲到全车人笑着认输", "keeps": "一车人的笑声，混着发动机响" }
+      ]
+    },
+    "ending": "回去上班的第一天，有人在会上指着一张图说：“问题就出在这儿。”你多看了那张图一会儿，然后举起了手。",
+    "facts": [
+      { "text": "火焰崖位于蒙古南戈壁省，又称巴彦扎格，蒙古语意为“梭梭丰富”；“火焰崖”这个名字是美国古生物学家罗伊·查普曼·安德鲁斯在 20 世纪 20 年代起的，指砂岩在日落时的红橙色。", "source": "https://en.wikipedia.org/wiki/Flaming_Cliffs" },
+      { "text": "1923 年 7 月 13 日，安德鲁斯的考察队成为世界上第一支发现恐龙蛋的队伍；这些蛋起初被认为属于原角龙，后来被确认属于窃蛋龙类。", "source": "https://en.wikipedia.org/wiki/Roy_Chapman_Andrews" },
+      { "text": "Oviraptor philoceratops 于 1924 年命名，属名意为“偷蛋贼”，种名意为“喜爱角龙的蛋”；正模标本趴在一窝约 15 枚蛋上，头骨与蛋之间只隔着约 10 厘米的沉积物。", "source": "https://en.wikipedia.org/wiki/Oviraptor" },
+      { "text": "1993 年在戈壁的乌哈托喀发现的一具窃蛋龙类成体，以前肢收拢、后肢蹲伏的姿势坐在一窝蛋上，被视为孵蛋的证据。", "source": "https://en.wikipedia.org/wiki/Citipati" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。巴彦扎格是常见的戈壁行程停靠点；按蒙古法律，化石属于国家，请让它们留在原地。文中的司机、他的话和沙里的碎片都是虚构的。"
+  },
+  "en": {
+    "title": "The Egg Thief · Flaming Cliffs",
+    "subtitle": "Entrance No. 27: a name that's been wrong for a hundred years",
+    "hook": "It was sitting on its own eggs. They called it a thief.",
+    "region": "Asia · Mongolia",
+    "moods": ["Sunset", "Red rock", "Argument", "Wilderness"],
+    "opens": "In summer, in the half hour before sunset",
+    "role": "Counsel for the defence",
+    "premise": "Bayanzag, in Mongolia's Ömnögovi province, means “rich in saxaul”. In the 1920s Roy Chapman Andrews named its red sandstone the Flaming Cliffs, and in 1923 his expedition found here the first dinosaur eggs ever recognised as such. A dinosaur dug up with the nest was given the name Oviraptor: egg thief.",
+    "mission": "Before the sun goes down, come up with one line in defence of the dinosaur they called a thief, one that would win everyone over.",
+    "chapters": [
+      { "title": "Red", "paragraphs": ["The sun has started down, and you're all still sitting in the thin shade of the saxaul while the afternoon's heat rises off the ground. You stay put and watch the cliffs across from you go from dust-yellow to orange to red, like bricks just pulled from a kiln. The wind smells of dry grass and stone that has been baking all day."] },
+      { "title": "The charge", "paragraphs": [
+        "The wind drops for a while, and at the foot of the cliff it's quiet enough to hear sand trickling down the slope. Your driver has a little English. He points at the ground. “Here. They found eggs, and a dinosaur next to them, so they said it was stealing.” He grins. “And the second half of its name means fond of ceratopsian eggs.”",
+        "You remember what you read on the plane: just ten centimetres of sand between its skull and the nest. Seventy years later, elsewhere in the Gobi, someone dug up one of its relatives crouched on a clutch of eggs, hind legs folded neatly either side, arms spread round the rim, exactly the way birds sit on nests today. And the 1923 eggs, taken for Protoceratops? They were its own kind's."
+      ] },
+      { "title": "The defence", "paragraphs": [
+        "The sun touches the horizon and the cliffs are at their reddest. You crouch. In the sand by your boot there's a small chip of something that might be eggshell. You don't touch it. You just look.",
+        "In your head you start drafting the defence, then crossing lines out: too long; too much like a paper; too much like an insult. The driver leans on the door. “You know it's still called that, right?” “Fine,” you say. “Then it gets a footnote.”"
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before dark, where does your defence go?",
+      "options": [
+        { "key": "sand", "label": "Write it in the sand with a finger and let the night wind read it", "keeps": "A little red sand under your fingernails" },
+        { "key": "postcard", "label": "On the back of a postcard, to the friend who says you overthink everything", "keeps": "A postcard that says: It was sitting on its eggs." },
+        { "key": "argue", "label": "Out loud, in the jeep back to camp, until everyone laughs and gives in", "keeps": "A jeepful of laughter over the engine noise" }
+      ]
+    },
+    "ending": "On your first day back at work, someone in a meeting points at a chart and says, “That's where the problem is.” You look at the chart a moment longer. Then you put your hand up.",
+    "facts": [
+      { "text": "The Flaming Cliffs, also called Bayanzag (“rich in saxaul”), are in Mongolia's Ömnögovi Province; Roy Chapman Andrews gave them the name in the 1920s for the red-orange sandstone at sunset.", "source": "https://en.wikipedia.org/wiki/Flaming_Cliffs" },
+      { "text": "On 13 July 1923 Andrews's party became the first in the world to discover dinosaur eggs; first thought to be Protoceratops eggs, they were later shown to belong to an oviraptorid.", "source": "https://en.wikipedia.org/wiki/Roy_Chapman_Andrews" },
+      { "text": "Oviraptor philoceratops was named in 1924: “egg thief”, with a species name meaning fondness for ceratopsian eggs. The type specimen lay over a nest of about 15 eggs, its skull only about 10 cm of sediment away from them.", "source": "https://en.wikipedia.org/wiki/Oviraptor" },
+      { "text": "An adult oviraptorid found at Ukhaa Tolgod in the Gobi in 1993 was sitting on a nest of eggs with folded forelimbs and crouched hindlimbs, evidence that these animals brooded their eggs.", "source": "https://en.wikipedia.org/wiki/Citipati" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Bayanzag is a common stop on Gobi trips; under Mongolian law fossils belong to the state, so leave them where they lie. The driver, what he says and the fragment in the sand are fiction."
+  }
+}

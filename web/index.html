@@ -6,13 +6,58 @@
   <title>桃源百旅 · 一百种不可思议的旅行</title>
   <meta name="description" content="桃源百旅 · 100 Journeys — 按心情、MBTI 和幻想类型进入的故事化旅行灵感。Story-driven fantasy travel by mood and personality." />
   <meta name="theme-color" content="#0d0f13" />
-  <link rel="icon" type="image/png" href="/static/assets/images/generated/brand-mark-128.png" />
-  <link rel="preload" as="image" href="/static/assets/images/generated/hero-taoyuan-1600.jpg"
-        imagesrcset="/static/assets/images/generated/hero-taoyuan-960.jpg 960w, /static/assets/images/generated/hero-taoyuan-1600.jpg 1600w" imagesizes="100vw" fetchpriority="high" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="桃源百旅 · 100 Journeys" />
+  <meta property="og:title" content="桃源百旅 · 一百种不可思议的旅行" />
+  <meta property="og:description" content="一百个藏在真实地方的入口，各自只在一个季节、一个时辰打开。" />
+  <meta property="og:image" content="/static/assets/images/generated/hero-taoyuan-1600.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/static/assets/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/static/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/static/assets/icons/manifest.json" />
 
   <!-- Theme before first paint: saved choice, else the OS preference. -->
   <script>
     (function () {
+      // Share links (/j/<slug>) open the journey inside the app.
+      var share = /^\/j\/([a-z0-9-]+)\/?$/.exec(location.pathname);
+      if (share) history.replaceState(null, '', '/' + location.search + '#/journey/' + share[1]);
+      // The home opening image starts downloading before anything else (AVIF; others use the JPEG).
+      if (!location.hash || location.hash === '#/' || location.hash === '#') {
+        var hp = document.createElement('link');
+        hp.rel = 'preload'; hp.as = 'image'; hp.type = 'image/avif'; hp.setAttribute('fetchpriority', 'high');
+        hp.href = '/static/assets/images/generated/hero-taoyuan.1600.avif';
+        hp.setAttribute('imagesrcset', '/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w');
+        hp.setAttribute('imagesizes', '100vw');
+        document.head.appendChild(hp);
+      }
+      // A journey page starts fetching its data before the scripts arrive.
+      var deep = /^#\/journey\/([a-z0-9-]+)/.exec(location.hash);
+      if (deep && window.fetch) {
+        var lang = null;
+        try { lang = localStorage.getItem('lang'); } catch (e) {}
+        if (lang !== 'zh' && lang !== 'en') lang = /^zh/i.test((navigator.languages && navigator.languages[0]) || navigator.language || 'zh') ? 'zh' : 'en';
+        var early = fetch('/api/journeys/' + deep[1] + '?lang=' + lang).then(function (r) { return r.ok ? r.json() : Promise.reject(r); });
+        window.__journeyPrefetch = { slug: deep[1], lang: lang, promise: early };
+        // …and its opening image, so it downloads while the scripts are still on their way.
+        early.then(function (res) {
+          var d = res && res.data;
+          var src = d && ((d.scene && d.scene.images && d.scene.images.hero) || d.image_url);
+          if (!src) return;
+          var l = document.createElement('link');
+          l.rel = 'preload'; l.as = 'image'; l.setAttribute('fetchpriority', 'high');
+          var m = /\/generated\/[^/]+\/cover\.jpg$/.test(src) ? [480, 720, 1120] : /\/generated\/card-[^/]+\.jpg$/.test(src) ? [480, 720] : /\/generated\/[^/]+\/hero\.jpg$/.test(src) ? [960, 1600] : null;
+          if (m) {
+            // A typed preload is skipped by browsers that can't decode AVIF (they use the JPEG).
+            l.type = 'image/avif';
+            l.setAttribute('imagesrcset', m.map(function (w) { return src.replace(/\.jpg$/, '.' + w + '.avif') + ' ' + w + 'w'; }).join(', '));
+            l.setAttribute('imagesizes', '100vw');
+            l.href = src.replace(/\.jpg$/, '.' + m[m.length - 1] + '.avif');
+          } else l.href = src;
+          document.head.appendChild(l);
+        }).catch(function () {});
+      }
       var saved = null;
       try { saved = localStorage.getItem('theme'); } catch (e) {}
       var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -31,9 +76,13 @@
   <link rel="stylesheet" href="/static/css/components/filter.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/components/checkout.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/components/ai-pet.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/components/lumi.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/pages/home.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/pages/explore.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/scenes.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/pages/detail.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/space.css?v=__ASSET_VERSION__" />
+  <link rel="stylesheet" href="/static/css/pages/compose.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/pages/auth.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/pages/profile.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/pages/recharge.css?v=__ASSET_VERSION__" />
@@ -63,6 +112,8 @@
   <script src="/static/js/api.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/guest.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/ui.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/lumi.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/scenes.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/nav.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/checkout.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/ai-pet.js?v=__ASSET_VERSION__"></script>
@@ -70,6 +121,10 @@
   <script src="/static/js/pages/home.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/pages/explore.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/pages/detail.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/find.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/guide.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/space.js?v=__ASSET_VERSION__"></script>
+  <script src="/static/js/pages/compose.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/pages/login.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/pages/register.js?v=__ASSET_VERSION__"></script>
   <script src="/static/js/pages/profile.js?v=__ASSET_VERSION__"></script>

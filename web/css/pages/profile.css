@@ -49,7 +49,8 @@
 .persona__code:hover { border-color: var(--color-text-3); }
 .persona__code[aria-pressed="true"] { background: var(--color-action); border-color: transparent; color: var(--color-on-action); }
 .persona__code[aria-pressed="true"] span { color: inherit; opacity: .8; }
-.persona > .btn--quiet { justify-self: start; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.persona__links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.persona__links .btn--quiet { padding: 0; text-decoration: underline; text-underline-offset: 3px; }
 .persona__result { border-top: 1px solid var(--color-line); padding-top: var(--space-5); display: grid; gap: 8px; }
 .persona__result h3 { font-family: var(--font-story); font-size: var(--text-2xl); }
 .persona__result p { color: var(--color-text-2); }

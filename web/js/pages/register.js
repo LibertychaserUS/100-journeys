@@ -107,6 +107,7 @@ Pages.Register = {
         captcha_id: form.querySelector('#reg-captcha-id').value, captcha_answer: v.captcha,
       });
       API.setToken(res.data.token);
+      API.track('register');
       if (v.avatar) {
         try { await API.uploadAvatar(v.avatar); }
         catch (err) { UI.toast(t('err.avatarUpload', { msg: I18n.error(err) })); }

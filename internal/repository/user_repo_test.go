@@ -118,3 +118,23 @@ func TestUserRepo_ListPointsHistory_Empty(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, history, 0)
 }
+
+// UT-REPO-USER-CHOICE-001: fork choices upsert per journey and list by slug.
+func TestUserRepo_Choices(t *testing.T) {
+	repo, db := setupUserRepo(t)
+	ctx := context.Background()
+	user := &model.User{Username: "chooser", Email: "chooser@example.com", PasswordHash: "x", Role: model.RoleUser, Level: 1}
+	require.NoError(t, repo.Create(ctx, user))
+	res, err := db.ExecContext(ctx, `INSERT INTO journeys (title, slug, price) VALUES ('t', 'choice-journey', 1)`)
+	require.NoError(t, err)
+	jid, _ := res.LastInsertId()
+
+	empty, err := repo.ListChoices(ctx, user.ID)
+	require.NoError(t, err)
+	assert.Empty(t, empty)
+	require.NoError(t, repo.SetChoice(ctx, user.ID, jid, "postcard"))
+	require.NoError(t, repo.SetChoice(ctx, user.ID, jid, "whisper"))
+	got, err := repo.ListChoices(ctx, user.ID)
+	require.NoError(t, err)
+	assert.Equal(t, map[string]string{"choice-journey": "whisper"}, got)
+}
