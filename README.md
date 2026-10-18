@@ -41,6 +41,8 @@ English: The domain filing is not complete yet, so the public demo uses the Tenc
 
 English: Both dark and light themes are supported (WCAG AA contrast, checked by automated axe scans), and the UI switches between Chinese and English, including English copy for all 12 journeys.
 
+截图 / Screenshots: [docs/design/redesign-2026-10](docs/design/redesign-2026-10/README.md)
+
 中文：公网演示账号属于临时演示凭据，演示结束后可轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
 
 English: Public demo accounts are temporary demo credentials and can be rotated or disabled after use. Plaintext production credentials must never be stored in README, Git history, or public docs; admin users are created/promoted through the server-side `cmd/admin-user` CLI, while local demo accounts are printed by `scripts/deploy/local-one-click.sh`. To reset local demo data, remove `data/*.db*` and rerun `scripts/deploy/local-one-click.sh`; public demo credentials are controlled by server environment variables and `scripts/deploy/init-demo-data.sh`, separate from production credentials.
