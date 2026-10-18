@@ -1,0 +1,15 @@
+/* =============================================================
+   CHECKOUT SHEET — order summary, payment, success state
+   ============================================================= */
+
+.checkout-sum { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px; border-radius: 12px; background: var(--color-surface-2); }
+.checkout-sum img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; }
+.checkout-sum b { display: block; font-size: var(--text-base); }
+.checkout-sum span { font-size: var(--text-sm); color: var(--color-text-3); }
+.checkout-wait { color: var(--color-text-2); font-size: var(--text-base); }
+.checkout-done { display: grid; gap: 10px; justify-items: center; text-align: center; padding-top: 6px; }
+.checkout-done__icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--color-ok) 14%, transparent); color: var(--color-ok); }
+.checkout-done h2 { font-family: var(--font-story); font-size: var(--text-2xl); }
+.checkout-done p { color: var(--color-text-2); }
+.checkout-done__no { font-size: var(--text-sm); color: var(--color-text-3) !important; }
+.checkout-done .sheet__actions { width: 100%; margin-top: 8px; }

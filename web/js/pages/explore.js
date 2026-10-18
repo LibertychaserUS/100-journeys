@@ -1,526 +1,352 @@
 /**
- * Explore page controller — Discovery feed with filters + masonry card grid
- * Xiaohongshu-style card-based discovery with infinite scroll
+ * Explore — search + filters + journey grid.
+ * Filter changes update the URL with history.replaceState (no re-render, no hashchange),
+ * and every request carries a sequence number so a slow response can never overwrite a newer one.
  */
-
 var Pages = window.Pages || {};
 
 Pages.Explore = {
-  _currentFilter: {},
-  _currentPage: 1,
-  _isLoading: false,
-  _hasMore: true,
+  PAGE_SIZE: 12,
+  _filter: {},
+  _page: 1,
+  _total: 0,
+  _loaded: 0,
+  _seq: 0,
   _tags: [],
-  _debounceTimer: null,
-  _imageMap: {
-    'bolivia-salt-flat-trek': '/static/assets/images/generated/card-salt-mirror.jpg',
-    'iceland-lava-tunnel-cycling': '/static/assets/images/generated/card-lava-tunnel.jpg',
-    'japan-onsen-temple-meditation': '/static/assets/images/generated/card-temple-onsen.jpg',
-    'morocco-sahara-camel-camp': '/static/assets/images/generated/card-sahara-stars.jpg',
-    'greenland-dog-sled-solo': '/static/assets/images/generated/card-greenland-sled.jpg',
-    'norway-aurora-hunt': '/static/assets/images/generated/hero-taoyuan.jpg',
-    'turkey-cappadocia-balloon': '/static/assets/images/generated/card-city-rules.jpg',
+  _panelOpen: false,
+  _debounce: null,
+  _cleanup: [],
+
+  _adventure: {
+    easy: { min: 1, max: 4, key: 'explore.adv.easy' },
+    mid: { min: 5, max: 7, key: 'explore.adv.mid' },
+    hard: { min: 8, max: 10, key: 'explore.adv.hard' },
   },
 
-  render() {
+  render(ctx) {
+    const esc = UI.esc;
+    this._filter = this._fromQuery(ctx.query);
+    this._panelOpen = false;
     const main = document.getElementById('main-content');
-    if (!main) return;
+    main.innerHTML = `
+      <div class="page explore">
+        <header class="container page__head">
+          <h1>${esc(t('explore.title'))}</h1>
+          <p>${esc(t('explore.sub'))}</p>
+        </header>
+        <div class="explore-toolbar" id="explore-toolbar">
+          <div class="container">
+            <div class="explore-toolbar__row">
+              <label class="explore-search">
+                ${UI.icon('search')}
+                <span class="sr-only">${esc(t('explore.searchLabel'))}</span>
+                <input type="search" id="explore-search" autocomplete="off" placeholder="${esc(t('explore.searchPlaceholder'))}">
+              </label>
+              <div class="explore-facets" role="group" aria-label="${esc(t('explore.fantasyLabel'))}" id="filter-fantasy">
+                <button class="chip explore-chip" type="button" data-key="fantasy_type" data-value="">${esc(t('explore.all'))}</button>
+                ${UI.fantasyTypes.map((f) => `<button class="chip explore-chip" type="button" data-key="fantasy_type" data-value="${f}">${esc(t(`fantasy.${f}`))}</button>`).join('')}
+              </div>
+              <div class="explore-filter">
+                <button class="btn btn--ghost explore-filter__btn" id="explore-filter-btn" type="button" aria-expanded="false" aria-controls="explore-panel">
+                  ${UI.icon('filter')}<span>${esc(t('explore.filters'))}</span><span class="explore-filter__badge" id="explore-filter-count" hidden></span>
+                </button>
+                <div class="explore-panel" id="explore-panel" role="region" aria-label="${esc(t('explore.filtersTitle'))}" hidden></div>
+              </div>
+            </div>
+            <div class="explore-active" id="explore-active" hidden></div>
+          </div>
+        </div>
+        <section class="container explore-results" aria-label="${esc(t('explore.feed'))}">
+          <p class="explore-results__count" id="explore-results" aria-live="polite"></p>
+          <div class="grid-cards explore-grid" id="explore-grid" aria-busy="true">${UI.skeletonCards(8)}</div>
+          <div class="explore-more" id="explore-loadmore"></div>
+        </section>
+      </div>`;
 
-    main.innerHTML = '';
-    main.appendChild(this._buildSearch());
-    main.appendChild(this._buildFilters());
-    main.appendChild(this._buildGrid());
-
-    // Parse hash params for initial filters
-    this._parseHashFilters();
-    this._loadTags();
-    this._loadJourneys(true);
-  },
-
-  /* ================================================================
-     Search Bar
-     ================================================================ */
-  _buildSearch() {
-    const div = document.createElement('div');
-    div.className = 'explore-search';
-    div.innerHTML = `
-      <div class="container explore-search__input-wrap">
-        <span class="explore-search__icon" aria-hidden="true">⌕</span>
-        <input type="search" class="explore-search__input" id="explore-search"
-               placeholder="搜索旅行目的地、风格、关键词..."
-               value="${this._escapeHtml(this._currentFilter.q || '')}">
-      </div>
-    `;
-    const input = div.querySelector('#explore-search');
-    input.addEventListener('input', (e) => {
-      clearTimeout(this._debounceTimer);
-      this._debounceTimer = setTimeout(() => {
-        this._currentFilter.q = e.target.value.trim() || undefined;
-        this._updateHash();
-        this._loadJourneys(true);
-      }, 300);
+    const search = main.querySelector('#explore-search');
+    search.value = this._filter.q || '';
+    search.addEventListener('input', () => {
+      clearTimeout(this._debounce);
+      this._debounce = setTimeout(() => this._set('q', search.value.trim()), 300);
     });
-    return div;
-  },
-
-  /* ================================================================
-     Filters
-     ================================================================ */
-  _buildFilters() {
-    const div = document.createElement('div');
-    div.className = 'explore-filters';
-
-    const mbtiTypes = [
-      'INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP',
-      'ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP',
-    ];
-
-    const visualStyles = [
-      { label: '纪实', value: 'raw' },
-      { label: '梦境', value: 'surreal' },
-      { label: '留白', value: 'minimal' },
-      { label: '暗光', value: 'dramatic' },
-    ];
-    const fantasyTypes = [
-      { label: '极限地貌', value: 'extreme' },
-      { label: '独处治愈', value: 'solitude' },
-      { label: '视觉奇观', value: 'visual' },
-      { label: '异域规则', value: 'culture' },
-      { label: '精神秘境', value: 'spiritual' },
-      { label: '夜行星空', value: 'night' },
-    ];
-
-    const advMin = this._currentFilter.adventure_min ?? 0;
-    const advMax = this._currentFilter.adventure_max ?? 10;
-
-    div.innerHTML = `
-      <div class="container">
-        <!-- MBTI -->
-        <div class="explore-filters__section">
-          <span class="explore-filters__label">MBTI 性格</span>
-          <div class="explore-filters__chips" role="group" aria-label="MBTI 筛选" id="filter-mbti">
-            ${mbtiTypes.map(m => {
-              const active = this._currentFilter.mbti === m ? 'explore-chip--active' : '';
-              return `<button class="explore-chip explore-chip--mbti-${m} ${active}" data-key="mbti" data-value="${m}" type="button" aria-pressed="${!!active}">${m}</button>`;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- Tags (populated after API call) -->
-        <div class="explore-filters__section">
-          <span class="explore-filters__label">标签</span>
-          <div class="explore-filters__chips" role="group" aria-label="标签筛选" id="filter-tags">
-            <span style="color:var(--color-text-muted);font-size:var(--text-sm);">加载中...</span>
-          </div>
-        </div>
-
-        <!-- Visual Style -->
-        <div class="explore-filters__section">
-          <span class="explore-filters__label">视觉风格</span>
-          <div class="explore-filters__chips" role="group" aria-label="视觉风格筛选" id="filter-visual">
-            ${visualStyles.map(v => {
-              const active = this._currentFilter.visual_style === v.value ? 'explore-chip--active' : '';
-              return `<button class="explore-chip ${active}" data-key="visual_style" data-value="${v.value}" type="button" aria-pressed="${!!active}">${v.label}</button>`;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- Fantasy Type -->
-        <div class="explore-filters__section">
-          <span class="explore-filters__label">幻想类型</span>
-          <div class="explore-filters__chips" role="group" aria-label="幻想类型筛选" id="filter-fantasy">
-            ${fantasyTypes.map(f => {
-              const active = this._currentFilter.fantasy_type === f.value ? 'explore-chip--active' : '';
-              return `<button class="explore-chip ${active}" data-key="fantasy_type" data-value="${f.value}" type="button" aria-pressed="${!!active}">${f.label}</button>`;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- Adventure Slider -->
-        <div class="explore-filters__section">
-          <span class="explore-filters__label" id="adventure-label">冒险程度: ${Math.min(advMin, advMax)} - ${Math.max(advMin, advMax)}</span>
-          <div class="explore-filters__slider-wrap">
-            <input type="range" class="explore-filters__slider" id="filter-adventure-min" min="0" max="10" step="1" value="${advMin}">
-            <input type="range" class="explore-filters__slider" id="filter-adventure-max" min="0" max="10" step="1" value="${advMax}">
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Chip click handlers (delegation for static chips)
-    div.querySelectorAll('.explore-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const key = chip.dataset.key;
-        const value = chip.dataset.value;
-        const isActive = chip.classList.contains('explore-chip--active');
-
-        // Toggle: if already active, deactivate; otherwise activate this one only
-        div.querySelectorAll(`.explore-chip[data-key="${key}"]`).forEach(c => {
-          c.classList.remove('explore-chip--active');
-          c.setAttribute('aria-pressed', 'false');
-        });
-        if (!isActive) {
-          chip.classList.add('explore-chip--active');
-          chip.setAttribute('aria-pressed', 'true');
-          this._currentFilter[key] = value;
-        } else {
-          delete this._currentFilter[key];
-        }
-        this._updateHash();
-        this._loadJourneys(true);
-      });
+    search.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { clearTimeout(this._debounce); this._set('q', search.value.trim()); }
     });
 
-    // Adventure sliders
-    const minSlider = div.querySelector('#filter-adventure-min');
-    const maxSlider = div.querySelector('#filter-adventure-max');
-    const advLabel = div.querySelector('#adventure-label');
+    main.querySelector('.explore').addEventListener('click', (e) => this._onClick(e));
+    UI.trackCardClicks(main.querySelector('#explore-grid'));
 
-    const updateAdvLabel = () => {
-      const min = parseInt(minSlider.value, 10);
-      const max = parseInt(maxSlider.value, 10);
-      advLabel.textContent = `冒险程度: ${Math.min(min, max)} - ${Math.max(min, max)}`;
+    const onDocClick = (e) => {
+      // composedPath survives the clicked node being re-rendered away.
+      const inside = e.composedPath().some((n) => n.classList && n.classList.contains('explore-filter'));
+      if (this._panelOpen && !inside) this._togglePanel(false);
     };
-
-    const onAdvChange = () => {
-      const min = parseInt(minSlider.value, 10);
-      const max = parseInt(maxSlider.value, 10);
-      this._currentFilter.adventure_min = Math.min(min, max);
-      this._currentFilter.adventure_max = Math.max(min, max);
-      updateAdvLabel();
-      clearTimeout(this._debounceTimer);
-      this._debounceTimer = setTimeout(() => {
-        this._updateHash();
-        this._loadJourneys(true);
-      }, 300);
-    };
-
-    minSlider.addEventListener('input', updateAdvLabel);
-    minSlider.addEventListener('change', onAdvChange);
-    maxSlider.addEventListener('input', updateAdvLabel);
-    maxSlider.addEventListener('change', onAdvChange);
-
-    return div;
-  },
-
-  /* ================================================================
-     Grid
-     ================================================================ */
-  _buildGrid() {
-    const div = document.createElement('div');
-    div.className = 'container';
-    div.innerHTML = `
-      <p class="explore-results-meta" id="explore-results" aria-live="polite"></p>
-      <div class="explore-grid" id="explore-grid" role="feed" aria-busy="true">
-        ${this._skeletonCards(6)}
-      </div>
-      <div class="explore-load-more" id="explore-loadmore"></div>
-    `;
-
-    // Infinite scroll
-    this._scrollHandler = () => {
-      if (this._isLoading || !this._hasMore) return;
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = window.innerHeight;
-      if (scrollTop + clientHeight >= scrollHeight - 400) {
-        this._currentPage++;
-        this._loadJourneys(false);
+    const onKey = (e) => {
+      if (e.key === 'Escape' && this._panelOpen) {
+        this._togglePanel(false);
+        document.getElementById('explore-filter-btn')?.focus();
       }
     };
-    window.addEventListener('scroll', this._scrollHandler);
+    document.addEventListener('click', onDocClick);
+    document.addEventListener('keydown', onKey);
+    this._cleanup = [() => document.removeEventListener('click', onDocClick), () => document.removeEventListener('keydown', onKey)];
 
-    return div;
+    this._sync();
+    this._loadTags();
+    this._load(true);
   },
 
-  _skeletonCards(count) {
-    return Array.from({ length: count }, () => `
-      <div class="skeleton-card">
-        <div class="skeleton-card__image"></div>
-        <div class="skeleton-card__body">
-          <div class="skeleton-card__text skeleton-card__text--short"></div>
-          <div class="skeleton-card__text skeleton-card__text--medium"></div>
-          <div class="skeleton-card__text skeleton-card__text--long"></div>
+  update(ctx) {
+    this._filter = this._fromQuery(ctx.query);
+    const search = document.getElementById('explore-search');
+    if (search && document.activeElement !== search) search.value = this._filter.q || '';
+    this._sync();
+    this._load(true);
+  },
+
+  destroy() {
+    clearTimeout(this._debounce);
+    document.body.classList.remove('explore-panel-open');
+    this._cleanup.forEach((fn) => fn());
+    this._cleanup = [];
+    this._seq++;
+  },
+
+  // ---------- state ----------
+  _fromQuery(query) {
+    const f = {};
+    ['q', 'fantasy_type', 'mbti', 'tag', 'visual_style'].forEach((k) => {
+      const v = query.get(k);
+      if (v) f[k] = v;
+    });
+    const min = parseInt(query.get('adventure_min'), 10);
+    const max = parseInt(query.get('adventure_max'), 10);
+    if (min || max) {
+      const match = Object.entries(this._adventure).find(([, r]) => r.min === (min || 1) && r.max === (max || 10));
+      if (match) f.adventure = match[0];
+      else if (max && max <= 4) f.adventure = 'easy';
+      else if (min && min >= 8) f.adventure = 'hard';
+    }
+    return f;
+  },
+
+  _params() {
+    const p = {};
+    ['q', 'fantasy_type', 'mbti', 'tag', 'visual_style'].forEach((k) => { if (this._filter[k]) p[k] = this._filter[k]; });
+    const adv = this._adventure[this._filter.adventure];
+    if (adv) { p.adventure_min = adv.min; p.adventure_max = adv.max; }
+    return p;
+  },
+
+  _set(key, value) {
+    if (value) this._filter[key] = value;
+    else delete this._filter[key];
+    Router.replaceQuery(this._params());
+    this._sync();
+    this._load(true);
+  },
+
+  _clearAll() {
+    const q = this._filter.q;
+    this._filter = {};
+    const search = document.getElementById('explore-search');
+    if (search) search.value = '';
+    if (!q && !Object.keys(this._params()).length) return;
+    Router.replaceQuery({});
+    this._sync();
+    this._load(true);
+  },
+
+  _onClick(e) {
+    const chip = e.target.closest('[data-key]');
+    if (chip) {
+      const { key, value } = chip.dataset;
+      const current = this._filter[key] || '';
+      // fantasy facet row behaves like tabs (All + one); panel choices toggle.
+      const next = key === 'fantasy_type' && chip.closest('#filter-fantasy') ? value : (current === value ? '' : value);
+      this._set(key, next);
+      return;
+    }
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.id === 'explore-filter-btn') { e.stopPropagation(); this._togglePanel(!this._panelOpen); return; }
+    if (btn.dataset.remove) { this._set(btn.dataset.remove, ''); if (btn.dataset.remove === 'q') document.getElementById('explore-search').value = ''; return; }
+    if (btn.dataset.action === 'clear') { this._clearAll(); return; }
+    if (btn.dataset.action === 'done') { this._togglePanel(false); document.getElementById('explore-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (btn.id === 'btn-loadmore') { this._page++; this._load(false); return; }
+    if (btn.dataset.action === 'retry') { this._load(true); }
+  },
+
+  _togglePanel(open) {
+    this._panelOpen = open;
+    const panel = document.getElementById('explore-panel');
+    const btn = document.getElementById('explore-filter-btn');
+    if (!panel || !btn) return;
+    btn.setAttribute('aria-expanded', String(open));
+    panel.hidden = !open;
+    document.body.classList.toggle('explore-panel-open', open);
+    if (open) {
+      this._renderPanel();
+      panel.querySelector('button')?.focus();
+    }
+  },
+
+  _renderPanel() {
+    const panel = document.getElementById('explore-panel');
+    if (!panel || panel.hidden) return;
+    const esc = UI.esc;
+    const choice = (key, value, label, extra = '') => {
+      const on = (this._filter[key] || '') === value;
+      return `<button class="chip explore-chip ${on ? 'explore-chip--active' : ''} ${extra}" type="button" data-key="${key}" data-value="${esc(value)}" aria-pressed="${on}">${esc(label)}</button>`;
+    };
+    panel.innerHTML = `
+      <div class="explore-panel__section">
+        <h3>${esc(t('explore.mbti'))}<em>${esc(t('explore.mbtiHint'))}</em></h3>
+        <div class="explore-panel__mbti" id="filter-mbti">${MBTI.codes.map((c) => choice('mbti', c, c)).join('')}</div>
+      </div>
+      <div class="explore-panel__section">
+        <h3>${esc(t('explore.adventure'))}</h3>
+        <div class="seg" id="filter-adventure">
+          <button type="button" data-key="adventure" data-value="" aria-pressed="${!this._filter.adventure}">${esc(t('explore.adv.any'))}</button>
+          ${Object.entries(this._adventure).map(([k, r]) => `<button type="button" data-key="adventure" data-value="${k}" aria-pressed="${this._filter.adventure === k}">${esc(t(r.key))}</button>`).join('')}
         </div>
       </div>
-    `).join('');
+      <div class="explore-panel__section">
+        <h3>${esc(t('explore.tags'))}</h3>
+        <div class="explore-panel__chips" id="filter-tags">${this._tags.map((tag) => choice('tag', tag.slug, UI.tagLabel(tag))).join('')}</div>
+      </div>
+      <div class="explore-panel__section">
+        <h3>${esc(t('explore.style'))}</h3>
+        <div class="explore-panel__chips" id="filter-visual">${['raw', 'surreal', 'minimal', 'dramatic'].map((s) => choice('visual_style', s, t(`style.${s}`))).join('')}</div>
+      </div>
+      <div class="explore-panel__foot">
+        <button class="btn btn--quiet" type="button" data-action="clear">${esc(t('explore.clearAll'))}</button>
+        <button class="btn btn--primary" type="button" data-action="done" id="explore-panel-done">${esc(t('explore.showN', { n: this._total }))}</button>
+      </div>`;
   },
 
-  /* ================================================================
-     Tags (from API)
-     ================================================================ */
+  _activeFilters() {
+    const list = [];
+    const f = this._filter;
+    if (f.q) list.push(['q', `“${f.q}”`]);
+    if (f.fantasy_type) list.push(['fantasy_type', UI.fantasyLabel(f.fantasy_type)]);
+    if (f.mbti) list.push(['mbti', f.mbti]);
+    if (f.adventure && this._adventure[f.adventure]) list.push(['adventure', t(this._adventure[f.adventure].key)]);
+    if (f.tag) {
+      const tag = this._tags.find((x) => x.slug === f.tag);
+      list.push(['tag', tag ? UI.tagLabel(tag) : t(`tag.${f.tag}`)]);
+    }
+    if (f.visual_style) list.push(['visual_style', t(`style.${f.visual_style}`)]);
+    return list;
+  },
+
+  _sync() {
+    const esc = UI.esc;
+    document.querySelectorAll('#filter-fantasy [data-key="fantasy_type"]').forEach((chip) => {
+      const on = (this._filter.fantasy_type || '') === chip.dataset.value;
+      chip.setAttribute('aria-pressed', String(on));
+      chip.classList.toggle('explore-chip--active', on);
+    });
+    const panelCount = ['mbti', 'tag', 'visual_style', 'adventure'].filter((k) => this._filter[k]).length;
+    const badge = document.getElementById('explore-filter-count');
+    if (badge) { badge.hidden = !panelCount; badge.textContent = panelCount || ''; }
+
+    const active = this._activeFilters();
+    const row = document.getElementById('explore-active');
+    if (row) {
+      row.hidden = !active.length;
+      row.innerHTML = active.length ? `
+        <span>${esc(t('explore.selected'))}</span>
+        ${active.map(([key, label]) => `<button class="chip chip--sm" type="button" data-remove="${key}" aria-label="${esc(t('explore.remove', { label }))}">${esc(label)}${UI.icon('close', 'icon--sm')}</button>`).join('')}
+        <button class="btn btn--quiet btn--sm" type="button" data-action="clear">${esc(t('explore.clearAll'))}</button>` : '';
+    }
+    this._syncPanel();
+  },
+
+  // Update pressed states in place so keyboard focus stays on the control the user pressed.
+  _syncPanel() {
+    const panel = document.getElementById('explore-panel');
+    if (!panel || panel.hidden) return;
+    panel.querySelectorAll('[data-key]').forEach((el) => {
+      const on = (this._filter[el.dataset.key] || '') === el.dataset.value;
+      el.setAttribute('aria-pressed', String(on));
+      el.classList.toggle('explore-chip--active', on && el.classList.contains('chip'));
+    });
+  },
+
+  // ---------- data ----------
   async _loadTags() {
     try {
       const res = await API.getTags();
-      this._tags = res.data || res || [];
-      const tagContainer = document.getElementById('filter-tags');
-      if (!tagContainer) return;
-
-      tagContainer.innerHTML = this._tags.map(tag => {
-        const name = tag.name || tag.slug || tag;
-        const value = tag.slug || tag.name || tag;
-        const active = this._currentFilter.tag === value ? 'explore-chip--active' : '';
-        return `<button class="explore-chip ${active}" data-key="tag" data-value="${this._escapeHtml(value)}" type="button" aria-pressed="${!!active}">${this._escapeHtml(name)}</button>`;
-      }).join('');
-
-      // Bind clicks
-      tagContainer.querySelectorAll('.explore-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          const key = chip.dataset.key;
-          const value = chip.dataset.value;
-          const isActive = chip.classList.contains('explore-chip--active');
-
-          tagContainer.querySelectorAll('.explore-chip').forEach(c => {
-            c.classList.remove('explore-chip--active');
-            c.setAttribute('aria-pressed', 'false');
-          });
-          if (!isActive) {
-            chip.classList.add('explore-chip--active');
-            chip.setAttribute('aria-pressed', 'true');
-            this._currentFilter[key] = value;
-          } else {
-            delete this._currentFilter[key];
-          }
-          this._updateHash();
-          this._loadJourneys(true);
-        });
-      });
+      this._tags = res.data || [];
+      this._renderPanel();
+      this._sync();
     } catch (err) {
-      console.error('Tag load failed:', err);
-      const tagContainer = document.getElementById('filter-tags');
-      if (tagContainer) tagContainer.innerHTML = '<span style="color:var(--color-text-muted);font-size:var(--text-sm);">加载失败</span>';
+      console.warn('Tag load failed:', err);
     }
   },
 
-  /* ================================================================
-     Data Loading
-     ================================================================ */
-  async _loadJourneys(reset = false) {
-    if (this._isLoading) return;
-    this._isLoading = true;
-
+  async _load(reset) {
+    const seq = ++this._seq;
     const grid = document.getElementById('explore-grid');
-    const results = document.getElementById('explore-results');
-    const loadMoreWrap = document.getElementById('explore-loadmore');
-
+    const more = document.getElementById('explore-loadmore');
+    const count = document.getElementById('explore-results');
+    if (!grid) return;
     if (reset) {
-      this._currentPage = 1;
-      this._hasMore = true;
-      if (grid) {
-        grid.setAttribute('aria-busy', 'true');
-        grid.innerHTML = this._skeletonCards(6);
-      }
+      this._page = 1;
+      grid.setAttribute('aria-busy', 'true');
+      grid.innerHTML = UI.skeletonCards(8);
+      more.innerHTML = '';
     } else {
-      if (loadMoreWrap) {
-        loadMoreWrap.innerHTML = '<div class="explore-load-more__spinner" aria-label="加载中"></div>';
-      }
+      more.innerHTML = `<button class="btn btn--ghost" type="button" id="btn-loadmore" aria-busy="true" disabled>${UI.esc(t('common.loading'))}</button>`;
     }
 
-    const filter = {
-      ...this._currentFilter,
-      page: this._currentPage,
-      limit: 12,
-    };
-
     try {
-      const res = await API.getJourneys(filter);
+      const res = await API.getJourneys({ ...this._params(), page: this._page, limit: this.PAGE_SIZE });
+      if (seq !== this._seq || !grid.isConnected) return; // a newer request owns the grid
       const journeys = res.data || [];
-      const total = res.total || journeys.length;
-
+      this._total = res.total || 0;
       if (reset) {
-        if (journeys.length === 0) {
-          grid.innerHTML = `
-            <div class="explore-empty" style="grid-column: 1 / -1;">
-              <p class="explore-empty__title">暂无结果</p>
-              <p class="explore-empty__hint">尝试调整筛选条件或搜索关键词，发现更多不可思议的旅行。</p>
-            </div>
-          `;
-        } else {
-          grid.innerHTML = journeys.map(j => this._renderCard(j)).join('');
-        }
+        this._loaded = journeys.length;
+        grid.innerHTML = journeys.length
+          ? journeys.map((j, i) => UI.journeyCard(j, { eager: i < 4 })).join('')
+          : this._emptyState();
       } else {
-        const html = journeys.map(j => this._renderCard(j)).join('');
-        grid.insertAdjacentHTML('beforeend', html);
+        this._loaded += journeys.length;
+        grid.insertAdjacentHTML('beforeend', journeys.map((j) => UI.journeyCard(j)).join(''));
       }
-
-      grid.setAttribute('aria-busy', 'false');
-
-      // Bind card clicks
-      grid.querySelectorAll('.journey-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const slug = card.dataset.slug;
-          if (slug) {
-            this._trackEvent('journey_click', slug);
-            Router.navigate(`/journey/${encodeURIComponent(slug)}`);
-          }
-        });
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            const slug = card.dataset.slug;
-            if (slug) {
-              this._trackEvent('journey_click', slug);
-              Router.navigate(`/journey/${encodeURIComponent(slug)}`);
-            }
-          }
-        });
-      });
-
-      // Results text
-      if (results) {
-        results.textContent = reset && journeys.length === 0 ? '' : `共 ${total} 个结果`;
+      count.textContent = this._total ? t('explore.count', { n: I18n.num(this._total) }) : '';
+      if (this._loaded < this._total) {
+        more.innerHTML = `<button class="btn btn--ghost" type="button" id="btn-loadmore">${UI.esc(t('explore.loadMore'))}</button>`;
+      } else {
+        more.innerHTML = this._total > this.PAGE_SIZE ? `<p class="explore-more__end">${UI.esc(t('explore.end'))}</p>` : '';
       }
-
-      const loadedCount = reset ? journeys.length : grid.querySelectorAll('.journey-card').length;
-      this._hasMore = loadedCount < total;
-      if (loadMoreWrap) {
-        if (!this._hasMore && journeys.length > 0) {
-          loadMoreWrap.innerHTML = '<p class="explore-end">已到底部</p>';
-        } else if (!this._hasMore) {
-          loadMoreWrap.innerHTML = '';
-        } else {
-          loadMoreWrap.innerHTML = `
-            <button class="explore-load-more__btn" type="button" id="btn-loadmore">加载更多</button>
-          `;
-          const btn = loadMoreWrap.querySelector('#btn-loadmore');
-          if (btn) {
-            btn.addEventListener('click', () => {
-              if (!this._isLoading && this._hasMore) {
-                this._currentPage++;
-                this._loadJourneys(false);
-              }
-            });
-          }
-        }
-      }
+      const done = document.getElementById('explore-panel-done');
+      if (done) done.textContent = t('explore.showN', { n: this._total });
     } catch (err) {
-      console.error('Explore load failed:', err);
-      if (grid) {
-        grid.setAttribute('aria-busy', 'false');
-        if (reset) {
-          grid.innerHTML = `
-            <div class="explore-empty" style="grid-column: 1 / -1;">
-              <p class="explore-empty__title">加载失败</p>
-              <p class="explore-empty__hint">${this._escapeHtml(err.message || '请检查网络连接后重试')}</p>
-            </div>
-          `;
-        }
+      if (seq !== this._seq || !grid.isConnected) return;
+      if (reset) {
+        count.textContent = '';
+        grid.innerHTML = `<div class="state" role="alert">
+          <p class="state__title">${UI.esc(t('explore.error.title'))}</p>
+          <p class="state__text">${UI.esc(I18n.error(err))}</p>
+          <div class="state__actions"><button class="btn btn--ghost" type="button" data-action="retry">${UI.icon('refresh')}${UI.esc(t('common.retry'))}</button></div>
+        </div>`;
+      } else {
+        this._page--;
+        more.innerHTML = `<button class="btn btn--ghost" type="button" id="btn-loadmore">${UI.esc(t('common.retry'))}</button>`;
       }
-      if (loadMoreWrap) loadMoreWrap.innerHTML = '';
     } finally {
-      this._isLoading = false;
+      if (seq === this._seq && grid.isConnected) grid.setAttribute('aria-busy', 'false');
     }
   },
 
-  _renderCard(j) {
-    const imageUrl = this._imageMap[j.slug] || j.image_url || '/static/assets/images/placeholder.jpg';
-
-    const aspectStyle = j.aspect_ratio
-      ? `padding-bottom: ${(1 / j.aspect_ratio * 100).toFixed(2)}%;`
-      : 'padding-bottom: 133.33%;';
-
-    const adventureLevel = j.adventure_level ?? j.risk_level ?? 0;
-    const filled = Math.max(0, Math.min(5, Math.round(adventureLevel / 2)));
-    const dots = Array.from({ length: 5 }, (_, i) =>
-      `<span class="journey-card__adventure-dot ${i < filled ? 'journey-card__adventure-dot--filled' : ''}"></span>`
-    ).join('');
-
-    const mbtiCode = (j.mbti_types || [])[0]?.mbti_type?.code || '';
-
-    return `
-      <article class="journey-card" data-slug="${this._escapeHtml(j.slug)}" role="link" tabindex="0">
-        <div class="journey-card__image-wrap" style="position:relative;${aspectStyle}">
-          <img class="journey-card__image"
-               src="${this._escapeHtml(imageUrl)}"
-               alt="${this._escapeHtml(j.title)}"
-               loading="lazy"
-               decoding="async"
-               width="900"
-               height="1200"
-               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
-               onerror="this.src='/static/assets/images/placeholder.jpg'">
-        </div>
-        <div class="journey-card__body">
-          <div class="journey-card__meta">
-            <span class="journey-card__tag">${this._escapeHtml(j.tag_name || j.tag || '旅行')}</span>
-            ${mbtiCode ? `<span class="journey-card__mbti">${this._escapeHtml(mbtiCode)}</span>` : ''}
-          </div>
-          <h3 class="journey-card__title">${this._escapeHtml(j.title)}</h3>
-          ${j.hook || j.story_hook ? `<p class="journey-card__hook">${this._escapeHtml(j.hook || j.story_hook)}</p>` : ''}
-          <div class="journey-card__footer">
-            <div class="journey-card__adventure" aria-label="冒险等级 ${adventureLevel}">
-              ${dots}
-            </div>
-            <span class="journey-card__action">探索→</span>
-          </div>
-        </div>
-      </article>
-    `;
-  },
-
-  /* ================================================================
-     Hash sync
-     ================================================================ */
-  _parseHashFilters() {
-    const hash = window.location.hash.slice(1);
-    const params = new URLSearchParams(hash.split('?')[1] || '');
-
-    const keys = ['tag', 'visual_style', 'fantasy_type', 'mbti', 'q'];
-    keys.forEach(k => {
-      const v = params.get(k);
-      if (v) this._currentFilter[k] = v;
-    });
-
-    const advMin = params.get('adventure_min');
-    const advMax = params.get('adventure_max');
-    if (advMin !== null) this._currentFilter.adventure_min = parseInt(advMin, 10);
-    if (advMax !== null) this._currentFilter.adventure_max = parseInt(advMax, 10);
-
-    const page = params.get('page');
-    if (page) this._currentPage = parseInt(page, 10);
-  },
-
-  _updateHash() {
-    const f = this._currentFilter;
-    const params = new URLSearchParams();
-    if (f.tag) params.set('tag', f.tag);
-    if (f.visual_style) params.set('visual_style', f.visual_style);
-    if (f.fantasy_type) params.set('fantasy_type', f.fantasy_type);
-    if (f.mbti) params.set('mbti', f.mbti);
-    if (f.q) params.set('q', f.q);
-    if (f.adventure_min !== undefined && f.adventure_min !== 0) params.set('adventure_min', String(f.adventure_min));
-    if (f.adventure_max !== undefined && f.adventure_max !== 10) params.set('adventure_max', String(f.adventure_max));
-    if (this._currentPage !== 1) params.set('page', String(this._currentPage));
-
-    const qs = params.toString();
-    const newHash = '#/explore' + (qs ? '?' + qs : '');
-    if (window.location.hash !== newHash) {
-      window.location.hash = newHash;
-    }
-  },
-
-  _escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  },
-
-  _trackEvent(type, slug) {
-    try {
-      const payload = JSON.stringify({ type, journey_slug: slug || '' });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(`${window.APP_CONFIG.apiBase}/analytics/events`, new Blob([payload], { type: 'application/json' }));
-        return;
-      }
-      fetch(`${window.APP_CONFIG.apiBase}/analytics/events`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true,
-      }).catch(() => {});
-    } catch {}
+  _emptyState() {
+    const hasFilters = Object.keys(this._filter).length > 0;
+    return `<div class="state explore-empty">
+      <p class="state__title">${UI.esc(t('explore.empty.title'))}</p>
+      <p class="state__text">${UI.esc(t('explore.empty.text'))}</p>
+      ${hasFilters ? `<div class="state__actions"><button class="btn btn--primary" type="button" data-action="clear">${UI.esc(t('explore.clearAll'))}</button></div>` : ''}
+    </div>`;
   },
 };

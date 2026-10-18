@@ -1,0 +1,58 @@
+const { test, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+const { freshPage } = require('./helpers');
+
+// Pages scanned in both themes. Hero imagery is excluded only from contrast checks over photos.
+const PAGES = [
+  ['home', '/#/', '.home-hero__title'],
+  ['explore', '/#/explore', '.journey-card[data-slug]'],
+  ['detail', '/#/journey/bolivia-salt-flat-trek', '.detail-hero__title'],
+  ['login', '/#/login', '#login-form'],
+  ['register', '/#/register', '#register-form'],
+  ['about', '/#/about', '.about-head'],
+  ['404', '/#/nowhere', '.error-code'],
+];
+
+for (const theme of ['dark', 'light']) {
+  test.describe(`Accessibility (${theme})`, () => {
+    for (const [name, url, ready] of PAGES) {
+      test(`${name} has no WCAG A/AA violations`, async ({ page }) => {
+        await freshPage(page);
+        await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+        await page.goto(url);
+        await expect(page.locator(ready).first()).toBeVisible();
+        await page.waitForLoadState('networkidle');
+        const results = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .exclude('.home-hero__particles')
+          .analyze();
+        const summary = results.violations.map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`);
+        expect(summary, summary.join('\n')).toEqual([]);
+      });
+    }
+  });
+}
+
+test.describe('Theme', () => {
+  test('theme toggle switches and persists', async ({ page }) => {
+    await freshPage(page);
+    await page.addInitScript(() => { if (!localStorage.getItem('theme')) localStorage.setItem('theme', 'dark'); });
+    await page.goto('/#/explore');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.locator('#nav-theme').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).toBe('rgb(243, 243, 241)');
+  });
+
+  test('keyboard users can skip to content', async ({ page }) => {
+    await freshPage(page);
+    await page.goto('/#/explore');
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#skip-link')).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#main-content')).toBeFocused();
+  });
+});

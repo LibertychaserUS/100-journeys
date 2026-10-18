@@ -1,99 +1,57 @@
+/**
+ * Admin login — same auth layout; only admin accounts get through to the dashboard.
+ */
 var Pages = window.Pages || {};
 
 Pages.AdminLogin = {
   render() {
+    const esc = UI.esc;
     const main = document.getElementById('main-content');
-    if (!main) return;
-
-    main.innerHTML = `
-      <section class="auth-page auth-page--admin">
-        <div class="auth-card auth-card--admin">
-          <p class="auth-kicker">restricted access</p>
-          <h1 class="auth-title">后台入口</h1>
-          <p class="auth-subtitle">仅限已授权管理员。普通用户请返回首页。</p>
-
-          <form class="auth-form" id="admin-login-form">
-            <div class="auth-field">
-              <label for="admin-login-email">邮箱</label>
-              <input type="email" id="admin-login-email" required autocomplete="username" placeholder="admin@example.com" />
-            </div>
-            <div class="auth-field">
-              <label for="admin-login-password">密码</label>
-              <input type="password" id="admin-login-password" required autocomplete="current-password" placeholder="后台密码" minlength="8" />
-            </div>
-            <div class="auth-field captcha-field">
-              <label for="admin-login-captcha">验证码</label>
-              <div class="captcha-row">
-                <input type="text" id="admin-login-captcha" required placeholder="输入答案" />
-                <span class="captcha-question" id="admin-login-captcha-q">加载中...</span>
-                <button type="button" class="captcha-refresh" id="admin-login-captcha-refresh" title="换一题">↻</button>
-              </div>
-              <input type="hidden" id="admin-login-captcha-id" />
-            </div>
-            <button type="submit" class="auth-submit">进入后台</button>
-          </form>
-
-          <p class="auth-switch auth-switch--muted">
-            没有后台权限？<a href="#/">返回首页</a>
-          </p>
-
-          <p class="auth-error" id="admin-login-error"></p>
+    main.innerHTML = AuthForm.layout(`
+      <form class="auth-form" id="admin-login-form" novalidate>
+        <div>
+          <p class="auth-kicker">${esc(t('adminLogin.kicker'))}</p>
+          <h1 class="auth-title">${esc(t('adminLogin.title'))}</h1>
+          <p class="auth-sub">${esc(t('adminLogin.sub'))}</p>
         </div>
-      </section>
-    `;
+        <div class="alert" id="admin-login-error-box" role="alert" tabindex="-1" hidden>${UI.icon('alert')}<span id="admin-login-error"></span></div>
+        ${AuthForm.field({ id: 'admin-login-email', label: t('login.email'), type: 'email', placeholder: 'admin@example.com', autocomplete: 'username', attrs: 'required' })}
+        ${AuthForm.field({ id: 'admin-login-password', label: t('login.password'), type: 'password', placeholder: t('login.passwordPh'), autocomplete: 'current-password', attrs: 'required', trailing: AuthForm.passwordToggle('admin-login-password') })}
+        ${AuthForm.captcha('admin-login')}
+        <button type="submit" class="btn btn--primary btn--lg btn--block auth-submit">${esc(t('adminLogin.submit'))}</button>
+        <p class="auth-switch"><a class="link" href="#/">${esc(t('adminLogin.back'))}</a></p>
+      </form>`, { admin: true });
 
-    const form = document.getElementById('admin-login-form');
-    const errorEl = document.getElementById('admin-login-error');
-    const captchaIdEl = document.getElementById('admin-login-captcha-id');
-    const captchaQEl = document.getElementById('admin-login-captcha-q');
-    const captchaRefreshBtn = document.getElementById('admin-login-captcha-refresh');
-
-    async function loadCaptcha() {
-      try {
-        const res = await API.getCaptcha();
-        const data = res.data || res;
-        captchaIdEl.value = data.id;
-        captchaQEl.textContent = data.question;
-        document.getElementById('admin-login-captcha').value = '';
-      } catch {
-        captchaQEl.textContent = '加载失败';
-      }
-    }
-
-    captchaRefreshBtn.addEventListener('click', loadCaptcha);
-    loadCaptcha();
-
+    const form = main.querySelector('#admin-login-form');
+    const reloadCaptcha = AuthForm.bindCommon(form, 'admin-login');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errorEl.textContent = '';
+      const email = form.querySelector('#admin-login-email').value.trim();
+      const password = form.querySelector('#admin-login-password').value;
+      const answer = form.querySelector('#admin-login-captcha').value.trim();
+      AuthForm.setFormError(form, 'admin-login-error-box', '');
+      AuthForm.setFieldError(form, 'admin-login-email', email ? '' : t('err.required'));
+      AuthForm.setFieldError(form, 'admin-login-password', password ? '' : t('err.required'));
+      AuthForm.setFieldError(form, 'admin-login-captcha', answer ? '' : t('err.required'));
+      if (!email || !password || !answer) return;
 
-      const email = document.getElementById('admin-login-email').value.trim();
-      const password = document.getElementById('admin-login-password').value;
-      const captchaId = captchaIdEl.value;
-      const captchaAnswer = document.getElementById('admin-login-captcha').value.trim();
-
+      const submit = form.querySelector('.auth-submit');
+      AuthForm.busy(submit, true, t('login.submitting'));
       try {
-        const res = await API.login({ email, password, captcha_id: captchaId, captcha_answer: captchaAnswer });
-        const data = res.data || res;
-        if (!data.token) throw new Error('登录失败');
-        API.setToken(data.token, false);
-
-        const meRes = await API.me();
-        const user = meRes.data || meRes;
-        if (user.role !== 'admin') {
-          API.clearToken();
-          if (window.App && window.App.updateNav) window.App.updateNav();
-          errorEl.textContent = '该账号没有后台权限';
-          loadCaptcha();
+        const res = await API.login({ email, password, captcha_id: form.querySelector('#admin-login-captcha-id').value, captcha_answer: answer });
+        if (!res.data.user || res.data.user.role !== 'admin') {
+          AuthForm.busy(submit, false, t('adminLogin.submit'));
+          AuthForm.setFormError(form, 'admin-login-error-box', t('adminLogin.notAdmin'));
+          reloadCaptcha();
           return;
         }
-
-        if (window.App && window.App.updateNav) window.App.updateNav();
-        Router.navigate('#/admin');
+        API.setToken(res.data.token, false);
+        await Session.refresh();
+        Router.navigate('/admin');
       } catch (err) {
-        API.clearToken();
-        errorEl.textContent = err.message || '后台登录失败';
-        loadCaptcha();
+        AuthForm.busy(submit, false, t('adminLogin.submit'));
+        AuthForm.setFormError(form, 'admin-login-error-box', I18n.error(err));
+        reloadCaptcha();
       }
     });
   },

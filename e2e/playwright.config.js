@@ -13,19 +13,26 @@ module.exports = defineConfig({
   reporter: 'list',
   use: {
     baseURL: remoteBaseURL || 'http://localhost:8090',
+    locale: 'zh-CN', // default UI language; i18n.spec.js covers English
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /mobile\.spec\.js/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      name: 'mobile',
+      testMatch: /mobile\.spec\.js/,
+      use: { ...devices['Pixel 7'] },
     },
   ],
   webServer: remoteBaseURL ? undefined : {
     command: 'cd .. && PORT=8090 go run cmd/server/main.go',
     url: 'http://localhost:8090',
     reuseExistingServer: !process.env.CI,
-    timeout: 30000,
+    timeout: 60000,
   },
 });
