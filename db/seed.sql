@@ -51,7 +51,7 @@ VALUES
   8,
   3,
   '["孤独","无限感","镜面世界","极简主义"]',
-  'bolivia-salt-flat.jpg',
+  'generated/card-salt-mirror.jpg',
   NULL,
   15999
 ),
@@ -68,7 +68,7 @@ VALUES
   9,
   4,
   '["黑暗","回声","原始","恐惧","自由"]',
-  'iceland-lava-tunnel.jpg',
+  'generated/card-lava-tunnel.jpg',
   NULL,
   19999
 ),
@@ -85,7 +85,7 @@ VALUES
   7,
   2,
   '["冥想","沉默","蒸汽","冷却","纯净"]',
-  'japan-temple-onsen.jpg',
+  'generated/card-temple-onsen.jpg',
   NULL,
   8999
 ),
@@ -102,7 +102,7 @@ VALUES
   6,
   3,
   '["星空","辽阔","游牧","银河","夜晚"]',
-  'morocco-sahara-camp.jpg',
+  'generated/card-sahara-stars.jpg',
   NULL,
   12999
 ),
@@ -119,7 +119,7 @@ VALUES
   10,
   5,
   '["极寒","孤独","犬队","生存","北极"]',
-  'greenland-dog-sled.jpg',
+  'generated/card-greenland-sled.jpg',
   NULL,
   29999
 ),
@@ -136,7 +136,7 @@ VALUES
   5,
   3,
   '["极光","寒冷","等待","爆发","夜空"]',
-  'norway-aurora.jpg',
+  'norway-aurora-2.jpg',
   NULL,
   18999
 ),
@@ -388,3 +388,115 @@ WHERE j.slug = 'maldives-underwater-dining' AND m.code IN ('ESFJ','ENFJ');
 INSERT OR IGNORE INTO journey_mbti (journey_id, mbti_id, compatibility_score)
 SELECT j.id, m.id, 4 FROM journeys j, mbti_types m
 WHERE j.slug = 'maldives-underwater-dining' AND m.code = 'ISFJ';
+
+-- =============================================================
+-- Journey covers (v1.5.0): one portrait cover per journey, shared by
+-- cards and detail pages. Idempotent, so existing databases pick it up.
+-- =============================================================
+UPDATE journeys SET image_path = 'generated/card-salt-mirror.jpg' WHERE slug = 'bolivia-salt-flat-trek' AND image_path IS NOT 'generated/card-salt-mirror.jpg';
+UPDATE journeys SET image_path = 'generated/card-lava-tunnel.jpg' WHERE slug = 'iceland-lava-tunnel-cycling' AND image_path IS NOT 'generated/card-lava-tunnel.jpg';
+UPDATE journeys SET image_path = 'generated/card-temple-onsen.jpg' WHERE slug = 'japan-onsen-temple-meditation' AND image_path IS NOT 'generated/card-temple-onsen.jpg';
+UPDATE journeys SET image_path = 'generated/card-sahara-stars.jpg' WHERE slug = 'morocco-sahara-camel-camp' AND image_path IS NOT 'generated/card-sahara-stars.jpg';
+UPDATE journeys SET image_path = 'generated/card-greenland-sled.jpg' WHERE slug = 'greenland-dog-sled-solo' AND image_path IS NOT 'generated/card-greenland-sled.jpg';
+UPDATE journeys SET image_path = 'norway-aurora-2.jpg' WHERE slug = 'norway-aurora-hunt' AND image_path IS NOT 'norway-aurora-2.jpg';
+
+-- =============================================================
+-- English content (v1.5.0). Upserted on every start so copy edits
+-- here reach existing databases.
+-- =============================================================
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Walking the Mirror of Uyuni', 'At the edge of the world, you step through the sky', 'You step on the sky, and the world loses its edges',
+  'When the rainy season lays a thin sheet of water over the Salar de Uyuni, the world loses its edges. You walk through half a centimetre of water with sky beneath your feet and sky above your head. No horizon, no sense of direction, only white silence stretching out forever. This is less a trip than a philosophical experiment in solitude and the infinite.',
+  'South America · Bolivia', '["Solitude", "Infinity", "Mirror world", "Minimalism"]'
+FROM journeys WHERE slug = 'bolivia-salt-flat-trek'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Cycling an Icelandic Lava Tube', 'There is a road inside the earth, and only you know it', 'There is a road inside the earth that only you know about',
+  'Deep in the Snæfellsnes peninsula, a lava tube formed three thousand years ago winds on for kilometres. No tourists, no signs, just basalt walls in the beam of your headlamp and a permanent darkness ahead. Every pedal stroke echoes and layers through the cave, as if the planet itself were whispering to you.',
+  'Europe · Iceland', '["Darkness", "Echoes", "Primal", "Fear", "Freedom"]'
+FROM journeys WHERE slug = 'iceland-lava-tunnel-cycling'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Temple Onsen Meditation in Hidden Japan', '3 a.m.: only steam and silence', 'Three in the morning, nothing but steam and silence',
+  'A small temple in the Wakayama mountains takes in lay guests. You rise with the monks at 3 a.m., hike to the summit in the dark and watch the first light break through a sea of clouds. Then come two hours of silent meditation and a soak in the natural hot spring behind the temple, where the water and your thoughts cool down together.',
+  'Asia · Japan', '["Meditation", "Silence", "Steam", "Cooling down", "Purity"]'
+FROM journeys WHERE slug = 'japan-onsen-temple-meditation'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'A Night with Camels in the Sahara', 'A sky without light pollution, vast enough to scare you', 'A sky with no light pollution, frighteningly vast',
+  'The dunes of Merzouga have no closing time. Three hours by camel into the heart of the desert, you pitch a tent somewhere without a single artificial light. When the Milky Way spreads from one edge of the horizon to the other, you suddenly understand why ancient nomads believed the gods lived in the sky: it feels more like home than anywhere on the ground.',
+  'Africa · Morocco', '["Starry sky", "Vastness", "Nomad", "Milky Way", "Night"]'
+FROM journeys WHERE slug = 'morocco-sahara-camel-camp'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Solo Dog-Sledding in Greenland', 'Minus thirty, and the whole world is you and twelve dogs', 'Minus thirty degrees: just you and twelve dogs',
+  'On the Ilulissat Icefjord, dog sledding isn''t a show; it''s the only way to get around. The guide hands you the reins and goes back for coffee. Out on the white ice sheet you have to learn to steer the team with your eyes and your voice, because getting lost here has real consequences. Fear and freedom arrive in the same moment.',
+  'Arctic · Greenland', '["Deep cold", "Solitude", "Sled dogs", "Survival", "Arctic"]'
+FROM journeys WHERE slug = 'greenland-dog-sled-solo'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Chasing the Aurora in Tromsø', 'Waiting for light from the sun in a minus-twenty night', 'In a minus-twenty night, you wait for a beam of light from the sun',
+  'Winter in Tromsø has no daytime, only a long blue hour and the night. You lie in the snow in three down jackets, neck craned at ninety degrees, waiting for the green curtain to rise from the horizon. When the aurora finally erupts, the whole sky dances, and you forget the cold, the time, even who you are.',
+  'Europe · Norway', '["Aurora", "Cold", "Waiting", "Eruption", "Night sky"]'
+FROM journeys WHERE slug = 'norway-aurora-hunt'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Kayaking Milford Sound', 'Under a two-kilometre waterfall, you are as small as a drop', 'Beneath a two-thousand-metre waterfall, you are as small as a drop of water',
+  'The cliffs of Milford Sound rise two thousand metres straight out of the water, hung with temporary waterfalls. One moment it is sunny; the next, a downpour sends hundreds of silver threads plunging into the sea at once. You paddle your kayak toward one of them, spray on your face, unable to tell rain from seawater from waterfall.',
+  'Oceania · New Zealand', '["Waterfalls", "Kayak", "Spray", "Smallness", "Downpour"]'
+FROM journeys WHERE slug = 'new-zealand-milford-kayak'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Trekking Torres del Paine', 'Wind tears the clouds apart and reveals granite spires', 'The wind shreds the clouds and reveals the granite spires',
+  'In Torres del Paine the weather changes faster than your heartbeat. One second it''s a gale and driving rain, the next the sun turns the three towers gold. You haul a forty-litre pack up loose scree, negotiating with gravity at every step. But the moment you finish the W Trek, you understand why people fly thirty hours to suffer like this.',
+  'South America · Chile', '["Gales", "Trekking", "Granite", "Three Towers", "Challenge"]'
+FROM journeys WHERE slug = 'patagonia-torres-del-paine-trek'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Sunrise by Balloon over Cappadocia', 'A hundred balloons rise at once, and you drift over the moon', 'A hundred balloons lift off together and you float above the surface of the moon',
+  'At 4:30 a.m. the valleys of Cappadocia are still steeped in blue. Burners roar in bursts as huge coloured envelopes break free of gravity one after another. When the sun leaps over the horizon and turns the valley rose gold, you look down at the fairy chimneys and cave churches. This is as close as people get to the dream of flight.',
+  'Asia · Turkey', '["Hot-air balloons", "Sunrise", "Moonscape", "Rose gold", "Flight"]'
+FROM journeys WHERE slug = 'turkey-cappadocia-balloon'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'The Inca Trail to Machu Picchu', 'Four days on stone steps laid five hundred years ago', 'Four days and three nights on steps laid five centuries ago',
+  'The Inca Trail isn''t a sightseeing route; it''s time travel. You climb stone steps cut by Inca masons five hundred years ago, pass through cloud forest and cross Dead Woman''s Pass at 4,200 metres. Before dawn on the fourth day the fog suddenly lifts and Machu Picchu appears in front of you. In that moment every aching muscle feels worth it.',
+  'South America · Peru', '["Ancient trail", "Inca", "Stone steps", "Cloud forest", "Time"]'
+FROM journeys WHERE slug = 'peru-machu-picchu-inca-trail'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Camping Under the Stars at Deadvlei', '900-year-old trees stand on red dunes like totems', 'Nine-hundred-year-old trees stand on red dunes like totems raised by the earth',
+  'Deadvlei isn''t really dead; it just stopped raining. Camel thorn trees that died nine centuries ago still stand on the cracked white clay pan, backed by some of the tallest red dunes in the world. Camp nearby on a moonless night and the Milky Way pours down from the dune crests, turning the silhouettes of the dead trees into the scene of an ancient ritual.',
+  'Africa · Namibia', '["Dead trees", "Red dunes", "Milky Way", "Clay pan", "Ancient"]'
+FROM journeys WHERE slug = 'namibia-deadvlei-stars'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;
+INSERT INTO journey_translations (journey_id, locale, title, subtitle, story_hook, story, region, mood_keywords)
+SELECT id, 'en', 'Dinner Beneath the Sea in the Maldives', 'Champagne with sharks, five metres down', 'Five metres under the sea, champagne with the sharks',
+  'Ithaa, the undersea restaurant at the Conrad Maldives, is a fully transparent acrylic dome. You sit five metres below the surface with white sand and coral at your feet while manta rays and reef sharks glide overhead. Just as the waiter pours the champagne, a nurse shark slides past the glass. It may be the most romantic dinner on Earth.',
+  'Asia · Maldives', '["Undersea", "Sharks", "Champagne", "Glass dome", "Romance"]'
+FROM journeys WHERE slug = 'maldives-underwater-dining'
+ON CONFLICT(journey_id, locale) DO UPDATE SET
+  title = excluded.title, subtitle = excluded.subtitle, story_hook = excluded.story_hook,
+  story = excluded.story, region = excluded.region, mood_keywords = excluded.mood_keywords;

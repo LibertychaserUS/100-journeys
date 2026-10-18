@@ -217,8 +217,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Award login points (once per day logic can be added later)
-	_ = h.userRepo.AddPoints(c.Request.Context(), user.ID, 10, "login", "每日登录奖励")
+	// Daily login reward: only the first login of the (UTC) day earns points.
+	_, _ = h.userRepo.AddPointsOncePerDay(c.Request.Context(), user.ID, 10, "login", "每日登录奖励")
 
 	token, err := middleware.GenerateToken(user)
 	if err != nil {
@@ -252,12 +252,6 @@ func (h *AuthHandler) Me(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, newDataEnvelope(user))
-}
-
-// POST /api/auth/save/:slug
-func (h *AuthHandler) SaveJourney(c *gin.Context) {
-	// TODO: resolve slug to journey_id via journey repo, then call userRepo.SaveJourney
-	c.JSON(http.StatusNotImplemented, newErrorEnvelope("save journey: resolve slug to id first"))
 }
 
 const maxAvatarBytes int64 = 512 * 1024

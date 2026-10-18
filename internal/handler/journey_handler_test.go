@@ -342,3 +342,121 @@ func TestHandler_AIChat_Invalid(t *testing.T) {
 		t.Fatalf("expected 400, got %d", w.Code)
 	}
 }
+
+func getLocalizedJSON(t *testing.T, r *gin.Engine, path string) map[string]interface{} {
+	t.Helper()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", path, nil)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("GET %s: expected 200, got %d (%s)", path, w.Code, w.Body.String())
+	}
+	var resp map[string]interface{}
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	return resp
+}
+
+// IT-API-I18N-001: lang=en returns English content for every seeded journey.
+func TestHandler_ListJourneys_English(t *testing.T) {
+	r := setupTestRouter(t)
+	resp := getLocalizedJSON(t, r, "/api/journeys?lang=en&limit=50")
+	items := resp["data"].([]interface{})
+	if len(items) < 12 {
+		t.Fatalf("expected all seeded journeys, got %d", len(items))
+	}
+	for _, it := range items {
+		j := it.(map[string]interface{})
+		title := j["title"].(string)
+		for _, r := range title {
+			if r >= 0x4e00 && r <= 0x9fff {
+				t.Errorf("journey %s still has a Chinese title in English mode: %s", j["slug"], title)
+				break
+			}
+		}
+		if j["locale"] != "en" {
+			t.Errorf("journey %s: expected locale en, got %v", j["slug"], j["locale"])
+		}
+		if len(j["mood_keywords"].([]interface{})) == 0 {
+			t.Errorf("journey %s: expected English mood keywords", j["slug"])
+		}
+	}
+}
+
+// IT-API-I18N-002: default (no lang) keeps the Chinese base content.
+func TestHandler_GetJourney_DefaultChinese(t *testing.T) {
+	r := setupTestRouter(t)
+	resp := getLocalizedJSON(t, r, "/api/journeys/bolivia-salt-flat-trek")
+	j := resp["data"].(map[string]interface{})
+	if j["title"] != "徒步穿越玻利维亚盐沼" {
+		t.Errorf("expected Chinese title, got %v", j["title"])
+	}
+	if j["locale"] != "zh" {
+		t.Errorf("expected locale zh, got %v", j["locale"])
+	}
+}
+
+// IT-API-I18N-003: detail endpoint localizes story and region.
+func TestHandler_GetJourney_English(t *testing.T) {
+	r := setupTestRouter(t)
+	resp := getLocalizedJSON(t, r, "/api/journeys/bolivia-salt-flat-trek?lang=en-US")
+	j := resp["data"].(map[string]interface{})
+	if j["title"] != "Walking the Mirror of Uyuni" {
+		t.Errorf("unexpected English title: %v", j["title"])
+	}
+	if j["region"] != "South America · Bolivia" {
+		t.Errorf("unexpected English region: %v", j["region"])
+	}
+	if story, _ := j["story"].(string); story == "" {
+		t.Error("expected an English story")
+	}
+}
+
+// IT-API-I18N-004: searching in English matches English content.
+func TestHandler_SearchJourneys_English(t *testing.T) {
+	r := setupTestRouter(t)
+	resp := getLocalizedJSON(t, r, "/api/journeys?lang=en&q=aurora")
+	items := resp["data"].([]interface{})
+	if len(items) != 1 || items[0].(map[string]interface{})["slug"] != "norway-aurora-hunt" {
+		t.Fatalf("expected the aurora journey, got %v", items)
+	}
+	// Chinese search still works while browsing in English.
+	resp = getLocalizedJSON(t, r, "/api/journeys?lang=en&q=极光")
+	if len(resp["data"].([]interface{})) != 1 {
+		t.Fatalf("expected Chinese query to match in English mode, got %v", resp["data"])
+	}
+}
+
+// IT-API-MEDIA-001: every journey resolves to its own cover image.
+func TestHandler_ListJourneys_UniqueCovers(t *testing.T) {
+	r := setupTestRouter(t)
+	resp := getLocalizedJSON(t, r, "/api/journeys?limit=50")
+	seen := map[string]string{}
+	for _, it := range resp["data"].([]interface{}) {
+		j := it.(map[string]interface{})
+		url := j["image_url"].(string)
+		if url == "" {
+			t.Errorf("journey %s has no cover", j["slug"])
+		}
+		if other, ok := seen[url]; ok {
+			t.Errorf("journeys %s and %s share cover %s", other, j["slug"], url)
+		}
+		seen[url] = j["slug"].(string)
+	}
+}
+
+// IT-API-MBTI-ORDER-001: MBTI matches are ordered best match first.
+func TestHandler_GetJourney_MBTIOrderedByScore(t *testing.T) {
+	r := setupTestRouter(t)
+	resp := getLocalizedJSON(t, r, "/api/journeys/bolivia-salt-flat-trek")
+	mbti := resp["data"].(map[string]interface{})["mbti_types"].([]interface{})
+	last := 6.0
+	for _, m := range mbti {
+		score := m.(map[string]interface{})["compatibility_score"].(float64)
+		if score > last {
+			t.Fatalf("mbti matches not sorted by score: %v", mbti)
+		}
+		last = score
+	}
+}

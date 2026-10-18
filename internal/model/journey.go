@@ -20,6 +20,7 @@ type Journey struct {
 	ImageURL       string        `json:"image_url"` // resolved by service layer (local or CDN)
 	BookingURL     *string       `json:"booking_url,omitempty"`
 	Price          int           `json:"price"`
+	Locale         string        `json:"locale"` // content language actually returned: "zh" (base) or a translation
 	Tags           []Tag         `json:"tags,omitempty"`
 	MBTITypes      []JourneyMBTI `json:"mbti_types,omitempty"`
 	CreatedAt      time.Time     `json:"created_at"`
@@ -47,14 +48,28 @@ type JourneyMBTI struct {
 
 // JourneyFilter holds query parameters for list endpoint
 type JourneyFilter struct {
-	Query        string `form:"q"`
-	TagSlug      string `form:"tag"`
-	VisualStyle  string `form:"visual_style"`
-	FantasyType  string `form:"fantasy_type"`
-	AdventureMin int    `form:"adventure_min"`
-	AdventureMax int    `form:"adventure_max"`
-	ObscurityMin int    `form:"obscurity_min"`
-	MBTIType     string `form:"mbti"`
-	Page         int    `form:"page"`
-	Limit        int    `form:"limit"`
+	Query        string  `form:"q"`
+	TagSlug      string  `form:"tag"`
+	VisualStyle  string  `form:"visual_style"`
+	FantasyType  string  `form:"fantasy_type"`
+	AdventureMin int     `form:"adventure_min"`
+	AdventureMax int     `form:"adventure_max"`
+	ObscurityMin int     `form:"obscurity_min"`
+	MBTIType     string  `form:"mbti"`
+	Locale       string  `form:"lang"` // requested content language; normalized by the service layer
+	Page         int     `form:"page"`
+	Limit        int     `form:"limit"`
+	IDs          []int64 `form:"-"` // internal: restrict to these journey IDs (e.g. a user's saved list)
+}
+
+// JourneyTranslation is localized copy for one journey; empty fields fall back to the base language.
+type JourneyTranslation struct {
+	JourneyID    int64
+	Locale       string
+	Title        string
+	Subtitle     string
+	StoryHook    string
+	Story        string
+	Region       string
+	MoodKeywords []string
 }

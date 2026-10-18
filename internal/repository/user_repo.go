@@ -14,6 +14,9 @@ type UserRepository interface {
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByID(ctx context.Context, id int64) (*model.User, error)
 	AddPoints(ctx context.Context, userID int64, delta int, actionType, description string) error
+	// AddPointsOncePerDay awards points only if the user has no entry of actionType for the current UTC day.
+	AddPointsOncePerDay(ctx context.Context, userID int64, delta int, actionType, description string) (bool, error)
+	UpdateMBTI(ctx context.Context, userID int64, mbtiType string) error
 	SaveJourney(ctx context.Context, userID, journeyID int64) error
 	UnsaveJourney(ctx context.Context, userID, journeyID int64) error
 	ListSavedJourneys(ctx context.Context, userID int64) ([]int64, error)
@@ -21,6 +24,8 @@ type UserRepository interface {
 	UpdateAvatar(ctx context.Context, userID int64, avatarURL string) error
 	GetBalance(ctx context.Context, userID int64) (int, error)
 	Recharge(ctx context.Context, userID int64, amount int, description string) error
+	// RechargeWithBonus credits amount and bonus atomically, writing one ledger row for each.
+	RechargeWithBonus(ctx context.Context, userID int64, amount, bonus int, description, bonusDescription string) (int, error)
 	Deduct(ctx context.Context, userID int64, amount int, orderID int64, description string) error
 }
 
@@ -277,4 +282,98 @@ func normalizedGender(gender string) string {
 	default:
 		return "prefer_not_to_say"
 	}
+}
+
+func (r *sqliteUserRepo) AddPointsOncePerDay(ctx context.Context, userID int64, delta int, actionType, description string) (bool, error) {
+	awarded := false
+	err := retryBusy(ctx, func() error {
+		awarded = false
+		tx, err := r.db.BeginTx(ctx, nil)
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		var already int
+		if err := tx.QueryRowContext(ctx,
+			`SELECT COUNT(*) FROM user_points_history
+			  WHERE user_id = ? AND action_type = ? AND date(created_at) = date('now')`,
+			userID, actionType).Scan(&already); err != nil {
+			return fmt.Errorf("check daily points: %w", err)
+		}
+		if already > 0 {
+			return nil
+		}
+
+		var current int
+		if err := tx.QueryRowContext(ctx, `SELECT points FROM users WHERE id = ?`, userID).Scan(&current); err != nil {
+			return fmt.Errorf("get current points: %w", err)
+		}
+		newBalance := current + delta
+		if _, err := tx.ExecContext(ctx, `UPDATE users SET points = ? WHERE id = ?`, newBalance, userID); err != nil {
+			return fmt.Errorf("update points: %w", err)
+		}
+		if _, err := tx.ExecContext(ctx,
+			`INSERT INTO user_points_history (user_id, action_type, points_delta, balance_after, description)
+			 VALUES (?, ?, ?, ?, ?)`,
+			userID, actionType, delta, newBalance, description); err != nil {
+			return fmt.Errorf("insert points history: %w", err)
+		}
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+		awarded = true
+		return nil
+	})
+	return awarded, err
+}
+
+func (r *sqliteUserRepo) UpdateMBTI(ctx context.Context, userID int64, mbtiType string) error {
+	return retryBusy(ctx, func() error {
+		if _, err := r.db.ExecContext(ctx,
+			`UPDATE users SET mbti_type = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, mbtiType, userID); err != nil {
+			return fmt.Errorf("update mbti: %w", err)
+		}
+		return nil
+	})
+}
+
+func (r *sqliteUserRepo) RechargeWithBonus(ctx context.Context, userID int64, amount, bonus int, description, bonusDescription string) (int, error) {
+	var balance int
+	err := retryBusy(ctx, func() error {
+		tx, err := r.db.BeginTx(ctx, nil)
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		var current int
+		if err := tx.QueryRowContext(ctx, `SELECT balance FROM users WHERE id = ?`, userID).Scan(&current); err != nil {
+			return fmt.Errorf("get current balance: %w", err)
+		}
+		afterRecharge := current + amount
+		if _, err := tx.ExecContext(ctx,
+			`INSERT INTO transactions (user_id, txn_type, amount, balance_after, description) VALUES (?, ?, ?, ?, ?)`,
+			userID, model.TxnTypeRecharge, amount, afterRecharge, description); err != nil {
+			return fmt.Errorf("insert recharge transaction: %w", err)
+		}
+		final := afterRecharge
+		if bonus > 0 {
+			final += bonus
+			if _, err := tx.ExecContext(ctx,
+				`INSERT INTO transactions (user_id, txn_type, amount, balance_after, description) VALUES (?, ?, ?, ?, ?)`,
+				userID, model.TxnTypeBonus, bonus, final, bonusDescription); err != nil {
+				return fmt.Errorf("insert bonus transaction: %w", err)
+			}
+		}
+		if _, err := tx.ExecContext(ctx, `UPDATE users SET balance = ? WHERE id = ?`, final, userID); err != nil {
+			return fmt.Errorf("update balance: %w", err)
+		}
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+		balance = final
+		return nil
+	})
+	return balance, err
 }

@@ -14,3 +14,9 @@ type JourneyRepository interface {
 	ListTags(ctx context.Context) ([]model.Tag, error)
 	ListMBTITypes(ctx context.Context) ([]model.MBTIType, error)
 }
+
+// JourneyTranslator overlays localized copy onto journeys loaded in the base language.
+// It is a separate interface so read-only fakes of JourneyRepository stay small.
+type JourneyTranslator interface {
+	ApplyTranslations(ctx context.Context, journeys []model.Journey, locale string) error
+}

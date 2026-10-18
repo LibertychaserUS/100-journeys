@@ -16,6 +16,7 @@ import (
 	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
+	"github.com/100-journeys/app/internal/webapp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -99,6 +100,7 @@ func main() {
 	paymentH := handler.NewPaymentHandler(userRepo, txnRepo)
 	captchaH := handler.NewCaptchaHandler(captchaStore)
 	auditH := handler.NewAuditHandler(db)
+	meH := handler.NewMeHandler(userRepo, svc)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -153,6 +155,9 @@ func main() {
 			auth.POST("/avatar", authH.UploadAvatar)
 		}
 
+		// Saved journeys + travel personality (protected)
+		handler.MeRoutes(api, meH)
+
 		// Admin (protected + admin role)
 		handler.AdminRoutes(api, adminH)
 
@@ -163,11 +168,13 @@ func main() {
 		handler.PaymentRoutes(api, paymentH)
 	}
 
-	// SPA fallback: serve index.html for non-API, non-static routes
-	// Inject window.APP_CONFIG into index.html
+	// SPA fallback: serve index.html for non-API, non-static routes.
+	// Injects window.APP_CONFIG and versions CSS/JS links (ASSET_VERSION env pins it; otherwise
+	// it is fingerprinted from web/ so edits and deploys bust the immutable /static cache).
+	assetVersion := os.Getenv("ASSET_VERSION")
 	r.NoRoute(func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
-			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			c.JSON(http.StatusNotFound, gin.H{"data": nil, "error": "not found"})
 			return
 		}
 
@@ -178,11 +185,13 @@ func main() {
 			return
 		}
 
-		html := string(content)
-		configScript := `<script>window.APP_CONFIG = { mediaBase: "` + mediaBase + `", apiBase: "/api" };</script>`
-		html = strings.Replace(html, "<!-- App config injected by Go server -->", configScript, 1)
-		html = strings.Replace(html, "<!-- window.APP_CONFIG = { mediaBase: \"...\", apiBase: \"/api\" } -->", "", 1)
+		version := assetVersion
+		if version == "" {
+			version = webapp.AssetVersion("./web")
+		}
+		html := webapp.RenderIndex(string(content), webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version})
 
+		c.Header("Cache-Control", "no-cache")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
 
