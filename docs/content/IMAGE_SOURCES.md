@@ -5,24 +5,67 @@ image; the journey's JSON `cover.license` and `cover.source` must match this tab
 
 ## Generated for this project
 
-Made with an image model for 100 Journeys; no third-party rights.
+Made with an image model for 100 Journeys; no third-party rights. Prompts and the crop/compress
+step are in [COVER_PROMPTS.md](COVER_PROMPTS.md).
 
 | File | Used by |
 |---|---|
 | `generated/card-salt-mirror.jpg` | 001 bolivia-salt-flat-trek |
-| `generated/card-lava-tunnel.jpg` | iceland-lava-tunnel-cycling |
-| `generated/card-temple-onsen.jpg` | japan-onsen-temple-meditation |
-| `generated/card-sahara-stars.jpg` | morocco-sahara-camel-camp |
-| `generated/card-greenland-sled.jpg` | greenland-dog-sled-solo |
-| `generated/card-city-rules.jpg` | unused, available for a city-rules entrance |
+| `generated/card-lava-tunnel.jpg` | 002 iceland-lava-tunnel-cycling |
+| `generated/card-temple-onsen.jpg` | 003 japan-onsen-temple-meditation |
+| `generated/card-sahara-stars.jpg` | 004 morocco-sahara-camel-camp |
+| `generated/card-greenland-sled.jpg` | 005 greenland-dog-sled-solo |
+| `generated/norway-aurora-hunt/cover.jpg` | 006 norway-aurora-hunt |
+| `generated/new-zealand-milford-kayak/cover.jpg` | 007 new-zealand-milford-kayak |
+| `generated/patagonia-torres-del-paine-trek/cover.jpg` | 008 patagonia-torres-del-paine-trek |
+| `generated/turkey-cappadocia-balloon/cover.jpg` | 009 turkey-cappadocia-balloon |
+| `generated/peru-machu-picchu-inca-trail/cover.jpg` | 010 peru-machu-picchu-inca-trail |
+| `generated/namibia-deadvlei-stars/cover.jpg` | 011 namibia-deadvlei-stars |
+| `generated/maldives-underwater-dining/cover.jpg` | 012 maldives-underwater-dining |
+| `generated/qinghai-qarhan-salt-road/cover.jpg` | 013 qinghai-qarhan-salt-road |
+| `generated/shanxi-yuncheng-salt-lake/cover.jpg` | 014 shanxi-yuncheng-salt-lake |
+| `generated/poland-wieliczka-salt-chapel/cover.jpg` | 015 poland-wieliczka-salt-chapel |
+| `generated/japan-chichibugahama-tide-mirror/cover.jpg` | 016 japan-chichibugahama-tide-mirror |
+| `generated/usa-bonneville-salt-flats/cover.jpg` | 017 usa-bonneville-salt-flats |
+| `generated/heilongjiang-wudalianchi-lava/cover.jpg` | 018 heilongjiang-wudalianchi-lava |
+| `generated/japan-sakurajima-ash-city/cover.jpg` | 019 japan-sakurajima-ash-city |
+| `generated/indonesia-ijen-blue-fire/cover.jpg` | 020 indonesia-ijen-blue-fire |
+| `generated/sichuan-emei-buddha-light/cover.jpg` | 021 sichuan-emei-buddha-light |
+| `generated/guizhou-fanjingshan-summit/cover.jpg` | 022 guizhou-fanjingshan-summit |
+| `generated/korea-haeinsa-woodblocks/cover.jpg` | 023 korea-haeinsa-woodblocks |
+| `generated/greece-meteora-monasteries/cover.jpg` | 024 greece-meteora-monasteries |
+| `generated/bhutan-tigers-nest/cover.jpg` | 025 bhutan-tigers-nest |
+| `generated/inner-mongolia-badain-jaran/cover.jpg` | 026 inner-mongolia-badain-jaran |
+| `generated/mongolia-flaming-cliffs/cover.jpg` | 027 mongolia-flaming-cliffs |
+| `generated/chile-atacama-night-sky/cover.jpg` | 028 chile-atacama-night-sky |
+| `generated/brazil-lencois-lagoons/cover.jpg` | 029 brazil-lencois-lagoons |
+| `generated/heilongjiang-mohe-cold/cover.jpg` | 030 heilongjiang-mohe-cold |
+| `generated/japan-shiretoko-drift-ice/cover.jpg` | 031 japan-shiretoko-drift-ice |
+| `generated/svalbard-polar-night/cover.jpg` | 032 svalbard-polar-night |
+| `generated/antarctica-port-lockroy/cover.jpg` | 033 antarctica-port-lockroy |
+| `generated/sichuan-jiuzhaigou-lakes/cover.jpg` | 034 sichuan-jiuzhaigou-lakes |
+| `generated/korea-jeju-haenyeo/cover.jpg` | 035 korea-jeju-haenyeo |
+| `generated/australia-reef-coral-spawning/cover.jpg` | 036 australia-reef-coral-spawning |
+| `generated/mexico-yucatan-cenote/cover.jpg` | 037 mexico-yucatan-cenote |
+| `generated/gansu-dunhuang-library-cave/cover.jpg` | 038 gansu-dunhuang-library-cave |
+| `generated/yunnan-shaxi-tea-horse-road/cover.jpg` | 039 yunnan-shaxi-tea-horse-road |
+| `generated/spain-camino-finisterre/cover.jpg` | 040 spain-camino-finisterre |
+| `generated/jordan-petra-by-night/cover.jpg` | 041 jordan-petra-by-night |
+| `generated/japan-nakasendo-post-towns/cover.jpg` | 042 japan-nakasendo-post-towns |
+| `generated/hongkong-midlevels-escalator/cover.jpg` | 043 hongkong-midlevels-escalator |
+| `generated/card-city-rules.jpg` | 044 chongqing-liziba-monorail |
+| `generated/singapore-supertree-night/cover.jpg` | 045 singapore-supertree-night |
+| `generated/italy-venice-acqua-alta/cover.jpg` | 046 italy-venice-acqua-alta |
+| `generated/scotland-edinburgh-one-oclock-gun/cover.jpg` | 047 scotland-edinburgh-one-oclock-gun |
+| `generated/morocco-marrakech-jemaa-el-fna/cover.jpg` | 048 morocco-marrakech-jemaa-el-fna |
 | `generated/hero-taoyuan*.jpg` | home hero, sign-in |
 | `generated/brand-mark*.png`, `generated/guide-light*.png` | brand mark, guide |
 
 ## Earlier photographs: origin not recorded
 
 These came with the first version of the project, and its history doesn't say where they came
-from. Before an entrance keeps one of them as its cover, replace it with a generated or properly
-licensed image, or confirm its source and add it below.
+from. No entrance uses them as a cover any more. Before one is shown again, replace it with a
+generated or properly licensed image, or confirm its source and add it below.
 
 `bolivia-salt-flat.jpg`, `greenland-dog-sled.jpg`, `hero-bg.jpg`, `iceland-lava-tunnel.jpg`,
 `japan-temple-onsen.jpg`, `maldives-underwater.jpg`, `morocco-sahara-camp.jpg`,
