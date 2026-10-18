@@ -8,6 +8,10 @@ image; the journey's JSON `cover.license` and `cover.source` must match this tab
 Made with an image model for 100 Journeys; no third-party rights. Prompts and the crop/compress
 step are in [COVER_PROMPTS.md](COVER_PROMPTS.md).
 
+The covers for entrances 6–48 were generated at 1120 × 1400 and resized to 720 × 900. Each was
+checked at full size for text, logos and recognisable faces; on `spain-camino-finisterre` a
+small made-up wordmark on the backpack was painted out.
+
 | File | Used by |
 |---|---|
 | `generated/card-salt-mirror.jpg` | 001 bolivia-salt-flat-trek |

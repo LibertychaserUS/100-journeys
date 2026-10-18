@@ -12,7 +12,7 @@ list below. After each image, wait until I say "next".
 
 Style for every image:
 - Photorealistic, cinematic travel photograph; natural lens, shallow depth of field where it helps.
-- Portrait 2:3 (1024 × 1536). Keep the subject in the middle: it is cropped to 4:5 (720 × 900) for cards.
+- Portrait 4:5 (1120 × 1400). It is resized to 720 × 900 for cards, so keep the subject away from the edges.
 - Palette: deep blue / ink shadows, with one warm light source (lantern, fire, sunrise, lamp) when the scene allows.
 - If a person appears: one small figure, seen from behind or in silhouette, face never visible,
   ordinary outdoor clothes, no logos. No crowds in focus, no identifiable real people.
@@ -76,7 +76,8 @@ Already done (older flat names, kept as they are): 1 `card-salt-mirror.jpg`, 2 `
 
 ## After generating
 
-Centre-crop to 4:5, resize to 720 × 900 and compress to ≤ 250 KB, then add the file to
+Resize to 720 × 900 (centre-crop first if the image isn't 4:5), save as JPEG ≤ 250 KB without
+metadata, check it at full size for text, logos and recognisable faces, then add the file to
 [IMAGE_SOURCES.md](IMAGE_SOURCES.md) and the entrance's `cover` block:
 
 ```bash
