@@ -321,8 +321,8 @@ Pages.Compose = {
   /** Slips you hold (rubbed, near or open), plus whatever is on the ticket already. */
   _holds(f) { return Road.owns(f, this._held) || this._state.picks[f.group] === f.key; },
 
-  /** Outlines of the slips still behind other doors: one per door for places and keepsakes,
-   *  one per slip for hours and seasons (they open at several doors). */
+  /** Outlines of the slips still behind other doors, one per door: an hour or a season shows the
+   *  first door that opens at it (a door that gives two seasons is one outline). */
   _outlines(g) {
     const locked = this._all.filter((f) => f.group === g && !this._holds(f));
     const seen = new Set();
@@ -330,7 +330,7 @@ Pages.Compose = {
     locked.forEach((f) => {
       const no = f.no || (f.door && f.door.no);
       if (!no) return;
-      const id = g === 'place' || g === 'keepsake' ? `door:${no}` : `slip:${f.key}`;
+      const id = `door:${no}`;
       if (seen.has(id)) return;
       seen.add(id);
       out.push({ id, no, f });

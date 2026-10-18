@@ -67,6 +67,7 @@ Pages.Station = {
         </div>
       </div>`;
     API.track('station_enter', '', { hour });
+    this._renderSigns(); // platforms and the order board need no data: no jump when the racks arrive
     Promise.all([Compose.fragments(), Road.vocab()])
       .then(([list, vocab]) => {
         if (seq !== this._seq) return;
@@ -120,6 +121,11 @@ Pages.Station = {
 
   // ---------- controls ----------
   _renderControls() {
+    this._renderSigns();
+    this._renderTimetable();
+  },
+
+  _renderSigns() {
     const esc = UI.esc;
     const f = this._filters;
     const page = document.querySelector('.station');
@@ -135,7 +141,6 @@ Pages.Station = {
       <button type="button" role="radio" class="sortboard__opt" data-sort="${s}" aria-checked="${sort === s}" tabindex="${sort === s ? 0 : -1}"><span>${esc(t(`station.sort.${s}`))}</span></button>`).join('');
     const n = ['season', 'hour', 'place', 'tag'].filter((k) => f[k]).length;
     document.getElementById('station-tt-label').textContent = n ? t('station.timetableN', { n }) : t('station.timetable');
-    this._renderTimetable();
   },
 
   _renderTimetable() {
