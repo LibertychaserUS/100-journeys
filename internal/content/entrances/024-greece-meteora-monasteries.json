@@ -1,0 +1,79 @@
+{
+  "slug": "greece-meteora-monasteries",
+  "entrance": { "no": 24, "realm": "mist-temple", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "dawn" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "dramatic",
+    "adventure_index": 3, "obscurity_level": 3, "risk_level": 1, "price": 13999,
+    "tags": ["spiritual", "culture", "solitude"],
+    "mbti": { "INTJ": 5, "INFP": 4, "ISTJ": 3, "INFJ": 3 }
+  },
+  "cover": { "path": "generated/greece-meteora-monasteries/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "吊网 · 迈泰奥拉",
+    "subtitle": "第 24 号入口：故意让人上不去的地方",
+    "hook": "绳子要等主让它断了，才换新的",
+    "region": "欧洲 · 希腊",
+    "moods": ["雾", "清晨", "安静", "高处"],
+    "opens": "秋天，雾还没散的清晨",
+    "role": "把梯子收上来的人",
+    "premise": "迈泰奥拉在希腊色萨利地区，卡兰巴卡镇旁边，是一片砂岩和砾岩的石柱。人们在这里先后修建了约 24 座修道院，大多建于 14 世纪后半叶；如今仍在运作的有六座，四座属于修士，两座属于修女。直到 20 世纪 20 年代岩石上凿出台阶以前，上去要靠一节节绑在一起的长梯，或者坐进大网里被绳子吊上去。1988 年，这里列入世界遗产。",
+    "mission": "门开之前，想好一件你回去以后要“把梯子收上来”的事，写在本子的最后一页。",
+    "chapters": [
+      { "title": "绞盘", "paragraphs": [
+        "天刚亮，平原上的雾还没退，一根根石柱浮在白色上面，像一群不打算靠岸的岛。你沿着凿出来的台阶往上走，在一座伸出悬崖的塔楼下停住。塔楼里有一架绞盘，一根绳子从里面垂下去，没进雾里。从前，粮食、木料和人，都是装在网里这样被摇上去的。有个老说法：绳子什么时候换？等主让它断的时候。",
+        "你忍不住在心里把这套设计过了一遍。梯子可以收上去；网，得有人在上面摇。路一直都在，钥匙却在已经上去的人手里。不是没来得及修路，是没人想修。"
+      ] },
+      { "title": "门开之前", "paragraphs": ["雾退到了石柱的半腰，太阳照在门上，门还关着。你坐在台阶上，把本子翻到最后一页，写下一件以后不再让人随手够到的东西：一个下午，一个计划，或者一扇门。你把外套穿好，盖住肩膀。风从石柱之间穿过去，带来一点焚香和湿石头的味道。门里有人在敲一块木板，一下，又一下，轻重不一。"] }
+    ],
+    "choice": {
+      "prompt": "门开了。你先做哪一件事？",
+      "options": [
+        { "key": "steps", "label": "回头把刚爬上来的台阶数一遍", "keeps": "一个数字，和小腿上的酸" },
+        { "key": "page", "label": "把最后一页撕下来，折成小块，放进贴身的口袋", "keeps": "一张折了四折的纸" },
+        { "key": "silent", "label": "进门前把手机关机，一直到下山再开", "keeps": "一个没有消息提醒的上午" }
+      ]
+    },
+    "ending": "回到城里，你把每周的一个下午在日历上涂成灰色，谁约都说没空。偶尔你会想起那根要等断了才换的绳子，和梯子被收上去时，木头擦过石头的那一声。",
+    "facts": [
+      { "text": "迈泰奥拉位于希腊色萨利，石柱主要由砂岩和砾岩构成；约 24 座修道院大多建于 14 世纪后半叶，如今仍在运作的有六座：四座男修道院，两座女修道院。", "source": "https://en.wikipedia.org/wiki/Meteora" },
+      { "text": "早年上山要靠绑在一起的长梯，或用大网把货物和人吊上去；据说绳子只在“主让它断了”的时候才换。20 世纪 20 年代，岩石上凿出了台阶。", "source": "https://en.wikipedia.org/wiki/Meteora" },
+      { "text": "瓦尔拉姆修道院的塔楼连同里面的旧绞盘可追溯到 1536 年，1961 至 1963 年修缮时还用它吊运过材料。", "source": "https://orthodoxwiki.org/Varlaam_Monastery_(Meteora)" },
+      { "text": "迈泰奥拉于 1988 年列入联合国教科文组织世界遗产名录。", "source": "https://en.wikipedia.org/wiki/Meteora" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。文中的本子、写下的事和时间安排都是虚构的。修道院至今仍是修士和修女生活、祈祷的地方，参观以各院自己的开放时间和规矩为准。"
+  },
+  "en": {
+    "title": "The Net · Meteora",
+    "subtitle": "Entrance No. 24: a place built to be hard to reach",
+    "hook": "They changed the rope only when the Lord let it break",
+    "region": "Europe · Greece",
+    "moods": ["Mist", "Early morning", "Quiet", "Height"],
+    "opens": "In autumn, at dawn, while the mist is still down",
+    "role": "The one who pulls up the ladder",
+    "premise": "Meteora is a cluster of sandstone and conglomerate pillars beside the town of Kalabaka in Thessaly, Greece. About 24 monasteries were built on them, most in the second half of the 14th century; six still function, four for men and two for women. Until steps were cut into the rock in the 1920s, the way up was by long ladders lashed together, or in a big net hauled up on a rope. The complex became a World Heritage Site in 1988.",
+    "mission": "Before the gate opens, choose one thing you'll pull the ladder up on once you're home, and write it on the last page of your notebook.",
+    "chapters": [
+      { "title": "The windlass", "paragraphs": [
+        "First light. The plain is still under mist, and the pillars float on it like islands with no plans to come ashore. You climb the cut steps and stop beneath a tower that juts out over the drop. Inside is a windlass, and a rope runs down from it into the white. Grain, timber and people once came up this way, in a net. The old line goes: when do you change the rope? When the Lord lets it break.",
+        "You find yourself working the design through. The ladder could be pulled up. The net needed someone at the top to turn the handle. There was always a way up, but the key stayed with whoever was already there. Nobody forgot to build a road. Nobody wanted one."
+      ] },
+      { "title": "Before the gate", "paragraphs": ["The mist has sunk to halfway down the pillars and the sun is on the gate, but it's still shut. You sit on the step, open your notebook at the last page and write down one thing you won't let just anyone reach any more: an afternoon, a plan, a door. You pull your jacket on over your shoulders. Wind threads between the pillars, carrying a little incense and wet stone. Inside, someone is striking a wooden board, once, then again, never quite evenly."] }
+    ],
+    "choice": {
+      "prompt": "The gate opens. What do you do first?",
+      "options": [
+        { "key": "steps", "label": "Turn round and count the steps you've just climbed", "keeps": "A number, and the ache in your calves" },
+        { "key": "page", "label": "Tear out the last page, fold it small and put it in an inside pocket", "keeps": "A page folded in four" },
+        { "key": "silent", "label": "Switch your phone off before you go in, and leave it off until you're down", "keeps": "A morning with no notifications" }
+      ]
+    },
+    "ending": "Back in the city you shade one afternoon a week grey in your calendar, and whoever asks, you're busy. Now and then you think of the rope they only changed once it broke, and the scrape of a ladder being pulled up against the rock.",
+    "facts": [
+      { "text": "Meteora's pillars, in Thessaly, are mainly sandstone and conglomerate. Of about 24 monasteries, most built in the second half of the 14th century, six still function: four for men and two for women.", "source": "https://en.wikipedia.org/wiki/Meteora" },
+      { "text": "Access was once by long ladders lashed together or large nets used to haul up goods and people; the ropes were replaced only “when the Lord let them break”. Steps were cut into the rock in the 1920s.", "source": "https://en.wikipedia.org/wiki/Meteora" },
+      { "text": "At Varlaam monastery, the tower with its old windlass dates from 1536 and was used as recently as 1961 to 1963 to lift materials for renovations.", "source": "https://orthodoxwiki.org/Varlaam_Monastery_(Meteora)" },
+      { "text": "Meteora was added to the UNESCO World Heritage List in 1988.", "source": "https://en.wikipedia.org/wiki/Meteora" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The notebook, what you write in it and the timings are fiction. The monasteries are still homes and places of prayer for monks and nuns; visits follow each monastery's own hours and rules."
+  }
+}

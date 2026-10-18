@@ -1,0 +1,89 @@
+{
+  "slug": "svalbard-polar-night",
+  "entrance": { "no": 32, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["polar-night"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "solitude", "visual_style": "minimal",
+    "adventure_index": 6, "obscurity_level": 7, "risk_level": 3, "price": 32999,
+    "tags": ["solitude", "night", "hidden"],
+    "mbti": { "INTJ": 5, "ISTJ": 4, "INFJ": 4 }
+  },
+  "cover": { "path": "generated/svalbard-polar-night/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "零下十八度 · 朗伊尔城",
+    "subtitle": "第 32 号入口：正午那一阵蓝",
+    "hook": "正午只蓝一小会儿，山里的种子在等很久以后",
+    "region": "北极 · 挪威斯瓦尔巴",
+    "moods": ["极夜", "正午的蓝", "冻土", "很久以后"],
+    "opens": "极夜里（大约 10 月底到次年 2 月中），正午前后那一阵蓝光",
+    "role": "替以后存东西的人",
+    "premise": "朗伊尔城在北纬 78 度左右，是世界上最北的定居点之一，极夜从 10 月 27 日一直到次年 2 月 15 日。城里的老墓地 1950 年起不再下葬，因为人们发现 1918 年死于流感的人在冻土里没有腐烂。山坡上的斯瓦尔巴全球种子库 2008 年启用，在砂岩山体里 130 米深处，零下 18 度，存着一百三十多万份种子样本。",
+    "mission": "趁正午的蓝光还在，走到种子库门口，写一张标签：一样你希望一百年后还在的东西。",
+    "chapters": [
+      { "title": "正午", "paragraphs": ["早上九点和夜里九点一样黑。你站在城边的路上，看着表等。十一点多，南边的天才从黑里透出一点蓝，像一张底片在慢慢显影。雪是蓝的，山是蓝的，你呼出来的气也是蓝的。向导说这点光撑不了多久。你又看了一眼表，记下它开始的时间。"] },
+      { "title": "冻土", "paragraphs": [
+        "蓝光落在老墓地上，一排十字架斜斜地插在雪坡里。向导说，1950 年以后这里就不再下葬了：人们发现，1918 年死于流感的人在冻土里一直没有腐烂。",
+        "种子库选在这里，冻土也是原因之一。哪天要是断了电，这座山自己就是冷的。"
+      ] },
+      { "title": "门", "paragraphs": [
+        "极夜里，种子库入口顶上和正面嵌着的艺术装置发着冷冷的光。入口从山坡里伸出来一截，门关着，这里没有常驻的人。",
+        "向导一样一样数给你听：门后一条隧道通进山里，130 米深；零下 18 度；箱子里装的是世界各地种子库的备份，谁存进来的，只有谁能取走。2015 年第一次有人来取：战争让叙利亚的一座种子库进不去了，存在这里的备份被取出去，重新种下。"
+      ] },
+      { "title": "标签", "paragraphs": ["风从山坡上刮下来，头顶的蓝开始暗了。你站在门前，从口袋里掏出一张空白标签，摘下手套，手指一下子就冻僵了。你想了很久：写什么，写给谁，写到哪一年。"] }
+    ],
+    "choice": {
+      "prompt": "标签上只写得下一行。你写——",
+      "options": [
+        { "key": "seed", "label": "一种家乡种子的名字，和你希望它被种下的年份", "keeps": "一张写着很远年份的标签" },
+        { "key": "list", "label": "三样要留到一百年后的东西，和替你守着它们的人", "keeps": "一张写着三个名字的清单" },
+        { "key": "blank", "label": "先不写，把空白标签带回去，想清楚再写", "keeps": "一张还空着的标签" }
+      ]
+    },
+    "ending": "回到家，你拉开冰箱的冷冻室，看了一眼温度：零下十八度，和山里一样。你把那张标签贴在了冰箱门上。",
+    "facts": [
+      { "text": "朗伊尔城位于北纬 78°13′ 左右，极夜从 10 月 27 日持续到次年 2 月 15 日，共 111 天。", "source": "https://en.wikipedia.org/wiki/Longyearbyen" },
+      { "text": "朗伊尔城的墓地 1950 年起停止下葬，因为人们发现 1918 年流感死者的遗体在冻土中没有腐烂。", "source": "https://en.wikipedia.org/wiki/Longyearbyen" },
+      { "text": "斯瓦尔巴全球种子库 2008 年启用，位于砂岩山体内 130 米处，保存温度零下 18 度；截至 2025 年 6 月存有约 136 万份种子样本。冻土能在断电时帮助保持低温。", "source": "https://en.wikipedia.org/wiki/Svalbard_Global_Seed_Vault" },
+      { "text": "存入的种子是各种子库的备份，所有权仍归存放方，只有存放方能取用；2015 年，因叙利亚战事无法进入原种子库，国际干旱地区农业研究中心首次取回了备份。", "source": "https://en.wikipedia.org/wiki/Svalbard_Global_Seed_Vault" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。极夜里在朗伊尔城跟着向导活动是真实的行程，种子库不对公众开放，只能在门外看；文中的向导、标签和你做的事都是虚构的。"
+  },
+  "en": {
+    "title": "Minus Eighteen · Longyearbyen",
+    "subtitle": "Entrance No. 32: a short blue noon",
+    "hook": "A brief blue noon, and seeds in the mountain waiting far longer",
+    "region": "Arctic · Svalbard, Norway",
+    "moods": ["Polar night", "Blue noon", "Permafrost", "The long view"],
+    "opens": "In the polar night (late October to mid-February), in the blue light around noon",
+    "role": "The keeper for later",
+    "premise": "Longyearbyen lies at about 78° north, one of the northernmost settlements on Earth; the polar night runs from 27 October to 15 February. Its old cemetery stopped taking burials in 1950, after it was found that people who died in the 1918 flu had not decomposed in the permafrost. Up the hill, the Svalbard Global Seed Vault, opened in 2008, keeps more than 1.3 million seed samples at minus 18 °C, 130 metres inside a sandstone mountain.",
+    "mission": "While the noon blue lasts, walk to the vault door and write a label: one thing you want to still exist in a hundred years.",
+    "chapters": [
+      { "title": "Noon", "paragraphs": ["Nine in the morning is as dark as nine at night. You stand on the road at the edge of town and wait by your watch. Just after eleven, the southern sky starts to show blue through the black, like a photograph developing. The snow is blue, the mountains are blue, your breath is blue. It won't last, your guide says. You check your watch again and note when it began."] },
+      { "title": "Permafrost", "paragraphs": [
+        "The blue light falls on the old cemetery, a row of crosses leaning in the snow. Nobody has been buried here since 1950, your guide says: they found that the people who died in the 1918 flu had never decomposed in the frozen ground.",
+        "The same frozen ground is one reason the vault is here. If the power ever fails, the mountain stays cold on its own."
+      ] },
+      { "title": "The door", "paragraphs": [
+        "In the polar night, the artwork set into the roof and face of the vault entrance glows a cold light. The entrance juts out of the hillside; the door is shut, and nobody works here full-time.",
+        "Your guide counts it off for you: a tunnel running 130 metres into the mountain; minus eighteen; boxes of backup copies from genebanks all over the world, which only whoever put them in may take out. The first time anyone did was 2015: war had cut off a genebank in Syria, and its backups were taken out to be sown again."
+      ] },
+      { "title": "The label", "paragraphs": ["Wind comes down the slope, and the blue overhead is starting to fade. Standing at the door, you take a blank label from your pocket and pull off a glove; your fingers stiffen at once. You think for a long time about what to write, and for whom, and for which year."] }
+    ],
+    "choice": {
+      "prompt": "There's room for one line. You write—",
+      "options": [
+        { "key": "seed", "label": "The name of a seed from home, and the year you hope it's sown", "keeps": "A label dated a long way ahead" },
+        { "key": "list", "label": "Three things to keep for a hundred years, and who will look after each", "keeps": "A list with three names on it" },
+        { "key": "blank", "label": "Nothing yet. You take the label home until you're sure", "keeps": "A label still blank" }
+      ]
+    },
+    "ending": "At home you open the freezer and glance at the temperature: minus eighteen, the same as inside the mountain. You stick the label on the freezer door.",
+    "facts": [
+      { "text": "Longyearbyen lies at about 78°13′ N; its polar night lasts from 27 October to 15 February, 111 days.", "source": "https://en.wikipedia.org/wiki/Longyearbyen" },
+      { "text": "Burials in Longyearbyen's cemetery stopped in 1950, after it was found that the bodies of people who died in the 1918 flu had not decomposed in the permafrost.", "source": "https://en.wikipedia.org/wiki/Longyearbyen" },
+      { "text": "The Svalbard Global Seed Vault opened in 2008, 130 m inside a sandstone mountain, and stores seeds at −18 °C; it held about 1.36 million samples in June 2025. The permafrost helps keep them cold if the power fails.", "source": "https://en.wikipedia.org/wiki/Svalbard_Global_Seed_Vault" },
+      { "text": "Vault samples are copies of samples held by the depositing genebanks, which keep ownership and sole access; in 2015 ICARDA made the first withdrawal, because the Syrian conflict had made its genebank in Syria inaccessible.", "source": "https://en.wikipedia.org/wiki/Svalbard_Global_Seed_Vault" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Guided outings in Longyearbyen during the polar night are real, and the vault can only be seen from outside; the guide, the label and what you do with it are fiction."
+  }
+}

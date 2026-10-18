@@ -1,0 +1,71 @@
+{
+  "slug": "sichuan-jiuzhaigou-lakes",
+  "entrance": { "no": 34, "realm": "water-deep", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "surreal",
+    "adventure_index": 2, "obscurity_level": 2, "risk_level": 1, "price": 5999,
+    "tags": ["visual", "nature"],
+    "mbti": { "ISFP": 5, "INFP": 4, "ISFJ": 4 }
+  },
+  "cover": { "path": "generated/sichuan-jiuzhaigou-lakes/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "水底的树 · 九寨沟五花海",
+    "subtitle": "第 34 号入口：清到看得见湖底倒木的早晨",
+    "hook": "湖水清得像没有水，湖底横着一棵很老的树",
+    "region": "亚洲 · 中国",
+    "moods": ["清澈", "秋色", "安静", "清晨"],
+    "opens": "秋天的早晨，太阳刚翻过山脊的时候",
+    "role": "看湖底的人",
+    "premise": "九寨沟在四川，名字来自沟里九个藏族村寨，1992 年列入世界遗产。这里的湖由冰川作用形成，被崩落的岩石堵住，再由碳酸钙沉积固结；水里析出的碳酸钙会落在石头、湖底，甚至水中的倒木上。五花海是一个很浅的彩色湖泊，湖底纵横交错地躺着古老的倒木。2017 年 8 月，一场 7.0 级地震让沟里的火花海湖堤溃决。",
+    "mission": "在湖底找到一根倒木，用眼睛从它的根顺到它的梢，中间不跟丢。",
+    "chapters": [
+      { "title": "根", "paragraphs": ["清早，栈道上还结着霜，五花海上浮着一层很薄的雾。你扶着栏杆往下看：水清得像不存在，湖底横七竖八躺着一根根倒木，颜色发白，像被人轻轻撒了一层面粉。你挑中一根，从粗的那头看起。一对老人在你身后停下，你往旁边让了让，指给他们看：“那儿，那一根。”老太太“哦”了一声，拖得很长。"] },
+      { "title": "梢", "paragraphs": ["太阳翻过山脊，光一下子落进水里，湖面分出几种颜色：靠岸的地方泛黄，往里是绿，最深处蓝得发黑。你那根树也跟着变了颜色，你差点跟丢，又在一块石头边上把它找了回来，一路看到它细细的梢。一片黄叶落在你面前的水面上，转了半圈，慢慢往下沉。你一直看着，直到它停在那根树旁边。"] }
+    ],
+    "choice": {
+      "prompt": "栈道上的人多起来之前，你做哪件事？",
+      "options": [
+        { "key": "sketch", "label": "用一根线，把那根树在水里的样子画在本子上", "keeps": "本子上一根歪歪扭扭的铅笔线" },
+        { "key": "leaf", "label": "再等一片叶子，看它从水面落到湖底要多久", "keeps": "一片叶子沉下去时的那段安静" },
+        { "key": "point", "label": "把那根树指给下一个停下来的人看", "keeps": "别人的一声“哦”" }
+      ]
+    },
+    "ending": "回到家，你在水龙头下冲一只玻璃杯，水开得很小，杯底的花纹隔着水看得清清楚楚。你想起湖底那根发白的老树，和停在它旁边的那片叶子。",
+    "facts": [
+      { "text": "九寨沟的名字来自沟内的九个藏族村寨；1992 年列入世界遗产，1997 年成为世界生物圈保护区。", "source": "https://en.wikipedia.org/wiki/Jiuzhaigou" },
+      { "text": "九寨沟的湖泊由冰川作用形成，被崩塌的岩石阻塞，再经碳酸盐沉积固结；淡水中快速析出的碳酸钙会落在石头、湖底，甚至水中的倒木上。五花海是一个浅而多彩的湖，湖底纵横交错着古老的倒木。", "source": "https://en.wikipedia.org/wiki/Jiuzhaigou" },
+      { "text": "2017 年 8 月，九寨沟县发生 7.0 级地震，火花海湖堤溃决；景区一度关闭，2018 年 3 月起有限开放。", "source": "https://en.wikipedia.org/wiki/Jiuzhaigou" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。文中的老人、对话和那片叶子都是虚构的；现实中游客沿栈道参观。"
+  },
+  "en": {
+    "title": "Trees Under Water · Five Flower Lake, Jiuzhaigou",
+    "subtitle": "Entrance No. 34: a morning clear enough to see the trees on the bottom",
+    "hook": "Water so clear it seems missing, and an old tree lying on the bottom",
+    "region": "Asia · China",
+    "moods": ["Clarity", "Autumn colour", "Quiet", "Morning"],
+    "opens": "Autumn mornings, just as the sun clears the ridge",
+    "role": "The one watching the lakebed",
+    "premise": "Jiuzhaigou, in Sichuan, takes its name from the nine Tibetan villages along its valleys, and became a World Heritage Site in 1992. Its lakes were shaped by glaciers, dammed by rockfalls and then sealed by calcium carbonate, which settles out of the water onto rocks, lake beds and even fallen trees. Five Flower Lake is shallow and many-coloured, its bed criss-crossed by ancient fallen trunks. In August 2017 a magnitude 7.0 earthquake broke the dam of Sparkling Lake, elsewhere in the valley.",
+    "mission": "Find one fallen trunk on the bottom and follow it with your eyes from root to tip without losing it.",
+    "chapters": [
+      { "title": "Root", "paragraphs": ["Early morning: frost on the boardwalk, a thin mist lying on Five Flower Lake. You lean on the rail and look down. The water is so clear it hardly seems to be there, and on the bottom the trunks lie every which way, pale, as if someone had dusted them with flour. You pick one and start at the thick end. An older couple stops behind you; you shift aside and point. “There. That one.” The woman says “oh”, and makes it last."] },
+      { "title": "Tip", "paragraphs": ["The sun clears the ridge and drops straight into the water, and the lake splits into colours: yellowish by the bank, then green, then a blue so deep it's nearly black. Your trunk changes colour with it. You almost lose it, find it again by a rock, and follow it all the way out to its thin tip. A yellow leaf lands on the water in front of you, turns half a circle and starts to sink. You watch it the whole way down, until it settles beside your tree."] }
+    ],
+    "choice": {
+      "prompt": "Before the boardwalk fills up, what do you do?",
+      "options": [
+        { "key": "sketch", "label": "Draw the trunk as it lies in the water, in one line in your notebook", "keeps": "A crooked pencil line" },
+        { "key": "leaf", "label": "Wait for another leaf and see how long it takes to reach the bottom", "keeps": "The quiet of a leaf sinking" },
+        { "key": "point", "label": "Point the trunk out to the next person who stops", "keeps": "Someone else's “oh”" }
+      ]
+    },
+    "ending": "At home, rinsing a glass under a slow tap, you can see the pattern on its base perfectly through the water. You think of the pale old tree on the lakebed, and the leaf that came to rest beside it.",
+    "facts": [
+      { "text": "Jiuzhaigou is named after the nine Tibetan settlements along its length; it became a UNESCO World Heritage Site in 1992 and a World Biosphere Reserve in 1997.", "source": "https://en.wikipedia.org/wiki/Jiuzhaigou" },
+      { "text": "Its lakes were formed by glacial activity, dammed by rockfalls and solidified by carbonate deposition; calcium carbonate precipitating from the fresh water falls on rocks, lake beds and even fallen trees. Five Flower Lake is a shallow, multi-coloured lake whose bottom is criss-crossed by ancient fallen tree trunks.", "source": "https://en.wikipedia.org/wiki/Jiuzhaigou" },
+      { "text": "A magnitude 7.0 earthquake struck Jiuzhaigou County in August 2017 and broke the Huohua (Sparkling) Lake dam; the valley closed and reopened with limited access in March 2018.", "source": "https://en.wikipedia.org/wiki/Jiuzhaigou" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The couple, the dialogue and the leaf are fiction; in reality visitors keep to the boardwalks."
+  }
+}

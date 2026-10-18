@@ -1,0 +1,93 @@
+{
+  "slug": "italy-venice-acqua-alta",
+  "entrance": { "no": 46, "realm": "city-rules", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "night" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "dramatic",
+    "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 13999,
+    "tags": ["culture", "night"],
+    "mbti": { "INTP": 5, "ISTJ": 4, "ESTJ": 4 }
+  },
+  "cover": { "path": "generated/italy-venice-acqua-alta/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "数汽笛 · 威尼斯",
+    "subtitle": "第 46 号入口：半夜响起的上行音阶",
+    "hook": "半夜汽笛响了：两个音，一个比一个高",
+    "region": "欧洲 · 意大利",
+    "moods": ["夜", "潮水", "信号", "秩序"],
+    "opens": "秋天（大约 10 到 11 月），夜里，涨潮前几个小时",
+    "role": "数汽笛的人",
+    "premise": "威尼斯要涨大潮时，钟楼上的警报先拉一声引起注意，再用一串往上走的音告诉全城水会涨多高：一个长音约 110 厘米，两个音 120，三个音 130，四个音 140 以上。这套音阶从 2007 年开始用。有记录以来最高的一次是 1966 年 11 月的 194 厘米，2019 年 11 月也涨到过 187 厘米。",
+    "mission": "听到警报，数清是几个音，算出你住的那条街会不会进水，然后在潮水最高之前定好出门的路线。",
+    "chapters": [
+      { "title": "汽笛", "paragraphs": [
+        "夜里一点多，你被一声长长的汽笛叫醒。声音从附近的钟楼上下来，平平的，一直拉着，像在说：注意。你坐起来，等着。",
+        "停了几秒，第二段来了。一个音，再一个，比前一个高。然后没了。你数清楚了：两个。"
+      ] },
+      { "title": "门边的卡片", "paragraphs": [
+        "房东在门边贴了一张塑封卡片：一个长音，110 厘米；两个音，120；三个，130；四个，140 以上。你拿手机照着看，又在心里过了一遍。120 厘米。木板路大约就搭在这个高度，水会涨到木板的边上；城里差不多三成的地面会在水下。",
+        "海口那几排闸门，一般要预报超过 130 厘米才升起来。今晚它们会一直躺在海底。你下楼，一楼的邻居已经把一块铁挡板推进门框的槽里，正用脚踢一踢它的下沿。他说：“两个音。有板子就够了。”"
+      ] },
+      { "title": "木板路", "paragraphs": [
+        "你穿上雨靴出门。小广场上，木板路已经搭好了，一节接一节，铁腿站在黑水里。水慢慢往上爬，在路灯下发亮，离木板的边只剩一指。人们排成一列走过去，不说话，也没人停下。",
+        "你在心里给这座城画一张新地图：哪座桥是干的，哪条巷子要绕开，哪个拐角木板断了。走到第三座桥，你已经不用看手机了。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "潮水涨到最高的那一刻，你在哪里？",
+      "options": [
+        { "key": "board", "label": "在楼下，帮邻居扶住那块挡水板", "keeps": "手心里一道铁板的冷" },
+        { "key": "map", "label": "在房间里，用铅笔把还干着的路画到纸地图上", "keeps": "一张画满铅笔箭头的旧地图" },
+        { "key": "planks", "label": "在木板路上，跟着前面的人一点一点往前挪", "keeps": "一整排雨靴踩在木板上的闷响" }
+      ]
+    },
+    "ending": "回到家，电梯到了楼层会“叮”一声，你会下意识地数。一声，就是一切照常。",
+    "facts": [
+      { "text": "威尼斯的涨潮警报从钟楼上的扬声器发出：先是一声引起注意的警报，再用音阶报潮位——同一个音的长音约 110 厘米，两个上行音 120 厘米，三个 130 厘米，四个表示 140 厘米以上。", "source": "https://www.ilpost.it/2019/11/21/venezia-acqua-alta/" },
+      { "text": "这套按潮位报音的警报从 2007 年 12 月 7 日开始使用；城里的木板路一般搭在 120 厘米的高度，潮位到 120 厘米时约 29% 的城区会被淹。", "source": "https://en.wikipedia.org/wiki/Acqua_alta" },
+      { "text": "有记录以来的最高潮位是 1966 年 11 月 4 日的 194 厘米；2019 年 11 月 12 日达到 187 厘米。", "source": "https://en.wikipedia.org/wiki/Acqua_alta" },
+      { "text": "防潮闸门系统 MOSE 共 78 扇闸门，分布在三个入海口，2020 年 10 月 3 日第一次为挡潮升起；截至 2023 年，预报潮位超过 130 厘米时才升起。", "source": "https://en.wikipedia.org/wiki/MOSE" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。警报的音阶、木板路和闸门都是真实的；文中的房东、门边的卡片、楼下的邻居和那一晚的潮位都是虚构的。"
+  },
+  "en": {
+    "title": "Counting the Siren · Venice",
+    "subtitle": "Entrance No. 46: a rising scale in the middle of the night",
+    "hook": "The siren sounds at night: two notes, each one higher",
+    "region": "Europe · Italy",
+    "moods": ["Night", "Tide", "Signals", "Order"],
+    "opens": "In autumn (roughly October and November), at night, a few hours before high tide",
+    "role": "The siren counter",
+    "premise": "When a big tide is coming, Venice's sirens sound once to get attention, then play a rising run of notes that tells the city how high the water will get: one long note for about 110 cm, two for 120, three for 130, four for 140 and over. The code has been in use since 2007. The record is 194 cm, in November 1966; in November 2019 the tide reached 187 cm.",
+    "mission": "When the siren goes, count the notes, work out whether your street will flood, and plan your way out before the tide peaks.",
+    "chapters": [
+      { "title": "The siren", "paragraphs": [
+        "Some time after one in the morning a long siren wakes you. It comes down from the bell tower nearby, one flat note held on and on, as if to say: listen. You sit up and wait.",
+        "A few seconds' silence, then the second part. One note, then another, higher than the first. Then nothing. You're sure of the count: two."
+      ] },
+      { "title": "The card by the door", "paragraphs": [
+        "Your landlady has taped a laminated card by the door. One long note, 110 cm. Two notes, 120. Three, 130. Four, 140 and over. You read it by the light of your phone and run through it again. A hundred and twenty. That's about the height the walkways are built to, so the water will come right up to the edges of the planks, and something like three-tenths of the city will be under it.",
+        "Out at the lagoon mouths, the barrier gates usually rise only for a forecast above 130. Tonight they'll stay down on the seabed. You go downstairs. The man on the ground floor has already slid a steel board into the slots in his door frame and is testing its bottom edge with his foot. “Two notes,” he says. “The board will do.”"
+      ] },
+      { "title": "The walkways", "paragraphs": [
+        "You pull on boots and go out. In the little square the walkways are already up, section after section, iron legs standing in black water. The tide is creeping higher, shining under the lamps, a finger's width from the edge of the boards. People cross in single file, not talking, nobody stopping.",
+        "In your head you're drawing a new map of the city: which bridges are dry, which alleys to go round, which corner has a gap in the boards. By the third bridge you've stopped checking your phone."
+      ] }
+    ],
+    "choice": {
+      "prompt": "When the tide is at its highest, where are you?",
+      "options": [
+        { "key": "board", "label": "Downstairs, holding the flood board steady for your neighbour", "keeps": "The cold of a steel plate in your palm" },
+        { "key": "map", "label": "In your room, pencilling the dry routes onto a paper map", "keeps": "An old map covered in pencil arrows" },
+        { "key": "planks", "label": "Out on the walkways, shuffling forward behind the person in front", "keeps": "The dull drum of a line of boots on planks" }
+      ]
+    },
+    "ending": "Back home, the lift pings when it reaches your floor, and you find yourself counting. One note: everything as usual.",
+    "facts": [
+      { "text": "Venice's tide warning comes from speakers in the bell towers: an attention siren, then a scale: one long note on the same pitch for about 110 cm, two rising notes for 120 cm, three for 130 cm, four for above 140 cm.", "source": "https://www.ilpost.it/2019/11/21/venezia-acqua-alta/" },
+      { "text": "The level-coded siren has been in use since 7 December 2007. The city's walkways are generally set at 120 cm, and at a 120 cm tide about 29% of the city is under water.", "source": "https://en.wikipedia.org/wiki/Acqua_alta" },
+      { "text": "The highest tide on record was 194 cm on 4 November 1966; on 12 November 2019 it reached 187 cm.", "source": "https://en.wikipedia.org/wiki/Acqua_alta" },
+      { "text": "The MOSE barrier has 78 gates across three lagoon inlets and was first raised against a high tide on 3 October 2020; as of 2023 it is raised for tides forecast above 130 cm.", "source": "https://en.wikipedia.org/wiki/MOSE" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The siren scale, the walkways and the barrier gates are real; the landlady, the card by the door, the neighbour downstairs and that night's tide are fiction."
+  }
+}

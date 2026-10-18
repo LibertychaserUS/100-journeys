@@ -1,0 +1,89 @@
+{
+  "slug": "hongkong-midlevels-escalator",
+  "entrance": { "no": 43, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "minimal",
+    "adventure_index": 1, "obscurity_level": 4, "risk_level": 1, "price": 2999,
+    "tags": ["culture", "hidden"],
+    "mbti": { "ENTP": 5, "ESTJ": 4, "ENTJ": 4 }
+  },
+  "cover": { "path": "generated/hongkong-midlevels-escalator/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "掉头 · 中环至半山扶梯",
+    "subtitle": "第 43 号入口：上午十点，整座山坡换一个方向",
+    "hook": "上午十点，下山的扶梯停住，然后往山上走",
+    "region": "亚洲 · 中国香港",
+    "moods": ["早高峰", "规则", "坡道", "计时"],
+    "opens": "一年里的每一天，上午十点前后",
+    "role": "等它掉头的人",
+    "premise": "中环至半山自动扶梯 1993 年启用，全长约 800 米，爬升 135 米，横穿 13 条街道，由一段段扶梯和斜行步道连成。山坡太窄，修不下上下两条并排的扶梯，所以它只能单向运行：早上 6 点到 10 点往下送人上班，10 点以后改为往上，一直开到午夜。",
+    "mission": "九点五十分以前，站到半山一段扶梯旁边，亲眼看着它停下、再朝反方向开动；然后做第一个踏上去往山上走的人。",
+    "chapters": [
+      { "title": "逆着人走", "paragraphs": [
+        "九点二十，扶梯的轰轰声从头顶的雨棚下一路滚下来。它在往下送人：西装、校服、拎着早餐的手，一层一层从你身边滑过去。你走旁边的楼梯往上，逆着人流，每上一段就看一眼表。",
+        "你查过了：扶梯每秒走 0.65 米，比商场里的快，比地铁站里的慢；从头坐到尾要二十分钟左右。你想知道的是，一个二十分钟长的东西，十点那一刻是怎么掉头的。"
+      ] },
+      { "title": "十点", "paragraphs": [
+        "九点五十八分，坚道附近这一段扶梯上，往下的人明显稀了。你读到过：控制室就在这附近，墙上一整面监控画面，操作台可以一条一条地决定每段扶梯往哪边走、什么时候停。旁边一位拎着菜的阿伯看你一直看表，笑了：“唔使急，一段一段转嘅。”",
+        "十点过一点，你面前这一段慢下来，停住了。有那么一小会儿，它只是一截金属楼梯，有个赶时间的人干脆踩着它走了下去。然后台阶轻轻一抖，开始往上走。你第一个踏上去，阿伯排第二。再往下那一段，还停在原地等着轮到它。"
+      ] },
+      { "title": "往上", "paragraphs": [
+        "阳光透过半透明的雨棚落下来，在扶手上一格一格地移。扶梯带着你横穿一条又一条街，路边的咖啡店刚把椅子摆出来。你在本子上记：九点五十八，人变少；十点过一点，停；不到一分钟，往上。",
+        "写到一半你停了笔，因为新的问题已经冒出来了：午夜它停下以后，第二天早上六点，是哪一段先动的？"
+      ] }
+    ],
+    "choice": {
+      "prompt": "到了半山顶上，接下来做什么？",
+      "options": [
+        { "key": "dawn", "label": "明早六点再来，看它第一下开动", "keeps": "手机里一个定在五点半的闹钟" },
+        { "key": "count", "label": "顺着旁边的楼梯走下山，自己数一数它一共有几段", "keeps": "本子上一个你亲手数出来的数字" }
+      ]
+    },
+    "ending": "回去以后的某个早上，你在地铁站看着两条扶梯一上一下并排走，第一次觉得这件事不是理所当然的。你在心里估了估它们的速度，然后跟着人群上去了。",
+    "facts": [
+      { "text": "中环至半山自动扶梯 1993 年启用，全长 800 米，横穿 13 条街道，垂直爬升 135 米；因地形和空间限制无法修建上下两条并排的扶梯，只能单向运行。中段设有控制室，可单独控制每条扶梯的方向与启停。", "source": "https://www.emsd.gov.hk/filemanager/conferencepaper/en/upload/61/cnfrnc-paper-20150705-09-3.pdf" },
+      { "text": "扶梯运行速度为每秒 0.65 米，介于商场扶梯（多为 0.5 米/秒）与铁路站扶梯（多为 0.75 米/秒）之间，全程约 20 分钟。", "source": "https://www.emsd.gov.hk/filemanager/conferencepaper/en/upload/61/cnfrnc-paper-20150705-09-3.pdf" },
+      { "text": "按运输署公布的安排，扶梯每天早上 6 点至 10 点向下行，10 点至午夜向上行；2024 年底日均约 99,000 人次使用。", "source": "https://www.td.gov.hk/en/transport_in_hong_kong/pedestrians/hillside_escalator" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。扶梯每天换向是真实的；文中各段换向的先后和停顿多久，是想象出来的；文中的阿伯、他的话和你记下的时间都是虚构的。"
+  },
+  "en": {
+    "title": "The Turnaround · Central–Mid-Levels Escalator",
+    "subtitle": "Entrance No. 43: at ten in the morning, the whole hillside changes direction",
+    "hook": "At ten, the escalator stops going down and starts going up",
+    "region": "Asia · Hong Kong, China",
+    "moods": ["Rush hour", "Rules", "Hillside", "Timing"],
+    "opens": "Every day of the year, around ten in the morning",
+    "role": "The one waiting for it to turn",
+    "premise": "The Central–Mid-Levels escalator opened in 1993: about 800 metres of escalators and moving walkways, climbing 135 metres and crossing 13 streets. The hillside is too tight for an up and a down side by side, so it runs one way at a time: downhill from 6 to 10 in the morning to carry people to work, then uphill from 10 until midnight.",
+    "mission": "Be standing beside one stretch of it, halfway up the hill, by ten to ten. Watch it stop and start again the other way, and be the first one on going up.",
+    "chapters": [
+      { "title": "Against the flow", "paragraphs": [
+        "Twenty past nine, and the rumble of the escalator rolls down under its long roof. It's carrying people down: suits, school uniforms, hands holding breakfast, gliding past you one level at a time. You take the stairs alongside, going up against the crowd, checking your watch at every landing.",
+        "You've done your homework. It moves at 0.65 metres a second, quicker than a shopping-mall escalator and slower than a station one, and riding the whole length takes about twenty minutes. What you want to know is how something twenty minutes long turns round at ten o'clock."
+      ] },
+      { "title": "Ten o'clock", "paragraphs": [
+        "Two minutes to ten, on the stretch near Caine Road, and the stream of people coming down has thinned right out. You've read that the control room is somewhere near here, with a whole wall of camera screens and a console that can set the direction of each escalator and stop or start it, one at a time. An old man with a bag of vegetables sees you checking your watch and laughs. “No rush,” he says in Cantonese. “It turns a bit at a time.”",
+        "Just after ten, the stretch in front of you slows and stops. For a moment it's only a metal staircase, and someone in a hurry simply walks down it. Then the steps give a small shudder and start to climb. You're first on; the old man is second. The stretch below is still standing still, waiting its turn."
+      ] },
+      { "title": "Going up", "paragraphs": [
+        "Sunlight comes through the translucent roof and slides along the handrail in squares. The escalator carries you over one side street after another; the cafés are just putting their chairs out. In your notebook you write: 9:58, crowd thins; just after 10, stops; under a minute, going up.",
+        "Halfway through you stop writing, because a new question has already turned up. At midnight it stops. At six the next morning, which stretch moves first?"
+      ] }
+    ],
+    "choice": {
+      "prompt": "At the top of the hill, what next?",
+      "options": [
+        { "key": "dawn", "label": "Come back at six tomorrow to see it make its first move", "keeps": "An alarm set for 5:30" },
+        { "key": "count", "label": "Walk back down the stairs beside it and count the stretches yourself", "keeps": "A number in your notebook you counted with your own eyes" }
+      ]
+    },
+    "ending": "Back home, one morning in the metro, you watch two escalators running side by side, one up, one down, and for once it doesn't seem like something to take for granted. You work out their speed in your head, then let the crowd carry you up.",
+    "facts": [
+      { "text": "The escalator link opened in 1993; it is 800 m long, crosses 13 streets and rises 135 m. There was no room for twin escalators, so it runs one way, and a control room midway can set the direction of, and start or stop, each escalator.", "source": "https://www.emsd.gov.hk/filemanager/conferencepaper/en/upload/61/cnfrnc-paper-20150705-09-3.pdf" },
+      { "text": "It runs at 0.65 m per second, between typical shopping-centre escalators (0.5 m/s) and railway-station ones (0.75 m/s); the whole journey takes about 20 minutes.", "source": "https://www.emsd.gov.hk/filemanager/conferencepaper/en/upload/61/cnfrnc-paper-20150705-09-3.pdf" },
+      { "text": "According to the Transport Department it runs downhill from 6 a.m. to 10 a.m. and uphill from 10 a.m. to midnight every day, with about 99,000 pedestrian trips a day in late 2024.", "source": "https://www.td.gov.hk/en/transport_in_hong_kong/pedestrians/hillside_escalator" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The daily reversal is real; the order in which the stretches turn and how long each one pauses are imagined here. The old man, what he says and the times in your notebook are fiction."
+  }
+}

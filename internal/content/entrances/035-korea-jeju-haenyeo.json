@@ -1,0 +1,83 @@
+{
+  "slug": "korea-jeju-haenyeo",
+  "entrance": { "no": 35, "realm": "water-deep", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "afternoon" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "raw",
+    "adventure_index": 3, "obscurity_level": 5, "risk_level": 1, "price": 5999,
+    "tags": ["culture", "nature"],
+    "mbti": { "ESFJ": 5, "ISFJ": 4, "ENFJ": 4 }
+  },
+  "cover": { "path": "generated/korea-jeju-haenyeo/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "火塘 · 济州岛",
+    "subtitle": "第 35 号入口：替海女看着那堆火",
+    "hook": "海上传来一声口哨，你往火里添一块木头",
+    "region": "亚洲 · 韩国",
+    "moods": ["海风", "火", "口哨", "照应"],
+    "opens": "春天的下午，海女们上岸之前",
+    "role": "看火的人",
+    "premise": "济州岛的海女不带呼吸装备下潜，一口气潜到十米左右，采鲍鱼、海螺和海胆；2016 年，济州海女文化列入联合国教科文组织人类非物质文化遗产。她们浮出水面时，会急促地吹出一声尖细的口哨，叫“숨비소리”（sumbisori）。上岸后，她们在 bulteok（불턱）里换衣服、烤火、商量事情：那是一圈石头垒起的矮墙，中间生着一堆火。",
+    "mission": "守着 bulteok 的火，直到最后一位海女上岸；给她留出离火最近的位置。",
+    "chapters": [
+      { "title": "石圈", "paragraphs": ["你到得早。bulteok 是一圈石头垒的矮墙，背着风，开口朝海。你从礁石缝里捡来漂流木，搭好，点着。一阵风把火苗压倒了，你挪了两块石头替它挡着，它又站了起来。"] },
+      { "title": "口哨", "paragraphs": ["第一声 숨비소리 从海面上传过来，又尖又细，像风吹过瓶口。接着是第二声、第三声。你本来想数，后来发现不用数：每个人的口哨都不一样。她们的浮球在浪里一起一落，像一行标点。"] },
+      { "title": "一人一把", "paragraphs": [
+        "下午过半，她们一个接一个上岸，网兜沉甸甸的，挨着火坐下。最后回来的是年纪最大的那位。她在靠岸的浅水里作业，那片海叫“할망바당”，奶奶的海，别人都不进去。她的网兜最轻。",
+        "没有人说话。坐在她旁边的人从自己网兜里抓出一把海螺，放进她的网兜；下一个人也抓了一把。她抬头看你一眼：“火不错。坐近点，你也冻着了。”"
+      ] },
+      { "title": "火边", "paragraphs": ["她们烤着手，商量明天去哪片礁石、谁跟谁一组。说的是济州话，你一句也听不懂，只看得出来，要等每个人都点了头，这件事才算定下。你又往火里添了一块木头。"] }
+    ],
+    "choice": {
+      "prompt": "火快灭的时候，你做哪一件事？",
+      "options": [
+        { "key": "stone", "label": "把一块烤热的石头，塞到最后起身的那位手里", "keeps": "掌心里一块石头慢慢散去的热" },
+        { "key": "wood", "label": "沿着礁石再捡一抱木头，留给明天", "keeps": "袖口上的海盐和烟味" },
+        { "key": "net", "label": "替她把网兜扛到路边", "keeps": "肩膀上一块湿印子" }
+      ]
+    },
+    "ending": "回去以后，一个冬天的傍晚，你在楼道里碰到隔壁的老太太拎着一袋菜。你接过来，替她提上楼，袋子比看上去沉。",
+    "facts": [
+      { "text": "济州海女文化于 2016 年列入人类非物质文化遗产代表作名录。海女不带氧气设备，每次憋一口气潜到约 10 米深采集贝类，按经验分为上军、中军、下军，浮出水面时会发出一种独特的声音。", "source": "https://ich.unesco.org/en/RL/culture-of-jeju-haenyeo-divers-01068" },
+      { "text": "海女浮出水面时急促吹出的口哨式换气叫 sumbisori（숨비소리）；她们的收获包括鲍鱼、海螺、章鱼和海胆。", "source": "https://en.wikipedia.org/wiki/Haenyeo" },
+      { "text": "bulteok 是用石头围成的圆圈，中间生火取暖；海女在这里换衣服、准备下水、休息，也交流消息、一起做决定。", "source": "https://artsandculture.google.com/exhibit/QQjXKL5n" },
+      { "text": "年纪大、气短的海女成为下军后，会去浅水的“할망바당”（奶奶的海）作业，其他海女不进去；海女们还会从自己的网兜里抓一把海产分给新手和年长的海女，这叫“게석”。", "source": "https://www.jnuri.net/mobile/article.html?no=64867" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。石砌的 bulteok 是真实的；文中这一座和它的火、“看火的人”这个角色、文中的海女和对话都是虚构的；游客不会参与海女的作业，你在这里也从不下水。"
+  },
+  "en": {
+    "title": "The Fire Ring · Jeju Island",
+    "subtitle": "Entrance No. 35: keeping the fire for the women of the sea",
+    "hook": "A whistle comes in off the sea; you add a log",
+    "region": "Asia · South Korea",
+    "moods": ["Sea wind", "Fire", "Whistles", "Company"],
+    "opens": "On a spring afternoon, before the haenyeo come in from the sea",
+    "role": "The fire-keeper",
+    "premise": "Jeju's haenyeo dive without breathing gear, going down about ten metres on a single breath for abalone, conch and sea urchins; in 2016 their culture was inscribed on UNESCO's list of intangible heritage. When they surface they let out a quick, whistling breath called sumbisori. Back on shore they change, warm up and talk things over in a bulteok: a ring of stacked stones with a fire in the middle.",
+    "mission": "Keep the bulteok fire going until the last diver is out of the water, and save her the place nearest the flames.",
+    "chapters": [
+      { "title": "The stone ring", "paragraphs": ["You get there early. The bulteok is a low ring of piled stones with its back to the wind and its mouth to the sea. You gather driftwood from between the rocks, stack it, light it. A gust lays the flame flat, so you shift two stones to shelter it, and it stands back up."] },
+      { "title": "Whistles", "paragraphs": ["The first sumbisori comes in off the water, high and thin, like wind across the mouth of a bottle. Then a second, then a third. You start to count, then find you don't need to: every woman's whistle is her own. Their floats rise and drop on the swell like a line of punctuation."] },
+      { "title": "A handful each", "paragraphs": [
+        "Halfway through the afternoon they come in one by one, nets heavy, and sit down at the fire. The last in is the oldest. She works the shallow water close to shore, the halmang badang, the grandmothers' sea, where the others don't go. Her net is the lightest.",
+        "Nobody says anything. The woman beside her takes a handful of conch from her own net and drops it into hers, and the next woman does the same. The old diver looks over at you. “Good fire. Sit closer. You're cold too.”"
+      ] },
+      { "title": "Around the fire", "paragraphs": ["They warm their hands and work out tomorrow: which reef, who goes with whom. It's all in the Jeju language and you don't follow a word, but you can see that nothing is settled until everyone has nodded. You put another log on."] }
+    ],
+    "choice": {
+      "prompt": "The fire's going down. What do you do?",
+      "options": [
+        { "key": "stone", "label": "Press a warm hearthstone into the hands of the last one to get up", "keeps": "The heat of a stone, fading in your palm" },
+        { "key": "wood", "label": "Go back along the rocks for another armful of wood, for tomorrow", "keeps": "Salt and smoke in your sleeve cuffs" },
+        { "key": "net", "label": "Carry her net up to the road for her", "keeps": "A wet patch on your shoulder" }
+      ]
+    },
+    "ending": "One winter evening back home you meet the old woman from next door on the stairs with her shopping. You take the bag and carry it up for her, and it's heavier than it looks.",
+    "facts": [
+      { "text": "The Culture of Jeju Haenyeo was inscribed on UNESCO's Representative List of Intangible Cultural Heritage in 2016. Divers go about 10 m down on a single breath without oxygen equipment, are grouped by experience into hagun, junggun and sanggun, and make a distinctive sound on resurfacing.", "source": "https://ich.unesco.org/en/RL/culture-of-jeju-haenyeo-divers-01068" },
+      { "text": "The rapid, whistling breath haenyeo let out on surfacing is called sumbisori; their harvest includes abalone, conch, octopus and sea urchins.", "source": "https://en.wikipedia.org/wiki/Haenyeo" },
+      { "text": "A bulteok is a ring of stones with a fire in the centre where haenyeo change, get ready to dive and rest, and also share information and make decisions.", "source": "https://artsandculture.google.com/exhibit/QQjXKL5n" },
+      { "text": "When an older diver's breath shortens and she becomes a hagun, she works the shallow halmang badang, the grandmothers' sea, which other divers don't enter; divers also hand a share of their catch to novices and older divers, a custom called gyeseok.", "source": "https://www.jnuri.net/mobile/article.html?no=64867" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Stone bulteok are real; this one and its fire, the fire-keeper's role, the divers and what they say are fiction. Visitors don't take part in the haenyeo's work, and in this story you never go in the water."
+  }
+}

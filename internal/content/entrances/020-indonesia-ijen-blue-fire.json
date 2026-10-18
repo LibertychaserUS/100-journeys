@@ -1,0 +1,103 @@
+{
+  "slug": "indonesia-ijen-blue-fire",
+  "entrance": { "no": 20, "realm": "fire-stone", "pace": "day", "scale": "far", "seasons": ["dry"], "time": "midnight" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "dramatic",
+    "adventure_index": 7, "obscurity_level": 5, "risk_level": 4, "price": 13999,
+    "tags": ["extreme", "night", "nature"],
+    "mbti": { "INTJ": 5, "ISTP": 4, "ESTP": 4 }
+  },
+  "cover": { "path": "generated/indonesia-ijen-blue-fire/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "蓝火 · 伊真火山",
+    "subtitle": "第 20 号入口：午夜的火山口，和挑着硫磺上来的人",
+    "hook": "午夜的火山口底，燃着蓝色的火",
+    "region": "亚洲 · 印度尼西亚",
+    "moods": ["午夜", "蓝火", "硫磺", "重量"],
+    "opens": "旱季，午夜过后",
+    "role": "让路的人",
+    "premise": "伊真火山在印尼东爪哇，火山口里有一个约一公里宽的青绿色酸湖，2001 年测得的 pH 值低于 0.3。蓝色的火，是硫磺气体从岩缝冒出来时燃起的，温度可达 600 ℃，火苗最高约五米。矿工把硫磺装进筐，一次挑 75 到 90 公斤，爬 300 米到火山口边，再走 3 公里下山过秤。",
+    "mission": "爬出火山口的路上，每遇到一个挑担的矿工，就停下来让到一边，数一数今晚你让了几次。",
+    "chapters": [
+      { "title": "上山", "paragraphs": [
+        "午夜过后，山路上是一串头灯，一直排到看不见的地方。向导走在你前面，把一只防毒面具挂在你脖子上，说：“风一变，就听我的。”",
+        "走了大约两个小时，空气开始发苦，有一股臭鸡蛋的味道。到了火山口边往下看，是黑的。黑的底上，有几道蓝色在动。"
+      ] },
+      { "title": "蓝", "paragraphs": [
+        "下到火山口底，还要走一段乱石路。离近了，那些蓝色不是一团，是一条一条，贴着石头流，像有人把一杯会燃烧的水泼在了地上。有的地方火苗腾起一人多高，嘶嘶地响。",
+        "你的眼睛被熏得流泪。你还是看着它。这是你见过最好看的火。"
+      ] },
+      { "title": "管子", "paragraphs": [
+        "火的旁边是工地。一排陶土管子从岩缝里接出来，管口滴下来的是深红色的液体硫磺，落在地上，慢慢凉成亮黄。矿工用铁棍把凉透的硫磺撬成大块，装进两只筐，一根扁担挑起来。",
+        "一个矿工看你盯着他的筐，笑了笑，让开一步，冲你点点头。你弯腰，把扁担架上肩，往上一顶——筐底离地不到一指，你就放下了。七十五到九十公斤，往上爬三百米，再走三公里下山过秤。大多数人一天这样走两趟。",
+        "你不再看火了。你把头灯往下压，照在他马上要落脚的那几块石头上。"
+      ] },
+      { "title": "让路", "paragraphs": [
+        "往上爬的路很窄。每有一个挑担的人从后面上来，你就贴着石壁站好，等他过去。扁担吱呀吱呀响，他的呼吸比你的还稳。你在心里数：一，二，三……",
+        "爬回火山口边时天亮了，你数到了十一。往下看，那片湖露出来了，是一种不像真的青绿色。蓝火在天光里看不见了，筐还在一只一只地往上走。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "离开火山口之前，你带走什么？",
+      "options": [
+        { "key": "torch", "label": "一路把头灯照在身后那个矿工的脚下", "keeps": "头灯带子上洗不掉的硫磺味" },
+        { "key": "turtle", "label": "向让你试担子的那个矿工，买一只他用硫磺做的小乌龟", "keeps": "一只掌心大小、亮黄色的硫磺小乌龟" },
+        { "key": "tally", "label": "在手背上画正字，记下你让路的次数", "keeps": "手背上两个正字，再加一横" }
+      ]
+    },
+    "ending": "回到家，你搬一箱水上楼，在楼梯拐角停下来喘口气。你想起那根扁担压在肩上的弧度，也想起那片蓝。你把箱子换到另一边肩膀，接着往上走。",
+    "facts": [
+      { "text": "蓝色的火来自从岩缝里冒出的硫磺气体，温度可达 600 ℃，点燃后火苗最高约五米，部分气体凝成液体后仍在燃烧。游客通常要走约两小时到火山口边。", "source": "https://en.wikipedia.org/wiki/Ijen" },
+      { "text": "火山口里有一个约一公里宽的青绿色酸湖，是世界上最大的强酸性火山口湖，2001 年测得 pH 值低于 0.3。", "source": "https://en.wikipedia.org/wiki/Ijen" },
+      { "text": "火山气体经陶土管道冷凝成液态硫磺，熔融时深红，冷却后变成亮黄色，矿工再把它敲成大块。", "source": "https://en.wikipedia.org/wiki/Ijen" },
+      { "text": "矿工一次挑 75 到 90 公斤硫磺，沿 45 到 60 度的坡爬 300 米到火山口边，再走 3 公里下山过秤，大多数人一天走两趟。", "source": "https://en.wikipedia.org/wiki/Ijen" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。午夜跟当地向导下火山口看蓝火是真实的行程；火山口里有毒气，能不能下去、走到哪里，都由当地管理方和向导决定。文中的向导、矿工、试担子的那一下和硫磺小乌龟都是虚构的。"
+  },
+  "en": {
+    "title": "Blue Fire · Kawah Ijen",
+    "subtitle": "Entrance No. 20: a crater at midnight, and the men who carry the sulphur out",
+    "hook": "At midnight, blue fire burns at the bottom of the crater",
+    "region": "Asia · Indonesia",
+    "moods": ["Midnight", "Blue fire", "Sulphur", "Weight"],
+    "opens": "In the dry season, just after midnight",
+    "role": "The one who steps aside",
+    "premise": "Ijen is a volcano in East Java, Indonesia, and its crater holds a turquoise acid lake about a kilometre wide; in 2001 its pH measured below 0.3. The blue fire is sulphurous gas igniting as it escapes from cracks at up to 600 °C, with flames as high as five metres. Miners load the sulphur into baskets and carry 75 to 90 kg at a time, 300 metres up to the rim and then 3 km down the mountain to be weighed.",
+    "mission": "On the climb out of the crater, stop and step aside for every miner carrying a load. Count how many times you do it tonight.",
+    "chapters": [
+      { "title": "Up", "paragraphs": [
+        "Just after midnight the path is a string of headlamps running up into the dark further than you can see. The guide walks ahead of you. He hangs a gas mask round your neck and says, “If the wind turns, you do what I say.”",
+        "About two hours in, the air turns bitter and smells of bad eggs. At the rim you look down and see black. Across the black, a few lines of blue are moving."
+      ] },
+      { "title": "Blue", "paragraphs": [
+        "Getting down to the crater floor takes another stretch of loose rock. Up close the blue isn't one glow but many ribbons, running along the stone as if someone had spilled a glass of burning water. In places the flames jump higher than a man, hissing.",
+        "The fumes make your eyes stream. You keep looking anyway. It's the most beautiful fire you have ever seen."
+      ] },
+      { "title": "The pipes", "paragraphs": [
+        "Next to the fire is a worksite. A row of ceramic pipes runs out of the cracks, and what drips from their mouths is deep red liquid sulphur, cooling on the ground into bright yellow. The miners lever the cold sulphur into slabs with iron bars, load two baskets, and lift them on a pole.",
+        "One of them sees you staring at his load, grins, steps back and nods: go on. You bend, set the pole on your shoulder and push up. The baskets clear the ground by less than a finger's width before you put them down. Seventy-five to ninety kilos, three hundred metres up the crater wall, then three kilometres down the mountain to the scales. Most of them do it twice a day.",
+        "You stop looking at the fire. You tilt your headlamp down onto the stones where he's about to put his feet."
+      ] },
+      { "title": "Stepping aside", "paragraphs": [
+        "The path out is narrow. Each time a man with a load comes up behind you, you flatten yourself against the rock and wait for him to pass. The pole creaks. His breathing is steadier than yours. You count: one, two, three…",
+        "By the time you reach the rim it's light, and you've got to eleven. Below you the lake has appeared, a turquoise that doesn't look real. The blue fire has gone invisible in the daylight. The baskets keep coming up, one after another."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before you leave the crater, what do you take with you?",
+      "options": [
+        { "key": "torch", "label": "Keep your headlamp on the feet of the miner behind you, all the way up", "keeps": "A smell of sulphur in your headlamp strap that won't wash out" },
+        { "key": "turtle", "label": "Buy a little sulphur turtle from the miner who let you try his load", "keeps": "A bright yellow turtle the size of your palm" },
+        { "key": "tally", "label": "Keep a tally in biro on the back of your hand, one stroke each time you step aside", "keeps": "Two five-bar gates and one stroke more, on the back of your hand" }
+      ]
+    },
+    "ending": "Back home, you carry a case of water up the stairs and stop on the landing to catch your breath. You think of the bend of that pole on a shoulder, and of the blue. You shift the case to your other shoulder and keep climbing.",
+    "facts": [
+      { "text": "The blue flames are sulphurous gas emerging from cracks at up to 600 °C; ignited, they reach about five metres, and some gas condenses to liquid that keeps burning. Visitors usually hike about two hours to the rim.", "source": "https://en.wikipedia.org/wiki/Ijen" },
+      { "text": "The crater holds a turquoise acid lake about one kilometre wide, the largest highly acidic crater lake in the world; its pH was measured at below 0.3 in 2001.", "source": "https://en.wikipedia.org/wiki/Ijen" },
+      { "text": "Volcanic gas is channelled through ceramic pipes and condenses into molten sulphur, deep red when liquid and bright yellow as it cools; miners break it into large pieces.", "source": "https://en.wikipedia.org/wiki/Ijen" },
+      { "text": "Miners carry 75–90 kg of sulphur 300 m up a 45–60° slope to the rim, then walk 3 km down to be weighed; most make the trip twice a day.", "source": "https://en.wikipedia.org/wiki/Ijen" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Guided midnight descents to see the blue fire are real; the crater has toxic gas, and whether anyone goes down, and how far, is decided by the local authorities and guides. The guide, the miners, the moment with the pole and the sulphur turtle are fiction."
+  }
+}

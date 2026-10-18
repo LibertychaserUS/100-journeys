@@ -1,0 +1,93 @@
+{
+  "slug": "heilongjiang-mohe-cold",
+  "entrance": { "no": 30, "realm": "ice-night", "pace": "day", "scale": "near", "seasons": ["winter"], "time": "dawn" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "raw",
+    "adventure_index": 5, "obscurity_level": 4, "risk_level": 2, "price": 6999,
+    "tags": ["extreme", "nature"],
+    "mbti": { "ISTP": 5, "ESTP": 4, "ESTJ": 4 }
+  },
+  "cover": { "path": "generated/heilongjiang-mohe-cold/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "冻住的泡泡 · 漠河",
+    "subtitle": "第 30 号入口：中国最冷的早晨",
+    "hook": "天刚亮，你吹出的泡泡没落地就冻住了",
+    "region": "亚洲 · 中国",
+    "moods": ["极寒", "动手", "天亮时", "没有风"],
+    "opens": "隆冬（大约 12 月到次年 1 月），天亮的时候",
+    "role": "做实验的人",
+    "premise": "漠河是中国最北的城市，北边隔着黑龙江，对岸就是俄罗斯。2023 年 1 月 22 日早上，漠河阿木尔镇的一个气象站测到零下 53 ℃，突破了漠河 1969 年记下的零下 52.3 ℃，也打破了中国有气象记载以来的最低气温纪录。",
+    "mission": "太阳出来之前，吹一个肥皂泡，看它在落地之前冻住。",
+    "chapters": [
+      { "title": "窗外的温度计", "paragraphs": [
+        "早上六点半，天还黑着。房东大哥把窗外那支温度计指给你看，红线缩在零下四十的下面。他说：“出去可以，我给你掐着时间。我一敲窗户，你就进来。”",
+        "你在炕沿上把东西一样一样摆好：一杯兑了糖的肥皂水，一根吸管，一条泡过热水的小毛巾，手机塞进贴身的口袋。手套戴两层。"
+      ] },
+      { "title": "实验", "paragraphs": [
+        "门一开，空气像一块玻璃贴到脸上。整个村子没有一丝风，家家烟囱冒出来的烟笔直往上，像拿尺子画的。脚下的雪咯吱咯吱响，脆得不像雪。东边的天开始发白，空气里飘着细细的亮点，一闪一闪。",
+        "你吹出一个泡泡。它晃了晃，落在雪面上，没有破。冰花从底边长出来，像蕨叶，一片压着一片，几秒钟就爬满了整个泡泡。它就停在那里，成了一只透明的小灯罩。",
+        "你把毛巾拎起来甩了两下。再拎起来时，它已经硬了。你把它竖着插进雪里，它自己站住了。你的睫毛上结了白霜，眨一下，有点沉。"
+      ] },
+      { "title": "敲窗", "paragraphs": [
+        "窗户响了两声。你最后看了一眼那只冰泡泡，太阳正好从树梢后面出来，空气里的亮点一下子全亮了，像有人往天上撒了一把碎玻璃。",
+        "进了屋，你把毛巾搭在暖气片上，它开始滴水。你在本子上写下几点几分、零下多少度、泡泡冻住用了几秒。房东大哥凑过来看了看，说：“明天再来，比今天还冷。”"
+      ] }
+    ],
+    "choice": {
+      "prompt": "敲窗之前，你还来得及做一件事，做哪个？",
+      "options": [
+        { "key": "bubble", "label": "再吹一个泡泡，让它落在你的手套上", "keeps": "手套上一朵碎掉的冰花" },
+        { "key": "towel", "label": "给那条自己站着的毛巾拍一张照片", "keeps": "一张毛巾在雪里站着的照片" },
+        { "key": "breath", "label": "对着手电光哈一口气，看它在光里结成亮晶晶的雾", "keeps": "一口在光里发亮的气" }
+      ]
+    },
+    "ending": "回到家，最冷的那天也不过零下几度。你在阳台上吹了一个泡泡，它飘了一会儿，啪地破了，什么也没留下。你笑了一下，把那张毛巾站着的照片又翻出来看。",
+    "facts": [
+      { "text": "漠河市是中国最北的城市，属于县级市，与俄罗斯以黑龙江为界。", "source": "https://zh.wikipedia.org/wiki/漠河市" },
+      { "text": "2023 年 1 月 22 日 7 时，漠河市阿木尔镇劲涛气象站测到零下 53 ℃，突破漠河 1969 年的极值零下 52.3 ℃，打破中国有气象记载以来的最低气温纪录。", "source": "https://www.thepaper.cn/newsDetail_forward_21683811" },
+      { "text": "漠河是中国少数属于亚寒带气候的地方之一，冬季漫长、干燥而严寒，气温通常是全国最低。", "source": "https://en.wikipedia.org/wiki/Mohe_City" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。冬天在户外吹肥皂泡看它结冰，是寒冷地方常见的小游戏；文中的房东、温度计的读数、那天的天气和本子上的记录都是虚构的。"
+  },
+  "en": {
+    "title": "The Frozen Bubble · Mohe",
+    "subtitle": "Entrance No. 30: the coldest morning in China",
+    "hook": "At first light, your soap bubble freezes before it touches the snow",
+    "region": "Asia · China",
+    "moods": ["Deep cold", "Hands-on", "First light", "Still air"],
+    "opens": "In deep winter (roughly December and January), at first light",
+    "role": "The one running experiments",
+    "premise": "Mohe is China's northernmost city; the Amur runs along its northern edge, with Russia on the far bank. On the morning of 22 January 2023 a weather station in Amur town, Mohe, recorded −53 °C, beating the −52.3 °C logged in Mohe in 1969 and setting China's lowest temperature on record.",
+    "mission": "Before the sun is up, blow one soap bubble and watch it freeze before it lands.",
+    "chapters": [
+      { "title": "The thermometer", "paragraphs": [
+        "Half past six and still dark. Your host points to the thermometer outside the window; the red line has shrunk below minus forty. “You can go out,” he says. “I'll keep time. When I knock on the glass, you come in.”",
+        "On the edge of the heated brick bed you lay out your kit: a cup of soapy water with sugar stirred in, a straw, a small towel soaked in hot water, your phone in an inside pocket. Two pairs of gloves."
+      ] },
+      { "title": "Experiments", "paragraphs": [
+        "The door opens and the air presses against your face like a pane of glass. There's no wind anywhere in the village. Smoke from every chimney rises dead straight, as if drawn with a ruler. The snow squeaks underfoot, too crisp to sound like snow. The east is going pale, and the air is full of tiny drifting glints.",
+        "You blow a bubble. It wobbles, settles on the snow, and doesn't burst. Frost starts growing up from the bottom edge, fern over fern, and in a few seconds it has climbed over the whole thing. It stays where it is, a little glass lampshade.",
+        "You flick the towel out twice. When you lift it again it's rigid. You stand it upright in the snow and it stays there on its own. Your eyelashes have gone white, and they feel heavy when you blink."
+      ] },
+      { "title": "The knock", "paragraphs": [
+        "Two taps on the window. You take one last look at the frozen bubble just as the sun clears the treetops, and every glint in the air lights up at once, as if someone had flung a handful of broken glass at the sky.",
+        "Inside, you hang the towel on the radiator and it starts to drip. In your notebook you write the time, the temperature, how many seconds the bubble took to freeze. Your host reads it over your shoulder. “Do it again tomorrow,” he says. “It'll be colder.”"
+      ] }
+    ],
+    "choice": {
+      "prompt": "There's time for one more thing before the knock. Which?",
+      "options": [
+        { "key": "bubble", "label": "Blow one more bubble and let it land on your glove", "keeps": "A broken frost-flower on your glove" },
+        { "key": "towel", "label": "Photograph the towel standing up by itself", "keeps": "A photo of a towel standing in the snow" },
+        { "key": "breath", "label": "Breathe out into your torch beam and watch it turn to glitter", "keeps": "One breath that shone in the light" }
+      ]
+    },
+    "ending": "Back home, the coldest day of the year barely gets a few degrees below zero. You blow a bubble off the balcony; it drifts for a moment, pops, and leaves nothing behind. You smile and scroll back to the photo of the towel standing up by itself.",
+    "facts": [
+      { "text": "Mohe is the northernmost city in China; the Amur River runs along its border with Russia.", "source": "https://en.wikipedia.org/wiki/Mohe_City" },
+      { "text": "At 7 a.m. on 22 January 2023 a station in Amur town, Mohe, recorded −53 °C, beating Mohe's 1969 extreme of −52.3 °C and China's lowest temperature on record.", "source": "https://www.thepaper.cn/newsDetail_forward_21683811" },
+      { "text": "Mohe is one of the few places in China with a subarctic climate: long, dry, severe winters, normally the coldest in the country.", "source": "https://en.wikipedia.org/wiki/Mohe_City" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Blowing soap bubbles outdoors to watch them freeze is a common game in very cold places; the host, the thermometer reading, that morning's weather and the notebook are fiction."
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "slug": "brazil-lencois-lagoons",
+  "entrance": { "no": 29, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["rainy"], "time": "afternoon" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "surreal",
+    "adventure_index": 4, "obscurity_level": 5, "risk_level": 1, "price": 14999,
+    "tags": ["visual", "nature"],
+    "mbti": { "ENFP": 5, "ESFP": 4, "ISFP": 4 }
+  },
+  "cover": { "path": "generated/brazil-lencois-lagoons/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "雨后的湖 · 伦索伊斯马拉年塞斯",
+    "subtitle": "第 29 号入口：雨季过后，沙丘之间长出了湖",
+    "hook": "翻过一座沙丘，下面是一池温水",
+    "region": "南美洲 · 巴西",
+    "moods": ["白沙", "温水", "撒欢", "午后"],
+    "opens": "雨季快结束的时候（大约 6、7 月），下午",
+    "role": "从一个湖游到下一个湖的人",
+    "premise": "伦索伊斯马拉年塞斯国家公园 1981 年设立，面积约 15.5 万公顷，白色沙丘最高约 40 米。每年 1 月到 6 月是雨季，雨水落进沙丘之间的洼地，被沙子下面一层不透水的岩石托住，积成一片片淡水湖，水温在 27.5 到 32 摄氏度之间。2024 年 7 月，这里被列入世界遗产。",
+    "mission": "一个下午，连着游过三个湖，在第三个湖里找到一条鱼。",
+    "chapters": [
+      { "title": "翻过去", "paragraphs": ["沙子烫脚，你一路小跑上了沙丘顶，往下一看：一池绿得发亮的水，就躺在两道白沙坡中间。你没等任何人，连跑带滑地冲下去，一屁股坐进水里，水花溅了一身。水是温的，像晒了一下午的澡盆。"] },
+      { "title": "第二个湖", "paragraphs": [
+        "下午三点，风从大西洋那边吹过来，把沙丘顶上的细沙吹成一缕一缕的烟。第二个湖比第一个大。你仰面漂在湖中间，耳朵泡在水里，只听得见自己的呼吸，和很远的、闷闷的风声。",
+        "云一朵接一朵往内陆走。你的两只脚趾头露在水面上，像两座小岛。漂着漂着，你发现风已经把你推到了对岸。"
+      ] },
+      { "title": "鱼", "paragraphs": [
+        "第三个湖小一点，也更清。你憋一口气，把脸埋进水里，一个小小的黑影从你脚踝边一闪而过。几个月前，这里还是一片干沙。",
+        "向导的小儿子坐在岸上，冲你咧嘴笑：“有的是下雨那几个月从河那边游过来的，有的在泥里睡了一整个旱季。”你不太信，又把脸埋下去看了一遍。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "太阳往下走了，最后做一件什么事？",
+      "options": [
+        { "key": "run", "label": "再从沙丘顶冲下来一次，直接冲进湖里", "keeps": "耳朵里好几天都倒不干净的一点沙" },
+        { "key": "float", "label": "仰面漂着，等第一颗星出来再上岸", "keeps": "泡得发皱的十个指尖" },
+        { "key": "count", "label": "回到第三个湖边，把鱼再数一遍", "keeps": "一个数：七条" }
+      ]
+    },
+    "ending": "回到城里，第一场大雨过后，路边积起一洼水。你蹲下来往里看了一眼，明知道里面什么都没有。",
+    "facts": [
+      { "text": "伦索伊斯马拉年塞斯国家公园于 1981 年设立，面积约 15.5 万公顷，沙丘最高约 40 米。", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" },
+      { "text": "1 月到 6 月的雨季里，雨水积在沙丘之间；沙下一层不透水的岩石让湖水不会渗走，湖水温度一般在 27.5–32 °C。", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" },
+      { "text": "这些湖常常彼此相连，也和流经这里的河相通；一种狼鱼（traíra）会在旱季钻进湿泥里休眠。", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" },
+      { "text": "2024 年 7 月，公园被列入联合国教科文组织世界遗产。", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。雨季后在湖里游泳是当地常见的玩法，请跟着当地向导、在允许的地方下水；向导的小儿子和文中的细节是虚构的。"
+  },
+  "en": {
+    "title": "Rain Lakes · Lençóis Maranhenses",
+    "subtitle": "Entrance No. 29: after the rains, lakes grow between the dunes",
+    "hook": "Over the top of a dune, a pool of warm water",
+    "region": "South America · Brazil",
+    "moods": ["White sand", "Warm water", "Play", "Afternoon"],
+    "opens": "As the rainy season ends (around June or July), in the afternoon",
+    "role": "The lagoon hopper",
+    "premise": "Lençóis Maranhenses National Park was created in 1981 and covers about 155,000 hectares of white dunes up to 40 metres high. From January to June the rain collects in the hollows between them, held up by a layer of impermeable rock under the sand, and becomes freshwater lagoons between 27.5 and 32 °C. In July 2024 the park became a World Heritage Site.",
+    "mission": "In one afternoon, swim three lagoons in a row, and find a fish in the third.",
+    "chapters": [
+      { "title": "Over the top", "paragraphs": ["The sand burns your feet, so you jog to the crest of the dune, look down, and there it is: a pool of bright green water lying between two white slopes. You don't wait for anyone. You half run, half slide all the way down and sit straight into it with a splash. The water's warm, like a bath left out in the sun all afternoon."] },
+      { "title": "The second lagoon", "paragraphs": [
+        "Three in the afternoon, and the wind is coming in off the Atlantic, lifting thin smoke of sand from the dune crests. The second lagoon is bigger than the first. You float on your back in the middle of it with your ears under, hearing nothing but your own breath and a dull, far-off rush of wind.",
+        "Clouds go over one after another, heading inland. Your big toes stick out of the water like two small islands. You drift and drift, and find the wind has carried you to the far shore."
+      ] },
+      { "title": "The fish", "paragraphs": [
+        "The third lagoon is smaller and clearer. You take a breath and put your face in, and something small and dark flicks past your ankle. A few months ago this was dry sand.",
+        "The guide's youngest is sitting on the bank, grinning at you. “Some swim in from the river in the rains. Some sleep in the mud the whole dry season.” You don't quite believe it, so you put your face back in to look again."
+      ] }
+    ],
+    "choice": {
+      "prompt": "The sun's getting low. One last thing?",
+      "options": [
+        { "key": "run", "label": "One more run from the crest, straight into the water", "keeps": "Sand in your ear that won't come out for days" },
+        { "key": "float", "label": "Float on your back until the first star, then get out", "keeps": "Ten fingertips wrinkled like raisins" },
+        { "key": "count", "label": "Go back to the third lagoon and count the fish again", "keeps": "A number: seven" }
+      ]
+    },
+    "ending": "Back in the city, after the first big rain, there's a puddle by the kerb. You crouch to look into it, knowing perfectly well there's nothing there.",
+    "facts": [
+      { "text": "Lençóis Maranhenses National Park was created in 1981; it covers about 155,000 ha, with dunes up to 40 m high.", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" },
+      { "text": "In the January–June rainy season water collects between the dunes; a layer of impermeable rock under the sand stops it draining, and the lagoons are typically 27.5–32 °C.", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" },
+      { "text": "The lagoons are often connected to each other and to the rivers that cross the area; the wolf fish (traíra) burrows into wet mud and stays dormant through the dry season.", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" },
+      { "text": "The park was declared a UNESCO World Heritage Site in July 2024.", "source": "https://en.wikipedia.org/wiki/Len%C3%A7%C3%B3is_Maranhenses_National_Park" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Swimming in the lagoons after the rains is a common thing to do there; go with a local guide and swim only where it's allowed. The guide's child and the details here are fiction."
+  }
+}

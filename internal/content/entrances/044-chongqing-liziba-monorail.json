@@ -1,0 +1,77 @@
+{
+  "slug": "chongqing-liziba-monorail",
+  "entrance": { "no": 44, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "blue-hour" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "dramatic",
+    "adventure_index": 1, "obscurity_level": 2, "risk_level": 1, "price": 2999,
+    "tags": ["visual", "culture"],
+    "mbti": { "ENFP": 5, "ENTP": 4, "ESTP": 4 }
+  },
+  "cover": { "path": "generated/card-city-rules.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "穿楼而过 · 重庆李子坝",
+    "subtitle": "第 44 号入口：轻轨从一栋住宅楼的腰里穿过去",
+    "hook": "你在一栋居民楼的半腰下车，再坐电梯下到街上",
+    "region": "亚洲 · 中国",
+    "moods": ["夜", "雨", "山城", "意外"],
+    "opens": "一年四季，天刚黑下来的蓝调时分，最好是刚下过一场雨",
+    "role": "拿纸质地图的人",
+    "premise": "重庆轨道交通 2 号线是跨座式单轨，被称为中国第一条重型单轨线路。李子坝站设在一栋 19 层住宅楼的第 6 到第 8 层，列车从楼中间穿过；车站和大楼是一起建起来的，还装了专门的降噪设备，把车站的声音和住户隔开。重庆多雾，又叫“雾都”。",
+    "mission": "不开手机导航，只凭一张纸质地图和开口问路，找到能看见列车穿楼的地方。",
+    "chapters": [
+      { "title": "一个圆点", "paragraphs": ["天刚黑，雨歇了一会儿，灯笼的光落在湿漉漉的石板上。纸质地图上，李子坝只是一个小圆点。可你脚下这条巷子，一头和别人家的屋顶一样高，另一头拐个弯，就往下钻进了黑里。你把地图转了三圈，还是对不上。"] },
+      { "title": "问路", "paragraphs": ["巷口传来塑料袋窸窸窣窣的声音。一位拎着菜的阿姨瞄了一眼你的地图，笑了：“看这个没得用。你先上去，再下来。”她用手在空中比画：上，下，再往前。你没听懂，但决定照她说的走。"] },
+      { "title": "楼的腰", "paragraphs": ["车厢里的灯很白，窗外是湿漉漉的夜。2 号线跨在一根梁上往前滑，安静得出奇。报站声响起，窗外的灯火忽然换成了墙，你已经在楼里面了。在李子坝下车，站台四面都是墙，一点也看不出这是谁家的六七楼。"] },
+      { "title": "下来", "paragraphs": ["电梯往下走的时候很安静，你按的是一楼。门一开，雨声先涌了进来，外面就是马路。上，下，再往前——阿姨那个手势，现在你看懂了。"] },
+      { "title": "下一班", "paragraphs": ["路灯下，雨丝斜斜地落。你过马路，站到对面，抬起头。楼上亮着几扇窗，有人在阳台上收衣服。一道灯光从黑处慢慢滑过来，钻进楼的腰里，又从另一边出来，声音比你想的轻得多。旁边一个小孩在数它在楼里待了几秒：“一、二、三……”你也跟着数。"] }
+    ],
+    "choice": {
+      "prompt": "雨小了。下一班车来之前，你做什么？",
+      "options": [
+        { "key": "draw", "label": "在地图那个小圆点旁边，画一栋被一条线穿过去的楼", "keeps": "一张多画了一栋楼的地图" },
+        { "key": "ride", "label": "再刷一次卡，从楼里穿过去，数它在楼里待了几秒", "keeps": "一个还没数完就过去了的数" },
+        { "key": "ask", "label": "回巷口找那位阿姨，告诉她你找到了", "keeps": "一句重庆话：“我就说嘛。”" }
+      ]
+    },
+    "ending": "回到家，你在自己住的楼里等电梯，忽然想：要是有一趟车从这一层穿过去，会是什么样。那张对不上的纸质地图，你一直没扔。",
+    "facts": [
+      { "text": "李子坝站位于一栋 19 层住宅楼的第 6 至第 8 层，单轨列车从楼中间穿过；车站与大楼同时建设，并配有专门的降噪设备，把车站噪声与住户隔开。", "source": "https://en.wikipedia.org/wiki/Liziba_station" },
+      { "text": "重庆轨道交通 2 号线是跨座式单轨，被称为中国第一条重型单轨线路。", "source": "https://en.wikipedia.org/wiki/Line_2_(Chongqing_Rail_Transit)" },
+      { "text": "重庆多雾，被称为“雾都”（Fog City）。", "source": "https://en.wikipedia.org/wiki/Chongqing" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。阿姨、小孩和所有对话都是虚构的。"
+  },
+  "en": {
+    "title": "Through the Building · Liziba, Chongqing",
+    "subtitle": "Entrance No. 44: the train that runs through a block of flats",
+    "hook": "Off the train halfway up a block of flats, then down by lift",
+    "region": "Asia · China",
+    "moods": ["Night", "Rain", "Mountain city", "Surprise"],
+    "opens": "Any time of year, in the blue hour just after dark; best just after rain",
+    "role": "The one with the paper map",
+    "premise": "Line 2 of Chongqing Rail Transit is a straddle-beam monorail, China's first heavy monorail line. Liziba station sits on the sixth to eighth floors of a 19-storey residential building, and the trains run straight through the middle of it; the station and the building went up together, with special noise-reduction equipment to keep the station's sound away from the flats. Chongqing is foggy enough to be known as the Fog City.",
+    "mission": "No phone navigation: with only a paper map and by asking the way, find a spot where you can watch a train go through the building.",
+    "chapters": [
+      { "title": "A dot", "paragraphs": ["Just after dark the rain has paused, and lantern light lies on the wet flagstones. On the paper map Liziba is a small circle. But the lane under your feet runs level with somebody's roof at one end, and at the other it turns a corner and dives down into the dark. You turn the map round three times. It still doesn't match."] },
+      { "title": "Asking", "paragraphs": ["A plastic bag rustles at the mouth of the lane. A woman carrying vegetables glances at your map and laughs. “That's no use here. Go up first, then come down.” She draws it in the air: up, down, straight on. You don't follow, but you decide to do exactly that."] },
+      { "title": "The middle of the building", "paragraphs": ["Hard white light in the carriage, a wet night outside. Line 2 glides along astride its beam, oddly quiet. The announcement comes, the city lights in the window turn suddenly into wall, and you're inside the building. At Liziba you step out onto a platform walled in on every side; nothing tells you this is somebody's sixth or seventh floor."] },
+      { "title": "Coming down", "paragraphs": ["The lift is quiet on the way down; you've pressed for the ground floor. The doors open and the sound of rain comes in first. Outside is the street. Up, down, straight on: now you can read her hands."] },
+      { "title": "The next one", "paragraphs": ["Under the streetlight the rain falls slantwise. You cross the road, stand on the far side and look up. A few windows are lit; someone is bringing in washing from a balcony. A light comes sliding out of the dark, slips into the middle of the building and out the other side, much quieter than you expected. A kid beside you counts the seconds it spends inside, “One, two, three…”, and you count along."] }
+    ],
+    "choice": {
+      "prompt": "The rain is easing. Before the next train, what do you do?",
+      "options": [
+        { "key": "draw", "label": "Next to the dot on your map, draw a building with a line through it", "keeps": "A map with one building added" },
+        { "key": "ride", "label": "Tap in again and ride through, counting the seconds you're inside", "keeps": "A count that ran out before you finished it" },
+        { "key": "ask", "label": "Go back to the lane and tell the woman you found it", "keeps": "One line in Chongqing dialect: “Told you so.”" }
+      ]
+    },
+    "ending": "Back home, waiting for the lift in your own building, you catch yourself wondering what it would be like if a train came through this floor. You never throw away the paper map that didn't match.",
+    "facts": [
+      { "text": "Liziba station occupies the sixth to eighth floors of a 19-storey residential building, with monorail trains running through the middle; it was built together with the building and uses specialised noise-reduction equipment to isolate station noise from the flats.", "source": "https://en.wikipedia.org/wiki/Liziba_station" },
+      { "text": "Line 2 of Chongqing Rail Transit is a straddle-beam monorail and China's first heavy monorail line.", "source": "https://en.wikipedia.org/wiki/Line_2_(Chongqing_Rail_Transit)" },
+      { "text": "Chongqing is known as the Fog City (雾都) for its frequent fog.", "source": "https://en.wikipedia.org/wiki/Chongqing" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The woman, the kid and all the dialogue are fiction."
+  }
+}

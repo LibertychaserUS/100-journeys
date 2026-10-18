@@ -1,0 +1,75 @@
+{
+  "slug": "morocco-marrakech-jemaa-el-fna",
+  "entrance": { "no": 48, "realm": "city-rules", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "dusk" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "dramatic",
+    "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 8999,
+    "tags": ["culture", "night"],
+    "mbti": { "ESFP": 5, "ENFP": 4, "ENFJ": 4 }
+  },
+  "cover": { "path": "generated/morocco-marrakech-jemaa-el-fna/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "人圈 · 德吉玛广场",
+    "subtitle": "第 48 号入口：天一黑，广场换了一张脸",
+    "hook": "说书人往人群里一指，一百个人回头看你",
+    "region": "非洲 · 摩洛哥",
+    "moods": ["喧闹", "炭火烟", "说书", "人群"],
+    "opens": "一年四季，日落前后，小吃摊开始支起来的时候",
+    "role": "被拉进圈里的人",
+    "premise": "德吉玛广场在马拉喀什老城。2001 年，联合国教科文组织第一次宣布“人类口头和非物质遗产代表作”，“德吉玛广场文化空间”就在其中，而设立这份名录的主意，正是从保护这座广场的呼声里来的。广场上有说书人、诗人、弄蛇人、柏柏尔乐手和格纳瓦舞者；天一黑，几十个小吃摊就把它占满了。",
+    "mission": "找一个你一个字也听不懂的人圈，站到它散场。",
+    "chapters": [
+      { "title": "换场", "paragraphs": ["太阳落到屋顶后面，弄蛇人又尖又细的笛声停了。他们收起东西走了，榨橙汁的摊子还亮着；空地上已经有人在搭架子、摆长凳、拉起一串串灯泡，小吃摊一个接一个支起来。烤肉的烟往上走，混进傍晚的天，一片空地变成了一条条冒烟的街。"] },
+      { "title": "圈", "paragraphs": ["笑声从人群里一阵一阵地炸开。这里有好几个圈，你挤进其中一个：中间站着一个老人，没有话筒，没有道具，只有一双手和一张脸。他用当地话讲，你一个字也听不懂。可是周围的人笑，你也跟着笑；他压低声音，整个圈往前凑了半步，你也凑了过去。"] },
+      { "title": "进圈", "paragraphs": ["讲到一半，老人的声音忽然停了。他转过身，手指直直地指着你，说了句什么。一百个人一起回头。旁边一个小男孩推了你一把：“他叫你进去！”你走进圈子中间，他把你摆成一个姿势：像在骑马？像在等人？整个圈笑成一片。你不知道自己演的是谁，可你站稳了，没有躲。"] }
+    ],
+    "choice": {
+      "prompt": "故事讲完，帽子转到了你面前。你会——",
+      "options": [
+        { "key": "coin", "label": "放一枚硬币进去，听他回你一句祝福", "keeps": "一句听不懂的祝福" },
+        { "key": "pull", "label": "把站在外圈不敢上前的那个游客也拉进来，换他演一回", "keeps": "两个陌生人一起挨的一阵笑" },
+        { "key": "stall", "label": "跟着刚才那个小男孩，去小吃摊的长凳上挤个位置", "keeps": "头发里一整晚的炭火味" }
+      ]
+    },
+    "ending": "回去以后，有天傍晚你在街口看见几个人围着一个弹吉他的。你没有绕开，走过去，站进了那个圈。",
+    "facts": [
+      { "text": "“德吉玛广场文化空间”于 2001 年被联合国教科文组织宣布为人类口头和非物质遗产代表作，2008 年列入人类非物质文化遗产代表作名录；广场上有说书人、诗人、弄蛇人、柏柏尔乐手、格纳瓦舞者等。", "source": "https://ich.unesco.org/en/RL/cultural-space-of-jemaa-el-fna-square-00014" },
+      { "text": "“人类口头和非物质遗产代表作”第一次宣布是在 2001 年 5 月 18 日；设立这一项目的主意，来自保护马拉喀什德吉玛广场的运动。", "source": "https://en.wikipedia.org/wiki/Masterpieces_of_the_Oral_and_Intangible_Heritage_of_Humanity" },
+      { "text": "白天广场上多是榨橙汁的摊子和弄蛇人；天黑以后，几十个小吃摊把广场占满。", "source": "https://en.wikipedia.org/wiki/Jemaa_el-Fnaa" },
+      { "text": "“哈尔卡”（halqa）是观众围成一圈、表演者站在中间的街头表演，有时会让观众参与；据一些史料，这种表演最早出现在德吉玛广场。", "source": "https://en.wikipedia.org/wiki/Halqa" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。傍晚在广场上围看说书和音乐是真实的日常；文中的说书人、小男孩和你被拉进圈的情节是虚构的。"
+  },
+  "en": {
+    "title": "The Circle · Jemaa el-Fnaa",
+    "subtitle": "Entrance No. 48: at dusk, the square changes its face",
+    "hook": "The storyteller points into the crowd, and a hundred heads turn",
+    "region": "Africa · Morocco",
+    "moods": ["Noise", "Charcoal smoke", "Stories", "Crowd"],
+    "opens": "Any time of year, around sunset, as the food stalls go up",
+    "role": "The one pulled into the circle",
+    "premise": "Jemaa el-Fnaa is the great square of Marrakech's old city. In 2001, when UNESCO proclaimed its first Masterpieces of the Oral and Intangible Heritage of Humanity, the “Cultural space of Jemaa el-Fna Square” was among them, and the idea for the list itself came from a campaign to protect this square. Storytellers, poets, snake charmers, Berber musicians and Gnawa dancers work it; as darkness falls, dozens of food stalls fill it.",
+    "mission": "Find a circle where you can't understand a word, and stay until it breaks up.",
+    "chapters": [
+      { "title": "The changeover", "paragraphs": ["The sun drops behind the rooftops and the thin, high whine of the snake charmers' pipes stops. They pack up and go; the orange-juice stalls are still lit, and on the open ground people are already putting up frames, benches and strings of bulbs, one food stall after another. Smoke from the grills rises into the evening sky, and an open square turns into streets of smoke."] },
+      { "title": "The circle", "paragraphs": ["Laughter keeps bursting out of the crowd. There are several circles; you squeeze into one. In the middle stands an old man with no microphone and no props, just his hands and his face. He tells it in the local Arabic and you don't catch a word. But when the people around you laugh, you laugh; when he drops his voice, the whole circle leans in half a step, and so do you."] },
+      { "title": "Inside", "paragraphs": ["Halfway through, the old man's voice stops dead. He swings round, points straight at you and says something. A hundred heads turn. A boy beside you gives you a shove. “He wants you in!” You step into the middle and he arranges you into a pose. Riding a horse? Waiting for someone? The circle falls apart laughing. You have no idea who you're meant to be. You hold the pose anyway."] }
+    ],
+    "choice": {
+      "prompt": "The story's over and the cap comes round to you. What do you do?",
+      "options": [
+        { "key": "coin", "label": "Drop in a coin and hear him answer with a blessing", "keeps": "A blessing you couldn't understand" },
+        { "key": "pull", "label": "Pull in the tourist hanging back at the edge and let them take a turn", "keeps": "A laugh two strangers got together" },
+        { "key": "stall", "label": "Follow the boy to a food stall and squeeze onto the bench", "keeps": "Charcoal smoke in your hair all night" }
+      ]
+    },
+    "ending": "Back home, one evening on a street corner, you see a few people gathered round someone playing a guitar. You don't walk around them. You step into the circle.",
+    "facts": [
+      { "text": "The “Cultural space of Jemaa el-Fna Square” was proclaimed by UNESCO in 2001 and inscribed on the Representative List in 2008; its performers include storytellers, poets, snake charmers, Berber musicians and Gnawa dancers.", "source": "https://ich.unesco.org/en/RL/cultural-space-of-jemaa-el-fna-square-00014" },
+      { "text": "The first Masterpieces of the Oral and Intangible Heritage of Humanity were proclaimed on 18 May 2001; the idea for the project came from a campaign to preserve Jemaa el-Fna Square in Marrakech.", "source": "https://en.wikipedia.org/wiki/Masterpieces_of_the_Oral_and_Intangible_Heritage_of_Humanity" },
+      { "text": "By day the square is mostly orange-juice stalls and snake charmers; as darkness falls, it fills with dozens of food stalls.", "source": "https://en.wikipedia.org/wiki/Jemaa_el-Fnaa" },
+      { "text": "The halqa is street theatre with the audience in a circle around the performer, sometimes drawing them in; some historical accounts say it began in Jemaa el-Fna.", "source": "https://en.wikipedia.org/wiki/Halqa" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Gathering round storytellers and musicians at dusk is everyday life in the square; the storyteller, the boy and the moment you're pulled into the circle are fiction."
+  }
+}

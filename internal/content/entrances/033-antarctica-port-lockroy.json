@@ -1,0 +1,101 @@
+{
+  "slug": "antarctica-port-lockroy",
+  "entrance": { "no": 33, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["summer"], "time": "midnight" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "minimal",
+    "adventure_index": 6, "obscurity_level": 8, "risk_level": 3, "price": 39999,
+    "tags": ["solitude", "culture", "hidden"],
+    "mbti": { "ISFJ": 5, "ESFJ": 4, "ENFJ": 4 }
+  },
+  "cover": { "path": "generated/antarctica-port-lockroy/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "企鹅邮局 · 洛克罗伊港",
+    "subtitle": "第 33 号入口：午夜的天不黑，信要走好几个星期",
+    "hook": "午夜的天还亮着，红邮筒里塞满了信",
+    "region": "南极洲 · 南极半岛",
+    "moods": ["小事", "惦记", "白夜", "安静"],
+    "opens": "南极的夏天（大约 11 月到次年 3 月），午夜前后",
+    "role": "邮局里多出来的一双手",
+    "premise": "洛克罗伊港在南极半岛西侧的古迪尔岛上，1944 年作为英国“塔巴林行动”的基地建成。如今它是一座博物馆兼邮局，由英国南极遗产信托的一支小队在夏季驻守，一季要经手约五万张明信片。岛上一半对游客开放，一半留给巴布亚企鹅；围绕这里企鹅群的游客影响研究，是南极持续时间最长的同类研究之一。",
+    "mission": "午夜之前，把今天投进红邮筒的明信片一张张盖上邮戳；轮到你自己那张时，写一句只有家里人看得懂的话。",
+    "chapters": [
+      { "title": "最后一船人", "paragraphs": [
+        "晚上十点，太阳还挂在山脊上，光是斜的，把每块石头的影子拉得老长。最后一艘船的小艇突突地把游客接走，马达声越来越远，岛上一下子只剩企鹅的叫声。",
+        "站长从门口铲出一条路，把铁锹往雪里一插：“好了，现在才是一天的活儿。”"
+      ] },
+      { "title": "邮戳", "paragraphs": [
+        "小屋里一盏台灯，照着一张旧木桌。墙上钉着今晚的单子：扎好明天的邮袋；扫掉窗台上的新雪；数一遍仓库里的罐头；清空红邮筒。你从最后一项做起。",
+        "明信片一张一张过你的手。你没有细读，还是看见了：有一张写给还不认字的孙女；有一张只写了一个日期；有一张角上画着一只歪歪扭扭的企鹅。你把每一张都摆正了再盖下去，盖得很用力，让邮戳清清楚楚。"
+      ] },
+      { "title": "邮路", "paragraphs": [
+        "麻绳勒紧袋口时吱的一声。站长一边扎邮袋，一边告诉你接下来的路：明天小艇把袋子送上船，船开到福克兰群岛的斯坦利，再搭军用飞机回英国，交给皇家邮政送往各地。快的三个星期，慢的六个星期。",
+        "“有人比自己的明信片先到家，”她说，“也有人到家好久了，才收到自己从南极寄的信。”"
+      ] },
+      { "title": "午夜", "paragraphs": [
+        "快十二点了，太阳刚沉到山脊后面，天没有黑，只褪成一种发白的蓝。你坐在窗边写自己那张：只写了家里那条老狗的名字，和一句“替我挠挠它的耳朵后面”。",
+        "你给它盖上邮戳，放在邮袋最上面。窗外，一只企鹅叼着一颗小石子，一摇一摆地走回自己的窝。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "邮袋扎口之前，还来得及做一件事：",
+      "options": [
+        { "key": "another", "label": "再写一张，寄给一个很久没联系的人", "keeps": "一张要走好几个星期的明信片" },
+        { "key": "list", "label": "把墙上那张划满了横线的单子折起来，放进口袋", "keeps": "一张每一行都划掉了的清单" },
+        { "key": "kettle", "label": "给还在外面铲雪的队友烧一壶水", "keeps": "递出去那杯热茶冒起的白气" }
+      ]
+    },
+    "ending": "几个星期后，你已经回到原来的日子，几乎忘了那张明信片。某天傍晚，家里人发来一张照片：老狗趴在门垫上，旁边是一张盖着南极邮戳的卡片。",
+    "facts": [
+      { "text": "洛克罗伊港的基地位于古迪尔岛，1944 年作为“塔巴林行动”的基地建立；现由英国南极遗产信托运营博物馆和邮局，夏季（通常 11 月至 3 月）有人驻守；岛的一半对游客开放，另一半留给企鹅。", "source": "https://en.wikipedia.org/wiki/Port_Lockroy" },
+      { "text": "2025/26 季，洛克罗伊港驻守 128 天，处理约五万张明信片，统计到 445 对巴布亚企鹅。", "source": "https://ukaht.org/latest-news/port-lockroy-2026-vital-statistics/" },
+      { "text": "这里的邮件逐件手工盖销，经船运到斯坦利，再由军用航班飞往英国布莱兹诺顿，由皇家邮政投递；快的约三周，偶尔要六周。", "source": "https://britishantarcticterritory.org.uk/blog-port-lockroys-postmaster" },
+      { "text": "古迪尔岛的巴布亚企鹅群，是南极持续时间最长的、研究游客数量对企鹅繁殖影响的实验之一。", "source": "https://nora.nerc.ac.uk/id/eprint/11642/" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。洛克罗伊港的邮局由信托雇用的小队打理，游客只是短暂登岛参观，不会留宿，也不会帮忙盖邮戳；文中的站长、她的话、清单和你写的那张卡片都是虚构的。"
+  },
+  "en": {
+    "title": "The Penguin Post Office · Port Lockroy",
+    "subtitle": "Entrance No. 33: midnight stays pale, and letters take weeks",
+    "hook": "Midnight, still light, and the red post box full",
+    "region": "Antarctica · Antarctic Peninsula",
+    "moods": ["Small tasks", "Thinking of home", "White night", "Quiet"],
+    "opens": "In the Antarctic summer (roughly November to March), around midnight",
+    "role": "An extra pair of hands at the post office",
+    "premise": "Port Lockroy is on Goudier Island, off the west side of the Antarctic Peninsula, and was built in 1944 as a base for Britain's Operation Tabarin. Today it is a museum and post office, staffed each summer by a small team from the UK Antarctic Heritage Trust, who handle around 50,000 postcards a season. Half the island is open to visitors and half is left to the gentoo penguins, whose colonies here are part of one of Antarctica's longest-running studies of how visitors affect them.",
+    "mission": "Before midnight, postmark every card dropped in the red box today, one at a time; when you reach your own, write a line only someone at home would understand.",
+    "chapters": [
+      { "title": "The last boat", "paragraphs": [
+        "Ten at night, and the sun is still above the ridge, the light coming in so low that every stone has a long shadow. The last ship's boat putters off with the visitors; the engine fades, and all at once the island is just penguins calling.",
+        "The base leader digs a path clear of the door and plants the shovel in the snow. “Right. Now the day's work starts.”"
+      ] },
+      { "title": "Postmarks", "paragraphs": [
+        "One desk lamp in the hut, over an old wooden table. Tonight's list is pinned to the wall: tie up the mailbags for tomorrow; brush the new snow off the window ledges; count the tins in the store; empty the red post box. You start with the last one.",
+        "The cards pass through your hands one by one. You don't read them, exactly, but you can't help seeing: one to a granddaughter who can't read yet, one with nothing on it but a date, one with a lopsided penguin in the corner. You square each card up before you stamp it, and press hard, so the postmark comes out clean."
+      ] },
+      { "title": "The route", "paragraphs": [
+        "The rope squeaks as it cinches the neck of a sack. Tying up the mailbags, the base leader tells you where they go next: tomorrow a small boat takes them out to a ship; the ship takes them to Stanley in the Falklands; a military flight takes them to England, and Royal Mail does the rest. Three weeks if it's quick. Six if it isn't.",
+        "“Some people get home before their postcards,” she says. “Some have been back for ages when their own letter from Antarctica turns up.”"
+      ] },
+      { "title": "Midnight", "paragraphs": [
+        "Almost twelve. The sun has only just slipped behind the ridge, and the sky hasn't gone dark, only faded to a whitish blue. At the window you write your own card: just the name of the old dog at home, and “Give him a scratch behind the ears for me.”",
+        "You postmark it and lay it on top of the sack. Outside, a penguin with a pebble in its beak waddles back to its nest."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before the sack is tied, there's time for one more thing:",
+      "options": [
+        { "key": "another", "label": "Write one more, to someone you've lost touch with", "keeps": "A postcard that will be weeks on its way" },
+        { "key": "list", "label": "Fold up tonight's list, every line struck through, and put it in your pocket", "keeps": "A list with every line crossed out" },
+        { "key": "kettle", "label": "Put the kettle on for whoever's still out shovelling", "keeps": "The steam off a mug you handed over" }
+      ]
+    },
+    "ending": "Weeks later you're back in your old routine and have nearly forgotten the card. Then one evening someone at home sends a photo: the old dog asleep on the doormat, and beside it, a card with an Antarctic postmark.",
+    "facts": [
+      { "text": "Port Lockroy's base, on Goudier Island, was established in 1944 under Operation Tabarin; the UK Antarctic Heritage Trust runs its museum and post office, staffed in the Antarctic summer (usually November to March), and half the island is open to visitors while the other half is reserved for penguins.", "source": "https://en.wikipedia.org/wiki/Port_Lockroy" },
+      { "text": "In the 2025/26 season the team spent 128 days at Port Lockroy, processed about 50,000 postcards and counted 445 pairs of gentoo penguins.", "source": "https://ukaht.org/latest-news/port-lockroy-2026-vital-statistics/" },
+      { "text": "Each piece of post is cancelled by hand, shipped to Stanley and flown on a military flight to Brize Norton for Royal Mail; it can arrive in as little as three weeks, occasionally six.", "source": "https://britishantarcticterritory.org.uk/blog-port-lockroys-postmaster" },
+      { "text": "The gentoo colonies on Goudier Island are the focus of one of the longest-running experiments in the Antarctic on how tourist numbers affect penguin breeding.", "source": "https://nora.nerc.ac.uk/id/eprint/11642/" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The post office is run by a small team the Trust recruits; visitors come ashore only for short visits and don't stay overnight or help with the post. The base leader, what she says, the list and the card you write are fiction."
+  }
+}

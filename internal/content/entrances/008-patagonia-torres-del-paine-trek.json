@@ -1,0 +1,75 @@
+{
+  "slug": "patagonia-torres-del-paine-trek",
+  "entrance": { "no": 8, "realm": "fire-stone", "pace": "multi-day", "scale": "far", "seasons": ["summer"], "time": "dawn" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "dramatic",
+    "adventure_index": 8, "obscurity_level": 5, "risk_level": 3, "price": 24999,
+    "tags": ["extreme", "nature", "hidden"],
+    "mbti": { "ENTJ": 5, "INTJ": 5, "ISTJ": 4, "ESTJ": 3 }
+  },
+  "cover": { "path": "generated/patagonia-torres-del-paine-trek/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "塔尖的红 · 百内国家公园",
+    "subtitle": "第 8 号入口：三座没有屋顶的塔",
+    "hook": "你算好了时间，第一道光正落在塔尖上",
+    "region": "南美洲 · 智利",
+    "moods": ["大风", "天亮前", "花岗岩", "专注"],
+    "opens": "南半球的夏天（大约 12 月到次年 2 月），天亮的那一刻",
+    "role": "定配速的人",
+    "premise": "百内国家公园在智利的巴塔哥尼亚，“Paine”在当地特维尔切语里是“蓝色”的意思。三座塔峰是约 1,250 万年前侵入的岩浆冷却成的花岗岩，原本压在上面的深色沉积岩已经被完全剥蚀；隔壁角峰（Cuernos）的头顶还留着那层黑色。W 线一般走三到五天，其中一段沿阿森西奥山谷上行，通到塔脚下一汪乳绿色的湖边。",
+    "mission": "在第一道光碰到塔尖之前，把整组人带到湖边的石头上坐好，一个不落。",
+    "chapters": [
+      { "title": "屋顶", "paragraphs": ["下午，风一阵一阵推着你的背包。角峰在路边陪了你几个小时：中间一段是浅色的花岗岩，顶上压着一层黑。向导停下来指给大家看：三座塔原来也有这样一层屋顶，后来被冰和风雨一点一点揭掉了。你把这层黑记在本子上，旁边写了一行：明天看没有屋顶的。"] },
+      { "title": "倒推", "paragraphs": ["夜里，山屋的灯熄了，只剩你的头灯照着地图背面。你把第二天倒着排一遍：日出时间，减去上山要走的时间，再留二十分钟余量。又数了一遍人头，四个。闹钟定在 3:40，你把手机放在枕头边，屏幕朝下。"] },
+      { "title": "头灯", "paragraphs": ["凌晨，风从山口灌下来，声音比脚步还响。四盏头灯排成一列，你走第二个，替所有人数着节奏：两步吸气，两步呼气。向导一抬手，大家就地蹲低，等这一阵风过去再起身。越往上石头越大，你不再看表，只看前面那盏灯照亮的下一块石头。"] },
+      { "title": "准时", "paragraphs": ["湖边还是灰的，你们比日出早到了十一分钟。湖水乳绿，比天色还暗。大家坐好，你最后一个坐下。然后它来了：先是一座塔的尖顶变红，像刚从炉子里夹出来，再一寸一寸往下走。上面什么也没剩下的花岗岩，把这点光整个接住了。你看了一眼表，又用袖子把它盖上。"] }
+    ],
+    "choice": {
+      "prompt": "光走到塔脚之前，你做哪一件事？",
+      "options": [
+        { "key": "timer", "label": "按下秒表，记下红色在岩壁上停了多久", "keeps": "本子上一个铅笔写的时间，几分几秒" },
+        { "key": "route", "label": "拿笔在地图上，把明天要走的那段路描一遍", "keeps": "一张多了一道笔迹的地图" },
+        { "key": "next", "label": "对着塔，把你下一个要去的地方说出口", "keeps": "一个山先听到的计划" }
+      ]
+    },
+    "ending": "回到城里，你还是习惯在前一晚把第二天倒推一遍。有时闹钟还没响你就醒了，屋里很黑，你想起那层被揭掉的屋顶，和那道按时落下来的光。",
+    "facts": [
+      { "text": "百内山体的花岗岩约在 1,250 万年前侵入形成；铀铅测年显示，这批岩浆在约 16 万年内完成了侵入和结晶。", "source": "https://en.wikipedia.org/wiki/Cordillera_Paine" },
+      { "text": "三座塔上方原有的沉积岩层已被完全侵蚀，只剩更坚硬的花岗岩；角峰顶部的深色岩石，是一层被严重侵蚀的沉积岩的残余。", "source": "https://en.wikipedia.org/wiki/Torres_del_Paine_National_Park" },
+      { "text": "“Paine”在特维尔切（Aonikenk）语中意为“蓝色”。公园以大风闻名，11 月到 1 月风最大；W 线一般走三到五天。", "source": "https://en.wikipedia.org/wiki/Torres_del_Paine_National_Park" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。文中的向导、同行的人、凌晨的时间安排和行程细节都是虚构的。"
+  },
+  "en": {
+    "title": "Red on the Towers · Torres del Paine",
+    "subtitle": "Entrance No. 8: three towers with their roof worn away",
+    "hook": "You planned it backwards from sunrise, and the light lands on time",
+    "region": "South America · Chile",
+    "moods": ["Wind", "Before dawn", "Granite", "Focus"],
+    "opens": "In the southern summer (roughly December to February), at first light",
+    "role": "The pacesetter",
+    "premise": "Torres del Paine is in Chilean Patagonia; paine means “blue” in the Tehuelche language. The three towers are granite, from magma that pushed into older rock about 12.5 million years ago, and the dark sedimentary layer that once sat on top of them has been completely worn away; the neighbouring Cuernos still wear theirs. The W route usually takes three to five days, and one leg climbs the Ascencio Valley to a milky-green tarn at the foot of the towers.",
+    "mission": "Before the first light touches the tops, get the whole group sitting on the rocks by the tarn. Nobody left behind.",
+    "chapters": [
+      { "title": "The roof", "paragraphs": ["Afternoon, and the wind keeps shoving at your pack. The Cuernos have been beside the trail for hours: pale granite in the middle, a dark band pressed down on top. The guide stops and points. The towers once had the same roof, he says, and ice and weather took it off a little at a time. You note the dark band in your notebook, and beside it: tomorrow, the ones without."] },
+      { "title": "Backwards", "paragraphs": ["Night in the hut. The lights are out and your headlamp is on the back of the map. You lay tomorrow out backwards: sunrise, minus the climb, minus twenty minutes of slack. You count heads again. Four. The alarm goes on for 3:40, and the phone goes by your pillow, face down."] },
+      { "title": "Headlamps", "paragraphs": ["Before dawn the wind coming down from the pass is louder than your boots. Four headlamps in a line. You walk second and keep the rhythm for everyone: two steps in, two steps out. The guide raises a hand and you all crouch where you are until the gust has gone through, then stand and carry on. The rocks get bigger as you climb, and you stop checking the time and watch only the next stone the lamp ahead is lighting."] },
+      { "title": "On time", "paragraphs": ["The tarn is still grey when you reach it, eleven minutes before sunrise. The water is milky green and darker than the sky. Everyone sits; you take the last rock. Then it comes: the tip of one tower turns red, as if it had just been lifted out of a forge, and the colour works its way down inch by inch. With nothing left on top of it, the granite catches every bit of the light. You glance at your watch, then pull your sleeve down over it."] }
+    ],
+    "choice": {
+      "prompt": "Before the light reaches the foot of the towers, what do you do?",
+      "options": [
+        { "key": "timer", "label": "Start the stopwatch and time how long the red stays on the rock", "keeps": "A time in pencil, minutes and seconds" },
+        { "key": "route", "label": "Trace tomorrow's stretch on the map with your pen", "keeps": "A map with one more line on it" },
+        { "key": "next", "label": "Say out loud, to the towers, where you're going next", "keeps": "A plan the mountains heard first" }
+      ]
+    },
+    "ending": "Back home you still work the next day out backwards the night before. Some mornings you wake before the alarm, in the dark, and think of the roof that wore away and the light that came exactly when you said it would.",
+    "facts": [
+      { "text": "The Paine granite was intruded about 12.5 million years ago; uranium–lead dating suggests the magma went in and crystallised within roughly 160,000 years.", "source": "https://en.wikipedia.org/wiki/Cordillera_Paine" },
+      { "text": "On the towers the overlying sedimentary layer has been completely eroded, leaving the tougher granite; the dark tops of the Cuernos are remnants of a heavily eroded sedimentary stratum.", "source": "https://en.wikipedia.org/wiki/Torres_del_Paine_National_Park" },
+      { "text": "Paine means “blue” in the Tehuelche (Aonikenk) language. The park is famous for its strong winds, windiest from November to January, and the W route takes about three to five days.", "source": "https://en.wikipedia.org/wiki/Torres_del_Paine_National_Park" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The guide, the group, the pre-dawn timings and the details of the walk are fiction."
+  }
+}

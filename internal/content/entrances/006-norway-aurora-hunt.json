@@ -1,0 +1,93 @@
+{
+  "slug": "norway-aurora-hunt",
+  "entrance": { "no": 6, "realm": "ice-night", "pace": "day", "scale": "far", "seasons": ["polar-night"], "time": "night" },
+  "journey": {
+    "fantasy_type": "night", "visual_style": "dramatic",
+    "adventure_index": 4, "obscurity_level": 3, "risk_level": 2, "price": 18999,
+    "tags": ["night", "visual", "nature"],
+    "mbti": { "INFJ": 5, "ENFP": 4, "ISFJ": 4 }
+  },
+  "cover": { "path": "generated/norway-aurora-hunt/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "灰弧 · 特罗姆瑟",
+    "subtitle": "第 6 号入口：绿色来临之前的那一道灰",
+    "hook": "它起先是灰的，像一朵不肯走的云",
+    "region": "欧洲 · 挪威",
+    "moods": ["等待", "极夜", "寒冷", "微光"],
+    "opens": "极夜（大约 11 月底到次年 1 月中），天黑透以后",
+    "role": "先看见灰色的人",
+    "premise": "特罗姆瑟在北纬将近 70 度，正好处在极光带下面。每年大约 11 月底到次年 1 月中，太阳不会升出地平线，挪威人管这段日子叫 mørketid，暗季。早在 1928 年，这座城里就有了极光观测站。",
+    "mission": "在别人还盯着手机刷预报的时候，先认出北边低空那道灰色的弧，然后只告诉站在你旁边的那个人。",
+    "chapters": [
+      { "title": "中午的蓝", "paragraphs": ["下午一点，超市玻璃门外的天是深蓝色的，这已经是一天里最亮的时候。港口那边的灯一直没关，推门进来的人肩上落着雪，脸上也带着一层蓝。你拿了一副更厚的手套去结账，走到门口，又折回去多拿了一副。"] },
+      { "title": "离开灯光", "paragraphs": [
+        "雪地上没有一盏路灯，只有小巴的车灯还亮着，照出一小片白。离城一个多小时，下车的十一个人大多互不认识。向导把保温桶搁在引擎盖上，给每人倒一杯热的黑加仑汁，说：“别找绿色。找一朵不动的云。”",
+        "你们站成一排跺脚。有个男人每隔一分钟刷新一次预报；有人一直说冷；有人开始后悔来了。一个穿薄运动鞋的女孩把两只手缩在袖子里，一声不吭。"
+      ] },
+      { "title": "灰", "paragraphs": [
+        "快十点的时候，你看见北边山脊上方有一道很淡的弧，灰白色，像一朵冻在半空的云。它不飘。你拿不准，举起手机拍了一张：屏幕上，它是绿的。",
+        "这么暗的地方，眼睛认不出颜色，相机却能把光攒得更久。你想起向导那句话，没有喊。你碰了碰旁边那个女孩的胳膊，朝北边指了指，顺手把多买的那副手套塞进她手里。"
+      ] },
+      { "title": "绿", "paragraphs": [
+        "几分钟后，灰色慢慢有了颜色：先是淡绿，然后亮起来，像一匹布那样抖动。一百多公里高的地方，太阳送来的带电粒子正撞在氧原子上。身后终于有人喊出声，十一个陌生人同时仰起了头。",
+        "女孩戴着你的手套，回头冲你笑了一下。向导什么也没说，只是往你的杯子里又添了一点热的。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "回城的小巴上，你会把哪一样带走？",
+      "options": [
+        { "key": "pencil", "label": "在本子上用铅笔画下那道弧，画成它刚出现时的灰色", "keeps": "一页铅笔画的灰弧" },
+        { "key": "gloves", "label": "不把手套要回来，让它跟着那个女孩去下一座城市", "keeps": "她下车前说的一句：“是你先看见的。”" }
+      ]
+    },
+    "ending": "回家以后的某个阴天傍晚，你看见楼顶上方挂着一道灰白的云，一动不动。你停下来多看了它一会儿，然后转过身，告诉了身边的人。",
+    "facts": [
+      { "text": "特罗姆瑟位于北纬约 69°40′，处在极光带内；大约 11 月底到次年 1 月中是极夜，挪威人称之为 mørketid。", "source": "https://en.wikipedia.org/wiki/Troms%C3%B8" },
+      { "text": "极光是来自太阳的带电粒子撞击高层大气中的原子而发出的光；最常见的绿色来自氧原子 557.7 纳米的发射。", "source": "https://en.wikipedia.org/wiki/Aurora" },
+      { "text": "光线很暗时，人眼主要靠不能分辨颜色的视杆细胞，所以微弱的极光看上去常是灰白色，相机却能拍出颜色。", "source": "https://earthsky.org/earth/will-you-see-colors-in-an-aurora/" },
+      { "text": "特罗姆瑟的极光观测站最初隶属于 1928 年成立的挪威宇宙物理研究所。", "source": "https://tgo.uit.no/about/about.html" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。驱车离城追极光是当地常见的夜间行程，但能不能看到取决于云量和太阳活动；文中的向导、同车的人、黑加仑汁和手套都是虚构的。"
+  },
+  "en": {
+    "title": "The Grey Arc · Tromsø",
+    "subtitle": "Entrance No. 6: the grey that comes before the green",
+    "hook": "At first it's grey, like a cloud that refuses to move",
+    "region": "Europe · Norway",
+    "moods": ["Waiting", "Polar night", "Cold", "Faint light"],
+    "opens": "In the polar night (late November to mid-January), once it's fully dark",
+    "role": "The one who sees the grey first",
+    "premise": "Tromsø sits at almost 70 degrees north, right under the auroral zone. From late November to mid-January the sun never clears the horizon; Norwegians call this stretch mørketid, the dark time. The town has had an auroral observatory since 1928.",
+    "mission": "While the others are still refreshing the forecast, pick out the grey arc low in the north, and tell only the person standing next to you.",
+    "chapters": [
+      { "title": "Midday blue", "paragraphs": ["At one in the afternoon the sky beyond the supermarket's glass doors is deep blue, and that is as bright as the day gets. Over by the harbour the lights never went off; people come in with snow on their shoulders and a blue cast to their faces. You take a thicker pair of gloves to the till, get as far as the door, and go back for a second pair."] },
+      { "title": "Away from the lights", "paragraphs": [
+        "There isn't a streetlight on the snowfield, only the minibus headlights picking out a patch of white. You're a little over an hour out of town, and the eleven people who climbed out are mostly strangers to each other. The guide sets a flask on the bonnet, pours everyone a cup of hot blackcurrant and says: “Don't look for green. Look for a cloud that doesn't move.”",
+        "You stand in a row and stamp your feet. One man refreshes the forecast every minute. Someone keeps saying how cold it is; someone else starts to regret coming. A girl in thin trainers has pulled her hands up inside her sleeves and hasn't said a word."
+      ] },
+      { "title": "Grey", "paragraphs": [
+        "Just before ten you see it: a very faint arc above the ridge to the north, greyish white, like a cloud frozen in place. It doesn't drift. You're not sure, so you lift your phone and take a picture. On the screen, it's green.",
+        "In light this low your eyes can't pick out colour; a camera can wait longer for it. You remember what the guide said and don't shout. You touch the girl's arm, point north, and while you're at it press the spare gloves into her hand."
+      ] },
+      { "title": "Green", "paragraphs": [
+        "Over a few minutes the grey takes on colour: pale green first, then brighter, and then it starts to ripple like a length of cloth. More than a hundred kilometres up, charged particles from the sun are slamming into oxygen. Someone behind you finally yells, and eleven strangers tip their heads back at once.",
+        "The girl, wearing your gloves, turns round and grins at you. The guide says nothing, just tops up your cup."
+      ] }
+    ],
+    "choice": {
+      "prompt": "On the minibus back to town, what do you hold on to?",
+      "options": [
+        { "key": "pencil", "label": "Sketch the arc in your notebook in pencil, grey, the way it first looked", "keeps": "A page with a grey pencil arc" },
+        { "key": "gloves", "label": "Don't ask for the gloves back; let them go on with her to the next city", "keeps": "What she says as she gets off: “You saw it first.”" }
+      ]
+    },
+    "ending": "Back home, on some overcast evening, you notice a pale grey cloud hanging over the rooftops, perfectly still. You stop and watch it a little longer than you need to. Then you turn and tell whoever is beside you.",
+    "facts": [
+      { "text": "Tromsø lies at about 69°40′N, inside the auroral zone; the polar night, which Norwegians call mørketid, runs from about late November to mid-January.", "source": "https://en.wikipedia.org/wiki/Troms%C3%B8" },
+      { "text": "Aurorae are caused by charged particles from the Sun colliding with atoms in the upper atmosphere; the common green is oxygen's emission at 557.7 nm.", "source": "https://en.wikipedia.org/wiki/Aurora" },
+      { "text": "In very dim light the eye relies on rod cells, which don't register colour, so faint aurora often looks grey or white while a camera records colour.", "source": "https://earthsky.org/earth/will-you-see-colors-in-an-aurora/" },
+      { "text": "Tromsø's Auroral Observatory began as a section of the Norwegian Institute of Cosmical Physics, established in 1928.", "source": "https://tgo.uit.no/about/about.html" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Driving out of town to chase the aurora is a common night trip there, though seeing it depends on cloud and solar activity. The guide, the other passengers, the blackcurrant and the gloves are fiction."
+  }
+}

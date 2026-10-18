@@ -1,0 +1,81 @@
+{
+  "slug": "jordan-petra-by-night",
+  "entrance": { "no": 41, "realm": "old-roads", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "night" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "dramatic",
+    "adventure_index": 3, "obscurity_level": 4, "risk_level": 1, "price": 13999,
+    "tags": ["culture", "night", "visual"],
+    "mbti": { "ESFP": 5, "ENTP": 4, "INTP": 4 }
+  },
+  "cover": { "path": "generated/jordan-petra-by-night/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "沿着水槽走 · 佩特拉之夜",
+    "subtitle": "第 41 号入口：烛光下，岩壁里藏着一条水路",
+    "hook": "大家都在抬头，你的指尖跟着墙上的水槽走",
+    "region": "亚洲 · 约旦",
+    "moods": ["烛光", "峡谷", "好奇", "热闹"],
+    "opens": "一年四季，晚上八点半，峡谷里的蜡烛全部点亮的时候",
+    "role": "顺着水走的人",
+    "premise": "佩特拉是纳巴泰人在岩石里凿出的都城，也是商队贸易的中心，1985 年列入世界遗产。进城要穿过西克峡谷（Siq）：约 1.2 公里长，最窄处只有 3 米左右，两侧岩壁高 91 到 182 米，尽头就是卡兹尼神殿，人称“宝库”。“佩特拉之夜”时，峡谷里会点起约两千支蜡烛。",
+    "mission": "走完整条西克峡谷，弄清楚墙上那条槽里的水，当年是怎么一路流进城的。",
+    "chapters": [
+      { "title": "墙上的槽", "paragraphs": ["纸袋里的蜡烛一盏接一盏，把峡谷底照成一条暖黄的河。人群慢下来，大家都仰着头，看两侧的岩壁在头顶合拢，只剩一条窄窄的星空。你却在看墙根：大约齐肩的高度，岩壁上凿着一道浅槽，一直往前伸。你伸出一根手指，悬在槽口上方一指宽的地方，跟着它走。"] },
+      { "title": "一节套一节", "paragraphs": [
+        "峡谷越走越窄，烛光在岩壁上一跳一跳。那道槽一直在往下走，很缓，缓得几乎看不出来，可你走了几百步回头一比，它确实低了一截。“水是自己走进城的。”你小声说。旁边一个本地向导听见了，笑着朝对面的墙一指：“那边还有一条，里面原来埋着陶管，一节套一节。”",
+        "你凑过去，在烛光里找到一小段露出来的管口，圆圆的，有一只碗那么粗。你在心里把整条水路接起来：城外的泉，两边的槽和管，峡谷口那道把山洪引开的坝。大约两千年前，有人在这条峡谷里一节一节地对过缝。你走得比谁都慢，不知不觉落到了人群最后。"
+      ] },
+      { "title": "宝库前", "paragraphs": ["峡谷忽然打开，卡兹尼神殿的整个立面被地上的烛光照亮，几百个人坐在地上，没有人说话。然后一支笛子响起来，接着是一把弦琴，声音在岩壁之间来回撞。你挤进人群坐下，旁边的大婶递来一杯滚烫的甜茶，身后的小孩跟着拍手，拍错了拍子，周围的人都笑了。你捧着茶，还惦记着那条水：过了这里，它又去了哪儿？"] }
+    ],
+    "choice": {
+      "prompt": "离开之前，你带走哪一样？",
+      "options": [
+        { "key": "map", "label": "在门票背面画下水路，标出坝、槽和陶管", "keeps": "一张画着水路的门票" },
+        { "key": "tune", "label": "跟着笛子哼会那段旋律，回去的路上一直哼", "keeps": "一段怎么也哼不准的调子" },
+        { "key": "bet", "label": "跟那个向导打个赌：水最后流到了哪里，明天白天见分晓", "keeps": "一个明天才知道输赢的赌" }
+      ]
+    },
+    "ending": "回到家，你拧开水龙头，会盯着水流看一会儿，想它是从哪些管子一路走来的。你会想起烛光里那道一直往下的槽，和那支笛子。",
+    "facts": [
+      { "text": "佩特拉是纳巴泰王国的都城和商队贸易的中心，控制着通往加沙、大马士革、红海和波斯湾的商路；1985 年 12 月 6 日列入世界遗产。", "source": "https://en.wikipedia.org/wiki/Petra" },
+      { "text": "西克峡谷是佩特拉的主入口，蜿蜒约 1.2 公里，最窄处约 3 米，岩壁高 91–182 米，尽头是卡兹尼神殿；峡谷口的大坝重建了纳巴泰人控制瓦迪穆萨洪水的工程。", "source": "https://en.wikipedia.org/wiki/Siq" },
+      { "text": "城市用水来自瓦迪穆萨的摩西泉，经两条水道穿过西克峡谷：北侧是一条承压的陶管水管，南侧是盖着砂岩石板、沿路约 1.5 米高的水槽；入口处的坝把冬季洪水引进一条 90 米长的隧道。", "source": "https://www.museum.de/audioguide/65/21/EN" },
+      { "text": "“佩特拉之夜”从晚上 8:30 开始，沿西克峡谷点起约 2,000 支蜡烛，一直通到卡兹尼神殿，约 10:30 结束。", "source": "https://visitpetra.jo/en/Thingstodo/75" }
+    ],
+    "fiction": "“入口”和编号是桃源百旅的设定。“佩特拉之夜”真实存在，但开放日期和形式会调整；文中的向导、大婶、孩子、笛子和弦琴、甜茶都是虚构的。岩壁和水道是文物，请只看不碰。"
+  },
+  "en": {
+    "title": "Follow the Water · Petra by Night",
+    "subtitle": "Entrance No. 41: by candlelight, a waterway hidden in the rock",
+    "hook": "Everyone looks up; your fingertip follows the water channel along the wall",
+    "region": "Asia · Jordan",
+    "moods": ["Candlelight", "Gorge", "Curiosity", "Crowd"],
+    "opens": "Any time of year, at half past eight in the evening, once every candle in the gorge is lit",
+    "role": "The one who follows the water",
+    "premise": "Petra, the rock-cut capital of the Nabataeans, was the centre of their caravan trade and became a World Heritage site in 1985. The way in is the Siq: a gorge about 1.2 kilometres long, in places only about three metres wide, between walls 91 to 182 metres high, ending at Al-Khazneh, the Treasury. On Petra by Night, some 2,000 candles line the way.",
+    "mission": "Walk the whole of the Siq and work out how the water in that groove in the wall once found its way into the city.",
+    "chapters": [
+      { "title": "The groove", "paragraphs": ["Candles in paper bags, one after another, turn the floor of the gorge into a warm yellow river. The crowd slows; everyone tilts their head back to watch the walls close in overhead, leaving a thin seam of stars. You're looking at the foot of the wall instead. At about shoulder height a shallow channel is cut into the rock, running on ahead. You hold one finger a finger's width above it and follow."] },
+      { "title": "One slotted into the next", "paragraphs": [
+        "The gorge narrows, and the candlelight jumps on the rock. The channel keeps dropping, so gently you can hardly see it, but a few hundred paces on you glance back and it's definitely lower. “The water walked into town on its own,” you murmur. A young local guide beside you hears, grins, and nods at the opposite wall. “There's another one over there. It used to have clay pipes in it, one slotted into the next.”",
+        "You cross over and, in the candlelight, find a short stretch of exposed pipe mouth, round, about as wide as a bowl. In your head you join the whole system up: the spring outside town, the channel and the pipes on either side, the dam at the mouth of the Siq turning the flash floods away. Roughly two thousand years ago someone fitted this joint by joint down the whole gorge. You're walking slower than anyone, and without noticing you've drifted to the back of the crowd."
+      ] },
+      { "title": "Before the Treasury", "paragraphs": ["The gorge opens all at once: the whole face of Al-Khazneh glows above the candles on the ground, a few hundred people sitting in front of it, nobody talking. Then a flute starts, then a stringed instrument, the sound knocking back and forth between the cliffs. You squeeze in and sit; the woman beside you passes you a cup of scalding sweet tea, and a child behind you claps along, off the beat, and everyone around laughs. You cradle the tea and keep thinking about the water. Past this point, where did it go?"] }
+    ],
+    "choice": {
+      "prompt": "Before you go, what do you take?",
+      "options": [
+        { "key": "map", "label": "Sketch the waterway on the back of your ticket, marking the dam, the channel and the pipes", "keeps": "A ticket with a waterway drawn on it" },
+        { "key": "tune", "label": "Hum along with the flute until you have the tune, and keep humming all the way back", "keeps": "A tune you never quite get right" },
+        { "key": "bet", "label": "Bet the guide where the water ended up, to be settled tomorrow in daylight", "keeps": "A bet you'll only win or lose tomorrow" }
+      ]
+    },
+    "ending": "Back home, you'll turn on a tap and watch the water for a moment, wondering what pipes it walked through to get here. You'll think of that groove in the candlelit rock, always running gently downhill, and of the flute.",
+    "facts": [
+      { "text": "Petra was the capital of the Nabataean kingdom and the centre of its caravan trade, commanding routes to Gaza, Damascus, the Red Sea and the Persian Gulf; it was designated a World Heritage Site on 6 December 1985.", "source": "https://en.wikipedia.org/wiki/Petra" },
+      { "text": "The Siq, Petra's main entrance, winds for about 1.2 km, is as narrow as about 3 m in places, has walls 91–182 m high and ends at Al-Khazneh; a dam at its mouth reconstructs the Nabataeans' control of the Wadi Musa floods.", "source": "https://en.wikipedia.org/wiki/Siq" },
+      { "text": "Petra's water came from the Moses Spring in Wadi Musa through two conduits in the Siq: a pressurised earthenware pipeline on the north side and, on the south, a channel covered with sandstone slabs running about 1.5 m above the road; a dam at the entrance diverted winter floods into a 90 m tunnel.", "source": "https://www.museum.de/audioguide/65/21/EN" },
+      { "text": "Petra by Night starts at 8:30 pm, with about 2,000 candles lighting the Siq all the way to the Treasury, and ends around 10:30 pm.", "source": "https://visitpetra.jo/en/Thingstodo/75" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Petra by Night is real, though its days and format change; the guide, the woman, the child, the flute and strings and the sweet tea are invented. The walls and water channels are protected antiquities: look, don't touch."
+  }
+}

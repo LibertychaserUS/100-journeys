@@ -1,0 +1,95 @@
+{
+  "slug": "greenland-dog-sled-solo",
+  "entrance": { "no": 5, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["winter"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "raw",
+    "adventure_index": 9, "obscurity_level": 8, "risk_level": 4, "price": 29999,
+    "tags": ["extreme", "solitude", "nature"],
+    "mbti": { "ESTP": 5, "ENTJ": 4, "ISTP": 4 }
+  },
+  "cover": { "path": "generated/card-greenland-sled.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "辫子 · 伊卢利萨特",
+    "subtitle": "第 5 号入口：太阳回来以后的正午",
+    "hook": "十二根牵绳，在雪上拧成了一根辫子",
+    "region": "北极 · 格陵兰",
+    "moods": ["冰原", "低太阳", "雪橇犬", "决断"],
+    "opens": "冬天，1 月中旬太阳回来以后，正午前后",
+    "role": "接过一段路的人",
+    "premise": "伊卢利萨特在格陵兰西岸的迪斯科湾边。城南的伊卢利萨特冰峡湾从冰盖向西伸出约 40 公里，2004 年列入世界遗产；峡湾尽头的瑟梅库雅勒冰川是世界上移动最快的冰川之一，冰舌处年均每天前进 45 米以上。熬过几个星期的极夜，这里每年 1 月 13 日迎接太阳回来。",
+    "mission": "正午太阳露头的那一阵，替猎人喊一段路：左、右、停。",
+    "chapters": [
+      { "title": "扇子", "paragraphs": [
+        "灰蓝的晨光里，冰原上只听得见狗的喘气声和滑板擦过雪面的沙沙声。十二只狗不是排成一列，而是像一把扇子散开在雪橇前面，每只狗一根自己的牵绳，绳头扎成一束，系在雪橇前头。",
+        "你坐在雪橇上看了一个上午，慢慢看出门道：谁的耳朵先转，谁偷懒让绳子松着，谁老想往右挤。领头的是一只母狗，它耳朵一偏，整把扇子就跟着偏过去。"
+      ] },
+      { "title": "辫子", "paragraphs": [
+        "天光亮了一点，雪面从灰变白。跑了一个多小时，狗们不停地换位置，从这只底下钻过去，又从那只前面绕回来，十二根绳在雪橇前面拧成了一股麻花。猎人喊停，蹲下去把绳头的扣一解，攥着那束绳子抖几下，辫子就散了。他说这活儿一天要干好几回。",
+        "他一边重新系扣一边说，北边只有这一种狗，别的狗不许带进来；格陵兰狗要是越过北极圈往南去，就不能再回来。你看了看那只领头的母狗，它正低头把爪缝里的冰一点点咬出来。"
+      ] },
+      { "title": "正午", "paragraphs": [
+        "第三天正午，南边的山脊先亮成橘红，然后太阳露出来，低得像贴着冰面在滚。每只狗的影子一下子都比雪橇还长。",
+        "猎人跟你换了位置，自己坐到后面，一只手还搭在雪橇上。“犹豫不犹豫，它们听得出来。”前面有一道被风压硬的雪坎，你得早一点喊，在你拿准之前就喊。你喊了。领头的母狗耳朵一转，整把扇子往左摆过去，雪橇擦着雪坎的边滑了过去。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "太阳在天上待不了多久。狗们停下来喘气，你会——",
+      "options": [
+        { "key": "braid", "label": "自己蹲下去解那根辫子，一根一根理顺", "keeps": "一个你会解的绳扣" },
+        { "key": "call", "label": "再喊一段路，这回不回头看猎人", "keeps": "被冷风吹哑的嗓子" },
+        { "key": "sun", "label": "把雪橇调个头，让十二只狗脸朝太阳歇着", "keeps": "十二道背上的金边" }
+      ]
+    },
+    "ending": "回去以后，早高峰换乘，人从四面八方挤过来，在楼梯口拧成一股。你的手指下意识地去找那个一解就散的扣。",
+    "facts": [
+      { "text": "伊卢利萨特冰峡湾从格陵兰冰盖向西伸向迪斯科湾，长约 40 公里，2004 年列入世界遗产名录；伊卢利萨特城就在它北边。", "source": "https://en.wikipedia.org/wiki/Ilulissat_Icefjord" },
+      { "text": "瑟梅库雅勒（雅各布港冰川）是世界上移动最快的冰川之一，冰舌处的年均流速超过每天 45 米。", "source": "https://en.wikipedia.org/wiki/Jakobshavn_Glacier" },
+      { "text": "伊卢利萨特每年 1 月 13 日迎接太阳回来，约三分之一的居民聚到名叫 Seqinniarfik（“去迎接太阳的地方”）的山坡上唱歌。", "source": "https://visitgreenland.com/articles/return-of-the-sun/" },
+      { "text": "为保护品种，别的狗不许带进格陵兰北部；格陵兰狗一旦越过北极圈往南，就不许再回来。", "source": "https://explorersweb.com/great-explorers-greenland-sled-dogs/" },
+      { "text": "格陵兰的扇形套法里，狗跑动中互相换位，牵绳会拧成“辫子”；绳头的活扣一解就能把它抖开。", "source": "https://thefanhitch.org/V7N4/V7%2CN4Mushing.html" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。从伊卢利萨特出发的多日狗拉雪橇行程真实存在，但都由当地雪橇手驾驶和负责安全；文中的猎人、狗的数目、你替他喊一段路的情节都是虚构的。"
+  },
+  "en": {
+    "title": "The Braid · Ilulissat",
+    "subtitle": "Entrance No. 5: noon, once the sun has come back",
+    "hook": "Twelve traces, twisted into a single braid on the snow",
+    "region": "Arctic · Greenland",
+    "moods": ["Ice", "Low sun", "Sled dogs", "Decisions"],
+    "opens": "In winter, around noon, after the sun returns in mid-January",
+    "role": "The one handed a stretch of the trail",
+    "premise": "Ilulissat sits on Disko Bay on Greenland's west coast. Just south of town, the Ilulissat Icefjord runs about 40 kilometres west from the ice sheet and has been a World Heritage Site since 2004; at its head, Sermeq Kujalleq is one of the fastest-moving glaciers in the world, its front averaging more than 45 metres a day. After weeks of polar night, the town welcomes the sun back every year on 13 January.",
+    "mission": "In the stretch of noon when the sun is up, call the trail for the hunter: left, right, stop.",
+    "chapters": [
+      { "title": "The fan", "paragraphs": [
+        "In the grey-blue morning the only sounds on the ice are the dogs panting and the runners hissing over the snow. The twelve dogs don't run in a line. They spread out in front of the sled like an open fan, each on its own trace, the ends bunched together and tied at the front of the sled.",
+        "You sit on the sled and watch all morning, and slowly start to read them: whose ears turn first, who lets the trace go slack, who keeps drifting right. The leader is a female; when her ears tip, the whole fan tips with her."
+      ] },
+      { "title": "The braid", "paragraphs": [
+        "The light has come up a little and the snow has gone from grey to white. After an hour the dogs have swapped places so many times, under one, round another, that the twelve traces are twisted into a single braid. The hunter calls a halt, crouches, slips the loop and shakes the bundle out. He does this several times a day.",
+        "Retying it, he tells you there's only this one kind of dog up here. Nobody may bring another breed north, and a Greenland dog that crosses the Arctic Circle going south isn't allowed back. You look at the lead dog. She's busy biting ice out from between her toes."
+      ] },
+      { "title": "Noon", "paragraphs": [
+        "On the third day, at noon, the ridge to the south glows orange, then the sun comes up so low it seems to roll along the ice. Every dog's shadow is suddenly longer than the sled.",
+        "The hunter swaps places with you and sits behind, one hand still on the sled. “They can hear it if you hesitate.” Ahead there's a ridge of wind-packed snow. You have to call it early, before you're sure. You call. The lead dog flicks an ear, the whole fan swings left, and the sled slides past the edge of the ridge."
+      ] }
+    ],
+    "choice": {
+      "prompt": "The sun won't stay up long. The dogs have stopped to pant. What do you do?",
+      "options": [
+        { "key": "braid", "label": "Crouch down and undo the braid yourself, one trace at a time", "keeps": "A knot you know how to untie" },
+        { "key": "call", "label": "Call one more stretch, without looking back at the hunter", "keeps": "A voice gone hoarse in the cold" },
+        { "key": "sun", "label": "Turn the sled so all twelve dogs rest facing the sun", "keeps": "A line of gold along twelve backs" }
+      ]
+    },
+    "ending": "Back home, changing trains at rush hour, you watch the crowd pour in from every side and twist into one rope at the foot of the stairs. Your fingers go looking for the loop that would shake it loose.",
+    "facts": [
+      { "text": "The Ilulissat Icefjord runs about 40 km west from the Greenland ice sheet to Disko Bay and became a UNESCO World Heritage Site in 2004; the town of Ilulissat lies just north of it.", "source": "https://en.wikipedia.org/wiki/Ilulissat_Icefjord" },
+      { "text": "Sermeq Kujalleq (Jakobshavn Glacier) is one of the fastest-moving glaciers in the world; at its terminus the flow averages more than 45 m a day over the year.", "source": "https://en.wikipedia.org/wiki/Jakobshavn_Glacier" },
+      { "text": "Ilulissat welcomes the sun back every year on 13 January, when about a third of the town gathers at Seqinniarfik, “the place where you go to greet the sun”, to sing.", "source": "https://visitgreenland.com/articles/return-of-the-sun/" },
+      { "text": "To keep the line pure, no other breeds may be brought into northern Greenland, and a Greenland dog that crosses the Arctic Circle to the south is not allowed to return.", "source": "https://explorersweb.com/great-explorers-greenland-sled-dogs/" },
+      { "text": "In the Greenland fan hitch the traces braid as the dogs change places; the loop holding them can be undone to shake the braid out.", "source": "https://thefanhitch.org/V7N4/V7%2CN4Mushing.html" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Multi-day dog-sled trips from Ilulissat are real, but local mushers drive and are responsible for safety; the hunter, the number of dogs and the stretch you call for him are fiction."
+  }
+}

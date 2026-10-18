@@ -1,0 +1,99 @@
+{
+  "slug": "heilongjiang-wudalianchi-lava",
+  "entrance": { "no": 18, "realm": "fire-stone", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "raw",
+    "adventure_index": 4, "obscurity_level": 6, "risk_level": 1, "price": 4999,
+    "tags": ["nature", "hidden", "visual"],
+    "mbti": { "INTP": 5, "ISTP": 4, "INTJ": 4 }
+  },
+  "cover": { "path": "generated/heilongjiang-wudalianchi-lava/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "夏天的冰 · 五大连池",
+    "subtitle": "第 18 号入口：三百年前的熔岩里，藏着一个冬天",
+    "hook": "七月的早晨，熔岩管里还挂着冰",
+    "region": "亚洲 · 中国",
+    "moods": ["冷", "黑石", "琢磨", "清晨"],
+    "opens": "夏天（大约 6 到 8 月），早上八点前后",
+    "role": "读石头的人",
+    "premise": "五大连池在黑龙江北部，一片有 14 座火山的火山群里。1719 到 1721 年，老黑山和火烧山喷发，熔岩堵住河道，堵出了五个相连的湖。2004 年起，这里是世界地质公园。熔岩管里藏着冰洞，研究者在 2012 年 8 月测到洞里约零下 2 ℃。",
+    "mission": "走出冰洞之前，想明白：为什么一整个夏天，也化不掉这里的冰。",
+    "chapters": [
+      { "title": "绳子", "paragraphs": [
+        "早上八点，太阳已经晒热了老黑山脚下的黑石头。你蹲下来。三百年前的熔岩表面一圈一圈皱着，像一捆捆盘起来的粗绳子。你用手指顺着一道褶摸过去，每一道弧都朝同一边鼓——那是它当年往前流的方向。",
+        "再往前，路变成一片碎石，又尖又脆，踩上去咔啦咔啦响。同一次喷发，两种样子：一种是流着流着凝住了，一种是被推着往前走、碎掉了。你把这两种都记在了门票背面。"
+      ] },
+      { "title": "门", "paragraphs": [
+        "冰洞的入口要往下走一段台阶，装着一扇厚门。管理员拉开门，冷气没有迎面扑过来，而是先从你的脚踝漫上来，像水一样往低处淌。你低头看了看自己的鞋。",
+        "洞里是黑色的玄武岩，洞顶垂着熔岩凝成的小钟乳，岩壁上结满霜花，地上是冰。管理员的温度计停在零下两度。外面是七月。"
+      ] },
+      { "title": "算一算", "paragraphs": [
+        "你站在冰旁边，在心里画了一张图。冬天，外面的空气比洞里冷、比洞里重，它自己会沉下来，灌满这条管子，把里面那点热顶出去。夏天反过来：外面的热空气轻，浮在洞口，下不来。热只能从石头里一点一点渗进来，渗进来的那一点，还得先花在化掉一层薄冰上。",
+        "你回头看那扇门。管理员说：“门是为了护冰装的，夏天不让热气进来。”你点点头，又看了一眼门轴。到了冬天，它也会把冷气挡在外面。"
+      ] },
+      { "title": "冒泡的水", "paragraphs": ["出了洞，太阳一下子压在后背上。路边有人在泉眼接水，瓶子里一直往上冒细泡，像刚拧开的汽水。你喝了一口：冰，扎舌头，有一点铁锈味。你把瓶子举起来对着光，看那些泡泡从底下升上来。重的往下沉，轻的往上走，你看了一上午的，都是这件事。"] }
+    ],
+    "choice": {
+      "prompt": "下山之前，你最后做哪一件事？",
+      "options": [
+        { "key": "door", "label": "回去问管理员：冬天的夜里，这扇门开着吗？", "keeps": "一个还在等回答的问题" },
+        { "key": "rope", "label": "回到熔岩上，用手指量一道绳纹的弧，画一个箭头", "keeps": "门票背面一个指向下游的小箭头" },
+        { "key": "fizz", "label": "在泉眼灌满一瓶水，拧紧了带下山", "keeps": "一瓶拧开时会“嘶”地叹一口气的泉水" }
+      ]
+    },
+    "ending": "回到城里，某个夏夜你打开冰箱，冷气先落在你的脚背上。你站着没动，等它漫过脚踝，想起那扇门。",
+    "facts": [
+      { "text": "五大连池有 14 座火山。1719 到 1721 年老黑山和火烧山喷发，熔岩在多处堵住河道，形成了五个相连的湖；这里也以矿泉和熔岩管闻名。", "source": "https://www.nps.gov/havo/learn/news/wudalianchi.htm" },
+      { "text": "老黑山和火烧山喷出的熔岩有绳状熔岩（pahoehoe）和渣块熔岩（aa）两类，覆盖约 65 平方公里。", "source": "https://en.wikipedia.org/wiki/Wudalianchi_volcanic_field" },
+      { "text": "五大连池的冰洞是玄武岩熔岩管。研究者 2012 年 8 月在白龙洞测得约零下 2 ℃；他们也指出洞里有一部分冰是搬进去做装饰的，而入口的密封门挡住了冬天的空气对流，会让冰慢慢化掉。", "source": "https://intechopen.com/chapters/69113" },
+      { "text": "对中国冰洞的研究发现：春、夏、秋三季热量只能靠传导很慢地进入洞内，冬天的对流却能很快把热带走；冰融化时吸热，也替洞挡住了一部分夏天的热。", "source": "https://tc.copernicus.org/articles/9/1983/2015/" },
+      { "text": "五大连池火山附近有富含二氧化碳的冷泉，水中以碳酸氢根为主。", "source": "https://journal.hep.com.cn/jes/EN/1160321415524180741" },
+      { "text": "五大连池 2004 年加入世界地质公园网络，是联合国教科文组织世界地质公园。", "source": "https://globalgeoparksnetwork.org/sites/default/files/2024-04/2022-Wudlianchi-UNESCO-Global-Geopark-Annual-Report.pdf" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。熔岩、冰洞、冷泉和入口的门都是真实的（门见于 2019 年的研究记载）；文中的管理员、他说的话、温度计和接泉水的人是虚构的。"
+  },
+  "en": {
+    "title": "Summer Ice · Wudalianchi",
+    "subtitle": "Entrance No. 18: a winter kept inside three-hundred-year-old lava",
+    "hook": "A July morning, and there's still ice hanging inside the lava tube",
+    "region": "Asia · China",
+    "moods": ["Cold", "Black rock", "Working it out", "Early morning"],
+    "opens": "In summer (roughly June to August), around eight in the morning",
+    "role": "The rock reader",
+    "premise": "Wudalianchi lies in northern Heilongjiang, in a field of 14 volcanoes. Between 1719 and 1721 Laoheishan and Huoshaoshan erupted, and their lava dammed the river into a chain of five lakes. It has been a Global Geopark since 2004. There is ice inside its lava tubes: researchers measured about −2 °C in one cave in August 2012.",
+    "mission": "Before you climb back into the sun, work out why a whole summer can't melt this ice.",
+    "chapters": [
+      { "title": "Rope", "paragraphs": [
+        "By eight the sun has already warmed the black rock at the foot of Laoheishan. You crouch. The skin of three-hundred-year-old lava lies in folds, like coils of heavy rope. You run a finger along one fold. Every arc bulges the same way: the way the lava was moving when it set.",
+        "Further on, the path turns to rubble, sharp and brittle, crunching underfoot. One eruption, two kinds of rock: one that flowed and stiffened where it was, one that was shoved along and broke. You note both on the back of your ticket."
+      ] },
+      { "title": "The door", "paragraphs": [
+        "The ice cave is down a flight of steps, behind a heavy door. The keeper pulls it open, and the cold doesn't hit your face. It spills over your ankles first and runs downhill like water. You look down at your shoes.",
+        "Inside, the walls are black basalt. Little lava drips hang from the roof, frost feathers the rock, and the floor is ice. The keeper's thermometer reads two below. Outside, it's July."
+      ] },
+      { "title": "The sums", "paragraphs": [
+        "You stand by the ice and draw the diagram in your head. In winter the air outside is colder and heavier than the air in here, so it sinks in by itself, fills the tube and pushes the warmth out. Summer runs the other way: warm air is light, it floats at the mouth and can't get down. Heat can only creep in through the rock, and what does get in is spent first on melting a thin skin of ice.",
+        "You look back at the door. “It's there to protect the ice,” the keeper says. “Keeps the summer out.” You nod, and glance at the hinges. Come winter, it will keep the cold out too."
+      ] },
+      { "title": "Water that fizzes", "paragraphs": ["Out of the cave, the sun lands on your back all at once. By the path someone is filling bottles at a spring, and the water keeps sending up fine bubbles, like a soda just opened. You take a mouthful: ice-cold, prickling, faintly of iron. You hold the bottle to the light and watch the bubbles climb. Heavy things sinking, light things rising: it's what you've been looking at all morning."] }
+    ],
+    "choice": {
+      "prompt": "Before you head down, what's the last thing you do?",
+      "options": [
+        { "key": "door", "label": "Go back and ask the keeper: on winter nights, is that door left open?", "keeps": "A question still waiting for its answer" },
+        { "key": "rope", "label": "Return to the lava, measure one fold's curve with your finger, and draw the arrow", "keeps": "A small arrow on the back of your ticket, pointing downstream" },
+        { "key": "fizz", "label": "Fill a bottle at the spring and screw the cap on tight", "keeps": "A bottle that sighs when you open it" }
+      ]
+    },
+    "ending": "Back in the city, on some summer night, you open the fridge and the cold lands on your feet first. You stand still, let it pool round your ankles, and think of that door.",
+    "facts": [
+      { "text": "Wudalianchi has 14 volcanoes. Laoheishan and Huoshaoshan erupted between 1719 and 1721; their lava blocked the river in several places and created five lakes. The area is also known for mineral springs and lava tubes.", "source": "https://www.nps.gov/havo/learn/news/wudalianchi.htm" },
+      { "text": "The Laoheishan and Huoshaoshan lavas are of two kinds, pahoehoe and aa, and cover about 65 km².", "source": "https://en.wikipedia.org/wiki/Wudalianchi_volcanic_field" },
+      { "text": "Wudalianchi's ice caves are basalt lava tubes. Researchers measured about −2 °C in Bailong cave in August 2012; they also note that some of the ice was moved in as decoration, and that airtight doors at the entrances block winter air circulation and will slowly melt the ice.", "source": "https://intechopen.com/chapters/69113" },
+      { "text": "In Chinese ice caves, heat enters only slowly by conduction in spring, summer and autumn, while winter convection carries heat out quickly; melting ice also absorbs heat and shields the cave in summer.", "source": "https://tc.copernicus.org/articles/9/1983/2015/" },
+      { "text": "CO2-rich cold springs rise near the Wudalianchi volcanoes; their water is dominated by bicarbonate.", "source": "https://journal.hep.com.cn/jes/EN/1160321415524180741" },
+      { "text": "Wudalianchi joined the Global Geoparks Network in 2004 and is a UNESCO Global Geopark.", "source": "https://globalgeoparksnetwork.org/sites/default/files/2024-04/2022-Wudlianchi-UNESCO-Global-Geopark-Annual-Report.pdf" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The lava, the ice caves, the springs and the door are real (the door is described in a 2019 study); the keeper, what he says, his thermometer and the person at the spring are fiction."
+  }
+}

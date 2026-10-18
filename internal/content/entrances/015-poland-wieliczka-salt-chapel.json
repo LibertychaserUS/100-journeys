@@ -1,0 +1,95 @@
+{
+  "slug": "poland-wieliczka-salt-chapel",
+  "entrance": { "no": 15, "realm": "mirror-salt", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "any" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "dramatic",
+    "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 11999,
+    "tags": ["culture", "spiritual", "hidden"],
+    "mbti": { "ISFJ": 5, "ISFP": 4, "ISTJ": 4 }
+  },
+  "cover": { "path": "generated/poland-wieliczka-salt-chapel/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "盐晶吊灯 · 维利奇卡盐矿",
+    "subtitle": "第 15 号入口：地下一百米，一座凿了七十年的礼拜堂",
+    "hook": "四壁是灰色的盐，头顶的灯也是盐",
+    "region": "欧洲 · 波兰",
+    "moods": ["地下", "手工", "回声", "耐心"],
+    "opens": "全年开放，不分时辰：地下一百米，本来就没有白天和黑夜",
+    "role": "数凿痕的人",
+    "premise": "维利奇卡盐矿从 13 世纪一直开采到 1996 年，1978 年进入第一批《世界遗产名录》。地下 101 米的圣金加礼拜堂 1896 年开始成形，矿工们在里面雕了大约七十年。地面是从一整块盐里刻出来的，吊灯用盐的晶体做成。",
+    "mission": "在圣金加礼拜堂里，找一处看得出是一凿一凿刻出来的地方，站在那儿，数完十道凿痕。",
+    "chapters": [
+      { "title": "灰色", "paragraphs": [
+        "巷道里只有头顶一盏昏黄的灯，空气凉，而且凉得纹丝不动，像一间很多年没人开过窗的老屋。你刚走完一圈又一圈的木楼梯，台阶数到三百多就放弃了。",
+        "带路的是个退休的老矿工，话不多。在这段没有雕刻的巷道里，他停下来，让你把手掌贴在墙上。墙是灰的，粗糙，像没打磨过的花岗岩。“你以为盐是白的，”他说，“白的那是你家厨房里的。”"
+      ] },
+      { "title": "礼拜堂", "paragraphs": [
+        "圣金加礼拜堂里的光是暖黄色的。你先抬头：几盏大吊灯悬在半空，挂满了盐的晶体，灯光就是从它们中间漏下来的。再低头：脚下的地面不是铺出来的，是从一整块盐里刻出来的。",
+        "墙上是一幅幅浮雕，其中一幅是《最后的晚餐》，也是一个矿工刻的。你找到桌布垂下来的那道褶，站在那儿，一道一道数上面的凿痕。数到第十道，老矿工在你身后说：“七十年。这一辈刻不完，下一辈接着刻。”"
+      ] },
+      { "title": "金加的戒指", "paragraphs": [
+        "升降机的铁门还没开，铃声在巷道里响了一下，回声拖得很长。等的时候，他讲了个老故事：匈牙利公主金加嫁到波兰之前，把订婚戒指扔进了家乡的一口盐井；到了这边，她让矿工往深处挖，挖出一块盐，一劈两半，戒指就在里面。“所以她护着我们，”他说，“护着所有挖盐的人。”",
+        "门开之前，他从口袋里掏出一小块灰色的盐，放在你手心，又把你的手指一根一根合上。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "那块灰色的盐，你打算怎么带回家？",
+      "options": [
+        { "key": "tin", "label": "装进一只旧铁盒，放在不会受潮的地方", "keeps": "一只装着灰盐的铁盒" },
+        { "key": "shelf", "label": "摆在厨房那罐白盐旁边", "keeps": "厨房架子上一白一灰两种盐" },
+        { "key": "carve", "label": "回家用小刀在上面刻一道，只刻一道", "keeps": "一块带着一道刻痕的盐" }
+      ]
+    },
+    "ending": "回家以后的某个阴雨天，你想起地下一百米的那几盏灯，想起盐最怕的就是潮气。你起身，把窗关小了一点。",
+    "facts": [
+      { "text": "维利奇卡盐矿自 13 世纪开采，持续产盐到 1996 年；1978 年被列入第一批世界遗产名录。", "source": "https://en.wikipedia.org/wiki/Wieliczka_Salt_Mine" },
+      { "text": "矿里的岩盐天然呈深浅不一的灰色，看上去更像未打磨的花岗岩，而不是白色晶体。", "source": "https://en.wikipedia.org/wiki/Wieliczka_Salt_Mine" },
+      { "text": "圣金加礼拜堂位于地下 101 米，1896 年形成，长约 54 米、宽 18 米、高 12 米，装饰工作持续了约 70 年；《最后的晚餐》浮雕出自矿工安东尼·维罗德克之手。", "source": "https://pl.wikipedia.org/wiki/Kaplica_%C5%9Bw._Kingi" },
+      { "text": "礼拜堂的地面雕自一整块盐，吊灯以盐晶制成。", "source": "https://pl.wikipedia.org/wiki/Kopalnia_Soli_%E2%80%9EWieliczka%E2%80%9D" },
+      { "text": "盐矿曾在 1989 至 1998 年被列入《濒危世界遗产名录》，原因是通风带来的湿气可能严重损坏盐雕。", "source": "https://en.wikipedia.org/wiki/Wieliczka_Salt_Mine" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。圣金加礼拜堂在常规参观路线上；文中的老矿工、他说的话和送你的那块盐都是虚构的。参观时请不要触摸雕刻。"
+  },
+  "en": {
+    "title": "The Salt Chandelier · Wieliczka Salt Mine",
+    "subtitle": "Entrance No. 15: a hundred metres down, a chapel seventy years in the carving",
+    "hook": "Grey salt walls, and overhead, chandeliers made of salt",
+    "region": "Europe · Poland",
+    "moods": ["Underground", "Handmade", "Echo", "Patience"],
+    "opens": "All year, at any hour: a hundred metres down, there's no day or night to speak of",
+    "role": "The counter of chisel marks",
+    "premise": "Salt was mined at Wieliczka from the 13th century until 1996, and in 1978 it was on UNESCO's very first World Heritage list. St Kinga's Chapel, 101 metres down, took shape in 1896, and miners went on carving it for about seventy years. Its floor was cut from a single block of salt; its chandeliers are made of salt crystals.",
+    "mission": "In St Kinga's Chapel, find one spot where you can tell it was cut stroke by stroke, and stay there long enough to count ten chisel marks.",
+    "chapters": [
+      { "title": "Grey", "paragraphs": [
+        "One dim yellow bulb hangs over the passage. The air is cool and perfectly still, like an old house where nobody has opened a window in years. You've just come down flight after flight of wooden stairs; somewhere past three hundred you stopped counting.",
+        "Your guide is a retired miner who doesn't say much. Here, where the walls are bare, he stops and has you lay your palm flat on the wall. It's grey and rough, like unpolished granite. “You thought salt was white,” he says. “White is what's in your kitchen.”"
+      ] },
+      { "title": "The chapel", "paragraphs": [
+        "The light in St Kinga's Chapel is warm and yellow. You look up first: great chandeliers hang in the air, strung with crystals of salt, and that light is coming through them. Then you look down. The floor under your feet was never laid. It was carved out of one block of salt.",
+        "The walls are covered in reliefs. One of them is the Last Supper, and a miner carved that too. You find the fold where the tablecloth hangs over the edge of the table and stand there, counting the chisel marks one at a time. At ten, the old man says behind you: “Seventy years. One generation couldn't finish it, so the next one carried on.”"
+      ] },
+      { "title": "Kinga's ring", "paragraphs": [
+        "The lift gate is still shut. A bell rings once somewhere along the passage and the echo trails on and on. While you wait, he tells you an old story. Before Kinga, a Hungarian princess, left to be married in Poland, she threw her engagement ring down a salt shaft at home. When she arrived, she had the miners here dig deep; they brought up a lump of salt, split it in two, and there was the ring. “So she looks after us,” he says. “Everyone who digs for salt.”",
+        "Before the gate opens, he takes a small grey lump of salt from his pocket, sets it in your palm, and folds your fingers over it one by one."
+      ] }
+    ],
+    "choice": {
+      "prompt": "That grey lump of salt: how will you take it home?",
+      "options": [
+        { "key": "tin", "label": "In an old tin, somewhere it won't get damp", "keeps": "A tin with a grey lump of salt inside" },
+        { "key": "shelf", "label": "On the kitchen shelf, next to the jar of white salt", "keeps": "Two salts on the shelf, one white, one grey" },
+        { "key": "carve", "label": "Cut one line into it with a penknife at home. Just one.", "keeps": "A lump of salt with a single cut in it" }
+      ]
+    },
+    "ending": "Back home, on some damp grey day, you think of those chandeliers a hundred metres down, and of how badly salt takes to moisture. You get up and close the window a little.",
+    "facts": [
+      { "text": "The Wieliczka mine was worked from the 13th century and produced salt continuously until 1996; in 1978 it was placed on the original UNESCO World Heritage list.", "source": "https://en.wikipedia.org/wiki/Wieliczka_Salt_Mine" },
+      { "text": "The mine's rock salt is naturally various shades of grey, more like unpolished granite than white crystal.", "source": "https://en.wikipedia.org/wiki/Wieliczka_Salt_Mine" },
+      { "text": "St Kinga's Chapel lies 101 m underground and dates from 1896; it is about 54 m long, 18 m wide and 12 m high, its decoration took around 70 years, and the Last Supper relief was carved by the miner Antoni Wyrodek.", "source": "https://pl.wikipedia.org/wiki/Kaplica_%C5%9Bw._Kingi" },
+      { "text": "The chapel floor is carved from a single block of salt and the chandeliers are made of salt crystals.", "source": "https://pl.wikipedia.org/wiki/Kopalnia_Soli_%E2%80%9EWieliczka%E2%80%9D" },
+      { "text": "The mine was on the List of World Heritage in Danger from 1989 to 1998 because humidity from ventilation threatened the salt sculptures.", "source": "https://en.wikipedia.org/wiki/Wieliczka_Salt_Mine" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. St Kinga's Chapel is on the regular visitor route; the old miner, what he says and the salt he gives you are fiction. Please don't touch the carvings."
+  }
+}

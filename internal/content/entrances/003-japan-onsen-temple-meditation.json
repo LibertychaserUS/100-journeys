@@ -1,0 +1,75 @@
+{
+  "slug": "japan-onsen-temple-meditation",
+  "entrance": { "no": 3, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["winter"], "time": "predawn" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "minimal",
+    "adventure_index": 3, "obscurity_level": 6, "risk_level": 1, "price": 8999,
+    "tags": ["spiritual", "culture", "solitude"],
+    "mbti": { "ISFJ": 5, "INFJ": 4, "INFP": 4 }
+  },
+  "cover": { "path": "generated/card-temple-onsen.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "煮蛋的泉 · 汤峰温泉",
+    "subtitle": "第 3 号入口：天亮前的一网兜蛋",
+    "hook": "天还没亮，你先替排在后面的人煮好蛋",
+    "region": "亚洲 · 日本",
+    "moods": ["热气", "天亮前", "照顾", "安静"],
+    "opens": "冬天，清晨六点，壶汤开门而天还黑着的时候",
+    "role": "替大家煮蛋的人",
+    "premise": "汤峰温泉在和歌山县田边市一条狭窄的山谷里，位于熊野古道中边路沿线，据说约 1,800 年前就被发现，是日本最古老的温泉之一。溪边的壶汤是一间只容一两人的小木屋，属于世界遗产的一部分，传说它的汤色一天会变七次。旁边的汤筒里，泉水涌出时约 90°C，人们把鸡蛋和蔬菜装进网兜放进去煮。",
+    "mission": "轮到你泡壶汤之前，煮好一网兜蛋，分给排在你后面的人。",
+    "chapters": [
+      { "title": "号码牌", "paragraphs": ["快六点了，汤峰的街还是黑的，只有溪水在响，硫磺味比你先到桥上。六点整，东光寺旁边的小窗口亮了灯。你买了票，换来一块号码牌。壶汤一次只进一两个人，每人三十分钟，排在你前面的有三位。你把牌子揣进袖口，回头看了看身后陆续排起来的人。"] },
+      { "title": "汤筒", "paragraphs": ["汤筒边的热气厚得看不见水底，扑到脸上是温的，带着一股蛋白的味道。桥那头小店的老太太递给你一网兜生鸡蛋，又往里多塞了两个：“给你后面那位，她带着孩子。”你攥着网兜的绳子，让蛋慢慢沉下去，一颗挨一颗挤在一起。大拇指在袖子里摸着那块号码牌，你在心里把后面的人一个一个点过去：一对老夫妇，一个背着大包、刚从古道上下来的年轻人，那位带孩子的母亲。"] },
+      { "title": "汤之胸", "paragraphs": ["天还黑着，东光寺门前只亮着一盏灯。等蛋的工夫，你站在台阶下。寺里的药师如来，据说是温泉的沉积物一点点凝成的；传说最早的热水就从它的胸口涌出来，人们叫这里“汤之胸”，叫着叫着，成了“汤峰”。你双手合十，什么也没求，只是让冻僵的手指慢慢回暖。"] },
+      { "title": "分蛋", "paragraphs": ["网兜提出水面的时候，蛋壳互相磕出细细的响声。你在溪水里激一下，剥开一个先尝：蛋白嫩得几乎还在晃。你沿着队伍挨个分过去，老夫妇一人一个，年轻人两个，那位母亲接过来，先吹凉了喂给孩子。队伍里有人小声说了句谢谢，热气从每个人手里冒出来。"] },
+      { "title": "壶汤", "paragraphs": ["小木屋的门一拉上，外面刚发青的天就只剩门缝里一线。石头围着一小池热水，白气贴着水面慢慢转。你看不出它此刻是什么颜色——灰白？淡青？你把身子沉下去，决定出去的时候再看一眼。"] }
+    ],
+    "choice": {
+      "prompt": "从壶汤出来，你最后做哪一件事？",
+      "options": [
+        { "key": "colour", "label": "回头看一眼池水，把这一刻的颜色写在手背上", "keeps": "手背上一个快被洗掉的颜色" },
+        { "key": "egg", "label": "把网兜里最后一个蛋，留给下一个来排队的陌生人", "keeps": "一只空网兜，还带着一点温度" }
+      ]
+    },
+    "ending": "回到城里的冬天早上，你煮蛋时会多放一个。剥壳的时候，你会想，那池看不清颜色的水，这会儿换到第几种了。",
+    "facts": [
+      { "text": "汤峰温泉位于和歌山县田边市、熊野古道中边路沿线，据说约 1,800 年前被发现，是日本最古老的温泉之一；泉水涌出时约 90°C，人们在汤筒里用网兜煮鸡蛋和蔬菜。", "source": "https://en.wikipedia.org/wiki/Yunomine_Onsen" },
+      { "text": "壶汤是溪边小屋里的石砌浴池，一次可容 1 至 2 人、每轮 30 分钟，凭号码牌按先后入浴，早上 6 点开放；它被登录为世界遗产，传说汤色一天变七次。", "source": "https://www.tb-kumano.jp/en/places/yunomine/" },
+      { "text": "东光寺供奉的药师如来坐像由温泉沉积物构成；相传最早的热水从佛像胸口涌出，原名“汤之胸”（Yunomune），后来演变为“汤峰”（Yunomine）。", "source": "https://www.japan.travel/en/spot/59/" }
+    ],
+    "fiction": "“入口”、编号和开放条件是桃源百旅的设定。壶汤、汤筒和东光寺都是真实的；小店的老人、排队的人和他们说的话是虚构的。"
+  },
+  "en": {
+    "title": "The Egg Spring · Yunomine Onsen",
+    "subtitle": "Entrance No. 3: a net of eggs before dawn",
+    "hook": "Before dawn, you cook the eggs for the people behind you",
+    "region": "Asia · Japan",
+    "moods": ["Steam", "Before dawn", "Looking after", "Quiet"],
+    "opens": "In winter, at six in the morning, when Tsuboyu opens and it's still dark",
+    "role": "The one who cooks the eggs",
+    "premise": "Yunomine Onsen lies in a narrow valley in Tanabe, Wakayama, on the Nakahechi route of the Kumano Kodo. The spring is said to have been found some 1,800 years ago, which would make it one of the oldest in Japan. Tsuboyu, a creekside hut with room for one or two bathers, is part of the World Heritage site, and its water is said to change colour seven times a day. Next to it, at the yuzutsu, the spring comes up at about 90°C, and people lower eggs and vegetables into it in net bags.",
+    "mission": "Before your turn in Tsuboyu, cook a net of eggs and hand them out to the people queuing after you.",
+    "chapters": [
+      { "title": "The numbered card", "paragraphs": ["Just before six the street in Yunomine is still dark; only the creek is talking, and the smell of sulphur reaches the bridge before you do. At six the little window beside Tōkō-ji lights up. You buy a ticket and swap it for a numbered card. Tsuboyu takes one or two people at a time, thirty minutes each, and there are three ahead of you. You tuck the card into your sleeve and glance back at the queue filling in behind you."] },
+      { "title": "The yuzutsu", "paragraphs": ["The steam over the yuzutsu is so thick you can't see the bottom; it's warm on your face and smells faintly of cooked egg. The old woman from the shop across the bridge hands you a net of raw eggs and slips two more in. “For the one behind you. She's got a little one with her.” You hold the string and let the eggs sink, crowding together in the net. Your thumb finds the card in your sleeve as you count off the people after you: an old couple, a young man with a big pack just down off the trail, the mother and her child."] },
+      { "title": "The chest of hot water", "paragraphs": ["It's still dark, and a single lamp burns at the gate of Tōkō-ji. While the eggs cook, you stand at the foot of its steps. Its Yakushi Nyorai, the healing Buddha, is said to have formed from the spring's own deposits, and the first hot water is said to have welled from its chest. People called the place yu no mune, the chest of hot water, and over time it wore down to Yunomine. You put your palms together. You don't ask for anything; you just let your fingers thaw."] },
+      { "title": "Handing round", "paragraphs": ["As the net comes up out of the water, the shells knock together with tiny clicks. You plunge them in the creek and peel one to test: the white barely holds its shape. Then you work your way down the queue, one each for the old couple, two for the young man; the mother blows on hers and feeds it to the child. Someone murmurs thank you, and steam rises from every pair of hands."] },
+      { "title": "Tsuboyu", "paragraphs": ["Once the hut door closes behind you, the grey-blue sky outside shrinks to a line in the crack. Stones hold a small pool of hot water, steam turning slowly on its surface. You can't tell what colour it is right now. Milky? Pale green? You lower yourself in and decide to look again on your way out."] }
+    ],
+    "choice": {
+      "prompt": "Coming out of Tsuboyu, what's the last thing you do?",
+      "options": [
+        { "key": "colour", "label": "Look back at the pool and write its colour, right now, on the back of your hand", "keeps": "A colour on your hand, half washed off" },
+        { "key": "egg", "label": "Leave the last egg in the net for the next stranger who joins the queue", "keeps": "An empty net bag, still a little warm" }
+      ]
+    },
+    "ending": "On winter mornings back home, you'll boil one egg more than you need. Peeling it, you'll wonder which of its seven colours that little pool is wearing now.",
+    "facts": [
+      { "text": "Yunomine Onsen, in Tanabe, Wakayama, on the Kumano Kodo's Nakahechi route, is said to have been discovered about 1,800 years ago, one of Japan's oldest springs; the water emerges at about 90°C, and people cook eggs and vegetables in nets at the yuzutsu.", "source": "https://en.wikipedia.org/wiki/Yunomine_Onsen" },
+      { "text": "Tsuboyu is a stone-lined bath in a creekside cabin for one or two people, 30 minutes per turn, first come first served with a numbered card, open from 6:00; it is registered as World Heritage, and its water is said to change colour seven times a day.", "source": "https://www.tb-kumano.jp/en/places/yunomine/" },
+      { "text": "The seated Yakushi Nyorai at Tōkō-ji is made of hot-spring deposits; legend says the first hot water gushed from its chest, and the place's original name, Yunomune (“hot water chest”), became Yunomine.", "source": "https://www.japan.travel/en/spot/59/" }
+    ],
+    "fiction": "The entrance, its number and its opening hour belong to the 100 Journeys world. Tsuboyu, the yuzutsu and Tōkō-ji are real; the old woman at the shop, the people in the queue and what they say are invented."
+  }
+}

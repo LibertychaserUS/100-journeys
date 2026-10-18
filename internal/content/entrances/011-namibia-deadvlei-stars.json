@@ -1,0 +1,89 @@
+{
+  "slug": "namibia-deadvlei-stars",
+  "entrance": { "no": 11, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["dry"], "time": "night" },
+  "journey": {
+    "fantasy_type": "night", "visual_style": "surreal",
+    "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 19999,
+    "tags": ["night", "visual", "nature"],
+    "mbti": { "INTJ": 5, "INFJ": 4, "INTP": 4 }
+  },
+  "cover": { "path": "generated/namibia-deadvlei-stars/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "枯树 · 死亡谷",
+    "subtitle": "第 11 号入口：死了六百多年、还没倒下的树",
+    "hook": "死了六百多年的树，还站在星空下",
+    "region": "非洲 · 纳米比亚",
+    "moods": ["深夜", "枯木", "星空", "漫长"],
+    "opens": "旱季的夜里，月亮落下以后",
+    "role": "倒着数年份的人",
+    "premise": "死亡谷（Deadvlei）是纳米比亚纳米布-诺克卢福国家公园里的一片白色黏土洼地，四周是号称世界最高的一批沙丘，最高的有三四百米。洼地上的骆驼刺树大约在六七百年前死去，因为这里太干，木头至今没有腐烂。2013 年，纳米布沙海列入世界遗产；与公园相邻的纳米布兰德自然保护区，是非洲第一个国际暗夜保护区。",
+    "mission": "选定一棵枯树，算一算：它死后站着的这些年，够你活几辈子。",
+    "chapters": [
+      { "title": "闭园以后", "paragraphs": ["白天的游客都走了。公园的大门跟着日出日落开关，今晚不在任何一张时间表上。向导把头灯调成红光，你跟着他走过最后一段软沙，脚下忽然变硬：白色的黏土裂成一块一块，像一张晾干了的地图。"] },
+      { "title": "算术", "paragraphs": [
+        "你在一棵树下停住。树皮早没了，枝干被太阳晒得发黑，伸向天的样子，大概和它死的那天差不多。六七百年前，也就是公元 1340 到 1430 年之间。它为什么不烂？你蹲下，把手掌平贴在地上，一点潮气都没有。能让木头腐烂的东西，在这里活不下去，所以它只能一直站着。",
+        "你用它站着的年数，除以你自己的岁数，算了一遍。又算了一遍。"
+      ] },
+      { "title": "星星挪过树枝", "paragraphs": [
+        "向导关了灯。没有月亮，银河从一道沙丘顶铺到另一道沙丘顶。最高的那座叫 Big Daddy，大约 325 米，此刻只是星星忽然断掉的一块黑。",
+        "你挑了一颗星，它正好卡在一根枯枝的尖上。你一动不动地等。二十分钟后，它已经挪到了枝杈的另一边。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "走出死亡谷之前，你带走什么？",
+      "options": [
+        { "key": "number", "label": "把算出来的那个数写在手背上", "keeps": "手背上一个洗了三天才掉的数字" },
+        { "key": "star", "label": "再挑一颗星、一根树枝，计时看它多久挪过去", "keeps": "表上的一个时长：二十二分钟" },
+        { "key": "sand", "label": "不倒鞋里的红沙，就这么走回去", "keeps": "鞋缝里一小撮倒不干净的红沙" }
+      ]
+    },
+    "ending": "后来，你在办公室里等一封迟迟不来的回信，看着窗外那棵行道树。你在心里把它的岁数也算了一遍，然后决定再等等。",
+    "facts": [
+      { "text": "死亡谷的骆驼刺树大约在六七百年前（约 1340–1430 年）死去；因为极其干燥，木头没有腐烂。", "source": "https://en.wikipedia.org/wiki/Deadvlei" },
+      { "text": "死亡谷是纳米布-诺克卢福国家公园里的白色黏土洼地，周围的沙丘号称世界最高，最高约 300–400 米。", "source": "https://en.wikipedia.org/wiki/Deadvlei" },
+      { "text": "Big Daddy 是索苏斯盐沼一带最高的沙丘，约 325 米。", "source": "https://en.wikipedia.org/wiki/Sossusvlei" },
+      { "text": "纳米布沙海于 2013 年列入联合国教科文组织世界遗产。", "source": "https://en.wikipedia.org/wiki/Namib_Sand_Sea" },
+      { "text": "纳米布兰德自然保护区 2012 年被评为金级国际暗夜保护区，是非洲第一个。", "source": "https://namibrand.org/dark-sky.html" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。现实中公园只在白天开放，夜里走进死亡谷是虚构的；向导和文中的细节也是虚构的。"
+  },
+  "en": {
+    "title": "Still Standing · Deadvlei",
+    "subtitle": "Entrance No. 11: trees that died six centuries ago and never fell",
+    "hook": "Trees dead six hundred years, still standing under the stars",
+    "region": "Africa · Namibia",
+    "moods": ["Night", "Deadwood", "Stars", "Deep time"],
+    "opens": "In the dry season, at night, after the moon has set",
+    "role": "The one who counts back",
+    "premise": "Deadvlei is a white clay pan in Namibia's Namib-Naukluft Park, ringed by what are claimed to be the highest dunes in the world, the tallest 300 to 400 metres. The camel thorn trees on the pan died roughly 600 to 700 years ago, and because it is so dry the wood has never decomposed. The Namib Sand Sea became a World Heritage Site in 2013; next door, the NamibRand Nature Reserve was Africa's first International Dark Sky Reserve.",
+    "mission": "Choose one dead tree and work out how many of your lifetimes it has been standing there.",
+    "chapters": [
+      { "title": "After hours", "paragraphs": ["The day visitors have gone. The park keeps sunrise-to-sunset hours, and tonight isn't on anyone's timetable. The guide switches his head-torch to red, and you follow him over the last of the soft sand until the ground goes hard underfoot: white clay, cracked into plates like a map left out to dry."] },
+      { "title": "The arithmetic", "paragraphs": [
+        "You stop under one tree. The bark is long gone, the sun has burned the wood black, and the branches still reach up much the way they must have on the day it died. Six or seven hundred years: somewhere between 1340 and 1430. So why hasn't it rotted? You crouch and lay your palm flat on the pan. Not a trace of damp. Whatever breaks wood down can't live here, so the tree has nothing to do but stand.",
+        "You divide its years by yours. Then you do the sum again."
+      ] },
+      { "title": "A star crosses a branch", "paragraphs": [
+        "The guide turns off his light. There's no moon. The Milky Way runs from one dune crest to the other, and Big Daddy, about 325 metres of sand, is just the place where the stars stop.",
+        "You pick a star sitting exactly on the tip of a dead branch and keep still. Twenty minutes later it's on the other side."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before you walk out, what do you take with you?",
+      "options": [
+        { "key": "number", "label": "Write your answer on the back of your hand", "keeps": "A number that takes three days to wash off" },
+        { "key": "star", "label": "Pick another star and another branch, and time it across", "keeps": "A time on your watch: twenty-two minutes" },
+        { "key": "sand", "label": "Leave the red sand in your boots and walk back as you are", "keeps": "A pinch of red sand in a boot seam" }
+      ]
+    },
+    "ending": "Later, waiting on a reply that won't come, you look at the plane tree outside the office window. You work out its age too, and decide you can wait a little longer.",
+    "facts": [
+      { "text": "The camel thorn trees of Deadvlei died about 600–700 years ago (c. 1340–1430); the wood hasn't decomposed because the area is so dry.", "source": "https://en.wikipedia.org/wiki/Deadvlei" },
+      { "text": "Deadvlei is a white clay pan in the Namib-Naukluft Park, surrounded by dunes claimed to be the world's highest, up to 300–400 m.", "source": "https://en.wikipedia.org/wiki/Deadvlei" },
+      { "text": "Big Daddy, the highest dune in the Sossusvlei area, is about 325 m.", "source": "https://en.wikipedia.org/wiki/Sossusvlei" },
+      { "text": "The Namib Sand Sea was inscribed as a UNESCO World Heritage Site in 2013.", "source": "https://en.wikipedia.org/wiki/Namib_Sand_Sea" },
+      { "text": "NamibRand Nature Reserve was designated a Gold Tier International Dark Sky Reserve in 2012, the first in Africa.", "source": "https://namibrand.org/dark-sky.html" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. In reality the park is open only by day; walking into Deadvlei at night is fiction, and so are the guide and the details here."
+  }
+}

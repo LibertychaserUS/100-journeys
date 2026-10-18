@@ -1,0 +1,89 @@
+{
+  "slug": "usa-bonneville-salt-flats",
+  "entrance": { "no": 17, "realm": "mirror-salt", "pace": "day", "scale": "far", "seasons": ["summer"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "minimal",
+    "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 15999,
+    "tags": ["extreme", "visual"],
+    "mbti": { "ESTP": 5, "ENTJ": 4, "ISTP": 4 }
+  },
+  "cover": { "path": "generated/usa-bonneville-salt-flats/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "黑线 · 邦纳维尔盐滩",
+    "subtitle": "第 17 号入口：一条 2009 年以后就没人画过的黑线",
+    "hook": "正午的白盐上，那条黑线又出现了",
+    "region": "北美洲 · 美国",
+    "moods": ["正午", "速度", "白", "引擎声"],
+    "opens": "夏天，8 月速度周期间，正午",
+    "role": "计时组的人",
+    "premise": "邦纳维尔盐滩在美国犹他州，长约 19 公里、宽约 8 公里，是更新世邦纳维尔湖留下的遗迹。从 1949 年起，这里在 8 月举办速度周（Speed Week）。早年的直道中央画着一条宽宽的黑线，最后一次用黑线是 2009 年的速度周。赛车区的盐壳在 1940、50 年代测得约 0.9 米厚，到 2015 年只剩约 5 厘米。",
+    "mission": "正午那一趟，第一个喊出计时段的速度，要让维修区那边也听得见。",
+    "chapters": [
+      { "title": "锥桶", "paragraphs": [
+        "天刚亮你就在盐上了。你的活是沿着赛道摆锥桶，每一个都要对准测量员留下的记号。盐壳在靴底下咯吱作响，白得你一直眯着眼。老计时员把皮卡停在你旁边，下车，用靴尖把你摆歪的一个踢正，又开走了。",
+        "计时段从第二英里开始，到第五英里结束。你在脑子里把它走了一遍：哪面旗子标着哪一英里，计时设备藏在哪个锥桶后面。"
+      ] },
+      { "title": "黑线", "paragraphs": [
+        "快到正午，你直起腰，看见了它：赛道正中一道宽宽的黑，从你脚边一直拉进远处的热浪里。没人画过它。",
+        "老计时员把墨镜推到额头上。“09 年以后就不画了。中间那条磨得太快，改成两边各一条，后来连这个也省了，换成旗子和锥桶。”他把墨镜放下来，“它想回来，就让它回来。”"
+      ] },
+      { "title": "一英里", "paragraphs": ["第一辆车在热浪那头点火，你先是脚底感觉到，然后才听见。它压着黑线冲过来，在热气里抖成一条，经过你面前时，风把你的帽檐往后一掀。你盯着计时屏。数字跳出来的那一刻，你已经喊出了口。"] },
+      { "title": "薄", "paragraphs": ["车走了，盐上留下两道浅浅的印子。你蹲下，用指甲抠了抠盐壳的边。老计时员说，他刚来那年，老前辈告诉他，这里的盐有三英尺厚。现在只剩大约五厘米，你的拇指都比它长。"] }
+    ],
+    "choice": {
+      "prompt": "收工之前，你从盐上带走什么？",
+      "options": [
+        { "key": "slip", "label": "那张印着你喊出的速度的计时单", "keeps": "一张被汗浸软的计时单" },
+        { "key": "line", "label": "趁黑线还在，沿着它走完整整一英里", "keeps": "一英里的步数" },
+        { "key": "fist", "label": "车手摘下头盔时，跟他碰一下拳", "keeps": "指关节上蹭到的一道盐" }
+      ]
+    },
+    "ending": "回到城里，有一天你在高架上堵得一动不动，盯着车道中间的白线。你想起盐上那条黑线，想起喊出那个数字时嗓子里的那股劲，然后把车窗摇下来一点。",
+    "facts": [
+      { "text": "邦纳维尔盐滩是更新世邦纳维尔湖的遗迹，长约 19 公里、宽约 8 公里，由美国土地管理局管理。", "source": "https://en.wikipedia.org/wiki/Bonneville_Salt_Flats" },
+      { "text": "邦纳维尔速度周从 1949 年开始，在 8 月举行；计时段通常从第二英里到第五英里。早年直道中央画一条宽黑线，最后一次用黑线是 2009 年 8 月的速度周，之后改用旗子和锥桶。", "source": "https://en.wikipedia.org/wiki/Bonneville_Speedway" },
+      { "text": "赛车区的盐壳在 1940、50 年代测得约 0.9 米（3 英尺）厚，2015 年只剩约 5 厘米（2 英寸）。", "source": "https://en.wikipedia.org/wiki/Bonneville_Speedway" },
+      { "text": "邦纳维尔湖存在于大约 3 万到 1.3 万年前，最深处超过 300 米，面积近 5.1 万平方公里。", "source": "https://en.wikipedia.org/wiki/Lake_Bonneville" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。速度周和计时都是真的，但黑线在正午重新出现是虚构的；计时组、老计时员和他的话也是虚构的。高速驾驶只属于有组织的赛事，文中的你不开车。"
+  },
+  "en": {
+    "title": "The Black Line · Bonneville Salt Flats",
+    "subtitle": "Entrance No. 17: a line nobody has painted since 2009",
+    "hook": "At noon, on the white salt, the black line comes back",
+    "region": "North America · United States",
+    "moods": ["Noon", "Speed", "White", "Engines"],
+    "opens": "In summer, during August's Speed Week, at noon",
+    "role": "The timing crew",
+    "premise": "The Bonneville Salt Flats in Utah, about 19 km long and 8 km wide, are what's left of Pleistocene Lake Bonneville. Speed Week has been held here in August since 1949. The course used to have a broad black line painted down its centre; the last Speed Week to use black lines was in 2009. Where the racing happens, the salt crust measured about three feet thick in the 1940s and 50s, and about two inches in 2015.",
+    "mission": "On the noon run, be the first to call the speed through the timed mile, loud enough for the pits to hear.",
+    "chapters": [
+      { "title": "Cones", "paragraphs": [
+        "You're out on the salt at first light. Your job is the cones: set them along the course, each one square on a surveyor's mark. The crust crunches under your boots and the white has you squinting. The old timer pulls up in his pickup, gets out, nudges one of yours straight with the toe of his boot, and drives off.",
+        "The timed miles start at mile two and run to mile five. You walk them in your head: which flag marks which mile, which cone the timing gear is sitting behind."
+      ] },
+      { "title": "The line", "paragraphs": [
+        "Close to noon you straighten up and see it: a broad black stripe down the middle of the course, running from your feet into the shimmer. Nobody painted it.",
+        "The old timer pushes his sunglasses up. “Quit painting that in oh-nine. The middle one wore out too fast, so they went to two, one each side, and then not even that. Flags and cones.” He drops the glasses again. “If it wants to come back, let it.”"
+      ] },
+      { "title": "The mile", "paragraphs": ["The first car fires up somewhere out in the heat, and you feel it through your soles before you hear it. It comes down the black line shivering in the haze, and as it passes, the wind flips your cap brim back. You're watching the timing screen. The number's out of your mouth the instant it lands."] },
+      { "title": "Thin", "paragraphs": ["When it's gone there are two faint tracks in the salt. You crouch and pick at the edge of the crust with a fingernail. When he started out, the old timer says, the old hands told him the salt here was three feet deep. Now it's about two inches. Your thumb is longer."] }
+    ],
+    "choice": {
+      "prompt": "Before you pack up, what do you take off the salt?",
+      "options": [
+        { "key": "slip", "label": "The timing slip with the speed you called", "keeps": "A timing slip gone soft with sweat" },
+        { "key": "line", "label": "While the black line's still there, walk the whole mile along it", "keeps": "The number of steps in a mile" },
+        { "key": "fist", "label": "Bump fists with the driver when the helmet comes off", "keeps": "A smear of salt across your knuckles" }
+      ]
+    },
+    "ending": "Back home, stuck dead still on the freeway, you stare at the white line between the lanes. You think of the black one on the salt, and the jolt in your throat when you called that number, and you roll the window down a crack.",
+    "facts": [
+      { "text": "The Bonneville Salt Flats, about 19 km long and 8 km wide, are a remnant of Pleistocene Lake Bonneville and are managed by the Bureau of Land Management.", "source": "https://en.wikipedia.org/wiki/Bonneville_Salt_Flats" },
+      { "text": "Speed Week has run in August since 1949, with timed miles usually from the second mile to the fifth. The course was once marked with a broad black centre line; the last event to use black lines was Speed Week in August 2009, after which flags and cones took over.", "source": "https://en.wikipedia.org/wiki/Bonneville_Speedway" },
+      { "text": "On the racing area the salt crust measured about 3 ft (0.9 m) thick in the 1940s and 50s and about 2 in (5 cm) in 2015.", "source": "https://en.wikipedia.org/wiki/Bonneville_Speedway" },
+      { "text": "Lake Bonneville existed from about 30,000 to 13,000 years ago and was more than 300 m deep, covering almost 51,000 km².", "source": "https://en.wikipedia.org/wiki/Lake_Bonneville" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Speed Week and its timing are real; the black line coming back at noon is invented, and so are the timing crew, the old timer and what he says. Driving at speed belongs to organised events, and in this story you never drive."
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "slug": "iceland-lava-tunnel-cycling",
+  "entrance": { "no": 2, "realm": "fire-stone", "pace": "day", "scale": "far", "seasons": ["winter"], "time": "afternoon" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "dramatic",
+    "adventure_index": 7, "obscurity_level": 7, "risk_level": 3, "price": 19999,
+    "tags": ["extreme", "hidden", "nature"],
+    "mbti": { "ISTP": 5, "INTP": 4, "ESTP": 4 }
+  },
+  "cover": { "path": "generated/card-lava-tunnel.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "火的水位线 · 劳法霍尔斯熔岩洞",
+    "subtitle": "第 2 号入口：一条流干了的火河",
+    "hook": "墙上一圈圈的线，是火退下去时留下的",
+    "region": "欧洲 · 冰岛",
+    "moods": ["冬日斜阳", "熔岩", "冰笋", "读墙"],
+    "opens": "冬天的下午，太阳贴着地平线、还没落下去的最后一个多小时",
+    "role": "读墙的人",
+    "premise": "劳法霍尔斯熔岩洞（Raufarhólshellir）在雷克雅未克东南，长约 1,360 米，是冰岛第四长的熔岩管，约 5,600 年前形成于莱塔熔岩（Leitahraun）的喷发。熔岩流的表面先冷却结成硬壳，壳下的熔岩继续往前流，流空之后，留下一条空管。如今只能跟着向导进洞。",
+    "mission": "天黑之前，数清楚洞壁上有几道熔岩线，说出最低的那一道是怎么留下的。",
+    "chapters": [
+      { "title": "骑过洞顶", "paragraphs": ["才过中午不久，太阳已经低得像傍晚。你骑车沿 39 号公路穿过熔岩原，钉胎压着路面的薄冰沙沙响，两边是盖着雪和苔藓的黑石头，一块挨一块，像凝在半空的浪。向导在前面停下，回头喊：“你刚骑过去的那一段，底下就是洞。”你低头看车轮，路面什么也没告诉你。"] },
+      { "title": "车留在洞口", "paragraphs": ["洞口那片天是灰白的，雪从很久以前塌开的洞顶缺口里飘下来，在底下堆成一道白坡。你把车靠在栏杆上，锁好，摘掉手套。冬天，水从顶上滴下来，落地就冻，在黑色的地面上长出一根根冰笋，高的到膝盖，矮的刚过脚踝，像谁在地上插了一排白蜡烛。"] },
+      { "title": "读墙", "paragraphs": [
+        "头灯的光圈在黑里晃了晃，落到侧壁上：墙上有一道道水平的线，一道比一道低，像浴缸放水以后留下的印子。你把手揣回口袋——早年来的人几乎掰断了这里所有细细的熔岩吸管，现在只能用眼睛去碰它。你用手电一道一道往下数：熔岩在这里停过，退下去一截，又停住。每一道线，是一次涨落。黑色下面渗出一缕缕红。",
+        "你在脑子里把那一天搭起来：上面一层壳已经硬了，底下还红着，从十公里外的高处一路流下来。源头一断，火继续往低处走，把管子留在了身后。最低的那一道，是它走之前最后站住的地方。"
+      ] },
+      { "title": "头顶的路", "paragraphs": ["这里的黑忽然宽了，头灯往上打，好一会儿才碰到洞顶——洞在这一段宽到十五米上下。向导朝上抬了抬下巴：“上面就是你骑过的那条路。”你仰起头，想象车轮从五千多年前结的那层壳上滚过去；想象壳底下，曾经有一个下午，整条管子里流满了红亮的石头。"] }
+    ],
+    "choice": {
+      "prompt": "离开洞口之前，你带走哪一样？",
+      "options": [
+        { "key": "sketch", "label": "用笔在手套背面画下那几道线的高低和间距", "keeps": "一只画着横线的手套" },
+        { "key": "echo", "label": "对着洞里轻轻拍一下手，听声音在空管里走多远", "keeps": "一声在管子里走远的回音" },
+        { "key": "snow", "label": "站在天窗底下，看雪落在哪一根冰笋的尖上", "keeps": "一片落在冰笋尖上的雪" }
+      ]
+    },
+    "ending": "回到家，某个早上你看着浴缸里的水慢慢放掉，会盯着它留下的那一圈印子。你会想起那条路底下的空管，和墙上一道一道往下退的火。",
+    "facts": [
+      { "text": "劳法霍尔斯熔岩洞长约 1,360 米，是冰岛第四长的熔岩管；据碳测年约形成于 5,600 年前，熔岩来自约 10 公里外高处的莱塔熔岩喷发。", "source": "https://en.wikipedia.org/wiki/Raufarh%C3%B3lshellir" },
+      { "text": "洞顶有多处天窗，下方会积雪；冰岛 39 号公路从洞的上方经过，那里洞宽约 15 米。早年脆弱的熔岩吸管几乎全被游客破坏，2017 年重新开放后只能跟随导览参观。", "source": "https://en.wikipedia.org/wiki/Raufarh%C3%B3lshellir" },
+      { "text": "熔岩管形成于熔岩流表面结壳成顶、内部熔岩继续流动并流空之后；洞壁上台阶状的痕迹记录了熔岩曾经流过的不同深度。", "source": "https://en.wikipedia.org/wiki/Lava_tube" }
+    ],
+    "fiction": "“入口”、编号和开放条件是桃源百旅的设定。冬天骑车穿过熔岩原、向导和她说的话都是虚构的；真实的参观是步行的导览团，自行车不能进洞。"
+  },
+  "en": {
+    "title": "Tide Lines of Fire · Raufarhólshellir",
+    "subtitle": "Entrance No. 2: a river of fire that ran dry",
+    "hook": "Rings on the wall, left where the fire went down",
+    "region": "Europe · Iceland",
+    "moods": ["Low winter sun", "Lava", "Ice", "Reading walls"],
+    "opens": "On winter afternoons, in the last hour or so before the low sun goes down",
+    "role": "The wall reader",
+    "premise": "Raufarhólshellir, southeast of Reykjavík, is about 1,360 metres long, the fourth-longest lava tube in Iceland. It formed some 5,600 years ago in the Leitahraun eruption: the surface of a lava flow cooled into a crust while the molten rock beneath kept moving, and when it drained away it left a hollow pipe. Today you can only go in with a guide.",
+    "mission": "Before dark, count the lava lines on the wall and work out how the lowest one got there.",
+    "chapters": [
+      { "title": "Riding over the roof", "paragraphs": ["It's barely past midday and the sun already hangs as low as evening. You ride Route 39 across the lava field, studded tyres hissing on a skin of ice, black rock on either side under snow and moss, heaped up like waves that froze mid-break. The guide pulls over and calls back: “That stretch you just rode? The cave's right under it.” You look down at your front wheel. The road gives nothing away."] },
+      { "title": "The bike stays at the mouth", "paragraphs": ["The sky over the mouth is a flat grey-white, and snow drifts down through the gap where the roof fell in long ago, piling into a white slope below. You lean the bike on the railing, lock it, pull off your gloves. In winter, water dripping from the ceiling freezes where it lands and grows ice stalagmites out of the black floor, some knee-high, some barely past your ankle, like a row of white candles pushed into the ground."] },
+      { "title": "Reading the wall", "paragraphs": [
+        "The guide's headlamp wobbles through the dark and settles on the side wall: level lines run along it, each one lower than the last, like the rings a bath leaves as it drains. You put your hands back in your pockets. Early visitors snapped off nearly every fragile lava straw in here, so now you touch with your eyes. You count the lines down with your torch: the lava stood here, dropped a little, stood again. Each line is one rise and fall. Streaks of red bleed out from under the black.",
+        "You rebuild that day in your head: a crust already hard on top, the core still glowing underneath, fed from vents ten kilometres uphill. When the feed stopped, the fire kept running downhill and left the pipe behind. The lowest line is the last place it stood before it went."
+      ] },
+      { "title": "The road overhead", "paragraphs": ["Here the dark opens out; your headlamp has to reach a long way up before it finds the ceiling, the tube fifteen metres or so across. The guide tips her chin upward. “That's your road up there.” You tilt your head back and picture your tyres rolling over a crust that set more than five thousand years ago, and under it, one afternoon, a pipe running full of glowing rock."] }
+    ],
+    "choice": {
+      "prompt": "Before you leave the mouth of the cave, what do you take with you?",
+      "options": [
+        { "key": "sketch", "label": "Draw the lines on the back of your glove, with the gaps between them", "keeps": "A glove ruled with pencil lines" },
+        { "key": "echo", "label": "Clap once, softly, and listen to how far the sound travels down the pipe", "keeps": "An echo walking away down a tube" },
+        { "key": "snow", "label": "Stand under the skylight and watch which ice stalagmite the snow lands on", "keeps": "One snowflake on the tip of an ice spike" }
+      ]
+    },
+    "ending": "Back home, some morning, you'll watch the bath drain and stare at the ring it leaves. You'll think of the hollow under that road, and the fire stepping down its walls one line at a time.",
+    "facts": [
+      { "text": "Raufarhólshellir is about 1,360 m long, the fourth-longest lava tube in Iceland; carbon dating puts its formation at about 5,600 years ago, from the Leitahraun eruption whose source lies some 10 km uphill.", "source": "https://en.wikipedia.org/wiki/Raufarh%C3%B3lshellir" },
+      { "text": "The cave has several skylights with snow piled beneath them, and Route 39 crosses over it where the tube is about 15 m across. Visitors destroyed nearly all its fragile lava straws; since reopening in 2017 it can only be visited on guided tours.", "source": "https://en.wikipedia.org/wiki/Raufarh%C3%B3lshellir" },
+      { "text": "A lava tube forms when a flow's crust hardens into a roof and the lava inside drains away; step marks on the walls record the depths at which the lava once flowed.", "source": "https://en.wikipedia.org/wiki/Lava_tube" }
+    ],
+    "fiction": "The entrance, its number and its opening hour belong to the 100 Journeys world. The winter bike ride across the lava field, the guide and what she says are invented; real visits are guided tours on foot, and no bike goes inside."
+  }
+}

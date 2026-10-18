@@ -1,0 +1,81 @@
+{
+  "slug": "japan-shiretoko-drift-ice",
+  "entrance": { "no": 31, "realm": "ice-night", "pace": "hour", "scale": "near", "seasons": ["winter"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "extreme", "visual_style": "raw",
+    "adventure_index": 6, "obscurity_level": 5, "risk_level": 3, "price": 7999,
+    "tags": ["nature", "visual", "extreme"],
+    "mbti": { "ENFP": 5, "ESFP": 4, "ESTP": 4 }
+  },
+  "cover": { "path": "generated/japan-shiretoko-drift-ice/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "仰面落海 · 知床流冰",
+    "subtitle": "第 31 号入口：海冰能到的最南边",
+    "hook": "你仰面倒进两块浮冰之间，海托住了你",
+    "region": "亚洲 · 日本",
+    "moods": ["流冰", "嘎吱声", "大笑", "冷"],
+    "opens": "冬天流冰靠岸的那几周（大约一月底到三月），早上",
+    "role": "第二个倒下去的人",
+    "premise": "知床半岛在北海道东北端，2005 年列入世界遗产，原因之一是这里通常是北半球海冰形成的最南端。黑龙江（阿穆尔河）的大量淡水冲淡了鄂霍次克海的表层，盐度变低，冰点升高，冬天更容易结冰；海流再把浮冰往南推，堆到半岛西侧，在北纬 43° 左右停住。",
+    "mission": "跟着向导走上浮冰，找到一道冰缝，仰面倒下去。",
+    "chapters": [
+      { "title": "拉链", "paragraphs": ["一大早，宇登吕港边的小屋里全是拉链声和笑声。你们七个互不认识的人，把自己塞进厚厚的干式防寒服，拉链从后腰一直拉到下巴。有人一条胳膊卡在袖子里出不来，原地转圈，整屋人笑得直不起腰。向导挨个敲了敲每个人的头罩：“这身衣服会让你浮着。踩我的脚印走，我停，你们就停。”"] },
+      { "title": "冰在说话", "paragraphs": ["门外的海一直白到天边，没有一滴水，只有一块挤着一块的冰，在很轻地动。走上去，脚底比你想的软。冰和冰挤在一起，发出低低的嘎吱声，像一条老木船在睡梦里翻身；远处有人喊了一句什么，被冰声吞掉一半。向导在一道黑色的冰缝前停下，一句话没说，张开双臂，往后一倒——扑通。他浮在水里，冲你们竖起大拇指。"] },
+      { "title": "冰缝里", "paragraphs": [
+        "冰缝里的水黑得发亮，贴着水面浮着一层薄薄的白气。他的大拇指还没放下，你已经第二个站到了冰缝边上。背对着海，张开手，倒下去。冷从脖子那一圈往里钻，又被挡在外面。你漂在两块浮冰之间，头顶是一整片淡蓝的天；耳朵贴着水，冰的嘎吱声变得很近，好像是从你胸口里响出来的。",
+        "冰上的陌生人一个接一个倒下来，扑通，扑通，每响一声，就有人笑出声。最后一个是那个卡过袖子的人，他倒下来时叫得比谁都响。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "爬回冰面之前，你还想做哪一件事？",
+      "options": [
+        { "key": "angel", "label": "躺到浮冰上，张开胳膊腿，划一个雪天使", "keeps": "冰面上一个张着手的人形" },
+        { "key": "listen", "label": "把耳朵再贴回水里，数冰响了几声", "keeps": "一声一直在耳朵里转的嘎吱" },
+        { "key": "together", "label": "向最后一个还在犹豫的人伸出手：“一起？”", "keeps": "两个人一起落水的那一声扑通" }
+      ]
+    },
+    "ending": "回到家，冬天的某个早上，你往杯子里丢冰块，冰块互相碰了一下，咔。你会一个人笑出声，屋里没人知道为什么。",
+    "facts": [
+      { "text": "知床半岛于 2005 年列入世界遗产，原因之一是这里通常是北半球海冰形成的最南端；冬季鄂霍次克海的海冰向南漂来，堆积在半岛西侧，形成约北纬 43° 的地球上纬度最低的常年海冰。", "source": "https://en.wikipedia.org/wiki/Shiretoko_Peninsula" },
+      { "text": "鄂霍次克海的浮冰得以形成，是因为黑龙江（阿穆尔河）注入大量淡水，降低了表层盐度，使海面的冰点升高。", "source": "https://en.wikipedia.org/wiki/Sea_of_Okhotsk" },
+      { "text": "宇登吕一带有当地向导带领的流冰漫步：参加者穿上干式防寒服，可以躺在浮冰上，也可以下到冰冷的海里，防寒服会让人浮在水面。", "source": "https://www.japan.travel/national-parks/parks/shiretoko/see-and-do/walk-drift-ice" },
+      { "text": "1996 年，鄂霍次克海的流冰被日本环境省选入“日本音风景百选”。", "source": "https://en.wikipedia.org/wiki/100_Soundscapes_of_Japan" }
+    ],
+    "fiction": "“入口”、编号和开放条件是桃源百旅的设定。流冰漫步是宇登吕一带真实的活动，必须穿专用防寒服、由当地向导带领，能否成行要看当天的冰况；文中的向导、同行的人和他们的对话都是虚构的。"
+  },
+  "en": {
+    "title": "Falling Backwards · Shiretoko Drift Ice",
+    "subtitle": "Entrance No. 31: sea ice, as far south as it goes",
+    "hook": "You fall backwards between two floes, and the sea holds you up",
+    "region": "Asia · Japan",
+    "moods": ["Drift ice", "Creaking", "Laughter", "Cold"],
+    "opens": "In the weeks when the drift ice comes in (roughly late January to March), in the morning",
+    "role": "The second one in",
+    "premise": "The Shiretoko Peninsula, at the north-eastern tip of Hokkaido, became a World Heritage site in 2005, partly because it is the southernmost place in the Northern Hemisphere where sea ice usually forms. Fresh water pouring out of the Amur River dilutes the surface of the Sea of Okhotsk, lowering its salinity and raising its freezing point; currents then push the ice south and pile it against the peninsula's west coast at around 43° north.",
+    "mission": "Follow the guide out onto the ice, find a gap between two floes, and fall in backwards.",
+    "chapters": [
+      { "title": "Zips", "paragraphs": ["Early morning, and the hut by the harbour at Utoro is all zips and laughter. Seven strangers, you haul yourselves into thick drysuits, zips running from the small of your back up to your chin. Someone gets an arm stuck in a sleeve and turns on the spot like a dog chasing its tail, and the whole room folds up laughing. The guide raps on each hood in turn. “This suit keeps you floating. Walk in my footsteps. When I stop, you stop.”"] },
+      { "title": "The ice talks", "paragraphs": ["Outside, the sea is white to the horizon. No water anywhere, just floe jammed against floe, shifting very slightly. Out on it, the ice gives underfoot more than you expected. Floes grind together with a low creak, like an old wooden boat rolling over in its sleep; someone's shout further off is half swallowed by it. The guide stops at a dark seam of open water, says nothing, spreads his arms and topples backwards. Splash. Floating, he gives you all a thumbs-up."] },
+      { "title": "In the gap", "paragraphs": [
+        "The water in the gap is glossy black, a thin breath of mist lying on it. Before his thumb is down you're second at the edge. Back to the sea, arms wide, over you go. The cold pushes at the seal round your neck and stops there. You drift between two floes with the whole pale-blue sky above you; with your ears in the water the creaking is close, as if it's coming from inside your chest.",
+        "One by one the strangers on the ice tip in after you, splash, splash, and every splash sets someone laughing. The last is the one who got stuck in his sleeve, and he yells louder than anyone."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before you climb back out, what else do you do?",
+      "options": [
+        { "key": "angel", "label": "Lie back on a floe and sweep out a snow angel", "keeps": "A spread-armed shape pressed into the ice" },
+        { "key": "listen", "label": "Put your ears back under and count the creaks", "keeps": "A creak still turning in your ears" },
+        { "key": "together", "label": "Hold out a hand to the last one still hesitating: “Together?”", "keeps": "One splash made by two people" }
+      ]
+    },
+    "ending": "Back home, some winter morning, you'll drop ice into a glass and hear the cubes knock together. You'll laugh out loud, alone, and nobody in the room will know why.",
+    "facts": [
+      { "text": "The Shiretoko Peninsula was inscribed as a World Heritage site in 2005, partly because it is the southernmost point in the Northern Hemisphere where sea ice usually forms; in winter, sea ice drifts south from the Sea of Okhotsk and piles up along the west side of the peninsula, the lowest-latitude regularly occurring sea ice on Earth, at about 43° N.", "source": "https://en.wikipedia.org/wiki/Shiretoko_Peninsula" },
+      { "text": "Ice floes form on the Sea of Okhotsk because fresh water from the Amur River lowers the salinity of the upper layer, raising the freezing point of the sea surface.", "source": "https://en.wikipedia.org/wiki/Sea_of_Okhotsk" },
+      { "text": "Around Utoro, local guides lead drift-ice walks: participants wear drysuits that keep them afloat, and can lie on the floating ice or take a dip in the freezing sea.", "source": "https://www.japan.travel/national-parks/parks/shiretoko/see-and-do/walk-drift-ice" },
+      { "text": "In 1996 Japan's Ministry of the Environment chose the drift ice of the Sea of Okhotsk as one of its 100 Soundscapes of Japan.", "source": "https://en.wikipedia.org/wiki/100_Soundscapes_of_Japan" }
+    ],
+    "fiction": "The entrance, its number and its opening hour belong to the 100 Journeys world. Drift-ice walks around Utoro are real, done only in special suits with a local guide, and depend on the day's ice; the guide, the group and what they say are invented."
+  }
+}

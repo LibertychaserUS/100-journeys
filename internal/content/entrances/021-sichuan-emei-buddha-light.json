@@ -1,0 +1,77 @@
+{
+  "slug": "sichuan-emei-buddha-light",
+  "entrance": { "no": 21, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["autumn", "winter"], "time": "afternoon" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "dramatic",
+    "adventure_index": 4, "obscurity_level": 3, "risk_level": 1, "price": 5999,
+    "tags": ["spiritual", "nature", "visual"],
+    "mbti": { "ENFJ": 5, "ESFJ": 4, "INFJ": 4 }
+  },
+  "cover": { "path": "generated/sichuan-emei-buddha-light/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "各自的光环 · 峨眉山金顶",
+    "subtitle": "第 21 号入口：云上那一圈，只属于你自己",
+    "hook": "光只绕着你自己的影子，所以你替别人找位置",
+    "region": "亚洲 · 中国",
+    "moods": ["云海", "寒冷", "等待", "让位"],
+    "opens": "秋冬两季的下午，太阳转到身后、云海铺在崖下的时候",
+    "role": "让位置的人",
+    "premise": "峨眉山海拔 3,099 米，是中国佛教四大名山中最高的一座，传为普贤菩萨的道场；金顶海拔 3,077 米。1996 年，峨眉山与乐山大佛一起列入世界遗产。人们说的“佛光”，物理上叫“光环”（glory）：太阳在身后、云雾在前方时，彩色的圆环会出现在你自己头部影子的周围，每个人都只看得见自己那一圈。",
+    "mission": "佛光出来的时候，帮身边一个看不到的人，找到能看见自己那一圈的位置。",
+    "chapters": [
+      { "title": "崖边的栏杆", "paragraphs": ["下午的金顶冷得发硬，栏杆上结着一层细霜。普贤像的金身在你背后亮着，香的烟被风压得很低。崖下是一整片云，白得发软，像能踩上去。栏杆边挤满了人：拄着竹杖一级一级爬上来的老香客，裹着租来的军大衣的年轻人，还有一个人在跟同伴讲，半山腰的猴子怎么抢走了他的一包饼干。你占到了一个好位置，手揣在袖子里，等。"] },
+      { "title": "你的那一圈", "paragraphs": ["云往上涌了一下，太阳从你背后照过来，云面上出现一个人影，很大，很淡。接着，影子的头周围亮起一圈光：最外一层是红的，往里渐渐发蓝，像一枚掉进雾里的戒指。你抬起手，那个影子也抬起手。栏杆边的人一起喊起来，每个人都在喊“看到了”，指的却是不太一样的地方。"] },
+      { "title": "让开半步", "paragraphs": [
+        "喊声里，身后传来一个细细的声音：“在哪儿呀？”是位老奶奶，个子小，被前面的人挡得严严实实，她的影子落不到云上。你知道指给她看没有用——你那一圈，她永远看不见。",
+        "你往旁边让开半步，扶着她走到栏杆前，站进你刚才的位置，让太阳正好落在她背上。“看您自己头的影子那儿。”过了一会儿，她不出声了，只是慢慢把一只手举起来，放下，又举起来。你站在她身后，没再看云，看她的手。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "光散之前，你做哪一件事？",
+      "options": [
+        { "key": "railing", "label": "再往边上挪一挪，给下一个挤不进来的人空出一截栏杆", "keeps": "手心里化开的一点栏杆上的霜" },
+        { "key": "tea", "label": "拧开保温杯，给她倒一杯盖的热茶", "keeps": "一只空了的杯盖，还冒着一点热气" }
+      ]
+    },
+    "ending": "回到山下，某个阴天的下午，你会看见有人站在人群最后踮着脚。你会往旁边让半步。",
+    "facts": [
+      { "text": "峨眉山海拔 3,099 米，是中国佛教四大名山中最高者，传为普贤菩萨的道场；金顶海拔 3,077 米。山上常见藏酋猴向游客讨要甚至抢夺食物。", "source": "https://en.wikipedia.org/wiki/Mount_Emei" },
+      { "text": "“峨眉山—乐山大佛”于 1996 年列入联合国教科文组织《世界遗产名录》。", "source": "https://whc.unesco.org/en/list/779/" },
+      { "text": "光环（glory）由阳光与云雾中的细小水滴作用形成，出现在观察者头部影子的周围，每一圈外红内蓝；18 世纪在安第斯山观察到它的人记录说，在场的六七个人每人都只在自己头影周围看到光环。在中国，这一现象被称为“佛光”，常见于峨眉山。", "source": "https://en.wikipedia.org/wiki/Glory_(optical_phenomenon)" }
+    ],
+    "fiction": "“入口”、编号和开放条件是桃源百旅的设定。佛光要看天气，并不按时出现；文中的老奶奶、香客和对话都是虚构的。"
+  },
+  "en": {
+    "title": "A Halo Each · Golden Summit, Emei Shan",
+    "subtitle": "Entrance No. 21: a ring on the cloud that belongs to you alone",
+    "hook": "The ring circles only your own shadow, so you find others their spot",
+    "region": "Asia · China",
+    "moods": ["Sea of cloud", "Cold", "Waiting", "Making room"],
+    "opens": "Autumn and winter afternoons, when the sun swings behind you and the cloud lies below the cliff",
+    "role": "The one who makes room",
+    "premise": "Mount Emei rises to 3,099 metres, the highest of China's four sacred Buddhist mountains and traditionally the seat of the bodhisattva Puxian; the Golden Summit stands at 3,077 metres. In 1996 it was inscribed as a World Heritage site together with the Leshan Giant Buddha. What pilgrims call Buddha's light, physicists call a glory: with the sun behind you and cloud in front, coloured rings appear around the shadow of your own head, and each person sees a ring only around their own.",
+    "mission": "When the light comes, help one person beside you who can't see it find the spot where they can see their own.",
+    "chapters": [
+      { "title": "The railing", "paragraphs": ["In the afternoon the Golden Summit is cold enough to feel solid; there's a skin of frost on the railing. The gilded Puxian shines behind you, incense smoke flattened by the wind. Below the cliff lies a single sheet of cloud, so soft and white it looks walkable. The railing is packed: old pilgrims who climbed the steps one by one on bamboo sticks, young people swaddled in rented army greatcoats, a man telling his friend how a macaque further down the mountain made off with his biscuits. You've got a good spot. Hands in your sleeves, you wait."] },
+      { "title": "Your ring", "paragraphs": ["The cloud heaves once, the sun comes over your shoulder, and a figure appears on the cloud, huge and faint. Then light gathers around its head: a ring, red on the outside, shading to blue within, like a ring dropped into fog. You lift a hand; the figure lifts one too. All along the railing people start shouting “There!”, each of them pointing somewhere slightly different."] },
+      { "title": "Half a step aside", "paragraphs": [
+        "Through the shouting, a thin voice behind you: “Where is it?” It's a small elderly woman, up on her toes, boxed in by the crowd; her shadow can't reach the cloud. Pointing won't help. Your ring is yours. She'll never see it.",
+        "So you step half a pace aside, take her arm, guide her to the railing and into the place where you were standing, and let the sun fall full on her back. “Look at the shadow of your own head.” After a moment she goes quiet. She raises one hand slowly, lowers it, raises it again. You stand behind her and watch her hand instead of the cloud."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Before the light fades, what do you do?",
+      "options": [
+        { "key": "railing", "label": "Shuffle along again and clear a stretch of railing for the next person who can't get in", "keeps": "Railing frost melting in your palm" },
+        { "key": "tea", "label": "Unscrew your flask and pour her a capful of hot tea", "keeps": "An empty flask cap, still steaming a little" }
+      ]
+    },
+    "ending": "Back down the mountain, on some grey afternoon, you'll notice someone at the back of a crowd, up on their toes. You'll step half a pace aside.",
+    "facts": [
+      { "text": "Mount Emei is 3,099 m high, the highest of China's Four Sacred Buddhist Mountains and traditionally the seat of Puxian (Samantabhadra); the temples of the Golden Summit (Jinding) stand at 3,077 m. Tibetan macaques there often take food from visitors.", "source": "https://en.wikipedia.org/wiki/Mount_Emei" },
+      { "text": "“Mount Emei Scenic Area, including Leshan Giant Buddha Scenic Area” was inscribed on the UNESCO World Heritage List in 1996.", "source": "https://whc.unesco.org/en/list/779/" },
+      { "text": "A glory forms when sunlight meets the tiny droplets in mist or cloud; its rings, red outside and bluish within, surround the shadow of the observer's head. An 18th-century observer in the Andes noted that each of the six or seven people present saw it only around their own shadow. In China it is called Buddha's light and is often seen on Mount Emei.", "source": "https://en.wikipedia.org/wiki/Glory_(optical_phenomenon)" }
+    ],
+    "fiction": "The entrance, its number and its opening hour belong to the 100 Journeys world. Buddha's light depends on the weather and keeps no schedule; the elderly woman, the pilgrims and what they say are invented."
+  }
+}

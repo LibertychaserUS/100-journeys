@@ -1,0 +1,83 @@
+{
+  "slug": "bhutan-tigers-nest",
+  "entrance": { "no": 25, "realm": "mist-temple", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "dramatic",
+    "adventure_index": 4, "obscurity_level": 4, "risk_level": 2, "price": 19999,
+    "tags": ["spiritual", "culture"],
+    "mbti": { "INFP": 5, "ENFJ": 4, "ENFP": 4 }
+  },
+  "cover": { "path": "generated/bhutan-tigers-nest/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "经幡 · 虎穴寺",
+    "subtitle": "第 25 号入口：剩下的，交给风",
+    "hook": "起风的早晨，替一个人挂一串经幡",
+    "region": "亚洲 · 不丹",
+    "moods": ["晨风", "经幡", "悬崖", "惦记"],
+    "opens": "秋天，晴朗有风的早晨",
+    "role": "替人挂经幡的人",
+    "premise": "虎穴寺（Paro Taktsang）建在帕罗河谷上方约 900 米的悬崖上，海拔约 3,120 米。传说 8 世纪时，莲花生大士骑在一头雌虎背上飞到这里，在山洞里修行；1692 年，人们围着那个山洞建起了寺院。1998 年 4 月，一场大火烧毁了主殿，2005 年修复。",
+    "mission": "在起风的早晨，替一个不在身边的人，挂起一串五色经幡。",
+    "chapters": [
+      { "title": "穿过松林", "paragraphs": [
+        "你背着一卷经幡上山：蓝、白、红、绿、黄，一面接一面缝在一根绳子上。松林里挂满了别人的经幡，有的新得发亮，有的已经褪成了灰白。向导说，褪色没关系，“印上去的经文淡了，就是风收走了。”",
+        "一路上你都在想那个人：TA 要是来了，会在哪个弯停下来喘气，会对哪一段台阶抱怨。"
+      ] },
+      { "title": "隔着山谷", "paragraphs": [
+        "到了观景的地方，寺就在山谷对面，白墙贴在黑色的岩壁上，看上去随时会被风吹走，却一直都在。下面一道瀑布，落差六十米。你想起那个传说：一头飞来的老虎，一个山洞，一个人在里面坐了很久。",
+        "“经幡不是送给神的，”向导说，“是交给风的。风把好意吹到每个地方，吹到谁身上都算数。”"
+      ] },
+      { "title": "风来了", "paragraphs": ["你们等风。太阳照上对面的寺墙时，风从谷底翻上来，满坡的经幡一下子全响了。向导点头：“就现在。”你把绳子一头系在松树上，另一头交给他。绳子拉直的那一刻，五种颜色一齐鼓起来，朝着同一个方向。"] }
+    ],
+    "choice": {
+      "prompt": "最后一个结由你来打。你怎么打？",
+      "options": [
+        { "key": "name", "label": "在心里把那个人的名字念一遍，再把结拉紧", "keeps": "手指上一道被绳子勒出的红印" },
+        { "key": "share", "label": "把多出来的一截绳子，递给旁边没带经幡的人", "keeps": "一声被风吹散了一半的谢谢" }
+      ]
+    },
+    "ending": "回到家，阳台上晾着的床单被风吹得鼓了起来。你站着看了一会儿，给那个人发了一条消息，只有一句：今天这边风很大。",
+    "facts": [
+      { "text": "虎穴寺位于帕罗河谷上方约 900 米，海拔约 3,120 米；寺院于 1692 年围绕莲花生大士修行的山洞建成。", "source": "https://en.wikipedia.org/wiki/Paro_Taktsang" },
+      { "text": "相传莲花生大士于 8 世纪骑雌虎飞到此地修行。1998 年 4 月主殿失火，2005 年修复。", "source": "https://en.wikipedia.org/wiki/Paro_Taktsang" },
+      { "text": "按传统说法，经幡并不是把祈祷送给神，而是让风把经文里的善意吹向四方；最好在晴朗有风的早晨挂新经幡，图文褪去时，祈祷就成了世界的一部分。", "source": "https://en.wikipedia.org/wiki/Prayer_flag" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。徒步上虎穴寺是真实的路线，沿途挂满经幡；向导、你挂经幡的地方和文中的细节都是虚构的。在宗教场所挂经幡，请听从当地人的安排。"
+  },
+  "en": {
+    "title": "Prayer Flags · Tiger's Nest",
+    "subtitle": "Entrance No. 25: the wind takes it from here",
+    "hook": "On a windy morning, hang a string of flags for someone",
+    "region": "Asia · Bhutan",
+    "moods": ["Morning wind", "Prayer flags", "Cliff", "Someone far away"],
+    "opens": "In autumn, on a clear, windy morning",
+    "role": "The one who hangs flags for someone",
+    "premise": "Paro Taktsang, the Tiger's Nest, clings to a cliff about 900 metres above the Paro valley, at around 3,120 metres. Legend says that in the 8th century Guru Rinpoche flew here on the back of a tigress to meditate in a cave; the monastery was built around that cave in 1692. A fire gutted the main building in April 1998, and it was restored in 2005.",
+    "mission": "On a windy morning, hang a string of five-coloured prayer flags for someone who isn't with you.",
+    "chapters": [
+      { "title": "Up through the pines", "paragraphs": [
+        "You carry a roll of flags up the mountain: blue, white, red, green, yellow, stitched one after another along a cord. The pines are full of other people's, some bright and new, some faded almost to grey. The guide says the fading is fine. “When the print's gone, the wind has taken it.”",
+        "All the way up you think about the person you're carrying them for: which bend they'd stop at to catch their breath, which flight of steps they'd grumble about."
+      ] },
+      { "title": "Across the gorge", "paragraphs": [
+        "At the lookout the monastery is right across the gorge, white walls pinned to black rock, looking as if the wind could take it any minute and never quite doing it. Below, a waterfall drops sixty metres. You think of the story: a tigress, a cave, a man who sat in there a long time.",
+        "“The flags aren't for the gods,” the guide says. “They're for the wind. It carries the good wishes everywhere. Whoever it touches, that counts.”"
+      ] },
+      { "title": "Here's the wind", "paragraphs": ["You wait for it. When the sun reaches the monastery walls, the wind comes up out of the valley and every flag on the slope cracks at once. The guide nods. “Now.” You tie one end to a pine and hand him the other. As the cord pulls tight, all five colours fill at the same moment and lean the same way."] }
+    ],
+    "choice": {
+      "prompt": "The last knot is yours. How do you tie it?",
+      "options": [
+        { "key": "name", "label": "Say their name once under your breath, then pull the knot tight", "keeps": "A red line across your fingers where the cord bit" },
+        { "key": "share", "label": "Hand the spare length of cord to the walker beside you who came without flags", "keeps": "A thank-you, half of it lost to the wind" }
+      ]
+    },
+    "ending": "At home, the sheets on the balcony line fill with wind. You watch them for a while, then send that person a message with just one line: it's windy here today.",
+    "facts": [
+      { "text": "Paro Taktsang sits about 900 m above the Paro valley, at about 3,120 m; the monastery was built in 1692 around the cave where Guru Rinpoche is said to have meditated.", "source": "https://en.wikipedia.org/wiki/Paro_Taktsang" },
+      { "text": "Legend says Guru Rinpoche flew here on a tigress in the 8th century. A fire broke out in the main building in April 1998; it was restored in 2005.", "source": "https://en.wikipedia.org/wiki/Paro_Taktsang" },
+      { "text": "Traditionally, prayer flags don't carry prayers to gods: the wind spreads their goodwill everywhere. New flags are best hung on sunny, windy mornings, and as the images fade the prayers become part of the universe.", "source": "https://en.wikipedia.org/wiki/Prayer_flag" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The hike to Taktsang is real and the trail is hung with prayer flags; the guide, the place you hang yours and the details here are fiction. At religious sites, hang flags only where local people show you."
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "slug": "japan-chichibugahama-tide-mirror",
+  "entrance": { "no": 16, "realm": "mirror-salt", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "dusk" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "surreal",
+    "adventure_index": 1, "obscurity_level": 4, "risk_level": 1, "price": 3999,
+    "tags": ["visual", "nature"],
+    "mbti": { "ESFP": 5, "ENFP": 4, "ESFJ": 4, "ENFJ": 3 }
+  },
+  "cover": { "path": "generated/japan-chichibugahama-tide-mirror/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "无风的镜子 · 父母之滨",
+    "subtitle": "第 16 号入口：风停下来的那几分钟",
+    "hook": "风一停，脚边每个水洼都装着一片天",
+    "region": "亚洲 · 日本",
+    "moods": ["退潮", "日落", "倒影", "热闹"],
+    "opens": "一年四季都有，退潮赶上日落、风又刚好停下来的傍晚",
+    "role": "替别人按快门的人",
+    "premise": "父母之滨在香川县三丰市，面朝濑户内海，沙滩长约一公里。退潮时，海水会退出去几百米，平坦的沙地上留下一个个水洼。傍晚海风常会停下来一阵，当地叫“濑户的夕凪”；这时水洼平得像镜子，把整片天空照进来。三丰市的观光网站按日列出退潮时段和日落时间，让人挑日子来。",
+    "mission": "日落前，给一个陌生人拍一张“站在天上”的照片，拍到对方说“就是这张”为止。",
+    "chapters": [
+      { "title": "等风", "paragraphs": ["傍晚，风一阵阵从海上吹过来。你们来早了：潮水已经退得很远，沙地上的水洼被吹得皱巴巴的，什么也照不出来。有人在练起跳，有人用手比心，一个小女孩拎着凉鞋踩水玩。一位捡垃圾的大叔走过来——这片沙滩一直是志愿者在打扫——他看了看天：“再等等，风要停了。”"] },
+      { "title": "镜子", "paragraphs": ["十几分钟后，风真的停了。水面一下子平下来，平到你在脚边就能看见一整朵云。整个沙滩好像同时吸了一口气，然后到处都是快门声。你蹲下去，把手机放低到几乎贴着水面，从岸这边朝海那边拍。取景框里，人站在天上，天又躺在人的脚下。"] },
+      { "title": "就是这张", "paragraphs": ["太阳贴到了海面上。旁边一对年轻人试了七八次，拍到的多半是自己的鞋。你接过他们的手机，让他们再往水边站近一点，喊“一、二、三”，他们跳起来，你又压低了一点。把手机还回去的时候，女孩看了一眼，叫出声来：“就是这张！”后面几个不认识的人跟着鼓起掌来。太阳落下去，风又起来了，镜子碎成一片细细的波纹。"] }
+    ],
+    "choice": {
+      "prompt": "风再起来之前，还剩最后几分钟，你做什么？",
+      "options": [
+        { "key": "pose", "label": "终于把手机交给别人，自己站到水边，摆一个傻姿势", "keeps": "一张你自己站在天上的照片" },
+        { "key": "line", "label": "招呼身边几个陌生人站成一排，拍一张连在一起的剪影", "keeps": "一排叫不出名字的剪影" },
+        { "key": "shoes", "label": "脱掉鞋，走进那片天空里", "keeps": "脚底湿沙子的凉" }
+      ]
+    },
+    "ending": "后来在城里等红灯，你看见雨后的一滩积水里倒映着一栋楼。你不由自主蹲低了一点，耳边又响起那一声“就是这张！”",
+    "facts": [
+      { "text": "父母之滨位于香川县三丰市，沙滩长约一公里；退潮时海水会退后几百米，在沙滩上留下许多像镜子一样的水洼。", "source": "https://www.japan.travel/en/spot/2074" },
+      { "text": "最适合拍摄的时间是退潮、日落且风停之后；濑户内海一带傍晚常有风平浪静的时段，称为“濑户的夕凪”。", "source": "https://www.japan.travel/en/spot/2074" },
+      { "text": "三丰市观光网站按日列出退潮时段与日落时间，并建议把镜头尽量贴近水面、从陆地一侧朝海拍；沙滩由志愿者维护清洁。", "source": "https://mitoyo-kanko.com/eng/chichibugahama" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。捡垃圾的大叔、那对年轻人和所有对话都是虚构的。"
+  },
+  "en": {
+    "title": "The Windless Mirror · Chichibugahama",
+    "subtitle": "Entrance No. 16: the few minutes when the wind drops",
+    "hook": "When the wind drops, every puddle at your feet holds a sky",
+    "region": "Asia · Japan",
+    "moods": ["Low tide", "Sunset", "Reflections", "Strangers"],
+    "opens": "All year round, on evenings when low tide meets sunset and the wind dies",
+    "role": "The one who takes the picture",
+    "premise": "Chichibugahama is a beach about a kilometre long in Mitoyo, Kagawa, on the Seto Inland Sea. At low tide the water pulls back several hundred metres and leaves pools all over the flat sand. In the evening the sea wind often drops for a while, a lull known as Seto-no-yunagi, and the pools turn to mirrors. Mitoyo's tourism site lists low-tide windows and sunset times day by day, so people can pick their evening.",
+    "mission": "Before sunset, take a picture of a stranger standing in the sky, and keep going until they say: that's the one.",
+    "chapters": [
+      { "title": "Waiting for the wind", "paragraphs": ["Early evening, and a steady wind is coming in off the sea. You're early. The tide is a long way out, and the pools are so creased they show nothing at all. People practise their jumps and make hearts with their hands; a little girl carries her sandals and splashes about. A man picking up litter, one of the volunteers who keep the beach clean, glances at the sky. “Give it a bit. The wind's about to go.”"] },
+      { "title": "The mirror", "paragraphs": ["Ten-odd minutes later it does. The water goes so flat you can see a whole cloud by your foot. The beach seems to breathe in all at once, and then there are shutters going everywhere. You crouch and hold the phone almost on the water, shooting from the land side out to sea, and in the frame people are standing on the sky, and the sky is lying under their feet."] },
+      { "title": "That's the one", "paragraphs": ["The sun is touching the sea. The couple next to you have tried seven or eight times and mostly got their shoes. You take their phone, move them closer to the water's edge and count: one, two, three. They jump; you get lower. When you hand it back the girl takes one look and shrieks, “That's the one!”, and a few people you don't know start clapping. Then the sun is gone, the wind comes back, and the mirror breaks into fine ripples."] }
+    ],
+    "choice": {
+      "prompt": "Before the wind comes back you have a few minutes left. What do you do?",
+      "options": [
+        { "key": "pose", "label": "Finally hand your phone to someone else and strike a ridiculous pose at the water's edge", "keeps": "A picture of you standing on the sky" },
+        { "key": "line", "label": "Get a handful of strangers into a row for one silhouette together", "keeps": "A row of silhouettes with no names" },
+        { "key": "shoes", "label": "Take your shoes off and walk into the sky", "keeps": "Cold wet sand under your feet" }
+      ]
+    },
+    "ending": "Later, waiting at a crossing in the city, you see a building upside down in a puddle after rain. You crouch a little without meaning to, and hear the girl shriek “That's the one!”",
+    "facts": [
+      { "text": "Chichibugahama, in Mitoyo, Kagawa, is about a kilometre long; at low tide the water recedes several hundred metres and leaves mirror-like tide pools across the sand.", "source": "https://www.japan.travel/en/spot/2074" },
+      { "text": "The best time for photographs is at sunset during low tide, after the wind has stopped; the evening lull around the Seto Inland Sea is known as Seto-no-yunagi.", "source": "https://www.japan.travel/en/spot/2074" },
+      { "text": "Mitoyo's tourism site publishes daily low-tide windows and sunset times, advises holding the camera as close to the water as possible and shooting from the land side toward the sea, and notes that volunteers keep the beach clean.", "source": "https://mitoyo-kanko.com/eng/chichibugahama" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The volunteer, the couple and all the dialogue are fiction."
+  }
+}
