@@ -54,8 +54,8 @@ const UI = (() => {
     return `<span class="meter" role="img" aria-label="${esc(t('card.adventureAria', { n: value || 0 }))}">${esc(t('card.adventure'))}<span class="meter__dots">${dots}</span></span>`;
   }
 
-  // Responsive images: generated JPEGs ship AVIF and WebP derivatives at fixed widths
-  // (scripts/images/derive.py); other images fall back to the plain <img>.
+  // Responsive images: generated JPEGs ship AVIF derivatives at fixed widths
+  // (scripts/images/derive.py); browsers without AVIF, and other images, use the plain <img>.
   const DERIVED = [
     [/\/generated\/[^/]+\/cover\.jpg$/, [480, 720, 1120]],
     [/\/generated\/card-[^/]+\.jpg$/, [480, 720]],
@@ -70,7 +70,7 @@ const UI = (() => {
     if (!rule) return img;
     const base = String(src).replace(/\.jpg$/, '');
     const set = (ext) => rule[1].map((w) => `${esc(base)}.${w}.${ext} ${w}w`).join(', ');
-    return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}"><source type="image/webp" srcset="${set('webp')}" sizes="${sizes}">${img}</picture>`;
+    return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}">${img}</picture>`;
   }
 
   function journeyCard(j, { eager = false } = {}) {

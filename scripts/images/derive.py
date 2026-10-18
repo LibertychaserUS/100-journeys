@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Responsive derivatives for the images under web/assets/images/generated.
 
-For every JPEG it writes <name>.<width>.avif and <name>.<width>.webp next to it, at the widths
-its kind needs (never wider than the source). The frontend's UI.picture() points <source>
-srcsets at these files, falling back to the JPEG. Run after adding or replacing an image:
+For every JPEG it writes <name>.<width>.avif next to it, at the widths its kind needs (never
+wider than the source). The frontend's UI.picture() points an AVIF <source> srcset at these
+files; browsers without AVIF use the JPEG. Run after adding or replacing an image:
 
     python3 scripts/images/derive.py
     python3 scripts/images/derive.py --cover-masters DIR   # also a sharp 1120w cover from originals
@@ -31,8 +31,8 @@ WIDTHS = {
     'texture': [600, 1024],
     'home': [960, 1600],
 }
-AVIF_Q, WEBP_Q = 52, 78
-AVIF_Q_LARGE, WEBP_Q_LARGE = 46, 72  # 1000px and wider: the openings, where bytes matter most for LCP
+AVIF_Q = 52
+AVIF_Q_LARGE = 46  # 1000px and wider: the openings, where bytes matter most for LCP
 
 
 def kind_of(name):
@@ -53,9 +53,24 @@ def save(img, path_base, width):
     w = min(width, img.width)
     h = round(img.height * w / img.width)
     out = img if w == img.width else img.resize((w, h), Image.LANCZOS)
-    large = width >= 1000
-    out.save(f'{path_base}.{width}.avif', 'AVIF', quality=AVIF_Q_LARGE if large else AVIF_Q)
-    out.save(f'{path_base}.{width}.webp', 'WEBP', quality=WEBP_Q_LARGE if large else WEBP_Q, method=6)
+    out.save(f'{path_base}.{width}.avif', 'AVIF', quality=AVIF_Q_LARGE if width >= 1000 else AVIF_Q)
+
+
+def match_grade(master, graded):
+    """Carry the cover's colour grade over to the original: fit an affine colour transform from
+    the original (at the cover's size) to the graded cover and apply it at full size."""
+    try:
+        import numpy as np
+    except ImportError:
+        return master
+    small = np.asarray(master.resize(graded.size, Image.LANCZOS), dtype=np.float64).reshape(-1, 3)
+    target = np.asarray(graded, dtype=np.float64).reshape(-1, 3)
+    x = np.hstack([small, np.ones((small.shape[0], 1))])
+    m, *_ = np.linalg.lstsq(x, target, rcond=None)  # 4x3
+    full = np.asarray(master, dtype=np.float64)
+    h, w, _ = full.shape
+    out = np.hstack([full.reshape(-1, 3), np.ones((h * w, 1))]) @ m
+    return Image.fromarray(np.clip(out, 0, 255).reshape(h, w, 3).astype(np.uint8))
 
 
 def fingerprint(img):
@@ -108,6 +123,7 @@ def main():
             if score > 18:  # no convincing original for this cover
                 continue
             master = ImageOps.fit(Image.open(best[0]).convert('RGB'), (1120, 1400), Image.LANCZOS)
+            master = match_grade(master, Image.open(src).convert('RGB'))
             save(master, os.path.splitext(src)[0], 1120)
             made += 1
     print(f'derived {made} image sets')

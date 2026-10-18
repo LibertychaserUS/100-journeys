@@ -145,7 +145,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `UT-AI-DS-004` | 日志 | 上游 400 | 日志只有状态码，没有密钥、用户消息或回复 |
 | `UT-CONTENT-005` | 文案公理 | 章节标题是「入口」「The light comes in.」这类导游式阶段名 | 校验报错；具体意象标题通过 |
 | `UT-CONTENT-SCENE-001` | 场景美术数据 | 每段旅程的 scenes/<slug>.json | 标志动作、质感、光线弧、节拍、配色合法，图片存在，seed 里每段旅程都有 |
-| `UT-CONTENT-IMG-001` | 响应式图片 | generated 下每张封面、场景图 | AVIF 与 WebP 各宽度齐全 |
+| `UT-CONTENT-IMG-001` | 响应式图片 | generated 下每张封面、场景图 | AVIF 各宽度齐全 |
 | `UT-WEB-005` | 资源打包 | index.html 列出的 CSS/JS | 合并成一个样式表和一个脚本，顺序不变，gzip 一致，拒绝 css/ js/ 之外的路径 |
 | `UT-WEB-006` | 分享页预加载 | 生成封面 vs 无衍生图的图片 | 生成封面带 AVIF 类型预加载，其他不加 |
 | `UT-WEB-004` | 分享页 | /j/:slug 的 Open Graph 标签 | 标题、描述替换并转义，默认分享标签移除，只剩一组 |

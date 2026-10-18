@@ -255,7 +255,7 @@ func TestScenes_AreValid(t *testing.T) {
 	}
 }
 
-// UT-CONTENT-IMG-001: every generated image the pages use has its AVIF and WebP derivatives
+// UT-CONTENT-IMG-001: every generated image the pages use has its AVIF derivatives
 // (scripts/images/derive.py), so <picture> srcsets never point at a missing file.
 func TestImages_HaveDerivatives(t *testing.T) {
 	root, _ := filepath.Abs("../../web/assets/images/generated")
@@ -281,7 +281,7 @@ func TestImages_HaveDerivatives(t *testing.T) {
 		}
 		rel, _ := filepath.Rel(root, p)
 		for _, w := range widths(rel) {
-			for _, ext := range []string{"avif", "webp"} {
+			for _, ext := range []string{"avif"} {
 				want := fmt.Sprintf("%s.%d.%s", strings.TrimSuffix(p, ".jpg"), w, ext)
 				if _, err := os.Stat(want); err != nil {
 					t.Errorf("%s: missing %s (run python3 scripts/images/derive.py)", rel, filepath.Base(want))
