@@ -125,11 +125,18 @@ func (h *JourneyHandler) AIChat(c *gin.Context) {
 	c.JSON(http.StatusOK, newDataEnvelope(resp))
 }
 
+// maxEventMetadata bounds the client-supplied metadata (visitor id plus a few short fields).
+const maxEventMetadata = 512
+
 // POST /api/analytics/events
 func (h *JourneyHandler) TrackAnalytics(c *gin.Context) {
 	var req model.AnalyticsEventRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, newErrorEnvelope(err.Error()))
+		return
+	}
+	if len(req.Metadata) > maxEventMetadata || len(req.JourneySlug) > 128 {
+		c.JSON(http.StatusBadRequest, newErrorEnvelope("event too large"))
 		return
 	}
 	accepted := h.trackEvent(analytics.Event{

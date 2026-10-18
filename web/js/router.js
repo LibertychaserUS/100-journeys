@@ -108,6 +108,9 @@ const Router = (() => {
 Router.define('/', Pages.Home);
 Router.define('/explore', Pages.Explore);
 Router.define('/journey/:slug', Pages.Detail);
+Router.define('/find', Pages.Find);
+Router.define('/guide', Pages.Guide);
+Router.define('/space', Pages.Space);
 Router.define('/login', Pages.Login);
 Router.define('/register', Pages.Register);
 Router.define('/profile', Pages.Profile);

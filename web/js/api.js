@@ -91,6 +91,11 @@ const API = (() => {
     },
     updateMBTI: (code) => authed('/auth/mbti', { method: 'PUT', body: JSON.stringify({ mbti_type: code }) }),
 
+    // Fork picks and the one-time guest merge
+    listChoices: () => authed('/auth/choices'),
+    setChoice: (slug, key) => authed(`/auth/choices/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify({ key }) }),
+    mergeGuest: (state) => authed('/auth/guest/merge', { method: 'POST', body: JSON.stringify(state) }),
+
     // Saved journeys
     listSaved: () => authed(`/auth/saved${qs(withLang())}`),
     saveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'PUT' }),
@@ -113,9 +118,11 @@ const API = (() => {
     adminExport: (format = 'csv') => fetch(`${base()}/admin/export?format=${format}`, { headers: authHeader() }),
 
     // Analytics (fire-and-forget)
-    track: (type, slug) => {
+    // meta lands in analytics_events.metadata with the anonymous visitor id used by the funnel.
+    track: (type, slug, meta = {}) => {
       try {
-        const payload = JSON.stringify({ type, journey_slug: slug || '' });
+        const vid = window.Guest ? Guest.vid() : '';
+        const payload = JSON.stringify({ type, journey_slug: slug || '', metadata: JSON.stringify({ vid, ...meta }) });
         const url = `${base()}/analytics/events`;
         if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }))) return;
         fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});

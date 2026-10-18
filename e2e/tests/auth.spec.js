@@ -88,7 +88,13 @@ test.describe('Auth Flow', () => {
 
   test('profile link navigates to profile', async ({ page }) => {
     await registerAndLogin(page, { prefix: 'profiletest' });
-    await page.locator('#nav-profile').click();
+    if (await page.locator('#nav-user').isVisible()) {
+      await page.locator('#nav-user').click();
+      await page.locator('#nav-profile').click();
+    } else {
+      await page.locator('#nav-menu').click();
+      await page.locator('#nav-drawer a[href="#/profile"]').click();
+    }
     await expect(page).toHaveURL(/#\/profile/);
     await expect(page.locator('.profile-name')).not.toHaveText('加载中…');
   });

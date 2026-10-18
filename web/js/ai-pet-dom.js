@@ -7,8 +7,6 @@
   if (!container) return;
   const esc = UI.esc;
   let open = false;
-  let quizAnswers = [];
-  let quizStep = 0;
   const history = []; // { who: 'pet'|'user', html }
 
   function render() {
@@ -66,7 +64,7 @@
 
   async function recommend() {
     const c = AIPet.copy();
-    const mbti = (Session.user && Session.user.mbti_type) || AIPet.getProfile().mbti;
+    const mbti = Guest.mbti();
     petSay(c.finding);
     try {
       const res = await API.getJourneys(mbti ? { mbti, limit: 3 } : { limit: 3 });
@@ -78,51 +76,16 @@
     }
   }
 
+  // The guide's walk lives on its own page (#/guide) so it can be resumed and measured.
   function startQuiz() {
-    if (!open) setOpen(true, { focus: false });
-    quizAnswers = [];
-    quizStep = 1;
-    askQuestion();
-  }
-
-  function askQuestion() {
-    const q = AIPet.question(quizStep);
-    if (!q) { finishQuiz(); return; }
-    const c = AIPet.copy();
-    addMessage('pet', `<p class="ai-pet__step">${esc(c.quizStep(quizStep, AIPet.quizLength))}</p><p><b>${esc(q.q)}</b></p>
-      <div class="ai-pet__quiz">${q.options.map((o, i) => `<button class="ai-pet__quiz-option" type="button" data-answer="${i}" data-step="${quizStep}">${esc(o.text)}</button>`).join('')}</div>`);
-    container.querySelector('.ai-pet__msg:last-child .ai-pet__quiz-option')?.focus();
-  }
-
-  async function finishQuiz() {
-    const c = AIPet.copy();
-    const { code } = AIPet.scoreMBTI(quizAnswers);
-    quizStep = 0;
-    AIPet.saveProfile({ ...AIPet.getProfile(), mbti: code });
-    let note = c.quizLogin;
-    if (API.isLoggedIn()) {
-      try {
-        await API.updateMBTI(code);
-        await Session.refresh();
-        note = c.quizSaved;
-        window.dispatchEvent(new CustomEvent('mbti:updated', { detail: code }));
-      } catch {}
-    }
-    petSay(`${c.quizDone(code)} ${note}`, [{ type: 'recommend', label: c.btnRecommend }]);
+    if (open) setOpen(false, { focus: false });
+    API.track('path_pick', '', { path: 'pet', from: 'widget' });
+    Router.navigate('/guide');
   }
 
   container.addEventListener('click', (e) => {
     if (e.target.closest('#ai-pet-avatar')) { setOpen(!open); return; }
     if (e.target.closest('#ai-pet-close')) { setOpen(false); return; }
-    const answer = e.target.closest('[data-answer]');
-    if (answer && Number(answer.dataset.step) === quizStep) {
-      answer.closest('.ai-pet__quiz').querySelectorAll('button').forEach((b) => { b.disabled = true; b.classList.toggle('is-chosen', b === answer); });
-      addMessage('user', esc(answer.textContent));
-      quizAnswers.push(Number(answer.dataset.answer));
-      quizStep++;
-      setTimeout(askQuestion, 250);
-      return;
-    }
     const action = e.target.closest('[data-pet-action]');
     if (action) {
       const type = action.dataset.petAction;

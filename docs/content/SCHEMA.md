@@ -139,16 +139,20 @@ Guests keep their state in `localStorage.guest_state` (see `web/js/guest.js`):
   composed: [ /* tickets from the compose game, each with a client-generated id */ ] }
 ```
 
-On sign-in the client sends `mbti` and `choices` to the account and replays `composed` tickets to
-the compose API, which must be idempotent on the ticket `id`.
+It also holds `vid` (anonymous visitor id), `opened` (entrances opened), `dialog` (the guide's walk,
+so it can resume) and `invite`. On sign-in `guest.js` sends `mbti` and `choices` once to
+`POST /api/auth/guest/merge` and clears them locally; signed in, the account is the source of truth
+(`Guest.mbti()`, `Guest.pick()`, `Guest.choose()`). `composed` tickets are replayed to the compose API,
+which must be idempotent on the ticket `id`.
 
 ## Funnel events
 
-Sent with `API.track(type, slug)`; the server drops unknown types, so a feature can ship its calls
-before its type is registered.
+Sent with `API.track(type, slug, meta)`; `meta` is stored as JSON together with an anonymous
+visitor id (`Guest.vid()`), which the admin funnel uses to count each visitor once. The server drops
+unknown types.
 
-`arrive` → `type_pick` (metadata `self` | `pet`) → `space_enter` → `journey_view` → `fork_choose`
-→ `save` → `checkout_start` → `purchase`, plus `compose_start` and `compose_complete`.
+Funnel: `arrive` → `path_pick` (`path`: `self` | `pet` | `browse`) → `type_found` (`via`: `self` | `pet`)
+→ `space_enter` → `entrance_open` → `register`. Also: `fork_choose`, `compose_start`, `compose_complete`.
 
 ## Checks
 

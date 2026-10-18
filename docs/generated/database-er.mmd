@@ -156,6 +156,8 @@ erDiagram
     ANALYTICS_EVENTS {
         int id PK
         string event_type
+        string 'arrive',
+        string 'fork_choose',
         string journey_slug
         int user_id FK
         string mbti_type
@@ -176,4 +178,11 @@ erDiagram
         string client_ip
         string user_agent
         string additional_fields
+    }
+
+    JOURNEY_CHOICES {
+        int user_id FK
+        int journey_id FK
+        string option_key
+        datetime updated_at
     }

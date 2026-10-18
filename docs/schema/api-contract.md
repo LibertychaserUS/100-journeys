@@ -309,7 +309,9 @@ AI 宠物/推荐对话接口。当前实现使用 mock provider。
 
 ### 3.9 `POST /api/analytics/events`
 
-记录前端分析事件。事件进入服务端缓冲区；当缓冲不可用或满载时，`accepted` 可能为 `false`，但接口仍返回 `202`。
+记录前端分析事件。事件进入服务端缓冲区；当缓冲不可用、满载或类型未登记时，`accepted` 为 `false`，但接口仍返回 `202`。
+
+`type` 取值：`journey_view` `journey_click` `pet_reply` `search` `filter`，以及核心路径漏斗 `arrive` `path_pick` `type_found` `space_enter` `entrance_open` `register` 和 `fork_choose` `compose_start` `compose_complete`。`metadata` 为不超过 512 字符的 JSON 字符串，前端写入匿名访客 id `vid`（不含个人信息），后台漏斗按它去重；超长返回 `400` + `event too large`。
 
 **请求 JSON**
 
@@ -509,6 +511,18 @@ AI 宠物/推荐对话接口。当前实现使用 mock provider。
 
 **响应 `200`**: `{ "data": { "mbti_type": "INFP" }, "error": null }`；非法代码返回 `400` + `invalid mbti type`。
 
+### 4.8 `GET /api/auth/choices` / `PUT /api/auth/choices/:slug`
+
+读取或保存当前用户在每个入口岔路上的选择。`GET` 返回 `{ "data": { "<slug>": "<option key>" } }`。`PUT` 请求 `{ "key": "postcard" }`，`key` 必须是该入口内容里的选项，否则 `400` + `invalid choice`；未知入口 `404`。
+
+### 4.9 `POST /api/auth/guest/merge`
+
+把访客在本地做的选择并入账户（注册或登录后由前端调用一次，可重复调用，结果相同）。
+
+**请求 JSON**: `{ "mbti_type": "INFP", "choices": { "bolivia-salt-flat-trek": "postcard" } }`，两项都可省略，`choices` 最多 100 条。
+
+**响应 `200`**: `{ "data": { "mbti_type": "INFP", "choices": { … 账户里全部选择 … }, "skipped": ["unknown-slug"] }, "error": null }`。访客类型非空时覆盖账户类型（最近一次选择）；不存在的入口或选项跳过并列在 `skipped`；非法类型 `400`。
+
 ---
 
 ## 5. 订单接口
@@ -706,7 +720,11 @@ AI 宠物/推荐对话接口。当前实现使用 mock provider。
     "top_purchased_journeys": [],
     "mbti_distribution": [],
     "gender_distribution": [],
-    "purchase_gender_distribution": []
+    "purchase_gender_distribution": [],
+    "funnel": [
+      { "step": "arrive", "visitors": 120, "rate": 100 },
+      { "step": "path_pick", "visitors": 84, "rate": 70 }
+    ]
   },
   "error": null
 }

@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 
 	"database/sql"
@@ -554,4 +555,14 @@ func TestAdmin_Stats_Funnel(t *testing.T) {
 		assert.Equal(t, want[step["step"].(string)], step["visitors"], step["step"])
 	}
 	assert.Equal(t, 75.0, funnel[1].(map[string]interface{})["rate"])
+}
+
+// IT-API-EVENT-002: oversized client metadata is rejected.
+func TestTrackAnalytics_RejectsLargeMetadata(t *testing.T) {
+	r, _, _ := setupAdminFullStackTestRouter(t)
+	w, resp := doJSON(t, r, "POST", "/api/analytics/events", "", model.AnalyticsEventRequest{
+		Type: "arrive", Metadata: strings.Repeat("x", 513),
+	})
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, "event too large", resp["error"])
 }

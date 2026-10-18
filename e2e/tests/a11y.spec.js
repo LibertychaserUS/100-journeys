@@ -11,14 +11,21 @@ const PAGES = [
   ['register', '/#/register', '#register-form'],
   ['about', '/#/about', '.about-head'],
   ['404', '/#/nowhere', '.error-code'],
+  ['find', '/#/find', '.type-card'],
+  ['guide', '/#/guide', '#guide-start'],
+  ['guide step', '/#/guide', '.guide__option', { dialog: { step: 2, answers: ['a', 'b'] } }],
+  ['guide reveal', '/#/guide', '.guide__reveal', { dialog: { step: 6, answers: ['a', 'b', 'c', 'a', 'b', 'c'] } }],
+  ['space', '/#/space', '#space-picks .journey-card', { mbti: 'INFP', mbti_source: 'self' }],
+  ['space (empty)', '/#/space', '.space__empty'],
 ];
 
 for (const theme of ['dark', 'light']) {
   test.describe(`Accessibility (${theme})`, () => {
-    for (const [name, url, ready] of PAGES) {
+    for (const [name, url, ready, guest] of PAGES) {
       test(`${name} has no WCAG A/AA violations`, async ({ page }) => {
         await freshPage(page);
         await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+        if (guest) await page.addInitScript((g) => localStorage.setItem('guest_state', JSON.stringify({ v: 1, ...g })), guest);
         await page.goto(url);
         await expect(page.locator(ready).first()).toBeVisible();
         await page.waitForLoadState('networkidle');

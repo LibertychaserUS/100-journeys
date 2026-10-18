@@ -32,6 +32,10 @@ Pages.Detail = {
         if (seq !== this._seq) return;
         this._journey = res.data;
         this._renderPage(res.data);
+        if (res.data.content) {
+          Guest.markOpened(res.data.slug);
+          if (API.isLoggedIn()) this._syncChoice(res.data, seq);
+        }
         this._loadSaved(res.data.slug, seq);
         const orderId = ctx.query.get('order');
         if (orderId) {
@@ -190,8 +194,16 @@ Pages.Detail = {
 
   _choiceFor(j) {
     const options = (j.content && j.content.choice && j.content.choice.options) || [];
-    const key = Guest.choice(j.slug);
+    const key = Guest.pick(j.slug);
     return options.some((o) => o.key === key) ? key : '';
+  },
+
+  /** Signed in, the account holds the pick: load it and reflect it once it arrives. */
+  async _syncChoice(j, seq) {
+    await Guest.loadAccountChoices();
+    if (seq !== this._seq) return;
+    const key = this._choiceFor(j);
+    if (key) this._reflectChoice(j, key);
   },
 
   _keepsText(c, key) {
@@ -200,7 +212,12 @@ Pages.Detail = {
   },
 
   _choose(j, key) {
-    Guest.setChoice(j.slug, key);
+    Guest.choose(j.slug, key).catch((err) => UI.toast(I18n.error(err)));
+    API.track('fork_choose', j.slug, { key });
+    this._reflectChoice(j, key);
+  },
+
+  _reflectChoice(j, key) {
     const main = document.getElementById('main-content');
     main.querySelectorAll('.fork__option').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.key === key)));
     const keeps = main.querySelector('#fork-keeps');

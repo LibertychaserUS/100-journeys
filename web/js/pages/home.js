@@ -43,6 +43,8 @@ Pages.Home = {
         </div>
       </section>
 
+      <div class="container" id="home-invite-slot">${this._invite()}</div>
+
       <section class="container home-steps" aria-label="${esc(t('home.stepsLabel'))}">
         <ol class="home-steps__row">
           ${[1, 2, 3].map((n) => `
@@ -73,6 +75,12 @@ Pages.Home = {
       const q = String(new FormData(e.currentTarget).get('q') || '').trim();
       Router.navigate(q ? `/explore?q=${encodeURIComponent(q)}` : '/explore');
     });
+    main.querySelector('#home-invite-slot').addEventListener('click', (e) => {
+      const a = e.target.closest('[data-path]');
+      if (!a) return;
+      API.track('path_pick', '', { path: a.dataset.path, from: 'home' });
+      if (a.dataset.path === 'browse') Guest.update((g) => { g.invite = 'dismissed'; });
+    });
     UI.trackCardClicks(main.querySelector('#featured-grid'));
     this._particles = HeroParticles.start(main.querySelector('.home-hero'), main.querySelector('.home-hero__particles'));
     this._loadFeatured();
@@ -81,6 +89,36 @@ Pages.Home = {
   destroy() {
     if (this._particles) this._particles.stop();
     this._particles = null;
+  },
+
+  /** The first step of the core flow: find your type (self or with the guide), or browse. */
+  _invite() {
+    const esc = UI.esc;
+    const code = Guest.mbti();
+    const face = `<img class="home-invite__face" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="48" height="48">`;
+    if (code) {
+      return `
+        <aside class="home-invite home-invite--back" aria-labelledby="home-invite-title">
+          ${face}
+          <div class="home-invite__text"><h2 id="home-invite-title">${esc(t('invite.welcome', { code }))}</h2></div>
+          <div class="home-invite__actions"><a class="btn btn--primary" id="invite-space" href="#/space">${esc(t('invite.back'))}</a></div>
+        </aside>`;
+    }
+    const quiet = Guest.get().invite === 'dismissed';
+    return `
+      <aside class="home-invite${quiet ? ' home-invite--quiet' : ''}" aria-labelledby="home-invite-title">
+        ${face}
+        <div class="home-invite__text">
+          <p class="eyebrow">${esc(t('invite.label'))}</p>
+          <h2 id="home-invite-title">${esc(t('invite.title'))}</h2>
+          ${quiet ? '' : `<p>${esc(t('invite.text'))}</p>`}
+        </div>
+        <div class="home-invite__actions">
+          <a class="btn btn--primary" id="invite-self" href="#/find" data-path="self">${esc(t('invite.self'))}</a>
+          <a class="btn btn--ghost" id="invite-pet" href="#/guide" data-path="pet">${esc(t('invite.pet'))}</a>
+          ${quiet ? '' : `<a class="btn btn--quiet" id="invite-browse" href="#/explore" data-path="browse">${esc(t('invite.browse'))}</a>`}
+        </div>
+      </aside>`;
   },
 
   async _loadFeatured() {

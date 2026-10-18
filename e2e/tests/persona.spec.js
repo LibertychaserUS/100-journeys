@@ -20,21 +20,17 @@ test.describe('Travel personality', () => {
     await expect(page.locator('#profile-mbti')).toContainText('INFP');
   });
 
-  // E2E-PERSONA-002: the guide's quiz produces a type and saves it when signed in
-  test('guide quiz saves a personality', async ({ page }) => {
+  // E2E-PERSONA-002: the guide's walk, started from the guide widget, saves the type when signed in
+  test('guide walk saves a personality', async ({ page }) => {
     await registerAndLogin(page, { prefix: 'quiz' });
+    await page.locator('#ai-pet-avatar').click();
+    await page.locator('#ai-pet-chat [data-pet-action="quiz"]').first().click();
+    await expect(page).toHaveURL(/#\/guide$/);
+    await expect(page.locator('#ai-pet-chat')).toBeHidden();
+    await page.locator('#guide-start').click();
+    for (let i = 0; i < 6; i++) await page.locator('.guide__option[data-key="a"]').click();
+    await expect(page.locator('.guide__reveal h1')).toBeVisible();
     await page.goto('/#/profile?tab=persona');
-    await page.locator('[data-action="quiz"]').click();
-    const chat = page.locator('#ai-pet-chat');
-    await expect(chat).toBeVisible();
-    for (let i = 0; i < 5; i++) {
-      const option = chat.locator('.ai-pet__msg:last-child .ai-pet__quiz-option').first();
-      await expect(option).toBeEnabled();
-      await option.click();
-    }
-    await expect(chat).toContainText('测试完成');
-    await expect(chat).toContainText('已经保存到你的账户');
-    await page.reload();
     await expect(page.locator('#profile-mbti')).not.toHaveText('未测人格');
   });
 

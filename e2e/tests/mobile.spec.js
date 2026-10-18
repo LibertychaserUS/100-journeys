@@ -19,12 +19,27 @@ test.describe('Mobile', () => {
 
   // E2E-MOBILE-002: no page scrolls sideways on a phone
   test('pages fit the phone width', async ({ page }) => {
-    for (const url of ['/#/', '/#/explore', '/#/journey/patagonia-torres-del-paine-trek', '/#/login', '/#/register', '/#/about']) {
+    for (const url of ['/#/', '/#/explore', '/#/journey/patagonia-torres-del-paine-trek', '/#/journey/bolivia-salt-flat-trek', '/#/login', '/#/register', '/#/about', '/#/find', '/#/guide', '/#/space']) {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, url).toBeLessThanOrEqual(0);
     }
+  });
+
+  // E2E-MOBILE-005: on a phone, two taps from home reach your space; the drawer links to it
+  test('two taps from home into your space', async ({ page }) => {
+    await page.goto('/#/');
+    await page.locator('#invite-self').click();
+    await page.locator('.type-card[data-code="ESFP"]').click();
+    await expect(page).toHaveURL(/#\/space$/);
+    await expect(page.locator('#space-picks .journey-card').first()).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    await page.goto('/#/explore');
+    await page.locator('#nav-menu').click();
+    await page.locator('#nav-drawer a[href="#/space"]').click();
+    await expect(page.locator('.space__head h1')).toContainText('ESFP');
   });
 
   // E2E-MOBILE-003: the filter panel opens as a sheet and applies filters

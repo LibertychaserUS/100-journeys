@@ -7,6 +7,9 @@
 | `/` | home |
 | `/explore` | explore |
 | `/journey/:slug` | journey detail |
+| `/find` | find |
+| `/guide` | guide |
+| `/space` | space |
 | `/login` | login |
 | `/register` | register |
 | `/profile` | profile |

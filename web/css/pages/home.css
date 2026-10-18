@@ -22,3 +22,19 @@
   .home-steps__row { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
   .home-featured__grid { gap: var(--space-3); grid-auto-rows: minmax(220px, auto); }
 }
+
+/* Home invitation — the first step of the core flow */
+.home-invite { margin-top: var(--space-6); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-5); align-items: center; padding: 22px 26px; border-radius: var(--radius-sheet); background: var(--color-surface); border: 1px solid var(--color-line-strong); }
+.home-invite__face { box-shadow: 0 0 0 6px var(--color-action-soft); }
+.home-invite__text h2 { margin-top: 4px; font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.35; }
+.home-invite__text p:not(.eyebrow) { margin-top: 4px; color: var(--color-text-2); font-size: var(--text-base); max-width: 36em; }
+.home-invite__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.home-invite--back .home-invite__text h2 { margin-top: 0; }
+@media (max-width: 960px) {
+  .home-invite { grid-template-columns: auto minmax(0, 1fr); }
+  .home-invite__actions { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (max-width: 760px) {
+  .home-invite { padding: 18px; gap: var(--space-4); }
+  .home-invite__actions .btn { flex: 1 1 auto; }
+}
