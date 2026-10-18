@@ -1,0 +1,58 @@
+/* =============================================================
+   LUMI — the lantern sprite (web/js/lumi.js). Illustration tokens only (--lumi-*).
+   ============================================================= */
+
+.lumi { display: block; overflow: visible; flex: none; }
+.lumi * { transform-box: view-box; }
+.lumi__body { stroke: var(--lumi-edge); stroke-width: 1.5; }
+.lumi__petals circle { stroke: var(--lumi-edge); stroke-width: 1.5; }
+.lumi__facet, .lumi__rib { fill: none; stroke: var(--lumi-line); stroke-width: 1.4; stroke-linecap: round; }
+.lumi__shine { fill: none; stroke: #fff; stroke-opacity: .7; stroke-width: 2.4; stroke-linecap: round; }
+.lumi__cap { fill: var(--lumi-ink); opacity: .82; }
+.lumi__tassel { stroke: var(--lumi-paper-2); stroke-width: 3; stroke-linecap: round; }
+.lumi__inner { fill: var(--lumi-core); opacity: .85; }
+.lumi__eyes ellipse { fill: var(--lumi-ink); }
+.lumi__cheek { fill: var(--lumi-cheek); }
+.lumi__mouth { fill: var(--lumi-ink); }
+.lumi__mouth--line { fill: none; stroke: var(--lumi-ink); stroke-width: 1.8; stroke-linecap: round; }
+.lumi__rays path { stroke: var(--lumi-ray); stroke-width: 3; stroke-linecap: round; }
+.lumi__halo { fill: none; stroke: var(--lumi-ray); stroke-width: 1.6; stroke-dasharray: 2 5; stroke-linecap: round; opacity: .9; }
+.lumi__prop { fill: var(--lumi-prop); stroke: var(--lumi-prop-line); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
+.lumi__prop .lumi__prop-hole { fill: var(--lumi-ink); stroke: none; }
+.lumi__sparks circle { fill: var(--lumi-glow); }
+.lumi__glow { opacity: var(--lumi-glow-a); }
+
+.lumi__pose--sway { transform-origin: 60px 64px; transform: rotate(-6deg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .lumi:not(.lumi--still) .lumi__float { animation: lumi-bob 3.4s ease-in-out infinite; }
+  .lumi:not(.lumi--still) .lumi__pose--sway { animation: lumi-sway 4.6s ease-in-out infinite; }
+  .lumi:not(.lumi--still) .lumi__glow { transform-origin: 60px 64px; animation: lumi-breathe 4s ease-in-out infinite; }
+  .lumi:not(.lumi--still) .lumi__eyes { transform-origin: 60px 66px; animation: lumi-blink 5.2s infinite; }
+  .lumi--idle:not(.lumi--still) .lumi__eyes { transform-origin: 60px 72px; }
+  .lumi:not(.lumi--still) .lumi__rays { transform-origin: 60px 64px; animation: lumi-turn 30s linear infinite; }
+  .lumi:not(.lumi--still) .lumi__sparks circle { animation: lumi-spark 3.6s ease-in-out infinite; }
+  .lumi:not(.lumi--still) .lumi__sparks circle:nth-child(2) { animation-delay: -1.2s; }
+  .lumi:not(.lumi--still) .lumi__sparks circle:nth-child(3) { animation-delay: -2.4s; }
+}
+@keyframes lumi-bob { 50% { transform: translateY(-3px); } }
+@keyframes lumi-sway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(-2deg); } }
+@keyframes lumi-breathe { 0%, 100% { transform: scale(.94); opacity: calc(var(--lumi-glow-a) * .75); } 50% { transform: scale(1.05); opacity: var(--lumi-glow-a); } }
+@keyframes lumi-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.12); } }
+@keyframes lumi-turn { to { transform: rotate(360deg); } }
+@keyframes lumi-spark { 0%, 100% { transform: translateY(0); opacity: .35; } 50% { transform: translateY(-6px); opacity: 1; } }
+
+/* The condensing moment: sparks gather, the flame flares, the form appears. */
+.lumi-condense { position: relative; display: inline-grid; width: var(--size); height: var(--size); }
+.lumi-condense > span { grid-area: 1 / 1; display: grid; place-items: center; }
+.lumi-condense__to { opacity: 0; transform: scale(.6); }
+.lumi-condense__sparks i { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px; border-radius: 50%; background: var(--lumi-glow); box-shadow: 0 0 10px 2px var(--lumi-glow); opacity: 0; transform: translate(var(--dx), var(--dy)); }
+.lumi-condense__flash { width: 60%; height: 60%; margin: auto; border-radius: 50%; background: radial-gradient(circle, var(--lumi-core) 0, var(--lumi-glow) 35%, transparent 70%); opacity: 0; transform: scale(.2); }
+.lumi-condense.is-on .lumi-condense__sparks i { animation: lumi-gather 760ms var(--d) cubic-bezier(.55, 0, .8, .2) forwards; }
+.lumi-condense.is-on .lumi-condense__from { animation: lumi-draw-in 820ms ease-in forwards; }
+.lumi-condense.is-on .lumi-condense__flash { animation: lumi-flash 620ms 780ms ease-out forwards; }
+.lumi-condense.is-on .lumi-condense__to { animation: lumi-appear 560ms 900ms cubic-bezier(.2, 1.4, .4, 1) forwards; }
+@keyframes lumi-gather { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: .9; transform: translate(0, 0) scale(.4); } }
+@keyframes lumi-draw-in { 45% { transform: scale(1.08); filter: brightness(1.15); } 85% { transform: scale(.42); opacity: 1; filter: brightness(1.6); } 100% { transform: scale(.25); opacity: 0; filter: brightness(1.8); } }
+@keyframes lumi-flash { 0% { opacity: 0; transform: scale(.2); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.9); } }
+@keyframes lumi-appear { to { opacity: 1; transform: scale(1); } }

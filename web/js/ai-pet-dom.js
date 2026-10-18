@@ -13,7 +13,7 @@
     container.innerHTML = `
       <section class="ai-pet__chat" id="ai-pet-chat" role="dialog" aria-modal="false" aria-labelledby="ai-pet-title" ${open ? '' : 'hidden'}>
         <header class="ai-pet__header">
-          <img class="ai-pet__face" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="36" height="36">
+          <span class="ai-pet__face" data-lumi-slot="36">${Lumi.svg(Guest.mbti(), { size: 36 })}</span>
           <div><h2 class="ai-pet__name" id="ai-pet-title">${esc(AIPet.name())}</h2><p class="ai-pet__status">${esc(t('pet.status'))}</p></div>
           <button class="icon-btn ai-pet__close" id="ai-pet-close" type="button" aria-label="${esc(t('pet.close'))}">${UI.icon('close')}</button>
         </header>
@@ -25,7 +25,7 @@
         </form>
       </section>
       <button class="ai-pet__avatar ${open ? '' : 'ai-pet__avatar--hint'}" id="ai-pet-avatar" type="button" aria-expanded="${open}" aria-controls="ai-pet-chat" aria-label="${esc(t('pet.open'))}">
-        <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="40" height="40">
+        <span data-lumi-slot="44">${Lumi.svg(Guest.mbti(), { size: 44 })}</span>
       </button>`;
     const msgs = container.querySelector('#ai-pet-messages');
     msgs.innerHTML = history.map((m) => `<div class="ai-pet__msg ai-pet__msg--${m.who}">${m.html}</div>`).join('');
@@ -122,5 +122,16 @@
   I18n.onChange(() => { history.length = 0; render(); });
 
   render();
+  // Lumi takes the traveller's form as soon as their type is known (or changes).
+  let shownCode = Guest.mbti();
+  function refreshLumi() {
+    const code = Guest.mbti();
+    if (code === shownCode) return;
+    shownCode = code;
+    container.querySelectorAll('[data-lumi-slot]').forEach((slot) => { slot.innerHTML = Lumi.svg(code, { size: Number(slot.dataset.lumiSlot) }); });
+  }
+  window.addEventListener('guest:updated', refreshLumi);
+  window.addEventListener('session:updated', refreshLumi);
+
   window.Pet = { open: () => setOpen(true), close: () => setOpen(false), startQuiz };
 })();

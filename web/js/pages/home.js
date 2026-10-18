@@ -95,7 +95,7 @@ Pages.Home = {
   _invite() {
     const esc = UI.esc;
     const code = Guest.mbti();
-    const face = `<img class="home-invite__face" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="48" height="48">`;
+    const face = `<span class="home-invite__face">${Lumi.svg(code, { size: 56 })}</span>`;
     if (code) {
       return `
         <aside class="home-invite home-invite--back" aria-labelledby="home-invite-title">

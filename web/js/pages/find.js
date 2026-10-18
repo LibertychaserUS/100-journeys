@@ -24,12 +24,13 @@ Pages.Find = {
                 <h2 id="find-g-${g}">${esc(t(`persona.group.${g}`))}</h2>
                 ${codes.map((c) => `
                   <button class="type-card" type="button" data-code="${c}" aria-pressed="${c === current}">
-                    <b>${c}</b><span>${esc(MBTI.name(c))}</span>
+                    ${Lumi.svg(c, { size: 56, still: true })}
+                    <span class="type-card__text"><b>${c}</b><span>${esc(MBTI.name(c))}</span></span>
                   </button>`).join('')}
               </div>`).join('')}
           </div>
           <aside class="find__unsure">
-            <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="56" height="56">
+            ${Lumi.svg('', { size: 56 })}
             <div><h2>${esc(t('find.unsure.title'))}</h2><p>${esc(t('find.unsure.text'))}</p></div>
             <a class="btn btn--ghost" id="find-unsure" href="#/guide">${esc(t('find.unsure.cta'))}</a>
           </aside>

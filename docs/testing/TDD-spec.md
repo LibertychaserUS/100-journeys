@@ -180,6 +180,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-HOME-001..005` | `e2e/tests/home.spec.js` | hero、5 个精选、心情入口带筛选跳转、搜索带 query、卡片跳转、封面不重复 | 通过 |
 | `E2E-EXPLORE-001..008` | `e2e/tests/explore.spec.js` | 加载 12 张卡；幻想类型筛选后结果数与 API 一致（旧版停在骨架屏）；搜索框可点击、输入时保持焦点（旧版被导航遮住）；筛选面板组合与移除；空状态清除；卡片跳转；从导航重新进入不残留筛选；带参链接还原 | 通过 |
 | `E2E-SPACE-001..005` | `e2e/tests/space.spec.js` | 首页邀请 → 类型牌 → 你的空间；小旅六步对话（刷新后续上、上一步）→ 揭晓 → 空间；“不确定”转交小旅、空空间不断路；访客类型与岔路选择注册后并入账户；英文全程 | 通过 |
+| `E2E-LUMI-001..002` | `e2e/tests/space.spec.js` | 16 张类型牌各带灯灵形态；选定类型后小旅凝聚成该形态（空间头部、向导窗口同步）；减少动态效果时直接出现 | 通过 |
 | `E2E-ADMIN-FUNNEL-001` | `e2e/tests/space.spec.js` | 后台漏斗面板六个步骤、访客数与比例 | 通过 |
 | `E2E-MOBILE-005` | `e2e/tests/mobile.spec.js` | 手机两次点击进入空间，无横向滚动，抽屉菜单有“我的空间” | 通过 |
 | `E2E-DETAIL-001..008` | `e2e/tests/detail.spec.js` | 入口编号、开放时间、身份/章节/岔路/尾声/真实与虚构按 API 渲染，本地化徽章、匹配度 5/5、章节默认可见；岔路选择写入票面并在刷新后保留；返回；分享写入剪贴板；404；访客收藏提示登录；收藏持久化并出现在「我的」；未知路由 404 | 通过 |
@@ -190,7 +191,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-PERSONA-001..002`、`E2E-PET-001` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；从向导窗口进入小旅的六步对话并保存到账户；向导推荐与 Esc 关闭还原焦点 | 通过 |
 | `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
 
-运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 86 个用例）。
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 88 个用例）。
 
 ### 4.4 Go Stress 矩阵
 

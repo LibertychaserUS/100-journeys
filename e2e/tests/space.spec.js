@@ -109,6 +109,33 @@ test.describe('Find your type → your space', () => {
     await context.close();
   });
 
+  // E2E-LUMI-001: Lumi takes the traveller's form: on the cards, in the reveal, and in the guide widget
+  test('Lumi condenses into the chosen type', async ({ page }) => {
+    await page.goto('/#/find');
+    await expect(page.locator('.type-card svg.lumi--form')).toHaveCount(16);
+    await expect(page.locator('#ai-pet-avatar svg.lumi')).toHaveClass(/lumi--idle/);
+    await page.locator('.type-card[data-code="INTJ"]').click();
+    const form = page.locator('#space-form svg[data-lumi="INTJ"]');
+    await expect(form).toBeVisible();
+    await expect(form).toHaveAttribute('aria-label', /INTJ/);
+    await expect(form).toHaveClass(/lumi--crystal/);
+    await expect(page.locator('#space-form .lumi-condense')).toHaveCount(0); // the moment has finished
+    await expect(page.locator('#ai-pet-avatar svg.lumi')).toHaveAttribute('data-lumi', 'INTJ');
+  });
+
+  // E2E-LUMI-002: with reduced motion the form appears at once
+  test('reduced motion shows the form without the animation', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce', locale: 'zh-CN' });
+    const page = await context.newPage();
+    await freshPage(page);
+    await page.addInitScript(() => localStorage.setItem('guest_state', JSON.stringify({ v: 1, dialog: { step: 5, answers: ['a', 'a', 'a', 'a', 'a'] } })));
+    await page.goto('/#/guide');
+    await page.locator('.guide__option[data-key="a"]').click();
+    await expect(page.locator('#guide-form .lumi-condense')).toHaveCount(0);
+    await expect(page.locator('#guide-form svg.lumi--form')).toBeVisible();
+    await context.close();
+  });
+
   // E2E-ADMIN-FUNNEL-001: the admin dashboard shows each funnel step with visitors and rate
   test('admin dashboard shows the funnel', async ({ page }) => {
     const me = { id: 1, username: 'admin', email: 'admin@example.com', role: 'admin', balance: 0, points: 0, level: 1 };

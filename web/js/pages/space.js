@@ -52,7 +52,7 @@ Pages.Space = {
       <section class="page space">
         <div class="container">
           <div class="state space__empty">
-            <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="64" height="64">
+            ${Lumi.svg('', { size: 72 })}
             <h1 class="state__title">${esc(t('space.empty.title'))}</h1>
             <p class="state__text">${esc(t('space.empty.text'))}</p>
             <div class="state__actions">
@@ -68,6 +68,8 @@ Pages.Space = {
   _renderShell(code, reveal) {
     const esc = UI.esc;
     const found = this._found();
+    const formSize = window.matchMedia('(max-width: 760px)').matches ? 88 : 128;
+    const formLabel = `${code} · ${MBTI.name(code)}`;
     const guest = !API.isLoggedIn();
     const compose = window.Pages && Pages.Compose ? `
       <section class="space__compose" aria-labelledby="space-compose-title">
@@ -90,6 +92,7 @@ Pages.Space = {
       <section class="page space">
         <div class="container">
           <header class="space__head">
+            <div class="space__form" id="space-form">${reveal ? '' : Lumi.svg(code, { size: formSize, label: formLabel })}</div>
             <p class="eyebrow">${esc(t('space.eyebrow'))}</p>
             <h1><span class="tag-code space__code">${esc(code)}</span>${esc(t('space.title', { name: MBTI.name(code) }))}</h1>
             <div class="space__found">
@@ -97,7 +100,7 @@ Pages.Space = {
               <span class="num">${esc(t('space.found', { n: found }))}</span>
               <a class="link-arrow" href="#/find" id="space-change">${esc(t('space.change'))}</a>
             </div>
-            ${reveal ? `<p class="space__reveal" role="status"><img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="28" height="28">${esc(t('space.reveal'))}</p>` : ''}
+            ${reveal ? `<p class="space__reveal" role="status">${esc(t('space.reveal'))}</p>` : ''}
           </header>
           ${this._composeFirst(code) ? compose + picks : picks + compose}
           <section class="space__section" aria-labelledby="space-keeps-title">
@@ -119,6 +122,7 @@ Pages.Space = {
         </div>
       </section>`;
 
+    if (reveal) Lumi.condense(document.getElementById('space-form'), code, { size: formSize, label: formLabel });
     document.querySelector('.space').addEventListener('click', (e) => {
       const card = e.target.closest('#space-picks .journey-card, #space-first, #space-keeps a');
       if (card) API.track('entrance_open', card.dataset.slug || '', { from: 'space' });

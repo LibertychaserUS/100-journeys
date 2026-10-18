@@ -49,7 +49,7 @@ Pages.Guide = {
           <p class="eyebrow">${esc(t('guide.eyebrow'))}</p>
           ${progress}
           <div class="guide__speaker">
-            <img class="guide__face" src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="64" height="64">
+            <span class="guide__face" id="guide-face">${Lumi.svg('', { size: 64 })}</span>
             <span>${esc(AIPet.name())}</span>
           </div>
           ${inner}
@@ -111,14 +111,16 @@ Pages.Guide = {
       UI.toast(I18n.error(err));
     }
     API.track('type_found', '', { via: 'pet', code });
-    this._renderReveal(code);
+    this._renderReveal(code, { condense: true });
     document.getElementById('guide-reveal')?.focus();
   },
 
-  _renderReveal(code) {
+  _renderReveal(code, { condense = false } = {}) {
     const esc = UI.esc;
+    const label = `${code} · ${MBTI.name(code)}`;
     this._shell(`
       <div class="guide__reveal" id="guide-reveal" tabindex="-1">
+        <div class="guide__form" id="guide-form">${condense ? '' : Lumi.svg(code, { size: 168, label })}</div>
         <p class="guide__lit">${esc(t('guide.reveal.eyebrow'))}</p>
         <h1><b>${esc(code)}</b><span>${esc(MBTI.name(code))}</span></h1>
         <p class="guide__line guide__line--sm">${esc(t('guide.reveal.text'))}</p>
@@ -128,6 +130,8 @@ Pages.Guide = {
         <a class="btn btn--ghost" href="#/find">${esc(t('guide.reveal.notMe'))}</a>
         <button class="btn btn--quiet" type="button" id="guide-again">${esc(t('guide.reveal.again'))}</button>
       </div>`);
+    document.querySelector('.guide__speaker')?.remove(); // Lumi has become the form below
+    if (condense) Lumi.condense(document.getElementById('guide-form'), code, { size: 168, label });
     document.getElementById('guide-again').addEventListener('click', () => {
       this._save({ step: 0, answers: [] });
       this._renderStep([]);
