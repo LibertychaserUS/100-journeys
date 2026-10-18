@@ -15,7 +15,7 @@
 
 ## 当前计数 / Current Counts
 
-- 解析 schema 表数量 / Schema tables parsed: 15
+- 解析 schema 表数量 / Schema tables parsed: 17
 - 生成 API 路由数量 / API routes generated: 28
 - 生成前端路由数量 / Frontend routes generated: 10
-- 测试证据文件数 / Test files in evidence matrix: 35
+- 测试证据文件数 / Test files in evidence matrix: 36

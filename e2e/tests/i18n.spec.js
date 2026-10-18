@@ -8,13 +8,14 @@ test.describe('Language', () => {
 
   // E2E-I18N-001: the switch translates UI and journey content, and is remembered
   test('switching to English translates UI and content', async ({ page }) => {
+    const { data: en } = await (await page.request.get('/api/journeys/bolivia-salt-flat-trek?lang=en')).json();
     await page.goto('/#/explore');
     await expect(page.locator('h1')).toHaveText('探索旅程');
     await page.locator('#nav-lang').click();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.locator('h1')).toHaveText('Explore journeys');
     await expect(page.locator('.nav__links a[href="#/explore"]')).toHaveText('Explore');
-    await expect(page.locator('.journey-card[data-slug="bolivia-salt-flat-trek"] .journey-card__title')).toHaveText('Walking the Mirror of Uyuni');
+    await expect(page.locator('.journey-card[data-slug="bolivia-salt-flat-trek"] .journey-card__title')).toHaveText(en.title);
     await expect(page.locator('#explore-results')).toHaveText('12 journeys');
 
     await page.reload();

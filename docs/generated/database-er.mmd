@@ -71,6 +71,25 @@ erDiagram
         string mood_keywords
     }
 
+    JOURNEY_ENTRANCES {
+        int journey_id PK
+        int no UK
+        string realm
+        string pace
+        string scale
+        string seasons
+        string time_of_day
+        string cover_license
+        string cover_source
+        string content_hash
+    }
+
+    JOURNEY_CONTENT {
+        int journey_id FK
+        string locale
+        string body
+    }
+
     USERS {
         int id PK
         string username

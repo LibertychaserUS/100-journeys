@@ -35,6 +35,9 @@ func (s *JourneyService) ListJourneys(ctx context.Context, filter model.JourneyF
 	if err := s.localize(ctx, journeys, locale); err != nil {
 		return nil, 0, err
 	}
+	if err := s.attachContent(ctx, journeys, locale, false); err != nil {
+		return nil, 0, err
+	}
 	for i := range journeys {
 		journeys[i].ImageURL = s.media.ResolveURL(journeys[i].ImagePath)
 	}
@@ -57,6 +60,9 @@ func (s *JourneyService) GetJourneyLocalized(ctx context.Context, slug, lang str
 	}
 	one := []model.Journey{*j}
 	if err := s.localize(ctx, one, NormalizeLocale(lang)); err != nil {
+		return nil, err
+	}
+	if err := s.attachContent(ctx, one, NormalizeLocale(lang), true); err != nil {
 		return nil, err
 	}
 	*j = one[0]
@@ -84,6 +90,14 @@ func (s *JourneyService) ListJourneysByIDs(ctx context.Context, ids []int64, lan
 		}
 	}
 	return ordered, nil
+}
+
+func (s *JourneyService) attachContent(ctx context.Context, journeys []model.Journey, locale string, full bool) error {
+	loader, ok := s.repo.(repository.JourneyContentLoader)
+	if !ok {
+		return nil
+	}
+	return loader.LoadContent(ctx, journeys, locale, full)
 }
 
 func (s *JourneyService) localize(ctx context.Context, journeys []model.Journey, locale string) error {

@@ -138,6 +138,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `UT-AI-002` | `RecommendEngine` | 覆盖 MBTI、关键词、fallback、limit、无匹配 | 推荐排序与数量符合规则 |
 | `UT-MW-001` | JWT middleware | 覆盖缺失、格式错误、无效、有效、过期、admin 权限 | JWT 与 admin gate 行为正确 |
 | `UT-MW-002` | CORS / RequestID | 覆盖允许源、拒绝源、预检、暴露头、request id 生成/保留 | 中间件响应头符合预期 |
+| `UT-CONTENT-001..004` | `internal/content` | 每个入口文件：结构、词表、封面存在、编号与 slug 唯一；文案不出现类型代码与说教词 | 全部入口可上线，lint 能抓到「因为你是 INFP」类句子 |
 | `UT-ANALYTICS-001` | analytics buffer | 覆盖 flush 持久化和五位数 burst 接收 | 未超过容量时不丢事件 |
 
 ### 4.2 集成测试矩阵
@@ -156,6 +157,8 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `IT-API-I18N-001..004` | 双语内容 | `?lang=en` 列表/详情为英文、默认中文、英文与中文搜索 | 12 段旅程全部有英文，`locale` 字段正确 |
 | `IT-API-MEDIA-001` | 封面 | 每段旅程封面唯一 | 不再出现多段旅程共用一张图 |
 | `IT-API-MBTI-ORDER-001` | MBTI 匹配顺序 | `mbti_types` 按匹配度降序 | 「最匹配」取第一项 |
+| `IT-CONTENT-001` | `content.Sync` | 写入 journeys / 翻译 / 入口 / 结构化内容 / 标签 / MBTI，第二次同步不变 | 幂等，内容哈希未变则跳过 |
+| `IT-API-CONTENT-001` | 入口内容 | 详情带 `entrance` 与完整 `content`，列表只带 `opens`、`role` | 字段与 JSON 文件一致，未写入口的旅程不带内容 |
 | `IT-API-SAVED-001..003` | 收藏 | 收藏/幂等/取消/本地化/未登录/不存在 | `/api/auth/saved` 往返一致 |
 | `IT-API-MBTI-001` | 保存人格 | 合法与非法代码 | `/auth/me` 返回保存的 `mbti_type` |
 | `IT-API-PAY-001..003` | 充值档位与赠送 | 档位公开、档位赠送入账两条流水、自定义金额无赠送 | 余额 = 本金 + 赠送 |
@@ -169,7 +172,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 |---|---|---|---|
 | `E2E-HOME-001..005` | `e2e/tests/home.spec.js` | hero、5 个精选、心情入口带筛选跳转、搜索带 query、卡片跳转、封面不重复 | 通过 |
 | `E2E-EXPLORE-001..008` | `e2e/tests/explore.spec.js` | 加载 12 张卡；幻想类型筛选后结果数与 API 一致（旧版停在骨架屏）；搜索框可点击、输入时保持焦点（旧版被导航遮住）；筛选面板组合与移除；空状态清除；卡片跳转；从导航重新进入不残留筛选；带参链接还原 | 通过 |
-| `E2E-DETAIL-001..007` | `e2e/tests/detail.spec.js` | 本地化徽章、匹配度 5/5、章节默认可见；返回；分享写入剪贴板；404；访客收藏提示登录；收藏持久化并出现在「我的」；未知路由 404 | 通过 |
+| `E2E-DETAIL-001..008` | `e2e/tests/detail.spec.js` | 入口编号、开放时间、身份/章节/岔路/尾声/真实与虚构按 API 渲染，本地化徽章、匹配度 5/5、章节默认可见；岔路选择写入票面并在刷新后保留；返回；分享写入剪贴板；404；访客收藏提示登录；收藏持久化并出现在「我的」；未知路由 404 | 通过 |
 | `E2E-AUTH-*` | `e2e/tests/auth.spec.js` | 表单与 label；注册跳转；字段级校验；有效登录；错误密码显示中文提示（旧版为 `HTTP 401`）；验证码错误落在验证码字段；账户菜单 Esc 还原焦点；登出；`?next=` 回跳 | 通过 |
 | `E2E-ORDER-001..006` | `e2e/tests/orders.spec.js` | 档位与赠送；赠送到账；页内确认支付；余额不足 → 充值 → 回到订单支付；「我的」中继续支付待支付订单；访客下单引导登录；10 用户顺序注册；出现原生 `confirm/alert` 即失败 | 通过 |
 | `E2E-I18N-001..002` | `e2e/tests/i18n.spec.js` | 切换英文后界面与旅程内容均为英文并记住；英文浏览器默认英文，英文搜索命中 | 通过 |
@@ -177,7 +180,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-PERSONA-001..002`、`E2E-PET-001` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；向导 5 题测验保存；向导推荐与 Esc 关闭还原焦点 | 通过 |
 | `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
 
-运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 66 个用例）。
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 67 个用例）。
 
 ### 4.4 Go Stress 矩阵
 

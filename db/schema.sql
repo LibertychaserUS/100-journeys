@@ -84,6 +84,29 @@ CREATE TABLE IF NOT EXISTS journey_translations (
     PRIMARY KEY (journey_id, locale)
 );
 
+-- Authored entrances (v1.6.0). Source of truth: internal/content/entrances/*.json, synced at startup.
+-- World metadata for one journey (language-independent).
+CREATE TABLE IF NOT EXISTS journey_entrances (
+    journey_id    INTEGER PRIMARY KEY REFERENCES journeys(id) ON DELETE CASCADE,
+    no            INTEGER NOT NULL UNIQUE CHECK(no BETWEEN 1 AND 100),
+    realm         TEXT    NOT NULL,             -- mirror-salt | fire-stone | ice-night | sand-stars | mist-temple | water-deep | city-rules | old-roads
+    pace          TEXT    NOT NULL,             -- hour | day | multi-day
+    scale         TEXT    NOT NULL,             -- near | far | polar
+    seasons       TEXT    NOT NULL DEFAULT '[]',-- JSON array of season keys
+    time_of_day   TEXT    NOT NULL DEFAULT '',
+    cover_license TEXT    NOT NULL DEFAULT '',
+    cover_source  TEXT    NOT NULL DEFAULT '',
+    content_hash  TEXT    NOT NULL DEFAULT ''
+);
+
+-- Structured narrative per language (JSON: opens, role, premise, mission, chapters, choice, ending, facts, fiction).
+CREATE TABLE IF NOT EXISTS journey_content (
+    journey_id INTEGER NOT NULL REFERENCES journeys(id) ON DELETE CASCADE,
+    locale     TEXT    NOT NULL CHECK(length(locale) BETWEEN 2 AND 10),
+    body       TEXT    NOT NULL,
+    PRIMARY KEY (journey_id, locale)
+);
+
 -- Indexes for filter performance
 CREATE INDEX IF NOT EXISTS idx_journeys_fantasy_type    ON journeys(fantasy_type);
 CREATE INDEX IF NOT EXISTS idx_journeys_visual_style    ON journeys(visual_style);

@@ -3,28 +3,32 @@ package model
 import "time"
 
 type Journey struct {
-	ID             int64         `json:"id"`
-	Title          string        `json:"title"`
-	Slug           string        `json:"slug"`
-	Subtitle       string        `json:"subtitle,omitempty"`
-	StoryHook      string        `json:"story_hook,omitempty"`
-	Story          string        `json:"story,omitempty"`
-	Region         string        `json:"region,omitempty"`
-	FantasyType    string        `json:"fantasy_type"`
-	VisualStyle    string        `json:"visual_style"`
-	AdventureIndex int           `json:"adventure_index"`
-	ObscurityLevel int           `json:"obscurity_level"`
-	RiskLevel      int           `json:"risk_level"`
-	MoodKeywords   []string      `json:"mood_keywords,omitempty"`
-	ImagePath      string        `json:"-"`         // raw DB path, resolved by service layer
-	ImageURL       string        `json:"image_url"` // resolved by service layer (local or CDN)
-	BookingURL     *string       `json:"booking_url,omitempty"`
-	Price          int           `json:"price"`
-	Locale         string        `json:"locale"` // content language actually returned: "zh" (base) or a translation
-	Tags           []Tag         `json:"tags,omitempty"`
-	MBTITypes      []JourneyMBTI `json:"mbti_types,omitempty"`
-	CreatedAt      time.Time     `json:"created_at"`
-	UpdatedAt      time.Time     `json:"updated_at"`
+	ID             int64    `json:"id"`
+	Title          string   `json:"title"`
+	Slug           string   `json:"slug"`
+	Subtitle       string   `json:"subtitle,omitempty"`
+	StoryHook      string   `json:"story_hook,omitempty"`
+	Story          string   `json:"story,omitempty"`
+	Region         string   `json:"region,omitempty"`
+	FantasyType    string   `json:"fantasy_type"`
+	VisualStyle    string   `json:"visual_style"`
+	AdventureIndex int      `json:"adventure_index"`
+	ObscurityLevel int      `json:"obscurity_level"`
+	RiskLevel      int      `json:"risk_level"`
+	MoodKeywords   []string `json:"mood_keywords,omitempty"`
+	ImagePath      string   `json:"-"`         // raw DB path, resolved by service layer
+	ImageURL       string   `json:"image_url"` // resolved by service layer (local or CDN)
+	BookingURL     *string  `json:"booking_url,omitempty"`
+	Price          int      `json:"price"`
+	Locale         string   `json:"locale"` // content language actually returned: "zh" (base) or a translation
+	// Entrance and Content come from internal/content (authored journeys). Content is complete on
+	// the detail endpoint; list endpoints only carry Content.Opens and Content.Role.
+	Entrance  *JourneyEntrance `json:"entrance,omitempty"`
+	Content   *JourneyContent  `json:"content,omitempty"`
+	Tags      []Tag            `json:"tags,omitempty"`
+	MBTITypes []JourneyMBTI    `json:"mbti_types,omitempty"`
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"updated_at"`
 }
 
 type Tag struct {
@@ -72,4 +76,51 @@ type JourneyTranslation struct {
 	Story        string
 	Region       string
 	MoodKeywords []string
+}
+
+// JourneyEntrance is the language-independent world data of an authored journey.
+type JourneyEntrance struct {
+	No           int      `json:"no"`
+	Realm        string   `json:"realm"`
+	Pace         string   `json:"pace"`
+	Scale        string   `json:"scale"`
+	Seasons      []string `json:"seasons"`
+	Time         string   `json:"time"`
+	CoverLicense string   `json:"cover_license,omitempty"`
+	CoverSource  string   `json:"cover_source,omitempty"`
+}
+
+// JourneyContent is the localized, structured narrative of an authored journey.
+type JourneyContent struct {
+	Opens    string           `json:"opens"`
+	Role     string           `json:"role"`
+	Premise  string           `json:"premise,omitempty"`
+	Mission  string           `json:"mission,omitempty"`
+	Chapters []ContentChapter `json:"chapters,omitempty"`
+	Choice   *ContentChoice   `json:"choice,omitempty"`
+	Ending   string           `json:"ending,omitempty"`
+	Facts    []ContentFact    `json:"facts,omitempty"`
+	Fiction  string           `json:"fiction,omitempty"`
+	Locale   string           `json:"locale"`
+}
+
+type ContentChapter struct {
+	Title      string   `json:"title"`
+	Paragraphs []string `json:"paragraphs"`
+}
+
+type ContentChoice struct {
+	Prompt  string          `json:"prompt"`
+	Options []ContentOption `json:"options"`
+}
+
+type ContentOption struct {
+	Key   string `json:"key"`
+	Label string `json:"label"`
+	Keeps string `json:"keeps"`
+}
+
+type ContentFact struct {
+	Text   string `json:"text"`
+	Source string `json:"source"`
 }
