@@ -72,8 +72,8 @@ journeys and analytics reference it, so **never rename an existing slug** (the 1
 | `chapters` | numbered chapters | 2–5 chapters, each `title` + 1–3 `paragraphs` |
 | `choice` | the fork | `prompt` + 2–3 `options` (`key`, `label`, `keeps`); keys identical in zh and en |
 | `ending` | afterwards | ≤ 3 sentences, back in ordinary life |
-| `facts` | "真实与虚构" | ≥ 2 items, each `text` + https `source` |
-| `fiction` | "真实与虚构" | what is invented (the entrance, the people, the details) |
+| `facts` | not shown; checked by the validator | ≥ 2 items, each `text` + https `source` |
+| `fiction` | not shown; the page ends with one line of small print, "故事情节含虚构" | what is invented (the entrance, the people, the details) |
 
 `keeps` is what the reader leaves with if they pick that option: a small concrete thing
 (`一张没有寄出的明信片`), never a lesson.
@@ -134,9 +134,10 @@ the copy:
 
 A beat tells the motif what to do in that chapter: `dark` the light goes out, `still` the world
 holds still, `grey` a faint first sign, `flare` the full moment, `vast` the space opens up. Images
-are optional paths under `web/assets/images` (`generated/<slug>/hero.jpg`, `scene-1.jpg`…); empty
-means the cover, framed differently per scene. `content.ValidateScene` and `UT-CONTENT-SCENE-001`
-check every file.
+are optional paths under `web/assets/images` (`generated/<slug>/hero.jpg`, `scene-1.jpg`…); the cover
+appears once, in the opening. Every other slot shows its own image; while one is empty, that scene
+shows a plate in the journey's palette (its tone on the arc, the accent, grain), never the cover again.
+`content.ValidateScene` and `UT-CONTENT-SCENE-001` check every file.
 
 ## Vocabulary
 

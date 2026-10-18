@@ -22,8 +22,14 @@ test.describe('Detail Page', () => {
     await expect(page.locator('#ch-role')).toHaveText(c.role);
     await expect(page.locator('.fork__option')).toHaveCount(c.choice.options.length);
     await expect(page.locator('.prep .clue')).toHaveCount(3);
-    await expect(page.locator('.truth__facts li')).toHaveCount(c.facts.length);
-    await expect(page.locator('.truth__facts a').first()).toHaveAttribute('rel', /noopener/);
+    // No essay about what is real: one line of small print
+    await expect(page.locator('.truth')).toHaveCount(0);
+    await expect(page.locator('.detail-fine')).toHaveText('故事情节含虚构');
+    // The cover appears once, in the opening; scenes without their own image get a palette plate
+    const cover = j.image_url.replace(/\.(jpe?g|png)$/i, '');
+    const covers = await page.locator('.scene__media img').evaluateAll((imgs, base) => imgs.filter((i) => (i.currentSrc || i.src).includes(base.split('/').pop())).length, cover);
+    expect(covers).toBe(1);
+    await expect(page.locator('.scene__plate').first()).toBeAttached();
     await expect(page.locator('#detail-ticket')).toContainText('匹配 5/5'); // 1–5 score, not "5%"
     await expect(page.locator('#detail-cta-buy')).toBeVisible();
     await expect(page.locator('#detail-cta-save')).toBeVisible();

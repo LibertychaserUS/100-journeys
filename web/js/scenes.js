@@ -148,10 +148,12 @@ var Scenes = (() => {
     // stillest in the middle of the journey, then broken into glitter when the sun comes up.
     mirror: {
       mount(ctx) {
+        // The journey's own sky image when it has one; otherwise a sky painted from its palette.
         const img = ctx.root.dataset.backdrop;
+        const bg = img ? ` style="background-image:url('${img.replace(/['"()\\]/g, '')}')"` : '';
         ctx.layer.innerHTML = `
-          <div class="mirror"><div class="mirror__sky" style="background-image:url('${img}')"></div>
-          <div class="mirror__water" style="background-image:url('${img}')"></div>
+          <div class="mirror${img ? '' : ' mirror--palette'}"><div class="mirror__sky"${bg}></div>
+          <div class="mirror__water"${bg}></div>
           <div class="mirror__line"></div><div class="mirror__glitter">${Array.from({ length: 70 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;top:${(Math.random() * 100).toFixed(1)}%;--s:${(Math.random() * 2.2 + 0.8).toFixed(1)}px;--d:${(Math.random() * 3).toFixed(2)}s"></i>`).join('')}</div></div>`;
       },
       update(ctx, { pageP, beat }) {

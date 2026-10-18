@@ -9,7 +9,7 @@
 @property --arc-h { syntax: '<number>'; inherits: true; initial-value: 222; }
 @property --arc-s { syntax: '<number>'; inherits: true; initial-value: 30; }
 
-.scenes { --sky-l: 7%; --sky-l2: 12%; position: relative; isolation: isolate; transition: --arc-h 1.4s var(--ease-in-out), --arc-s 1.4s var(--ease-in-out); }
+.scenes { --sky-l: 7%; --sky-l2: 12%; --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); position: relative; isolation: isolate; transition: --arc-h 1.4s var(--ease-in-out), --arc-s 1.4s var(--ease-in-out); }
 [data-theme="light"] .scenes { --sky-l: 95%; --sky-l2: 89%; }
 
 .scenes__backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
@@ -25,7 +25,7 @@
 .tex-salt .scenes__texture, .tex-ember .scenes__texture, .tex-stars .scenes__texture, .tex-sand .scenes__texture,
 .tex-ink .scenes__texture, .tex-caustics .scenes__texture, .tex-snow .scenes__texture, .tex-dust .scenes__texture,
 .tex-paper .scenes__texture, .tex-haze .scenes__texture, .tex-fog .scenes__texture {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: var(--grain);
 }
 .tex-salt .scenes__texture { background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,.5) 0 1px, transparent 1.5px), radial-gradient(circle at 70% 80%, rgba(255,255,255,.35) 0 1px, transparent 1.5px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 37px 41px, 53px 47px, 240px 240px; }
 .tex-ember .scenes__texture { opacity: .6; }
@@ -59,9 +59,32 @@
 /* Media: framed (split), bleeding (full scene) and the hero; the cover is graded per scene when a journey has no image of its own */
 .scene__media { position: relative; overflow: hidden; }
 .scene__media img { width: 100%; height: 100%; object-fit: cover; transform: translate3d(0, calc((var(--p, .5) - .5) * -8%), 0) scale(1.14); will-change: transform; }
-.scene__media[data-grade="g0"] img { object-position: 50% 70%; }
-.scene__media[data-grade="g1"] img { object-position: 50% 30%; filter: saturate(.85) brightness(.9); }
-.scene__media[data-grade="g2"] img { object-position: 30% 50%; filter: contrast(1.08) saturate(1.1); }
+/* Plates: until a scene has its own image it shows the journey's palette at that point of the
+   arc (never the cover again). Four kinds echo four kinds of shot: a wide horizon, an atmosphere
+   behind text, a lamp in the dark, a kept paper stub. Grain and a slow light make them material. */
+.scene__plate { --h: var(--ph, var(--arc-h)); --s: calc(var(--ps, var(--arc-s)) * 1%); background-color: hsl(var(--h) var(--s) 10%); }
+.scene__plate::after { content: ""; position: absolute; inset: 0; background-image: var(--grain); background-size: 240px 240px; opacity: .4; mix-blend-mode: soft-light; pointer-events: none; }
+.plate__light { position: absolute; inset: -12%; background: radial-gradient(42% 30% at 50% 38%, hsl(var(--h) var(--s) 72% / .16) 0, transparent 70%); transform: translate3d(0, calc((var(--p, .5) - .5) * -12%), 0); will-change: transform; }
+.scene__plate[data-plate="horizon"] { background:
+  radial-gradient(70% 34% at 50% 62%, color-mix(in srgb, var(--accent) 34%, transparent) 0, transparent 72%),
+  linear-gradient(180deg, hsl(var(--h) var(--s) 20%) 0%, hsl(var(--h) var(--s) 32%) 61.5%, hsl(var(--h) calc(var(--s) * .7) 11%) 62%, hsl(var(--h) calc(var(--s) * .6) 7%) 100%); }
+.scene__plate[data-plate="horizon"]::before { content: ""; position: absolute; left: 0; right: 0; top: 62%; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 60%, transparent) 30% 70%, transparent); }
+[data-theme="light"] .scene__plate[data-plate="horizon"] { background:
+  radial-gradient(70% 34% at 50% 62%, color-mix(in srgb, var(--accent) 40%, transparent) 0, transparent 72%),
+  linear-gradient(180deg, hsl(var(--h) var(--s) 88%) 0%, hsl(var(--h) var(--s) 76%) 61.5%, hsl(var(--h) calc(var(--s) * .7) 60%) 62%, hsl(var(--h) calc(var(--s) * .6) 50%) 100%); }
+.scene__plate[data-plate="field"] { background:
+  radial-gradient(90% 70% at 80% 16%, hsl(var(--h) var(--s) 30%) 0, transparent 70%),
+  radial-gradient(60% 50% at 10% 92%, color-mix(in srgb, var(--accent) 20%, transparent) 0, transparent 70%),
+  hsl(var(--h) calc(var(--s) * .8) 8%); }
+.scene__plate[data-plate="lamp"] { background:
+  radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--accent) 80%, #fff) 0 3%, color-mix(in srgb, var(--accent) 42%, transparent) 4.2%, transparent 36%),
+  radial-gradient(80% 46% at 50% 100%, hsl(var(--h) var(--s) 18%) 0, transparent 72%),
+  hsl(var(--h) calc(var(--s) * .7) 7%); }
+.scene__plate[data-plate="stub"] { background: linear-gradient(165deg, hsl(var(--h) calc(var(--s) * .45) 90%) 0, hsl(var(--h) calc(var(--s) * .55) 79%) 100%); }
+.scene__plate[data-plate="stub"]::before { content: ""; position: absolute; left: 14%; right: 14%; top: 26%; height: 1px; background: color-mix(in srgb, var(--accent) 70%, #000 10%); box-shadow: 0 10px 0 -0.5px hsl(var(--h) var(--s) 40% / .35), 0 20px 0 -0.5px hsl(var(--h) var(--s) 40% / .25); }
+.scene__plate[data-plate="stub"]::after { opacity: .55; mix-blend-mode: multiply; }
+.plate__no { position: absolute; left: 14%; top: 12%; font-size: 11px; letter-spacing: .14em; color: hsl(var(--h) calc(var(--s) * .5) 30%); }
+.plate__stamp { position: absolute; right: 12%; bottom: 12%; width: 34%; aspect-ratio: 1; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--accent) 75%, #6b2a1a); box-shadow: inset 0 0 0 4px transparent, inset 0 0 0 5px color-mix(in srgb, var(--accent) 55%, transparent); opacity: .7; transform: rotate(-14deg); }
 .scene__frame { margin: 0; aspect-ratio: 4 / 5; border-radius: 24px; overflow: hidden; box-shadow: 0 50px 120px -40px rgba(0, 0, 0, .7); }
 .scene__frame .scene__media { height: 100%; }
 .scene__frame--still { aspect-ratio: 1; }
@@ -104,7 +127,7 @@
 .is-armed .scene.is-in .scene__art[data-reveal] { transform: translate3d(0, calc((var(--p, .5) - .5) * -60px), 0); }
 @media (prefers-reduced-motion: reduce) {
   .is-armed .scene [data-reveal] { opacity: 1; transform: none; filter: none; clip-path: none; transition: none; }
-  .scene__media img, .scene__media--hero img, .scene__art, .scene--hero .detail-hero__text { transform: none !important; }
+  .scene__media img, .scene__media--hero img, .scene__art, .scene--hero .detail-hero__text, .plate__light { transform: none !important; }
 }
 @media print { .is-armed .scene [data-reveal] { opacity: 1; transform: none; filter: none; } .scenes__backdrop { display: none; } }
 
@@ -124,6 +147,12 @@
 .mirror__sky, .mirror__water { transition: opacity 1.2s var(--ease-out), filter 1.2s var(--ease-out); }
 .mirror__sky { opacity: calc(.12 + var(--light) * .24); }
 [data-theme="light"] .mirror__sky, [data-theme="light"] .mirror__water { opacity: .22; }
+.mirror--palette .mirror__sky, .mirror--palette .mirror__water { background:
+  radial-gradient(58% 10% at 28% 40%, hsl(var(--arc-h) calc(var(--arc-s) * 1%) 80% / .4) 0, transparent 70%),
+  radial-gradient(44% 8% at 74% 54%, hsl(calc(var(--arc-h) + 24) calc(var(--arc-s) * 1%) 74% / .34) 0, transparent 70%),
+  radial-gradient(72% 16% at 52% 84%, color-mix(in srgb, var(--accent) 46%, transparent) 0, transparent 72%),
+  linear-gradient(180deg, hsl(var(--arc-h) calc(var(--arc-s) * .8%) 16%) 0%, hsl(var(--arc-h) calc(var(--arc-s) * 1%) 44%) 78%, color-mix(in srgb, var(--accent) 50%, hsl(var(--arc-h) 40% 62%)) 100%); }
+.mirror--palette .mirror__sky { opacity: calc(.3 + var(--light) * .4); }
 .motif-mirror .scene--prologue .scene__display { -webkit-box-reflect: below -0.12em linear-gradient(transparent 55%, rgba(0, 0, 0, .22)); }
 
 /* Descent: daylight drains, a headlamp follows the pointer, a depth gauge counts down */
@@ -134,8 +163,8 @@
 .descent__gauge b { font-family: var(--font-story); font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 400; }
 .descent__gauge span { font-size: var(--text-xs); letter-spacing: .2em; }
 .descent__gauge i { position: absolute; right: -10px; top: -120px; width: 1px; height: 240px; background: currentColor; transform-origin: top; opacity: .6; }
-.motif-descent .scene__media img { -webkit-mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 calc(18% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .25) calc(30% + var(--lamp, 1) * 55%)); mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 calc(18% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .25) calc(30% + var(--lamp, 1) * 55%)); }
-.motif-descent.is-lights-out .scene[data-dark] .scene__media img { -webkit-mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 9%, transparent 22%); mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 9%, transparent 22%); }
+.motif-descent .scene__media img, .motif-descent .scene__plate { -webkit-mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 calc(18% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .25) calc(30% + var(--lamp, 1) * 55%)); mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 calc(18% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .25) calc(30% + var(--lamp, 1) * 55%)); }
+.motif-descent.is-lights-out .scene[data-dark] .scene__media img, .motif-descent.is-lights-out .scene[data-dark] .scene__plate { -webkit-mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 9%, transparent 22%); mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 9%, transparent 22%); }
 [data-theme="light"] .descent__dark { opacity: calc(var(--depth) * .5); }
 .descent.is-vast .descent__lamp { background: radial-gradient(ellipse 80% 70% at 50% 40%, color-mix(in srgb, var(--accent) 16%, transparent) 0, transparent 70%); }
 
@@ -213,5 +242,5 @@
   .scene__art { font-size: clamp(3.5rem, 22vw, 6rem); }
   .descent__gauge { right: 10px; top: auto; bottom: 90px; transform: none; }
   .descent__gauge i { display: none; }
-  .motif-descent .scene__media img { -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0, #000 calc(20% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .3) 80%); mask-image: radial-gradient(circle at 50% 45%, #000 0, #000 calc(20% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .3) 80%); }
+  .motif-descent .scene__media img, .motif-descent .scene__plate { -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0, #000 calc(20% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .3) 80%); mask-image: radial-gradient(circle at 50% 45%, #000 0, #000 calc(20% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .3) 80%); }
 }

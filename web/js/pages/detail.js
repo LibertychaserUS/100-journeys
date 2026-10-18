@@ -90,19 +90,32 @@ Pages.Detail = {
     return t('detail.risk.high');
   },
 
-  // Images for the scenes: the journey's own when it has them, otherwise the cover, framed
-  // differently per scene (crop and grade) so the scroll never repeats itself.
+  // Each scene shows its own image. The cover appears once, in the opening; a scene whose image
+  // doesn't exist yet gets a plate in the journey's palette instead of the cover again.
   _img(j, slot, i = 0) {
     const imgs = (j.scene && j.scene.images) || {};
-    if (slot === 'scene' && imgs.scenes && imgs.scenes[i]) return { src: imgs.scenes[i], own: true };
-    if (slot !== 'scene' && imgs[slot]) return { src: imgs[slot], own: true };
-    return { src: j.image_url, own: false };
+    if (slot === 'scene') return imgs.scenes && imgs.scenes[i] ? imgs.scenes[i] : '';
+    return imgs[slot] || (slot === 'hero' ? j.image_url : '');
   },
 
-  _media(j, slot, i, cls = '') {
-    const { src, own } = this._img(j, slot, i);
+  // The arc's tone at a point of the page (0 = opening, 1 = ending), for plates.
+  _tone(j, at) {
+    const arc = (j.scene && j.scene.arc) || [];
+    if (!arc.length) return null;
+    return arc[Math.min(arc.length - 1, Math.max(0, Math.round(at * (arc.length - 1))))];
+  },
+
+  _media(j, slot, i, cls = '', at = 0.5) {
+    const src = this._img(j, slot, i);
+    if (!src) {
+      const kind = slot === 'scene' ? (cls.includes('bleed') ? 'field' : 'horizon') : slot === 'fork' ? 'lamp' : 'stub';
+      const tone = this._tone(j, at);
+      const style = tone ? ` style="--ph:${Number(tone.h) || 0};--ps:${Number(tone.s) || 0}"` : '';
+      const no = kind === 'stub' && j.entrance && j.entrance.no ? `<span class="plate__no num">No.${String(j.entrance.no).padStart(3, '0')}</span><span class="plate__stamp"></span>` : '';
+      return `<div class="scene__media scene__plate ${cls}" data-plate="${kind}"${style} aria-hidden="true"><span class="plate__light"></span>${no}</div>`;
+    }
     const sizes = { hero: '100vw', ending: '220px', fork: '(max-width: 960px) 100vw, 40vw' }[slot] || (cls.includes('bleed') ? '100vw' : '(max-width: 960px) 100vw, 45vw');
-    return `<div class="scene__media ${cls}" data-grade="${own ? 'own' : `g${i % 3}`}">${UI.picture(src, { sizes, eager: slot === 'hero' })}</div>`;
+    return `<div class="scene__media ${cls}">${UI.picture(src, { sizes, eager: slot === 'hero' })}</div>`;
   },
 
   _paras(list) { return (list || []).map((p) => `<p data-reveal>${UI.esc(p)}</p>`).join(''); },
@@ -113,13 +126,14 @@ Pages.Detail = {
     const beats = (j.scene && j.scene.beats) || [];
     const beat = beats[i] || '';
     const layout = ['split', 'bleed', 'word'][i % 3];
+    const at = (i + 1) / (total + 2); // where this chapter sits on the lighting arc
     const n = `${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
     const head = `<p class="scene__num num" data-reveal>${esc(n)}</p><h2 id="ch-${i + 1}" class="scene__title" data-reveal>${esc(ch.title)}</h2>`;
     const attrs = `class="scene scene--chapter scene--${layout} chapter" data-scene="ch-${i + 1}" ${beat ? `data-beat="${esc(beat)}"` : ''} ${beat === 'dark' ? 'data-dark' : ''} aria-labelledby="ch-${i + 1}"`;
     if (layout === 'bleed') {
       return `
         <section ${attrs}>
-          ${this._media(j, 'scene', i, 'scene__media--bleed')}
+          ${this._media(j, 'scene', i, 'scene__media--bleed', at)}
           <div class="scene__scrim" aria-hidden="true"></div>
           <div class="container scene__inner scene__inner--low on-media">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
         </section>`;
@@ -136,7 +150,7 @@ Pages.Detail = {
     return `
       <section ${attrs}>
         <div class="container scene__grid">
-          <figure class="scene__frame" data-reveal>${this._media(j, 'scene', i)}</figure>
+          <figure class="scene__frame" data-reveal>${this._media(j, 'scene', i, '', at)}</figure>
           <div class="scene__text">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
         </div>
       </section>`;
@@ -160,7 +174,7 @@ Pages.Detail = {
       ${c.choice ? `
       <section class="scene scene--fork chapter fork" id="fork" data-scene="fork" aria-labelledby="fork-q">
         <div class="container scene__grid scene__grid--fork">
-          <figure class="scene__frame scene__frame--still" data-reveal>${this._media(j, 'fork', 3)}</figure>
+          <figure class="scene__frame scene__frame--still" data-reveal>${this._media(j, 'fork', 3, '', 0.85)}</figure>
           <div class="scene__text">
             <h2 id="fork-q" class="scene__title" data-reveal>${esc(c.choice.prompt)}</h2>
             <div class="fork__options" role="group" aria-labelledby="fork-q" data-reveal>
@@ -173,7 +187,7 @@ Pages.Detail = {
       ${c.ending ? `
       <section class="scene scene--ending chapter chapter--ending" data-scene="ending">
         <div class="container scene__inner scene__inner--narrow">
-          <figure class="scene__echo" data-reveal>${this._media(j, 'ending', 4)}</figure>
+          <figure class="scene__echo" data-reveal>${this._media(j, 'ending', 4, '', 1)}</figure>
           <p class="ending scene__display scene__display--prose" data-reveal>${esc(c.ending)}</p>
         </div>
       </section>` : ''}`;
@@ -206,17 +220,11 @@ Pages.Detail = {
       </section>` : ''}`;
   },
 
-  /** The practical part after the story: when to go, gear, risk, and what is real. */
+  /** The practical part after the story: when to go, gear, risk; then one line of small print. */
   _practical(j) {
     const esc = UI.esc;
     const c = j.content && j.content.chapters ? j.content : null;
-    const e = j.entrance || {};
     const mbti = (j.mbti_types || []).map((m) => m.mbti_type.code);
-    const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
-    const coverKey = `detail.cover.${e.cover_license}`;
-    const coverLabel = t(coverKey) === coverKey ? e.cover_license : t(coverKey);
-    const coverSource = /^https:\/\//.test(e.cover_source || '')
-      ? `<a href="${esc(e.cover_source)}" target="_blank" rel="noopener noreferrer">${esc(host(e.cover_source))}</a>` : '';
     const clues = c ? `
         <div class="clue"><h3>${esc(t('detail.clue.opens'))}</h3><p>${esc(c.opens)}</p></div>
         <div class="clue"><h3>${esc(t('detail.clue.gear'))}</h3><p>${esc(this._gear(j))}</p></div>
@@ -231,14 +239,7 @@ Pages.Detail = {
           <h2 id="prep-title">${esc(t(c ? 'detail.prep' : 'detail.ch3.title'))}</h2>
           <div class="clues">${clues}</div>
         </section>
-        ${c ? `
-        <aside class="truth" aria-labelledby="truth-title">
-          <h2 id="truth-title">${esc(t('detail.truth.title'))}</h2>
-          <h3>${esc(t('detail.truth.real'))}</h3>
-          <ul class="truth__facts">${(c.facts || []).map((f) => `<li>${esc(f.text)} <a href="${esc(f.source)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(t('detail.truth.sourceAria', { host: host(f.source) }))}">${esc(host(f.source))}</a></li>`).join('')}</ul>
-          ${c.fiction ? `<h3>${esc(t('detail.truth.fiction'))}</h3><p>${esc(c.fiction)}</p>` : ''}
-          ${e.cover_license ? `<p class="truth__cover">${esc(t('detail.truth.cover', { label: coverLabel }))}${coverSource ? ` · ${coverSource}` : ''}</p>` : ''}
-        </aside>` : ''}
+        <p class="detail-fine">${esc(t('detail.fine'))}</p>
       </div>`;
   },
 
@@ -300,12 +301,13 @@ Pages.Detail = {
     const realm = e && t(realmKey) !== realmKey ? t(realmKey) : '';
     const pick = c ? this._choiceFor(j) : '';
     const kept = pick ? c.choice.options.find((o) => o.key === pick).keeps : '';
-    const hero = this._img(j, 'hero');
+    const imgs = sc.images || {};
+    const backdrop = imgs.texture || imgs.hero || ''; // motifs that use an image never borrow the cover
     const stat = (key, value, max) => `
       <div class="ticket__stat"><span>${esc(t(key))}</span><span class="bar" aria-hidden="true"><b style="width:${Math.round(((value || 0) / max) * 100)}%"></b></span><span class="num">${value || 0}/${max}</span></div>`;
 
     main.innerHTML = `
-      <article class="detail scenes motif-${esc(sc.motif || 'drift')} tex-${esc(sc.texture || 'none')}" data-backdrop="${esc(hero.src)}" style="--accent:${esc(sc.accent || '#f2c46d')}">
+      <article class="detail scenes motif-${esc(sc.motif || 'drift')} tex-${esc(sc.texture || 'none')}" data-backdrop="${esc(backdrop)}" style="--accent:${esc(sc.accent || '#f2c46d')}">
         <div class="scenes__backdrop" aria-hidden="true"><div class="scenes__sky"></div><div class="scenes__motif"></div><div class="scenes__texture"></div></div>
 
         <header class="scene scene--hero detail-hero" data-scene="hero">
