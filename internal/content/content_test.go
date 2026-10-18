@@ -65,6 +65,24 @@ func TestValidate_FlagsTelling(t *testing.T) {
 	}
 }
 
+// UT-CONTENT-005: chapter titles may not be a guide's signposts.
+func TestValidate_FlagsSignpostTitles(t *testing.T) {
+	e := validSample()
+	e.ZH.Chapters[0].Title = "入口"
+	e.EN.Chapters[1].Title = "The light comes in."
+	problems := strings.Join(Validate(e), "\n")
+	for _, want := range []string{`"入口"`, `"The light comes in."`} {
+		if !strings.Contains(problems, want) {
+			t.Errorf("expected a signpost problem for %s, got:\n%s", want, problems)
+		}
+	}
+	e = validSample()
+	e.ZH.Chapters[0].Title = "脚尖上的云"
+	if got := Validate(e); len(got) != 0 {
+		t.Errorf("a concrete image title should pass, got %v", got)
+	}
+}
+
 // UT-CONTENT-003: structural rules (choice keys match across languages, facts carry sources).
 func TestValidate_Structure(t *testing.T) {
 	e := validSample()

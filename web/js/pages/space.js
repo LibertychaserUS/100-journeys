@@ -100,7 +100,6 @@ Pages.Space = {
               <span class="num">${esc(t('space.found', { n: found }))}</span>
               <a class="link-arrow" href="#/find" id="space-change">${esc(t('space.change'))}</a>
             </div>
-            ${reveal ? `<p class="space__reveal" role="status">${esc(t('space.reveal'))}</p>` : ''}
           </header>
           ${this._composeFirst(code) ? compose + picks : picks + compose}
           <section class="space__section" aria-labelledby="space-keeps-title">

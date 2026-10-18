@@ -93,6 +93,51 @@ The reader should recognise themselves in the scene, not be told who they are.
   prep text stays generic (gear and risk are derived from the scores).
 - English is written, not translated: same scene, natural idiom.
 
+### Copy axiom: never signpost the moment
+
+Nothing in the copy or the interface announces a stage of the journey the way a guide would:
+no chapter called 入口 / 光进来 / 尾声 / "The entrance", no "now you are inside", "the light comes
+in", "you will take home…". The moment is carried by the page (the scroll scene, its beat, the
+light) and by concrete things in the prose. Chapter titles are an image, an object, a time or a
+sensation: 冰凉的车窗, 脚尖上的云, 一千个亮点, 七点四十五分. The detail page shows no narrator labels
+around the story either; it keeps only what using the page needs (booking, sources).
+`content.Validate` rejects the common stage names as chapter titles in both languages.
+
+### Writing toward the matching types
+
+Every entrance has MBTI affinities. Write it from the angle its top-scoring types quietly enjoy,
+without ever naming a type or a trait:
+
+| Leaning | What the prose lingers on |
+|---|---|
+| NT | precise numbers, mechanisms, cause and effect, how a thing works or came to be |
+| NF | inner quiet, meaning, metaphor, a private gesture nobody else sees |
+| SP | sensation, motion, play, the present second |
+| SJ | care for someone, order, provenance, small rituals done properly |
+
+## Scenes (art direction)
+
+Each journey's immersive page is drawn from `internal/content/scenes/<slug>.json`, kept apart from
+the copy:
+
+```jsonc
+{
+  "slug": "bolivia-salt-flat-trek",
+  "motif": "mirror",            // mirror | descent | aurora | sky-rotate | mist | tide | track | map | rise
+  "texture": "salt",            // salt | ember | stars | sand | ink | caustics | snow | dust | paper | haze | fog
+  "arc": [{"h": 222, "s": 40}], // 3-8 tones, opening → ending; lightness comes from the theme
+  "accent": "#f6c9d6",          // decorative only: glows and lines, never text or controls
+  "beats": ["dark", "still", "flare"], // one per chapter: "" | dark | still | grey | flare | vast
+  "images": { "hero": "", "scenes": [], "fork": "", "ending": "", "texture": "" }
+}
+```
+
+A beat tells the motif what to do in that chapter: `dark` the light goes out, `still` the world
+holds still, `grey` a faint first sign, `flare` the full moment, `vast` the space opens up. Images
+are optional paths under `web/assets/images` (`generated/<slug>/hero.jpg`, `scene-1.jpg`…); empty
+means the cover, framed differently per scene. `content.ValidateScene` and `UT-CONTENT-SCENE-001`
+check every file.
+
 ## Vocabulary
 
 Labels live in `web/js/i18n.js` under `entrance.*`.
@@ -160,6 +205,7 @@ Funnel: `arrive` → `path_pick` (`path`: `self` | `pet` | `browse`) → `type_f
 go test ./internal/content/ ./internal/handler/
 ```
 
-`UT-CONTENT-001…004` validate every file (structure, vocabulary, lint, covers), `IT-CONTENT-001`
-syncs them into a fresh database, `IT-API-CONTENT-001` checks the API shape, and
+`UT-CONTENT-001…005` validate every file (structure, vocabulary, lint, signpost titles, covers),
+`UT-CONTENT-SCENE-001` the scene files, `IT-CONTENT-001/002` sync them into a fresh database and
+survive a restart, `IT-API-CONTENT-001` checks the API shape, and
 `E2E-DETAIL-001/008` check the page.

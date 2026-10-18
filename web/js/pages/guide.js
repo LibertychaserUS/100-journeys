@@ -121,7 +121,6 @@ Pages.Guide = {
     this._shell(`
       <div class="guide__reveal" id="guide-reveal" tabindex="-1">
         <div class="guide__form" id="guide-form">${condense ? '' : Lumi.svg(code, { size: 168, label })}</div>
-        <p class="guide__lit">${esc(t('guide.reveal.eyebrow'))}</p>
         <h1><b>${esc(code)}</b><span>${esc(MBTI.name(code))}</span></h1>
         <p class="guide__line guide__line--sm">${esc(t('guide.reveal.text'))}</p>
       </div>

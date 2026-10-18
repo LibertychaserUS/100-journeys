@@ -45,7 +45,6 @@
 .guide__actions { margin-top: var(--space-6); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .guide__reveal { margin-top: var(--space-5); }
 .guide__reveal:focus { outline: none; }
-.guide__lit { font-size: var(--text-xs); letter-spacing: .16em; color: var(--color-text-3); }
 .guide__reveal h1 { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px; font-family: var(--font-story); }
 .guide__reveal h1 b { font-size: clamp(2.75rem, 6vw, 4rem); letter-spacing: .08em; line-height: 1; }
 .guide__reveal h1 span { font-size: var(--text-xl); color: var(--color-text-2); font-weight: 400; }
@@ -65,7 +64,6 @@
 .space__meter { width: 160px; height: 4px; border-radius: 2px; background: var(--color-line-strong); overflow: hidden; }
 .space__meter b { display: block; height: 100%; min-width: 2px; background: var(--color-action); }
 .space__found .link-arrow { font-size: var(--text-sm); text-decoration: underline; text-underline-offset: 3px; }
-.space__reveal { justify-self: start; margin-top: var(--space-5); display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px 10px 10px; border-radius: var(--radius-pill); background: var(--color-action-soft); font-family: var(--font-story); }
 
 .space__section { padding-block: var(--space-6); border-top: 1px solid var(--color-line); }
 .space__compose { margin-block: var(--space-2) var(--space-6); display: flex; justify-content: space-between; align-items: center; gap: var(--space-5); padding: 22px 24px; border-radius: var(--radius-sheet); background: var(--color-surface); border: 1px solid var(--color-line-strong); }

@@ -149,10 +149,9 @@ Pages.Detail = {
     return `
       <section class="scene scene--prologue chapter chapter--prologue" data-scene="prologue" aria-labelledby="ch-role">
         <div class="container scene__inner scene__inner--narrow">
-          <p class="scene__eyebrow" data-reveal>${esc(t('detail.prologue'))}</p>
           <h2 id="ch-role" class="scene__display" data-reveal>${esc(c.role)}</h2>
           ${c.premise ? `<p class="scene__lead" data-reveal>${esc(c.premise)}</p>` : ''}
-          ${c.mission ? `<p class="mission" data-reveal><span>${esc(t('detail.missionLabel'))}</span>${esc(c.mission)}</p>` : ''}
+          ${c.mission ? `<p class="mission" data-reveal>${esc(c.mission)}</p>` : ''}
         </div>
       </section>
       ${chapters.map((ch, i) => this._chapterScene(j, ch, i, chapters.length)).join('')}
@@ -161,20 +160,18 @@ Pages.Detail = {
         <div class="container scene__grid scene__grid--fork">
           <figure class="scene__frame scene__frame--still" data-reveal>${this._media(j, 'fork', 3)}</figure>
           <div class="scene__text">
-            <p class="scene__eyebrow" data-reveal>${esc(t('detail.choice.eyebrow'))}</p>
             <h2 id="fork-q" class="scene__title" data-reveal>${esc(c.choice.prompt)}</h2>
             <div class="fork__options" role="group" aria-labelledby="fork-q" data-reveal>
               ${c.choice.options.map((o) => `<button type="button" class="fork__option" data-key="${esc(o.key)}" aria-pressed="${o.key === pick}"><span class="fork__lamp" aria-hidden="true"></span><span>${esc(o.label)}</span></button>`).join('')}
             </div>
-            <p class="fork__keeps" id="fork-keeps" aria-live="polite" data-reveal>${esc(this._keepsText(c, pick))}</p>
+            <p class="fork__keeps" id="fork-keeps" aria-live="polite" data-reveal>${this._keepsHtml(c, pick)}</p>
           </div>
         </div>
       </section>` : ''}
       ${c.ending ? `
-      <section class="scene scene--ending chapter chapter--ending" data-scene="ending" aria-labelledby="ch-end">
+      <section class="scene scene--ending chapter chapter--ending" data-scene="ending">
         <div class="container scene__inner scene__inner--narrow">
           <figure class="scene__echo" data-reveal>${this._media(j, 'ending', 4)}</figure>
-          <p class="scene__eyebrow" id="ch-end" data-reveal>${esc(t('detail.ending'))}</p>
           <p class="ending scene__display scene__display--prose" data-reveal>${esc(c.ending)}</p>
         </div>
       </section>` : ''}`;
@@ -257,9 +254,14 @@ Pages.Detail = {
     if (key) this._reflectChoice(j, key);
   },
 
+  _keepsHtml(c, key) {
+    const kept = this._keepsText(c, key);
+    return kept ? `<span class="sr-only">${UI.esc(t('detail.choice.keptSr'))}</span>${UI.esc(kept)}` : '';
+  },
+
   _keepsText(c, key) {
     const o = ((c.choice && c.choice.options) || []).find((x) => x.key === key);
-    return o ? t('detail.choice.keeps', { keeps: o.keeps }) : t('detail.choice.hint');
+    return o ? o.keeps : '';
   },
 
   _choose(j, key) {
@@ -274,7 +276,7 @@ Pages.Detail = {
     const main = document.getElementById('main-content');
     main.querySelectorAll('.fork__option').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.key === key)));
     const keeps = main.querySelector('#fork-keeps');
-    if (keeps) keeps.textContent = this._keepsText(j.content, key);
+    if (keeps) keeps.innerHTML = this._keepsHtml(j.content, key);
     const o = j.content.choice.options.find((x) => x.key === key);
     const line = main.querySelector('#ticket-keeps');
     if (line && o) { line.textContent = o.keeps; line.classList.remove('is-empty'); }
@@ -320,7 +322,7 @@ Pages.Detail = {
           </div>
           <div class="container scene__inner scene__inner--hero on-media">
             <div class="detail-hero__text">
-              ${e ? `<p class="detail-hero__no num" data-reveal>${esc(t('entrance.no', { n: e.no }))}${realm ? ` · ${esc(realm)}` : ''}</p>` : ''}
+              ${e ? `<p class="detail-hero__no num" data-reveal>${esc(t('entrance.no', { n: String(e.no).padStart(3, '0') }))}${realm ? ` · ${esc(realm)}` : ''}</p>` : ''}
               <h1 class="detail-hero__title" data-reveal>${String(j.title).split(' · ').map((part) => `<span class="nowrap">${esc(part)}</span>`).join('<span class="detail-hero__dot"> · </span>')}</h1>
               ${j.story_hook ? `<p class="detail-hero__hook" data-reveal>${esc(I18n.lang === 'zh' ? `「${j.story_hook}」` : `“${j.story_hook}”`)}</p>` : ''}
               <ul class="detail-hero__moods" data-reveal>${(j.mood_keywords || []).map((m) => `<li class="chip chip--sm">#${esc(m)}</li>`).join('')}</ul>
@@ -331,7 +333,7 @@ Pages.Detail = {
                 <div class="detail-hero__price"><dt>${esc(t('detail.facts.price'))}</dt><dd class="num">${esc(UI.coins(j.price))}</dd></div>
               </dl>
             </div>
-            <a class="scene__cue" href="#${c ? 'ch-role' : 'ch1'}" data-cue>${esc(t('detail.cue'))}<span aria-hidden="true"></span></a>
+            <a class="scene__cue" href="#${c ? 'ch-role' : 'ch1'}" data-cue aria-label="${esc(t('detail.cue'))}"><span aria-hidden="true"></span></a>
           </div>
         </header>
 

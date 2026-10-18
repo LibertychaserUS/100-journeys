@@ -160,7 +160,11 @@ func Load() ([]Entrance, error) {
 }
 
 var (
-	mbtiCode = regexp.MustCompile(`\b[EI][NS][FT][JP]\b`)
+	// Chapter titles name a concrete image, object, time or sensation — never a stage of the
+	// trip announced like a guide would ("the entrance", "the light comes in", "epilogue").
+	stageTitlesZH = []string{"入口", "进入", "出发", "抵达", "到达", "离开", "回程", "开始", "结束", "尾声", "结尾", "序章", "终章", "高潮", "光进来", "天亮了", "门开了"}
+	stageTitlesEN = []string{"the entrance", "entrance", "the way in", "the way out", "arrival", "departure", "leaving", "the return", "the beginning", "the end", "epilogue", "prologue", "the climax", "the light comes in", "light comes in", "dawn breaks", "the door opens"}
+	mbtiCode      = regexp.MustCompile(`\b[EI][NS][FT][JP]\b`)
 	// Copy must show why a journey fits, never tell: no type codes, no trait vocabulary, no lecturing.
 	bannedZH = []string{"MBTI", "人格", "性格", "内向", "外向", "理性", "感性", "直觉型", "因为你是", "作为一个", "适合你这种", "你天生", "你这样的人"}
 	bannedEN = []string{"mbti", "personality", "introvert", "extrovert", "because you are", "because you're", "your type", "people like you"}
@@ -249,9 +253,19 @@ func Validate(e Entrance) []string {
 		if n := len(t.Chapters); n < 2 || n > 5 {
 			add("%s needs 2-5 chapters, has %d", lang.name, n)
 		}
+		stages := stageTitlesZH
+		if lang.name == "en" {
+			stages = stageTitlesEN
+		}
 		for i, c := range t.Chapters {
 			if c.Title == "" || len(c.Paragraphs) == 0 {
 				add("%s chapter %d needs a title and paragraphs", lang.name, i+1)
+			}
+			title := strings.ToLower(strings.Trim(strings.TrimSpace(c.Title), "。.!！"))
+			for _, st := range stages {
+				if title == st {
+					add("%s chapter %d is titled like a guide's signpost (%q): name an image, object, time or sensation", lang.name, i+1, c.Title)
+				}
 			}
 		}
 		if t.Choice == nil || len(t.Choice.Options) < 2 || len(t.Choice.Options) > 3 {
