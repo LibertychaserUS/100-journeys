@@ -1,0 +1,41 @@
+{
+  "slug": "qinghai-qarhan-salt-road",
+  "motif": "track",
+  "texture": "salt",
+  "arc": [
+    {
+      "h": 45,
+      "s": 20
+    },
+    {
+      "h": 200,
+      "s": 15
+    },
+    {
+      "h": 50,
+      "s": 10
+    },
+    {
+      "h": 160,
+      "s": 35
+    },
+    {
+      "h": 40,
+      "s": 30
+    }
+  ],
+  "accent": "#bfeee0",
+  "beats": [
+    "",
+    "",
+    "flare",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "slug": "chongqing-liziba-monorail",
+  "motif": "track",
+  "texture": "fog",
+  "arc": [
+    {
+      "h": 225,
+      "s": 45
+    },
+    {
+      "h": 35,
+      "s": 60
+    },
+    {
+      "h": 210,
+      "s": 10
+    },
+    {
+      "h": 230,
+      "s": 35
+    },
+    {
+      "h": 40,
+      "s": 40
+    },
+    {
+      "h": 220,
+      "s": 30
+    }
+  ],
+  "accent": "#ffb454",
+  "beats": [
+    "",
+    "",
+    "dark",
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

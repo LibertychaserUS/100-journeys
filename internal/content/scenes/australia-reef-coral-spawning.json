@@ -1,0 +1,45 @@
+{
+  "slug": "australia-reef-coral-spawning",
+  "motif": "tide",
+  "texture": "caustics",
+  "arc": [
+    {
+      "h": 20,
+      "s": 50
+    },
+    {
+      "h": 225,
+      "s": 40
+    },
+    {
+      "h": 0,
+      "s": 45
+    },
+    {
+      "h": 215,
+      "s": 35
+    },
+    {
+      "h": 335,
+      "s": 45
+    },
+    {
+      "h": 225,
+      "s": 25
+    }
+  ],
+  "accent": "#ff9ec7",
+  "beats": [
+    "dark",
+    "still",
+    "grey",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

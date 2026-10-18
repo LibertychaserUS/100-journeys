@@ -1,0 +1,39 @@
+{
+  "slug": "greece-meteora-monasteries",
+  "motif": "mist",
+  "texture": "fog",
+  "arc": [
+    {
+      "h": 215,
+      "s": 20
+    },
+    {
+      "h": 200,
+      "s": 8
+    },
+    {
+      "h": 38,
+      "s": 45
+    },
+    {
+      "h": 30,
+      "s": 30
+    },
+    {
+      "h": 210,
+      "s": 15
+    }
+  ],
+  "accent": "#f3d39b",
+  "beats": [
+    "grey",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

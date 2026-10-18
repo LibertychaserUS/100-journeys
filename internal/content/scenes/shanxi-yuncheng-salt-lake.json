@@ -1,0 +1,44 @@
+{
+  "slug": "shanxi-yuncheng-salt-lake",
+  "motif": "mirror",
+  "texture": "salt",
+  "arc": [
+    {
+      "h": 48,
+      "s": 25
+    },
+    {
+      "h": 345,
+      "s": 45
+    },
+    {
+      "h": 12,
+      "s": 50
+    },
+    {
+      "h": 285,
+      "s": 35
+    },
+    {
+      "h": 150,
+      "s": 40
+    },
+    {
+      "h": 40,
+      "s": 20
+    }
+  ],
+  "accent": "#ff7a9c",
+  "beats": [
+    "vast",
+    "",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

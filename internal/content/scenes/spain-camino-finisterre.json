@@ -1,0 +1,46 @@
+{
+  "slug": "spain-camino-finisterre",
+  "motif": "map",
+  "texture": "dust",
+  "arc": [
+    {
+      "h": 210,
+      "s": 10
+    },
+    {
+      "h": 110,
+      "s": 25
+    },
+    {
+      "h": 35,
+      "s": 45
+    },
+    {
+      "h": 200,
+      "s": 35
+    },
+    {
+      "h": 20,
+      "s": 70
+    },
+    {
+      "h": 230,
+      "s": 25
+    }
+  ],
+  "accent": "#ffb347",
+  "beats": [
+    "",
+    "",
+    "",
+    "",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

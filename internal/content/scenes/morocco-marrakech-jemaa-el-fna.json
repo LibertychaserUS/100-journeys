@@ -1,0 +1,40 @@
+{
+  "slug": "morocco-marrakech-jemaa-el-fna",
+  "motif": "rise",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 25,
+      "s": 60
+    },
+    {
+      "h": 32,
+      "s": 45
+    },
+    {
+      "h": 270,
+      "s": 30
+    },
+    {
+      "h": 40,
+      "s": 65
+    },
+    {
+      "h": 230,
+      "s": 35
+    }
+  ],
+  "accent": "#ffa94d",
+  "beats": [
+    "",
+    "",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "slug": "sichuan-jiuzhaigou-lakes",
+  "motif": "tide",
+  "texture": "caustics",
+  "arc": [
+    {
+      "h": 200,
+      "s": 15
+    },
+    {
+      "h": 180,
+      "s": 55
+    },
+    {
+      "h": 50,
+      "s": 45
+    },
+    {
+      "h": 150,
+      "s": 45
+    },
+    {
+      "h": 220,
+      "s": 55
+    },
+    {
+      "h": 30,
+      "s": 40
+    }
+  ],
+  "accent": "#5ce1e6",
+  "beats": [
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

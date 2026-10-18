@@ -1,0 +1,40 @@
+{
+  "slug": "inner-mongolia-badain-jaran",
+  "motif": "sky-rotate",
+  "texture": "sand",
+  "arc": [
+    {
+      "h": 40,
+      "s": 55
+    },
+    {
+      "h": 215,
+      "s": 55
+    },
+    {
+      "h": 235,
+      "s": 40
+    },
+    {
+      "h": 250,
+      "s": 30
+    },
+    {
+      "h": 25,
+      "s": 35
+    }
+  ],
+  "accent": "#ffd59e",
+  "beats": [
+    "",
+    "still",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}
