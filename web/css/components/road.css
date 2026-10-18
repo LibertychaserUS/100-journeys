@@ -112,7 +112,9 @@ button.ltag[aria-pressed="true"] { background: var(--color-action); color: var(-
 [data-theme="light"] .stub__glow[data-lit="true"] { background: radial-gradient(circle, #e9852d 0, rgba(233, 133, 45, .55) 50%, transparent 75%); box-shadow: none; }
 
 .stub--mini { min-height: 0; width: 200px; }
-.stub--mini .stub__band { height: 40px; }
+.stub--mini .stub__band { height: 40px; letter-spacing: .04em; text-transform: none; white-space: nowrap; }
+.stub--mini .stub__platform { display: none; } /* a narrow stub keeps the realm; the station shows the platform */
+.stub--mini .stub__realm { overflow: hidden; text-overflow: ellipsis; }
 .stub--mini .stub__body { padding: 10px 12px 8px; }
 .stub--mini .stub__title { font-size: var(--text-base); line-height: 1.5; }
 :lang(en) .stub--mini .stub__title { font-size: .9375rem; line-height: 1.3; }
