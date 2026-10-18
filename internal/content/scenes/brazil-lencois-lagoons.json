@@ -1,0 +1,40 @@
+{
+  "slug": "brazil-lencois-lagoons",
+  "motif": "tide",
+  "texture": "sand",
+  "arc": [
+    {
+      "h": 45,
+      "s": 20
+    },
+    {
+      "h": 165,
+      "s": 55
+    },
+    {
+      "h": 195,
+      "s": 55
+    },
+    {
+      "h": 180,
+      "s": 40
+    },
+    {
+      "h": 25,
+      "s": 45
+    }
+  ],
+  "accent": "#7fe0c9",
+  "beats": [
+    "flare",
+    "still",
+    ""
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

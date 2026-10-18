@@ -1,0 +1,87 @@
+{
+  "slug": "japan-nakasendo-post-towns",
+  "entrance": { "no": 42, "realm": "old-roads", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "minimal",
+    "adventure_index": 3, "obscurity_level": 4, "risk_level": 1, "price": 6999,
+    "tags": ["culture", "nature"],
+    "mbti": { "ISFJ": 5, "ISTJ": 4, "ESTJ": 4 }
+  },
+  "cover": { "path": "generated/japan-nakasendo-post-towns/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "熊铃 · 中山道",
+    "subtitle": "第 42 号入口：两个宿场之间的八公里",
+    "hook": "每走一段，路边就挂着一只等你敲响的铃",
+    "region": "亚洲 · 日本",
+    "moods": ["古道", "秋林", "铃声", "一杯茶"],
+    "opens": "秋天，上午，山谷里的雾刚退下去的时候",
+    "role": "敲铃的人",
+    "premise": "中山道是连接江户和京都的古道，全长约 534 公里，沿途有 69 个宿场。马笼宿和妻笼宿之间约 8 公里的一段留了下来，步行要两三个小时。1971 年，妻笼的居民立下规约：镇上的地方不卖、不租、不拆。",
+    "mission": "从马笼走到妻笼，路过的每一只熊铃都敲一下，数清一共几只；半路在茶屋喝一杯茶。",
+    "chapters": [
+      { "title": "铃", "paragraphs": ["上午的雾还挂在杉树梢上。出了马笼，石板路往山上走。没走多远，路边的木柱上挂着一只铜铃，旁边的牌子请路过的人敲一下，好让附近的熊知道有人来了。你敲了。声音顺着山谷荡下去。你在本子上画了一道，记下时间，然后数着步子走向下一只。"] },
+      { "title": "茶屋", "paragraphs": [
+        "杉树林里的光暗了一截。走到一半，一座老茶屋的门开着：泥土地面，一个地炉，两间铺着榻榻米的屋子。门口的人招手让你进去坐，给你倒了一杯热茶。“这房子两百年了，”他说，“以前这里有七户人家，还有一个管木头出山的番所。现在就剩这一座，我们这些人轮流来守。”",
+        "门边一棵歪脖子松树，路对面一棵樱树，叶子已经黄了。喝完茶，你把杯子在水里涮了涮，倒扣回托盘上原来的位置。"
+      ] },
+      { "title": "不卖，不租，不拆", "paragraphs": [
+        "沙，沙。妻笼的街上，一位老太太在门口扫落叶。街不长，木头房子一间挨着一间，屋檐低得伸手就碰得到。她扫完自家门口，又顺手把邻居家的也扫了。",
+        "1971 年，这条街上的人约好了：不卖，不租，不拆。你看着她把扫帚靠回墙边，角度和刚才一模一样。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "到了妻笼，天还早。走之前，你会——",
+      "options": [
+        { "key": "count", "label": "把本子上的铃数和每段的时间誊清，留给下一个要走这条路的人", "keeps": "一张标着铃的路线表" },
+        { "key": "sweep", "label": "借老太太的扫帚，把剩下的半条街扫完", "keeps": "掌心里扫帚柄的木头味" },
+        { "key": "tea", "label": "原路走回茶屋，再喝一杯，往门口的箱子里放一枚硬币", "keeps": "硬币落进木箱的一声闷响" }
+      ]
+    },
+    "ending": "回到城里，有一天你路过一栋要拆的老楼，站了很久。身后好像有人敲了一下铃。",
+    "facts": [
+      { "text": "中山道是连接江户与京都的古道，全长约 534 公里，沿途有 69 个宿场；马笼宿到妻笼宿约 8 公里，步行两三个小时。", "source": "https://en.wikipedia.org/wiki/Nakasendō" },
+      { "text": "1971 年，妻笼居民立下规约，镇上任何地方都不得出售、出租或拆毁；1976 年妻笼被日本政府指定为国家级的历史建筑保存地区。", "source": "https://en.wikipedia.org/wiki/Tsumago-juku" },
+      { "text": "半路一石栃的立场茶屋已有约 200 年历史，那里曾是七户人家的小村，还有一个监管木材运出的番所；如今由妻笼的保存团体管理，欢迎路人进去喝杯茶。", "source": "https://www.mlit.go.jp/tagengo-db/R1-01478.html" },
+      { "text": "马笼到妻笼的路边挂着铃，路过的人敲响它，好让附近的黑熊避开。", "source": "https://www.kanpai-japan.com/nakasendo-trail-hiking-magome-tsumago" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。从马笼走到妻笼是常见的步行路线；文中守茶屋的人、扫地的老太太和他们说的话是虚构的。"
+  },
+  "en": {
+    "title": "Bear Bells · the Nakasendo",
+    "subtitle": "Entrance No. 42: eight kilometres between two post towns",
+    "hook": "Every so often, a bell by the path, waiting to be rung",
+    "region": "Asia · Japan",
+    "moods": ["Old road", "Autumn woods", "Bells", "A cup of tea"],
+    "opens": "In autumn, in the morning, as the mist drains out of the valley",
+    "role": "The bell ringer",
+    "premise": "The Nakasendo linked Edo and Kyoto: about 534 kilometres, with 69 post towns along the way. The 8-kilometre stretch between Magome and Tsumago survives and takes two to three hours on foot. In 1971 the people of Tsumago agreed a charter: nothing in the town would be sold, rented out or torn down.",
+    "mission": "Walk from Magome to Tsumago. Ring every bear bell you pass and keep count; stop halfway for a cup of tea at the teahouse.",
+    "chapters": [
+      { "title": "Bells", "paragraphs": ["The morning mist is still caught in the tops of the cedars. Out of Magome the stone path climbs. Before long there's a brass bell hanging from a post beside the trail, and a sign asking you to ring it so any bear nearby knows someone is coming. You ring it. The sound rolls away down the valley. You make a mark in your notebook, note the time, and count your steps to the next one."] },
+      { "title": "The teahouse", "paragraphs": [
+        "Under the cedars the light drops a shade. Halfway along, an old teahouse stands with its door open: a packed-earth floor, a sunken hearth, two tatami rooms. A man at the door waves you in and pours you a cup of hot tea. “This house is two hundred years old,” he says. “There used to be seven houses here, and a guardhouse that checked the timber going out. Now there's just this one. A few of us take turns looking after it.”",
+        "By the door stands a twisted pine; across the path, a cherry tree with its leaves gone yellow. When you've finished, you rinse your cup and set it back upside down, exactly where it was on the tray."
+      ] },
+      { "title": "Don't sell, don't rent, don't tear down", "paragraphs": [
+        "Swish, swish. On Tsumago's street an old woman is sweeping leaves outside her door. The street is short, wooden houses shoulder to shoulder, eaves low enough to touch. When she's done with her own doorstep, she sweeps her neighbour's too.",
+        "In 1971 the people on this street agreed: don't sell, don't rent, don't tear down. You watch her lean the broom back against the wall at exactly the angle it was before."
+      ] }
+    ],
+    "choice": {
+      "prompt": "You've reached Tsumago and it's still early. Before you go, you—",
+      "options": [
+        { "key": "count", "label": "Copy out your bell count and times neatly, for the next walker", "keeps": "A route card with every bell marked" },
+        { "key": "sweep", "label": "Borrow her broom and finish the other half of the street", "keeps": "The smell of a wooden broom handle on your palm" },
+        { "key": "tea", "label": "Walk back to the teahouse for one more cup, and drop a coin in the box", "keeps": "The dull clink of a coin in a wooden box" }
+      ]
+    },
+    "ending": "Back in the city, you pass an old building marked for demolition and stand there a long time. Somewhere behind you, someone rings a bell.",
+    "facts": [
+      { "text": "The Nakasendo linked Edo and Kyoto over about 534 km, with 69 post towns; the stretch between Magome and Tsumago is about 8 km and takes two to three hours to walk.", "source": "https://en.wikipedia.org/wiki/Nakasendō" },
+      { "text": "In 1971 Tsumago's residents adopted a charter that no place in the town should be sold, hired out or destroyed; in 1976 the government designated it a national architectural preservation site.", "source": "https://en.wikipedia.org/wiki/Tsumago-juku" },
+      { "text": "The teahouse at Ichikokutochi, halfway along, is about 200 years old; the hamlet once had seven buildings, including a guardhouse that monitored shipments of wood, and the house is now looked after by the Friends of Tsumago, who invite walkers in for tea.", "source": "https://www.mlit.go.jp/tagengo-db/R1-01478.html" },
+      { "text": "Bells hang beside the Magome–Tsumago trail for walkers to ring, to keep black bears away.", "source": "https://www.kanpai-japan.com/nakasendo-trail-hiking-magome-tsumago" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Walking from Magome to Tsumago is a popular route; the man at the teahouse, the woman sweeping and what they say are fiction."
+  }
+}

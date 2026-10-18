@@ -505,16 +505,26 @@ func TestHandler_GetJourney_English(t *testing.T) {
 // IT-API-I18N-004: searching in English matches English content.
 func TestHandler_SearchJourneys_English(t *testing.T) {
 	r := setupTestRouter(t)
-	resp := getLocalizedJSON(t, r, "/api/journeys?lang=en&q=aurora")
-	items := resp["data"].([]interface{})
-	if len(items) != 1 || items[0].(map[string]interface{})["slug"] != "norway-aurora-hunt" {
-		t.Fatalf("expected the aurora journey, got %v", items)
+	en := authored(t, "norway-aurora-hunt").EN.Title
+	resp := getLocalizedJSON(t, r, "/api/journeys?lang=en&limit=50&q=aurora")
+	if j := findSlug(resp, "norway-aurora-hunt"); j == nil || j["title"] != en {
+		t.Fatalf("expected the aurora journey with its English title %q, got %v", en, resp["data"])
 	}
 	// Chinese search still works while browsing in English.
-	resp = getLocalizedJSON(t, r, "/api/journeys?lang=en&q=极光")
-	if len(resp["data"].([]interface{})) != 1 {
+	resp = getLocalizedJSON(t, r, "/api/journeys?lang=en&limit=50&q=极光")
+	if findSlug(resp, "norway-aurora-hunt") == nil {
 		t.Fatalf("expected Chinese query to match in English mode, got %v", resp["data"])
 	}
+}
+
+func findSlug(resp map[string]interface{}, slug string) map[string]interface{} {
+	items, _ := resp["data"].([]interface{})
+	for _, it := range items {
+		if j := it.(map[string]interface{}); j["slug"] == slug {
+			return j
+		}
+	}
+	return nil
 }
 
 // IT-API-MEDIA-001: every journey resolves to its own cover image.

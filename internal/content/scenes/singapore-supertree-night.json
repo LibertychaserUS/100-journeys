@@ -1,0 +1,44 @@
+{
+  "slug": "singapore-supertree-night",
+  "motif": "track",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 30,
+      "s": 45
+    },
+    {
+      "h": 200,
+      "s": 10
+    },
+    {
+      "h": 270,
+      "s": 45
+    },
+    {
+      "h": 290,
+      "s": 55
+    },
+    {
+      "h": 220,
+      "s": 50
+    },
+    {
+      "h": 230,
+      "s": 30
+    }
+  ],
+  "accent": "#c77dff",
+  "beats": [
+    "",
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

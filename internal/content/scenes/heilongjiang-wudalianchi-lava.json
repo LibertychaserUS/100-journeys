@@ -1,0 +1,45 @@
+{
+  "slug": "heilongjiang-wudalianchi-lava",
+  "motif": "descent",
+  "texture": "dust",
+  "arc": [
+    {
+      "h": 35,
+      "s": 30
+    },
+    {
+      "h": 220,
+      "s": 8
+    },
+    {
+      "h": 200,
+      "s": 35
+    },
+    {
+      "h": 190,
+      "s": 25
+    },
+    {
+      "h": 45,
+      "s": 45
+    },
+    {
+      "h": 210,
+      "s": 20
+    }
+  ],
+  "accent": "#9fd8ff",
+  "beats": [
+    "",
+    "dark",
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

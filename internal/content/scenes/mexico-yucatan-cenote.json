@@ -1,0 +1,39 @@
+{
+  "slug": "mexico-yucatan-cenote",
+  "motif": "descent",
+  "texture": "caustics",
+  "arc": [
+    {
+      "h": 40,
+      "s": 40
+    },
+    {
+      "h": 165,
+      "s": 35
+    },
+    {
+      "h": 45,
+      "s": 65
+    },
+    {
+      "h": 210,
+      "s": 55
+    },
+    {
+      "h": 160,
+      "s": 30
+    }
+  ],
+  "accent": "#ffe28a",
+  "beats": [
+    "dark",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

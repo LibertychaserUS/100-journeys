@@ -1,0 +1,41 @@
+{
+  "slug": "indonesia-ijen-blue-fire",
+  "motif": "descent",
+  "texture": "ember",
+  "arc": [
+    {
+      "h": 230,
+      "s": 35
+    },
+    {
+      "h": 55,
+      "s": 30
+    },
+    {
+      "h": 210,
+      "s": 80
+    },
+    {
+      "h": 5,
+      "s": 55
+    },
+    {
+      "h": 175,
+      "s": 45
+    }
+  ],
+  "accent": "#4da6ff",
+  "beats": [
+    "dark",
+    "flare",
+    "",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

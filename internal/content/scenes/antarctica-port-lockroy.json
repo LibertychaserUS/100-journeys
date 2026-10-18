@@ -1,0 +1,41 @@
+{
+  "slug": "antarctica-port-lockroy",
+  "motif": "map",
+  "texture": "paper",
+  "arc": [
+    {
+      "h": 35,
+      "s": 45
+    },
+    {
+      "h": 40,
+      "s": 50
+    },
+    {
+      "h": 30,
+      "s": 25
+    },
+    {
+      "h": 205,
+      "s": 25
+    },
+    {
+      "h": 40,
+      "s": 30
+    }
+  ],
+  "accent": "#ff6b6b",
+  "beats": [
+    "",
+    "",
+    "",
+    "still"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

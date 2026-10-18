@@ -1,0 +1,41 @@
+{
+  "slug": "chile-atacama-night-sky",
+  "motif": "sky-rotate",
+  "texture": "stars",
+  "arc": [
+    {
+      "h": 48,
+      "s": 60
+    },
+    {
+      "h": 45,
+      "s": 20
+    },
+    {
+      "h": 30,
+      "s": 30
+    },
+    {
+      "h": 235,
+      "s": 45
+    },
+    {
+      "h": 255,
+      "s": 35
+    }
+  ],
+  "accent": "#ffd23f",
+  "beats": [
+    "",
+    "",
+    "still",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

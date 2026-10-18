@@ -1,0 +1,81 @@
+{
+  "slug": "australia-reef-coral-spawning",
+  "entrance": { "no": 36, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["spring"], "time": "night" },
+  "journey": {
+    "fantasy_type": "night", "visual_style": "surreal",
+    "adventure_index": 5, "obscurity_level": 7, "risk_level": 2, "price": 17999,
+    "tags": ["night", "nature", "visual"],
+    "mbti": { "INTP": 5, "INFP": 4, "ENFP": 4 }
+  },
+  "cover": { "path": "generated/australia-reef-coral-spawning/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "倒着下的雪 · 大堡礁",
+    "subtitle": "第 36 号入口：没有眼睛的珊瑚，怎么约好同一个晚上",
+    "hook": "满月后的几个夜里，雪从海底往上下",
+    "region": "大洋洲 · 澳大利亚",
+    "moods": ["夜海", "满月之后", "等待", "惊奇"],
+    "opens": "南半球的春天（大约十月到十二月），满月之后的几个晚上，日落以后",
+    "role": "等珊瑚的人",
+    "premise": "大堡礁的大多数珊瑚，一年里只挑几个晚上一起排出卵和精子：近岸的礁大约在十月满月后的那一周，外礁在十一月和十二月。触发它们的，是春天升高的水温、月相和昼夜的交替。直到 1981 年春天，詹姆斯·库克大学的研究者才在汤斯维尔附近的磁岛第一次记下这一幕。",
+    "mission": "在第一颗卵团离开之前，先看见珊瑚把它们“含”在嘴里的那一刻。",
+    "chapters": [
+      { "title": "关灯", "paragraphs": ["太阳刚落进海里，船在礁边下了锚。满月已经过去好几天，今晚的月亮还没从海平线上来。船上的研究员把甲板灯一盏一盏关掉，只留下一盏红灯：“人造的光会把它们搞糊涂。”你坐在黑里，一直在想一件事：珊瑚没有眼睛，没有耳朵，也没法互相打招呼，一百多种珊瑚，怎么约好同一个晚上？"] },
+      { "title": "三只钟", "paragraphs": [
+        "黑里只剩那盏红灯，船底一下一下拍着水。研究员压低声音给你数：第一只钟是水温，春天的海一层层暖起来，卵和精子在珊瑚身体里慢慢长熟；第二只是月亮，满月以后，它一天比一天升得晚，日落和月出之间的那段黑，一夜比一夜长；第三只是日落本身，像一声发令枪。",
+        "“有人拿另一种珊瑚做过实验，”她说，“它好像就在等日落和月出之间的那段黑。”你在心里把三只钟叠在一起，叠出来的只剩很窄的一道缝：这几天里的某一晚，日落后的某一个钟头。"
+      ] },
+      { "title": "含住", "paragraphs": ["手电的光柱切进黑水里，照出一丛一丛的珊瑚。你跟着向导浮在礁上，看见每一个小小的口里都含着一颗粉红色的小珠子，像含在舌尖、还没咽下去的糖。向导从水里抬起头：“它们在‘定’了，快了。”你盯着离你最近的那一丛，数它嘴里的珠子：一颗，两颗，十几颗，全满了。"] },
+      { "title": "面镜前的粉", "paragraphs": ["耳边只有呼吸管里自己的一呼一吸。然后，一颗松开了。它慢慢往上浮，打着转，从你的面罩前经过。接着是第二颗，第十颗，然后整片礁一起松了手：数不清的粉红小珠子从海底升起来，在手电光里亮成一片，像一场倒着下的雪。它们碰到你的手背、你的脸颊，绕过去，继续往上。你忘了数。不到一个钟头，水里只剩海面上一层淡淡的粉。"] }
+    ],
+    "choice": {
+      "prompt": "回到船上，你记下哪一样？",
+      "options": [
+        { "key": "minute", "label": "在防水本上写下第一颗卵团松开的时间，精确到分钟", "keeps": "一个记到分钟的时间" },
+        { "key": "slick", "label": "趴在船边，伸手从水面那层粉色里捞一下", "keeps": "指缝里一点淡淡的粉" }
+      ]
+    },
+    "ending": "回到城里，某个十月或十一月的晚上，你会发现月亮比昨天升得晚了一点。你会想起那片黑水里，有一百多种珊瑚正在数同一段黑夜。",
+    "facts": [
+      { "text": "大堡礁的大多数珊瑚以集体产卵的方式繁殖，由春夏升高的海水温度、月相周期和昼夜周期触发；近岸礁在十月满月后的一周内产卵，外礁在十一月和十二月。", "source": "https://en.wikipedia.org/wiki/Great_Barrier_Reef" },
+      { "text": "1981 年春天，詹姆斯·库克大学的年轻研究者在汤斯维尔附近的磁岛首次记录到多物种同步产卵；此前人们普遍认为珊瑚在体内孵育幼体。每个珊瑚虫体内的卵和精子被包成一团，这场景常被比作一场倒着下的暴风雪。", "source": "https://www.scu.edu.au/news/2021/sea-lebrating-40th-anniversary-of-mass-coral-spawning-discovery.php" },
+      { "text": "大堡礁有 130 多种珊瑚在同一晚产卵，时间窗口只有约 30–60 分钟，受水温、潮汐、日出日落和月光强度共同影响；实验中模拟城市“光污染”的灯光打乱了珊瑚体内的信号，使其没有产卵。观察时，卵团会先出现在珊瑚虫口中（称为“setting”），再被释放。", "source": "https://elifesciences.org/articles/09991" },
+      { "text": "2021 年对珊瑚 Dipsastraea speciosa 的研究发现：满月之后月出逐日推迟，日落与月出之间出现的那段黑暗，触发了这种珊瑚的同步产卵。", "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8403928/" }
+    ],
+    "fiction": "“入口”、编号和开放条件是桃源百旅的设定。观看珊瑚产卵的夜间浮潜要由当地向导带领，日期每年不同、无法保证；文中的船、研究员、向导和她们说的话都是虚构的。"
+  },
+  "en": {
+    "title": "Upside-Down Snow · Great Barrier Reef",
+    "subtitle": "Entrance No. 36: how corals with no eyes agree on one night",
+    "hook": "A few nights after the full moon, it snows upwards from the reef",
+    "region": "Oceania · Australia",
+    "moods": ["Night sea", "After the full moon", "Waiting", "Wonder"],
+    "opens": "In the southern spring (roughly October to December), a few nights after the full moon, after sunset",
+    "role": "The coral watcher",
+    "premise": "Most corals on the Great Barrier Reef release their eggs and sperm together on just a few nights a year: inshore reefs in the week after the October full moon, outer reefs in November and December. The cue is a combination of warming spring water, the phase of the moon and the cycle of day and night. Nobody recorded it until the spring of 1981, when researchers from James Cook University watched it happen off Magnetic Island, near Townsville.",
+    "mission": "Before the first bundle lifts off, catch the moment the corals are holding them in their mouths.",
+    "chapters": [
+      { "title": "Lights out", "paragraphs": ["The sun has just dropped into the sea as the boat anchors by the reef. The full moon was several nights ago, and tonight's moon hasn't cleared the horizon yet. One of the researchers on board switches the deck lights off one by one, leaving a single red lamp. “Artificial light confuses them.” You sit in the dark chewing on one question: corals have no eyes, no ears, no way of signalling each other, so how do more than a hundred species agree on the same night?"] },
+      { "title": "Three clocks", "paragraphs": [
+        "In the dark there's only the red lamp and the hull slapping softly at the water. The researcher counts the clocks off for you, low-voiced. The first is the water: as the spring sea warms, the eggs and sperm ripen inside the coral. The second is the moon: once it's past full, it rises later every night, so the dark between sunset and moonrise grows a little longer each time. The third is sunset itself, like a starting gun.",
+        "“Someone tried it on another coral,” she says. “It seemed to be waiting for exactly that gap of dark.” You stack the three clocks in your head, and what's left is a very narrow slot: one night out of these few, one hour after sundown."
+      ] },
+      { "title": "Setting", "paragraphs": ["The torch beam cuts into the black water and finds the coral, clump after clump. Floating over the reef behind the guide, you see a small pink bead held in every tiny mouth, like a sweet kept on the tongue. The guide lifts her head out of the water. “They're setting. Not long now.” You fix on the nearest colony and count the beads in its mouths: one, two, a dozen, every one of them full."] },
+      { "title": "Pink past the mask", "paragraphs": ["All you can hear is your own breath going in and out of the snorkel. Then one lets go. It drifts upwards, turning, past your mask. A second, a tenth, and then the whole reef lets go at once: countless pink beads rising from the floor, lit up in the torch beam, an upside-down snowstorm. They bump the back of your hand, your cheek, slide past and keep climbing. You lose count. Within the hour, all that's left is a faint pink film on the surface."] }
+    ],
+    "choice": {
+      "prompt": "Back on deck, what do you keep?",
+      "options": [
+        { "key": "minute", "label": "Write down the minute the first bundle let go, in the waterproof notebook", "keeps": "A time noted to the minute" },
+        { "key": "slick", "label": "Lean over the side and scoop a hand through the pink film", "keeps": "A faint pink between your fingers" }
+      ]
+    },
+    "ending": "Back in the city, some October or November night, you'll notice the moon coming up a little later than it did yesterday. You'll think of a hundred-odd kinds of coral out there in the dark water, all counting the same stretch of night.",
+    "facts": [
+      { "text": "Most corals on the Great Barrier Reef breed in mass spawning events triggered by the rising sea temperatures of spring and summer, the lunar cycle and the day-night cycle; inner reefs spawn in the week after the October full moon, outer reefs in November and December.", "source": "https://en.wikipedia.org/wiki/Great_Barrier_Reef" },
+      { "text": "Multi-species mass spawning was first recorded in spring 1981 off Magnetic Island near Townsville by young James Cook University researchers; until then corals were thought to brood their young inside their bodies. Each polyp bundles its eggs and sperm together, and the event is often likened to an upside-down snowstorm.", "source": "https://www.scu.edu.au/news/2021/sea-lebrating-40th-anniversary-of-mass-coral-spawning-discovery.php" },
+      { "text": "Over 130 coral species on the reef spawn on the same night, within a window of about 30–60 minutes, cued by water temperature, tides, sunrise and sunset, and moonlight; in experiments, light mimicking urban light pollution disrupted the corals' signalling and stopped them spawning. Observers record the moment bundles appear in the polyp mouths (“setting”) before release.", "source": "https://elifesciences.org/articles/09991" },
+      { "text": "A 2021 study of the coral Dipsastraea speciosa found that the period of darkness between sunset and moonrise, which appears as moonrise slips later after the full moon, triggers its synchronised spawning.", "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8403928/" }
+    ],
+    "fiction": "The entrance, its number and its opening hour belong to the 100 Journeys world. Night snorkels to watch the spawning are run with local guides, and the dates shift every year and are never guaranteed; the boat, the researcher, the guide and what they say are invented."
+  }
+}

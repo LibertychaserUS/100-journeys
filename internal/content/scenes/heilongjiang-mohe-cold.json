@@ -1,0 +1,40 @@
+{
+  "slug": "heilongjiang-mohe-cold",
+  "motif": "rise",
+  "texture": "snow",
+  "arc": [
+    {
+      "h": 230,
+      "s": 35
+    },
+    {
+      "h": 210,
+      "s": 25
+    },
+    {
+      "h": 340,
+      "s": 25
+    },
+    {
+      "h": 25,
+      "s": 45
+    },
+    {
+      "h": 205,
+      "s": 20
+    }
+  ],
+  "accent": "#ffc4d6",
+  "beats": [
+    "dark",
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

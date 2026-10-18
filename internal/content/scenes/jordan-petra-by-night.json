@@ -1,0 +1,40 @@
+{
+  "slug": "jordan-petra-by-night",
+  "motif": "track",
+  "texture": "ember",
+  "arc": [
+    {
+      "h": 25,
+      "s": 40
+    },
+    {
+      "h": 38,
+      "s": 70
+    },
+    {
+      "h": 12,
+      "s": 45
+    },
+    {
+      "h": 230,
+      "s": 35
+    },
+    {
+      "h": 30,
+      "s": 65
+    }
+  ],
+  "accent": "#ffbf69",
+  "beats": [
+    "",
+    "still",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

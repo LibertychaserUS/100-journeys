@@ -1,0 +1,93 @@
+{
+  "slug": "japan-sakurajima-ash-city",
+  "entrance": { "no": 19, "realm": "fire-stone", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "morning" },
+  "journey": {
+    "fantasy_type": "culture", "visual_style": "raw",
+    "adventure_index": 2, "obscurity_level": 4, "risk_level": 2, "price": 5999,
+    "tags": ["culture", "nature"],
+    "mbti": { "ESTJ": 5, "ISTJ": 4, "ESFJ": 4 }
+  },
+  "cover": { "path": "generated/japan-sakurajima-ash-city/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "灰袋 · 樱岛",
+    "subtitle": "第 19 号入口：在活火山对面过日子",
+    "hook": "早饭前，先把昨夜落下的火山灰扫进袋子",
+    "region": "亚洲 · 日本",
+    "moods": ["日常", "灰", "秩序", "夏天的早晨"],
+    "opens": "夏天，早上六点多",
+    "role": "拿扫帚的邻居",
+    "premise": "樱岛和鹿儿岛市隔着约 4 公里的海湾。1914 年那次大喷发，熔岩填满了海峡，把这座岛连成了半岛；1955 年以来，它几乎一直在喷发。鹿儿岛市给落灰多的人家发专门装火山灰的袋子，叫“克灰袋”。",
+    "mission": "趁太阳还没晒热，把门前的灰扫干净、装袋、扎紧口，送到画着樱岛的那块牌子下面。",
+    "chapters": [
+      { "title": "天气预报", "paragraphs": [
+        "六点二十，电视里的天气预报讲完了雨，接着讲灰：今天上午，灰往市区这边落。你把窗户关严，去门口拿扫帚。",
+        "隔壁的阿姨也开了门，抬头看了一眼对岸，说：“山上是东风。”这是她的老习惯。从 1985 年起，鹿儿岛的天气预报每天都报一句“樱岛上空约 1500 米的风”，一直报到 2021 年。现在气象台改发降灰预报，告诉大家灰会落在哪儿、落多少，她嘴里还是那一句。"
+      ] },
+      { "title": "顺序", "paragraphs": [
+        "你有自己的顺序：先扫车顶，再扫窗台，最后扫台阶。灰细得像磨碎的沙，一碰就扬，扫帚要压低，慢慢推。",
+        "装进克灰袋。袋子用完了，就把两只购物袋套在一起。袋口扎紧，别让灰漏出来。今天的衣服晾在屋里。扫帚靠回门边，毛朝下。"
+      ] },
+      { "title": "画着山的牌子", "paragraphs": [
+        "放灰的地方在街角，一块小牌子上画着樱岛。牌子下面已经有三只袋子，口都扎着，排成一排。你把自己那只放在最后，往里推了推，让它和别的对齐。",
+        "对岸的山又吐出一口灰白的烟，慢慢往上长。一个背书包的孩子撑着伞走过去，没有抬头。远处码头上，渡轮拉了一声长笛。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "回家的路上，你还顺手做哪一件事？",
+      "options": [
+        { "key": "next", "label": "把隔壁阿姨门口的灰也扫了", "keeps": "她从窗口递出来的一颗糖" },
+        { "key": "row", "label": "把牌子下歪掉的几只袋子重新摆齐", "keeps": "一排袋口朝同一边的灰袋" },
+        { "key": "ferry", "label": "去码头坐一趟渡轮，从海上看那座山", "keeps": "甲板上落在你手背的一点灰" }
+      ]
+    },
+    "ending": "回到自己的城市，某天早上天气预报说“有风”，你会下意识地想问一句：往哪边吹？你把阳台上的衣服收了进来，虽然那天什么也不会落下。",
+    "facts": [
+      { "text": "樱岛与鹿儿岛市隔着约 4 公里的海湾。1914 年的大喷发中，熔岩填满了海峡，把岛变成了半岛；1955 年以来它几乎一直在喷发。", "source": "https://en.wikipedia.org/wiki/Sakurajima" },
+      { "text": "鹿儿岛市把装火山灰用的“克灰袋”发给降灰多的地区的住户；手边没有时，可以把两只塑料袋套在一起用，袋口要扎紧。", "source": "https://www.city.kagoshima.lg.jp/soumu/shichoshitu/kokusai/ja/garbage/ash.html" },
+      { "text": "装好的灰送到住宅区的降灰指定放置点，放置点立着画有樱岛的牌子。", "source": "https://www.city.kagoshima.lg.jp/faq-kankyomachizukuri/douroiji/q11.html" },
+      { "text": "鹿儿岛地方气象台从 1985 年起在天气预报里报“樱岛上空约 1500 米的风”，2021 年 3 月停止；气象厅自 2015 年 3 月起发布更详细的降灰预报。", "source": "https://www.data.jma.go.jp/kagoshima/update/houdou/jma-kagoshima-20210210.pdf" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。克灰袋、降灰放置点和降灰预报都是真实的；文中的邻居、那天早上的风向、那条街和那个孩子都是虚构的。"
+  },
+  "en": {
+    "title": "The Ash Bag · Sakurajima",
+    "subtitle": "Entrance No. 19: getting on with it, across the bay from a volcano",
+    "hook": "Before breakfast, sweep last night's ash into the bag",
+    "region": "Asia · Japan",
+    "moods": ["Routine", "Ash", "Order", "Summer morning"],
+    "opens": "In summer, a little after six in the morning",
+    "role": "The neighbour with the broom",
+    "premise": "Sakurajima sits about 4 km across the bay from Kagoshima city. In 1914 its lava filled the strait and turned the island into a peninsula, and since 1955 it has been erupting almost constantly. The city hands out special bags for the ash, called kokuhai-bukuro, to households where it falls heavily.",
+    "mission": "Before the sun gets hot, sweep the ash off the front step, bag it, tie it shut, and carry it to the sign with the volcano on it.",
+    "chapters": [
+      { "title": "The forecast", "paragraphs": [
+        "Twenty past six. The weather on TV finishes with the rain and moves on to the ash: this morning it will fall on the city side. You shut the windows properly and fetch the broom from by the door.",
+        "Next door, the old woman is out too. She glances across the water and says, “Easterly up on the mountain.” Old habit. From 1985 the Kagoshima forecast carried a line every day for the wind about 1,500 metres above Sakurajima, and kept it until 2021. These days the observatory issues ash-fall forecasts instead, saying where the ash will land and how much. She still says the old line."
+      ] },
+      { "title": "The order", "paragraphs": [
+        "You have an order. Car roof first, then window sills, then the step. The ash is fine and gritty and lifts at a touch, so you keep the broom low and push slowly.",
+        "Into the ash bag it goes. Out of bags? Two shopping bags, one inside the other. Tie the neck so nothing leaks. Today the washing dries indoors. The broom goes back by the door, bristles down."
+      ] },
+      { "title": "The sign with the mountain", "paragraphs": [
+        "The drop-off point is on the corner, under a small sign with a picture of Sakurajima on it. Three bags are already there, necks tied, in a row. You set yours at the end and nudge it until it lines up with the rest.",
+        "Across the bay the mountain lets out another grey-white plume, and it grows slowly upward. A child with a school bag walks past under an umbrella and doesn't look up. Down at the harbour the ferry gives one long blast."
+      ] }
+    ],
+    "choice": {
+      "prompt": "On the way home, what else do you do while you're at it?",
+      "options": [
+        { "key": "next", "label": "Sweep the old woman's step as well", "keeps": "A sweet she passes you through the window" },
+        { "key": "row", "label": "Straighten the bags that have slumped under the sign", "keeps": "A row of ash bags, every neck facing the same way" },
+        { "key": "ferry", "label": "Take the ferry out and look at the mountain from the water", "keeps": "A pinch of ash on the back of your hand, from the deck" }
+      ]
+    },
+    "ending": "Back in your own city, some morning the forecast mentions wind and you catch yourself wondering which way it's blowing. You bring the washing in off the balcony anyway, though nothing is going to fall that day.",
+    "facts": [
+      { "text": "Sakurajima is about 4 km across the bay from Kagoshima city. In the 1914 eruption lava filled the strait and turned the island into a peninsula; it has erupted almost constantly since 1955.", "source": "https://en.wikipedia.org/wiki/Sakurajima" },
+      { "text": "Kagoshima city gives kokuhai-bukuro ash bags to households in heavy-ashfall areas; without one, two plastic bags doubled up will do, tied at the neck.", "source": "https://www.city.kagoshima.lg.jp/soumu/shichoshitu/kokusai/ja/garbage/ash.html" },
+      { "text": "Bagged ash goes to designated residential drop-off points, each marked by a sign with a picture of Sakurajima.", "source": "https://www.city.kagoshima.lg.jp/faq-kankyomachizukuri/douroiji/q11.html" },
+      { "text": "From 1985 the Kagoshima Local Meteorological Observatory included the wind about 1,500 m above Sakurajima in its forecasts, ending in March 2021; since March 2015 JMA has issued more detailed ash-fall forecasts.", "source": "https://www.data.jma.go.jp/kagoshima/update/houdou/jma-kagoshima-20210210.pdf" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The ash bags, the drop-off points and the ash-fall forecasts are real; the neighbour, that morning's wind, the street and the child are fiction."
+  }
+}

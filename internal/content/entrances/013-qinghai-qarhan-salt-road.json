@@ -1,0 +1,79 @@
+{
+  "slug": "qinghai-qarhan-salt-road",
+  "entrance": { "no": 13, "realm": "mirror-salt", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "noon" },
+  "journey": {
+    "fantasy_type": "visual", "visual_style": "minimal",
+    "adventure_index": 4, "obscurity_level": 7, "risk_level": 2, "price": 6999,
+    "tags": ["visual", "hidden", "nature"],
+    "mbti": { "ISTJ": 5, "ESTJ": 4, "INTP": 4 }
+  },
+  "cover": { "path": "generated/qinghai-qarhan-salt-road/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "卤水补路 · 察尔汗盐湖",
+    "subtitle": "第 13 号入口：一条用盐修的路",
+    "hook": "路面坑了，就浇一勺卤水，等太阳把它晒回路",
+    "region": "亚洲 · 中国",
+    "moods": ["正午", "白", "手艺", "盐"],
+    "opens": "夏天，正午，太阳最毒、水分蒸发最快的时候",
+    "role": "跟车补路的人",
+    "premise": "察尔汗盐湖在青海柴达木盆地，面积 5,856 平方公里，是中国最大的盐湖，也是中国钾肥的主要产地。这里一年只下几十毫米雨，蒸发却在三千毫米以上。湖面的盐盖上修着一条 32 公里长的盐路，32 公里折合市制约一万丈，人们叫它“万丈盐桥”。",
+    "mission": "跟着养路班子，亲手补好一个坑：铺盐、浇卤、等它结住。",
+    "chapters": [
+      { "title": "后斗", "paragraphs": ["上午的太阳已经白得晃眼。皮卡后斗里装着：一把铁镐，一把长柄勺，两只塑料桶，一卷卷尺，一顶帽檐晒卷了的草帽，还有半袋馒头。老周把草帽扣到你头上：“盐地上的太阳，是从脚底下往上晒的。”车开上盐桥，两边是白得发蓝的盐壳和绿得发亮的卤水，路面平得像刚擦过的案板。"] },
+      { "title": "坑", "paragraphs": ["十二点刚过，老周让停车。路边有个脸盆大的坑，边上的盐被车轮碾成了碎粒。他让你先量：长、宽、深，记在手背上。然后他用镐把坑底刨松，从路旁的盐田里敲下几块盐，砸碎，铺进去，比路面高出一指。“别铺平，”他说，“卤水一浇，它自己会塌下去一点。”"] },
+      { "title": "浇", "paragraphs": [
+        "正午的光直直地压下来，路面白得睁不开眼。卤水从路边的卤水沟里舀，稠，凉，沾在手指上一会儿就干成一层白霜。老周不让你一下倒完：“一勺，等它喝进去，再一勺。”你一勺一勺地浇，看着卤水渗进碎盐的缝里，冒出细细的气泡。",
+        "你蹲在那儿琢磨：这卤水本来就咸到快装不下了，太阳一晒，水跑掉，多出来的盐没地方去，只能结成晶体，把碎粒一颗一颗粘在一起。这个坑不是被填上的，是重新长出来的。"
+      ] },
+      { "title": "结住", "paragraphs": ["车的影子缩成窄窄一条，你们挤在里面啃馒头，等。一点多，老周用鞋底踩了踩，又让你踩。表面硬了，泛着一层亮。他说五十年代修敦格公路的人，最先发现这湖水是苦的，一化验，里面有钾——这片湖后来的一切，都是从一条路开始的。上车之前，你又低头找那块补丁，它已经和路一个颜色了。"] }
+    ],
+    "choice": {
+      "prompt": "收工前，老周让你挑一样带走：",
+      "options": [
+        { "key": "crystal", "label": "从盐田边上捡一小粒刚结的盐晶，装进火柴盒", "keeps": "火柴盒里一粒方方的盐" },
+        { "key": "numbers", "label": "把手背上的三个数字抄进本子，写上日期和气温", "keeps": "一页记着长、宽、深的笔记" }
+      ]
+    },
+    "ending": "回到城里，你走过一块刚补的柏油，会停下来看它比周围深的颜色。你会想，它要多久才能长成路的颜色。",
+    "facts": [
+      { "text": "察尔汗盐湖面积 5,856 平方公里，是中国最大的盐湖，钾肥年产能约占全国六成；上世纪 50 年代修筑敦格公路的工人发现湖水苦涩，化验后发现其中含有氯化钾。", "source": "https://paper.people.com.cn/rmrbhwb/pc/content/202607/14/content_30168468.html" },
+      { "text": "“万丈盐桥”是修在察尔汗盐湖盐盖上的盐路，全长 32 公里，折合市制约万丈；路面由盐和卤水反复浇灌碾压结晶而成，出现坑洼时，养护工人取盐粒铺在坑里、浇上卤水，结晶后路面即恢复平整。", "source": "https://www.cnr.cn/qhfw/jdt/20230619/t20230619_526293442.shtml" },
+      { "text": "察尔汗一带年降水只有 28–40 毫米，年蒸发量却有 3,000–3,564 毫米；湖区海拔约 2,677 米。", "source": "https://en.wikipedia.org/wiki/Qarhan_Playa" }
+    ],
+    "fiction": "“入口”、编号和开放条件是桃源百旅的设定。老周和养路班子是虚构的，游客也不能随车参与养护；补路的做法依据公开报道写成，手上的细节有想象的成分。"
+  },
+  "en": {
+    "title": "Mending with Brine · Qarhan Salt Lake",
+    "subtitle": "Entrance No. 13: a road repaired with salt",
+    "hook": "A pothole, a ladle of brine, and the sun turns it back into road",
+    "region": "Asia · China",
+    "moods": ["Noon", "White", "Craft", "Salt"],
+    "opens": "In summer, at noon, when the sun is fiercest and the water dries off fastest",
+    "role": "The ride-along road mender",
+    "premise": "Qarhan Salt Lake lies in the Qaidam Basin in Qinghai: 5,856 square kilometres, China's largest salt lake and the heart of its potash industry. It gets a few tens of millimetres of rain a year and loses more than 3,000 millimetres to evaporation. Across its salt crust runs a 32-kilometre road; in old Chinese units that comes to about ten thousand zhang, so people call it the Ten-Thousand-Zhang Salt Bridge.",
+    "mission": "With the road crew, mend one pothole yourself: lay the salt, pour the brine, wait for it to set.",
+    "chapters": [
+      { "title": "The truck bed", "paragraphs": ["The morning sun is already a white glare. In the back of the pickup: a pickaxe, a long-handled ladle, two plastic buckets, a tape measure, a straw hat with a sun-curled brim, half a bag of steamed buns. Old Zhou drops the hat on your head. “Out here the sun gets you from underneath as well.” The truck rolls onto the salt bridge. On either side, crust so white it looks blue and brine pools a startling green; the road is as flat as a freshly wiped chopping board."] },
+      { "title": "The hole", "paragraphs": ["Just after twelve, Old Zhou has you pull over. There's a hole the size of a washbasin, its edges ground to grit by tyres. He has you measure it first, length, width, depth, and write the numbers on the back of your hand. Then he loosens the bottom with the pick, knocks a few chunks off the salt pan by the road, breaks them up and packs them in, a finger proud of the surface. “Don't level it,” he says. “Once the brine goes on, it settles by itself.”"] },
+      { "title": "The pour", "paragraphs": [
+        "The noon light comes straight down, and the road is too white to look at. The brine comes out of a channel beside the road: thick, cool, drying on your fingers to a white frost. Old Zhou won't let you tip it all in. “One ladle. Let it drink. Then another.” You pour a ladle at a time and watch it soak into the cracks between the grains, sending up tiny bubbles.",
+        "Crouched there, you work it out. The brine is already about as salty as water can get. The sun drives the water off, the extra salt has nowhere to go but into crystals, and the crystals glue the grains together. The hole isn't being filled. It's growing back."
+      ] },
+      { "title": "Setting", "paragraphs": ["The truck's shadow has shrunk to a thin strip; you squeeze into it, eat buns and wait. Some time after one, Old Zhou tests it with the sole of his boot, then has you try. The surface has gone hard, with a faint shine. He tells you it was the crews building the Dunhuang–Golmud road in the 1950s who first noticed the lake tasted bitter; tested, the water turned out to hold potassium. Everything this lake became began with a road. Before you climb back in, you look down for your patch. It's already the colour of the road."] }
+    ],
+    "choice": {
+      "prompt": "Before knocking off, Old Zhou lets you pick one thing to take:",
+      "options": [
+        { "key": "crystal", "label": "Pick a tiny fresh crystal off the edge of the salt pan and keep it in a matchbox", "keeps": "A square grain of salt in a matchbox" },
+        { "key": "numbers", "label": "Copy the three numbers off your hand into a notebook, with the date and the temperature", "keeps": "A page of length, width and depth" }
+      ]
+    },
+    "ending": "Back in the city, you'll stop at a fresh patch of asphalt, darker than the road around it. You'll wonder how long it takes to grow into the colour of the road.",
+    "facts": [
+      { "text": "Qarhan Salt Lake covers 5,856 km² and is China's largest salt lake, with about 60% of the country's potash capacity; in the 1950s, workers building the Dunhuang–Golmud road noticed the water tasted bitter, and tests found potassium chloride.", "source": "https://paper.people.com.cn/rmrbhwb/pc/content/202607/14/content_30168468.html" },
+      { "text": "The “Ten-Thousand-Zhang Salt Bridge” is a road built on the lake's salt crust, 32 km long (about 10,000 zhang); it was formed by repeatedly pouring brine over salt, rolling it and letting it crystallise, and potholes are mended by spreading salt grains in them and pouring brine over the top.", "source": "https://www.cnr.cn/qhfw/jdt/20230619/t20230619_526293442.shtml" },
+      { "text": "The Qarhan area gets only 28–40 mm of rain a year against 3,000–3,564 mm of evaporation, at an elevation of about 2,677 m.", "source": "https://en.wikipedia.org/wiki/Qarhan_Playa" }
+    ],
+    "fiction": "The entrance, its number and its opening hour belong to the 100 Journeys world. Old Zhou and the road crew are invented, and visitors can't ride along on maintenance; the repair method follows published reports, but the hands-on details are imagined."
+  }
+}

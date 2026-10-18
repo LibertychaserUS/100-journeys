@@ -1,0 +1,81 @@
+{
+  "slug": "spain-camino-finisterre",
+  "entrance": { "no": 40, "realm": "old-roads", "pace": "multi-day", "scale": "far", "seasons": ["autumn"], "time": "dusk" },
+  "journey": {
+    "fantasy_type": "spiritual", "visual_style": "raw",
+    "adventure_index": 5, "obscurity_level": 3, "risk_level": 1, "price": 15999,
+    "tags": ["spiritual", "culture"],
+    "mbti": { "ENFJ": 5, "ENFP": 4, "INFJ": 4 }
+  },
+  "cover": { "path": "generated/spain-camino-finisterre/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "零公里 · 菲斯特拉角",
+    "subtitle": "第 40 号入口：过了圣地亚哥，再走到大地尽头",
+    "hook": "最后一块路标上写着：0,000 公里",
+    "region": "欧洲 · 西班牙",
+    "moods": ["同行", "海风", "日落", "分享"],
+    "opens": "秋天（大约 9 到 10 月），日落时",
+    "role": "走在最后的人",
+    "premise": "圣地亚哥朝圣之路在西班牙境内的路段，1993 年列入世界遗产。要拿到朝圣证书，至少得徒步走完最后 100 公里，骑车则是 200 公里。很多人到了圣地亚哥并不停下，又往西走约 90 公里，到菲斯特拉角——拉丁文里的“大地尽头”。",
+    "mission": "在 0,000 公里的路标前，等最后一个同伴走到，再一起看太阳落下去。",
+    "chapters": [
+      { "title": "多走的三天", "paragraphs": ["在圣地亚哥，你们四个都已经拿到了证书。没人提议接着走，可第二天早上，四双靴子还是一起出了城，往西。膝盖不太好的老师，说话太快的男孩，一个话很少的女人，还有你。你走在最后。"] },
+      { "title": "贝壳", "paragraphs": ["路边的石桩上刻着扇贝壳，贝壳的纹路指着方向，下面是一行剩下的公里数。每过一块，你就在后面念出来：“还有四十二点七。”男孩回头喊：“你别念了！”到了下一块，是他先念的。"] },
+      { "title": "一锅饭", "paragraphs": ["傍晚在村里的朝圣者旅舍，你们把背包里剩下的东西倒在桌上：两个土豆，半根香肠，一包米，一个洋葱，一块硬奶酪。每人切一样。你把唯一一把有靠背的椅子推给老师，自己坐在床沿上吃。吃到一半，那个话很少的女人讲了一个很长的故事。"] },
+      { "title": "不烧", "paragraphs": ["第三天下午到了海角。有人掏出打火机，想把磨破的袜子烧掉。你想起镇上的人说过：这不是什么老规矩，海角的山坡还因为这个烧起来过。你把袜子接过来，塞进自己的包里，说：“回去我给你补。”"] },
+      { "title": "零", "paragraphs": ["最后一块路标就立在灯塔旁边，上面写着 0,000 公里。另外两个人已经坐在石头上了。你没坐，回头看：老师还在坡下，一步一步往上挪，风把她的帽子吹歪了。太阳离海面只剩一指宽。"] }
+    ],
+    "choice": {
+      "prompt": "太阳落下去之前，你做哪一件事？",
+      "options": [
+        { "key": "pack", "label": "走下坡去，接过老师的背包，陪她走完最后几百米", "keeps": "肩上多出来的那份重量" },
+        { "key": "bread", "label": "把最后一块面包掰成四份，等她到了再分", "keeps": "指缝里带着海盐味的面包屑" },
+        { "key": "names", "label": "在朝圣护照背面写下你们四个人的名字", "keeps": "一本背面写着四个名字的朝圣护照" }
+      ]
+    },
+    "ending": "回到城里，手机的计步每到半夜就归零，你偶尔会想起灯塔边那块石头。和朋友吃饭时，你还是最后一个动筷子，先看看每个人碗里有没有。",
+    "facts": [
+      { "text": "圣地亚哥朝圣之路西班牙境内的路段 1993 年列入世界遗产，法国境内的路段 1998 年列入；扇贝壳是这条路的标志，也被用作路标。", "source": "https://en.wikipedia.org/wiki/Camino_de_Santiago" },
+      { "text": "要拿到朝圣证书（Compostela），步行或骑马至少要走完最后 100 公里，骑自行车至少 200 公里，并在朝圣护照上盖章。", "source": "https://oficinadelperegrino.com/en/pilgrimage/the-compostela/" },
+      { "text": "菲斯特拉角距圣地亚哥约 90 公里，名字来自拉丁语的“大地尽头”，是许多朝圣者的最后一站，也一直被当作看一天里最后一缕阳光的地方。", "source": "https://en.wikipedia.org/wiki/Cape_Finisterre" },
+      { "text": "菲斯特拉角被视为朝圣之路的“零公里”和终点。", "source": "https://es.wikipedia.org/wiki/Cabo_Finisterre" },
+      { "text": "菲斯特拉镇政府把在海角烧靴子、丢衣物的做法称作“假仪式”，说它让这里像垃圾场，还引发过山火。", "source": "https://metropolitano.gal/extra/una-campana-busca-erradicar-el-falso-ritual-de-quemar-las-botas-de-los-peregrinos-en-fisterra" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。从圣地亚哥继续走到菲斯特拉，是许多朝圣者真实的选择；文中的四个人、路标上的数字、那锅饭和那双袜子都是虚构的。"
+  },
+  "en": {
+    "title": "Kilometre Zero · Cape Finisterre",
+    "subtitle": "Entrance No. 40: past Santiago, on to the end of the earth",
+    "hook": "The last waymark reads 0,000 km",
+    "region": "Europe · Spain",
+    "moods": ["Company", "Sea wind", "Sunset", "Sharing"],
+    "opens": "In autumn (roughly September and October), at sunset",
+    "role": "The one at the back",
+    "premise": "The Camino de Santiago through Spain became World Heritage in 1993. To earn the Compostela you must walk at least the last 100 km, or cycle the last 200. Many pilgrims don't stop at Santiago: they walk on about 90 km west to Cape Finisterre, from the Latin finis terrae, the end of the earth.",
+    "mission": "At the 0,000 km waymark, wait for the last of your group to arrive, then watch the sun go down together.",
+    "chapters": [
+      { "title": "Three more days", "paragraphs": ["In Santiago all four of you already have your certificates. Nobody suggested walking on, but the next morning four pairs of boots leave town together anyway, heading west. The teacher with the bad knee, the boy who talks too fast, the woman who hardly talks at all, and you. You walk at the back."] },
+      { "title": "The shell", "paragraphs": ["The stone posts by the path carry a scallop shell, its ridges pointing the way, and under it the kilometres left. At every one you read it out from the back: “Forty-two point seven.” The boy turns round and shouts, “Stop doing that!” At the next post, he reads it out before you can."] },
+      { "title": "One pot", "paragraphs": ["That evening in the village hostel you all tip out what's left in your packs: two potatoes, half a sausage, a bag of rice, an onion, a hard end of cheese. Everyone chops one thing. You push the only chair with a back towards the teacher and eat sitting on the edge of a bunk. Halfway through, the woman who hardly talks tells a very long story."] },
+      { "title": "Not burning", "paragraphs": ["On the third afternoon you reach the cape. Someone pulls out a lighter to burn a pair of worn-through socks. You remember what they said in town: it's no ancient rite, and it has set the hillside on fire before. You take the socks, stuff them in your own pack and say, “I'll darn them when we get back.”"] },
+      { "title": "Zero", "paragraphs": ["The last waymark stands by the lighthouse and reads 0,000 km. The other two are already sitting on the rocks. You don't sit. You look back: the teacher is still on the slope below, one step at a time, her hat knocked sideways by the wind. The sun is a finger's width above the sea."] }
+    ],
+    "choice": {
+      "prompt": "Before the sun goes down, what do you do?",
+      "options": [
+        { "key": "pack", "label": "Go back down, take the teacher's pack, and walk the last few hundred metres with her", "keeps": "The extra weight on your shoulders" },
+        { "key": "bread", "label": "Break the last loaf into four, and wait until she arrives to hand it round", "keeps": "Crumbs between your fingers that taste of sea salt" },
+        { "key": "names", "label": "Write all four names on the back of your pilgrim passport", "keeps": "A pilgrim passport with four names on the back" }
+      ]
+    },
+    "ending": "Back in the city, your phone's step count goes back to zero every midnight, and now and then it makes you think of the stone by the lighthouse. At dinner with friends you're still the last to start, checking first that everyone has some.",
+    "facts": [
+      { "text": "The Camino de Santiago in Spain was inscribed as World Heritage in 1993, and the routes in France in 1998; the scallop shell is the route's symbol and is also used on waymarks.", "source": "https://en.wikipedia.org/wiki/Camino_de_Santiago" },
+      { "text": "The Compostela requires at least the last 100 km on foot or horseback, or 200 km by bicycle, with a stamped pilgrim credential.", "source": "https://oficinadelperegrino.com/en/pilgrimage/the-compostela/" },
+      { "text": "Cape Finisterre is about 90 km from Santiago; its name means “end of the earth”, it is the final destination for many pilgrims, and it has long been a place to see the last sun of the day.", "source": "https://en.wikipedia.org/wiki/Cape_Finisterre" },
+      { "text": "The cape is considered kilometre zero and the end of the Camino de Santiago.", "source": "https://es.wikipedia.org/wiki/Cabo_Finisterre" },
+      { "text": "Fisterra's town council calls burning boots and leaving clothes at the cape a “false ritual” that turns it into a dump and has caused wildfires.", "source": "https://metropolitano.gal/extra/una-campana-busca-erradicar-el-falso-ritual-de-quemar-las-botas-de-los-peregrinos-en-fisterra" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. Walking on from Santiago to Fisterra is a real choice many pilgrims make; the four walkers, the numbers on the posts, the shared pot and the socks are fiction."
+  }
+}

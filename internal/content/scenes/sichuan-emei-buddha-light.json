@@ -1,0 +1,44 @@
+{
+  "slug": "sichuan-emei-buddha-light",
+  "motif": "mist",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 210,
+      "s": 18
+    },
+    {
+      "h": 42,
+      "s": 45
+    },
+    {
+      "h": 220,
+      "s": 10
+    },
+    {
+      "h": 10,
+      "s": 45
+    },
+    {
+      "h": 215,
+      "s": 40
+    },
+    {
+      "h": 210,
+      "s": 15
+    }
+  ],
+  "accent": "#ffd27a",
+  "beats": [
+    "still",
+    "flare",
+    ""
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

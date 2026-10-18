@@ -1,0 +1,42 @@
+{
+  "slug": "scotland-edinburgh-one-oclock-gun",
+  "motif": "map",
+  "texture": "paper",
+  "arc": [
+    {
+      "h": 210,
+      "s": 15
+    },
+    {
+      "h": 45,
+      "s": 40
+    },
+    {
+      "h": 210,
+      "s": 8
+    },
+    {
+      "h": 220,
+      "s": 20
+    },
+    {
+      "h": 40,
+      "s": 30
+    }
+  ],
+  "accent": "#e9c46a",
+  "beats": [
+    "",
+    "grey",
+    "flare",
+    "still",
+    ""
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

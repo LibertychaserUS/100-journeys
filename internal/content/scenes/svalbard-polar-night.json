@@ -1,0 +1,45 @@
+{
+  "slug": "svalbard-polar-night",
+  "motif": "aurora",
+  "texture": "snow",
+  "arc": [
+    {
+      "h": 230,
+      "s": 40
+    },
+    {
+      "h": 220,
+      "s": 55
+    },
+    {
+      "h": 215,
+      "s": 50
+    },
+    {
+      "h": 190,
+      "s": 40
+    },
+    {
+      "h": 230,
+      "s": 30
+    },
+    {
+      "h": 210,
+      "s": 20
+    }
+  ],
+  "accent": "#7ab8ff",
+  "beats": [
+    "grey",
+    "still",
+    "",
+    "dark"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

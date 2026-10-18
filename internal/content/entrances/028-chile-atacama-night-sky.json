@@ -1,0 +1,81 @@
+{
+  "slug": "chile-atacama-night-sky",
+  "entrance": { "no": 28, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["dry"], "time": "night" },
+  "journey": {
+    "fantasy_type": "night", "visual_style": "minimal",
+    "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 17999,
+    "tags": ["night", "nature", "solitude"],
+    "mbti": { "INTP": 5, "INTJ": 4, "ENTP": 4 }
+  },
+  "cover": { "path": "generated/chile-atacama-night-sky/cover.jpg", "license": "self-generated", "source": "Generated for this project with an image model; see docs/content/IMAGE_SOURCES.md" },
+  "zh": {
+    "title": "会变焦的沙漠 · 阿塔卡马",
+    "subtitle": "第 28 号入口：一架能拉开十六公里的望远镜",
+    "hook": "一辆 28 只轮胎的车，正把一只天线搬去五千米",
+    "region": "南美洲 · 智利",
+    "moods": ["干", "星空", "机械", "算数"],
+    "opens": "旱季，天黑以后",
+    "role": "算数的人",
+    "premise": "阿塔卡马是地球上最干燥的非极地沙漠，有些气象站从来没有记录到降雨。海拔约 5,000 米的查南托高原上，ALMA 射电望远镜阵列由 66 面天线组成。两辆名叫 Otto 和 Lore 的运输车负责搬动天线，让整个阵列在 150 米到约 16 公里之间收拢或张开。",
+    "mission": "午夜之前，自己算出来：天线拉到最开时，阵列看清的细节比收得最紧时细多少倍。",
+    "chapters": [
+      { "title": "Otto", "paragraphs": ["上午的太阳照在一片亮黄色的车漆上，晃得人睁不开眼。在海拔 2,900 米的支持基地，你第一次见到它：一辆大车，二十米长，十米宽，二十八只轮胎，空车就有 130 吨。驾驶座的靠背特意做成能让司机背上氧气瓶的形状。一位工程师拍拍车门：“把天线放到底座上，误差就几毫米。”"] },
+      { "title": "每小时十二公里", "paragraphs": ["正午，发动机低低地响着，它背着一面一百多吨的天线，慢慢开出基地。载着天线，它最快每小时只走十二公里。你坐在路边的阴影里，在票根背面列算式：从基地到高原那条路 28 公里，除以 12，两小时二十分钟。那只白色的碟子在车背上微微晃着，像一只被人双手捧着的碗。"] },
+      { "title": "干", "paragraphs": ["下午，你坐在沙漠边一个小镇的土墙阴影里，空气干得嘴唇发紧。你喝了水，十分钟后又渴了。有人说，这片沙漠里有的气象站从来没量到过一滴雨。你望着地平线上的火山，想象不出这里的“下雨天”会是什么样子。"] },
+      { "title": "十六公里", "paragraphs": [
+        "天黑以后，你躺在沙地上，银河从这边的山脊一直拉到那边。白天那位工程师说过：一面天线单独看，看得很糊；很多面一起看，离得越开，看得越细。你把票根翻过来。最紧的时候 150 米，最开的时候 16 公里。16000 除以 150，一百零几。你又算了一遍，还是一百出头。",
+        "你把票根折好。头顶的星星一颗也没变，你却一直在想：一只十六公里宽的眼睛，正在高原上睁着。"
+      ] }
+    ],
+    "choice": {
+      "prompt": "午夜前的最后一件事，你做什么？",
+      "options": [
+        { "key": "check", "label": "用手机计算器再验一遍那个数", "keeps": "一个算了三遍的数：107" },
+        { "key": "sketch", "label": "在票根上画 66 个小点，一次收拢，一次拉开", "keeps": "一张画满小点的票根" },
+        { "key": "ask", "label": "给那位工程师发条消息：有没有办法比 16 公里拉得更开？", "keeps": "一条还没收到回复的消息" }
+      ]
+    },
+    "ending": "回到城里，开会时有人说“我们得退远一点看全局”，你在本子边上写了个 107。你想起那辆背着天线、每小时只走十二公里的黄色大车，和它放下天线时那几毫米的误差。",
+    "facts": [
+      { "text": "阿塔卡马是世界上最干燥的非极地沙漠，沙漠里有些气象站从未记录到降雨。", "source": "https://en.wikipedia.org/wiki/Atacama_Desert" },
+      { "text": "ALMA 建在海拔约 5,000 米的查南托高原，由 66 面高精度天线组成；天线可以在高原上移动，彼此间距从 150 米到 16 公里。", "source": "https://en.wikipedia.org/wiki/Atacama_Large_Millimeter_Array" },
+      { "text": "两辆运输车名叫 Otto 和 Lore，各有 28 只轮胎，空车约 130 吨，载着天线时最高时速 12 公里，能把天线放到几毫米以内的位置；驾驶座靠背的形状能让司机背着氧气瓶。它们沿一条 28 公里的路，往返于海拔 2,900 米的支持基地和 5,000 米的高原。", "source": "https://www.eso.org/public/teles-instr/alma/transporters/" }
+    ],
+    "fiction": "“入口”与编号是桃源百旅的设定。工程师、在支持基地看运输车的情节、票根上的算式和夜里的观星都是虚构的；现实中，海拔 5,000 米的天线阵区不对游客开放。"
+  },
+  "en": {
+    "title": "The Desert That Zooms · Atacama",
+    "subtitle": "Entrance No. 28: a telescope you can pull sixteen kilometres wide",
+    "hook": "A truck on 28 tyres carries a dish up to 5,000 metres",
+    "region": "South America · Chile",
+    "moods": ["Dry", "Starlight", "Machines", "Sums"],
+    "opens": "In the dry season, after dark",
+    "role": "The one doing the sums",
+    "premise": "The Atacama is the driest non-polar desert on Earth; some of its weather stations have never recorded rain. On the Chajnantor plateau, about 5,000 metres up, the ALMA array is made of 66 antennas. Two transporters called Otto and Lore move them around, so the whole array can close in to 150 metres or spread out to about 16 kilometres.",
+    "mission": "Before midnight, work out for yourself how much finer the detail is when the dishes are spread widest than when they're packed tightest.",
+    "chapters": [
+      { "title": "Otto", "paragraphs": ["Morning sun glares off yellow paint. At the support base, 2,900 metres up, you meet it: a vehicle twenty metres long and ten wide, on twenty-eight tyres, 130 tonnes before it's carrying anything. The back of the driver's seat is shaped so the driver can wear an oxygen tank. An engineer pats the door. “When it sets a dish down on its pad, it's out by a few millimetres. That's all.”"] },
+      { "title": "Twelve an hour", "paragraphs": ["Noon, and an engine is rumbling low. It pulls out of the base with an antenna of more than a hundred tonnes on its back; loaded, it does twelve kilometres an hour at most. Sitting in the shade by the road, you write it out on the back of your ticket: twenty-eight kilometres from the base to the plateau, divided by twelve. Two hours twenty. Up on the truck the white dish sways a little, like a bowl carried in both hands."] },
+      { "title": "Dry", "paragraphs": ["Afternoon, in the shade of a mud-brick wall at the edge of a desert town, the air is so dry your lips feel tight. You drink, and ten minutes later you're thirsty again. Someone mentions that a few weather stations out here have never recorded rain at all. You look at the volcano on the horizon and can't picture what a rainy day here would even look like."] },
+      { "title": "Sixteen kilometres", "paragraphs": [
+        "After dark you lie on the sand, and the Milky Way runs from one ridge to the other. The engineer said it earlier: one dish on its own sees a blur; many together see sharp, and the further apart they stand, the finer the detail. You turn the ticket over. Tightest, 150 metres. Widest, 16 kilometres. Sixteen thousand over a hundred and fifty: a hundred and something. You do it again. Just over a hundred.",
+        "You fold the ticket. Not one star has changed, but you can't stop thinking of an eye sixteen kilometres wide, open somewhere up on the plateau."
+      ] }
+    ],
+    "choice": {
+      "prompt": "Last thing before midnight: what do you do?",
+      "options": [
+        { "key": "check", "label": "Run the sum once more on your phone's calculator", "keeps": "A number checked three times: 107" },
+        { "key": "sketch", "label": "Draw 66 dots on the ticket, once packed tight and once spread out", "keeps": "A ticket covered in dots" },
+        { "key": "ask", "label": "Message the engineer: is there any way to go wider than 16 kilometres?", "keeps": "A message still waiting for an answer" }
+      ]
+    },
+    "ending": "Back in the city, someone in a meeting says you need to step back to see the whole picture, and you write 107 in the margin. You think of the yellow truck doing twelve an hour with a dish on its back, and setting it down a few millimetres from perfect.",
+    "facts": [
+      { "text": "The Atacama is the driest non-polar desert in the world, and some weather stations in the desert have never recorded rain.", "source": "https://en.wikipedia.org/wiki/Atacama_Desert" },
+      { "text": "ALMA stands on the Chajnantor plateau at about 5,000 m and is made up of 66 high-precision antennas, which can be moved across the plateau over distances from 150 m to 16 km.", "source": "https://en.wikipedia.org/wiki/Atacama_Large_Millimeter_Array" },
+      { "text": "The two transporters, Otto and Lore, have 28 tyres each, weigh 130 tonnes empty, top out at 12 km/h when carrying an antenna and can place it to within a few millimetres; the driver's seat is shaped for an oxygen tank. They use a 28 km road between the support facility at 2,900 m and the plateau at 5,000 m.", "source": "https://www.eso.org/public/teles-instr/alma/transporters/" }
+    ],
+    "fiction": "The entrance and its number belong to the 100 Journeys world. The engineer, watching a transporter at the support base, the sums on the ticket and the night in the desert are fiction; in reality the 5,000 m antenna site is closed to visitors."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "slug": "japan-chichibugahama-tide-mirror",
+  "motif": "mirror",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 205,
+      "s": 30
+    },
+    {
+      "h": 340,
+      "s": 40
+    },
+    {
+      "h": 22,
+      "s": 65
+    },
+    {
+      "h": 40,
+      "s": 60
+    },
+    {
+      "h": 225,
+      "s": 35
+    }
+  ],
+  "accent": "#ffb38a",
+  "beats": [
+    "",
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

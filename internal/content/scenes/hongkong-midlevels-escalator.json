@@ -1,0 +1,40 @@
+{
+  "slug": "hongkong-midlevels-escalator",
+  "motif": "rise",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 205,
+      "s": 20
+    },
+    {
+      "h": 30,
+      "s": 20
+    },
+    {
+      "h": 45,
+      "s": 35
+    },
+    {
+      "h": 48,
+      "s": 45
+    },
+    {
+      "h": 200,
+      "s": 25
+    }
+  ],
+  "accent": "#ffd166",
+  "beats": [
+    "",
+    "still",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

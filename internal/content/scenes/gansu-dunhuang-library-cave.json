@@ -1,0 +1,44 @@
+{
+  "slug": "gansu-dunhuang-library-cave",
+  "motif": "descent",
+  "texture": "paper",
+  "arc": [
+    {
+      "h": 38,
+      "s": 35
+    },
+    {
+      "h": 35,
+      "s": 55
+    },
+    {
+      "h": 25,
+      "s": 15
+    },
+    {
+      "h": 210,
+      "s": 10
+    },
+    {
+      "h": 40,
+      "s": 30
+    },
+    {
+      "h": 30,
+      "s": 25
+    }
+  ],
+  "accent": "#d9a066",
+  "beats": [
+    "",
+    "dark",
+    "vast"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}
