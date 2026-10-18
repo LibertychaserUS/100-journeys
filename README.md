@@ -1,402 +1,152 @@
-# 100 Journeys | 100种不可思议的旅行
+# 100 Journeys | 桃源百旅
 
 [![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/Tencent%20Cloud-live%20demo-blue)](http://49.232.207.220/)
-[![CodeRabbit](https://img.shields.io/badge/CodeRabbit-review%20actioned-orange)](https://github.com/LibertychaserUS/100-journeys/pull/1)
-[![Stress](https://img.shields.io/badge/stress-target%20profile%20passing-green)](docs/ops/LOAD_TEST_RESULTS.md)
-[![k6](https://img.shields.io/badge/k6-baseline%20recorded-blue)](docs/ops/LOAD_TEST_RESULTS.md)
-[![E2E Tests](https://img.shields.io/badge/E2E%20tests-Playwright%2063%2F63%20passing-green)](docs/QUALITY_REVIEW_REPORT.md)
+[![Live demo](https://img.shields.io/badge/live%20demo-AWS%20Lightsail-f2c46d)](https://52-203-52-72.sslip.io/)
+[![E2E](https://img.shields.io/badge/Playwright-65%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
 
-中文：**100种不可思议的旅行** 是一个轻量级全栈 Web App MVP，以“情绪 / MBTI / 隐藏身份 / 奇幻旅程”为入口，把旅行内容做成故事卡片、AI 宠物陪伴、WonderCoin 模拟下单和后台统计证据闭环。
+中文：**桃源百旅** 是一个故事化的旅行灵感产品。用户不是从地图选目的地，而是从一种心情、一个 MBTI 人格或一类幻想世界出发，读一段带有临时身份、任务和线索的“旅行剧本”，再用虚拟币领取它。
 
-English: **100 Journeys** is a lightweight full-stack Web App MVP for story-driven fantasy travel discovery. Users choose a mood, persona, or hidden world instead of browsing a conventional destination list.
+English: **100 Journeys** is a story-driven travel discovery app. Instead of choosing a destination from a map, you start from a mood, an MBTI personality or a kind of fantasy world, read a short "travel script" with a role, a mission and clues, and claim it with a virtual coin wallet.
 
-Current stable branch: `main`
+Full-stack: Go + Gin API, pure-Go SQLite, a vanilla JS single-page app, JWT auth, a simulated wallet and checkout, an admin dashboard, Playwright and k6 test suites, and CI/CD to AWS.
 
 ---
 
-## Development Context | 开发语境
+## Live demo | 在线演示
 
-中文：本项目交付开发统一记录为 **使用已接入 Kimi API 的 Claude Code 完成**。Kimi API 通过本地 Claude Code launcher 接入后，Claude Code 负责需求拆解、SDD/DDD/TDD/E2E、全栈实现、测试验证和文档整理。
-
-English: This delivery records the implementation context as **completed with Claude Code connected to the Kimi API**. Claude Code, backed by the Kimi API integration, was used for requirements breakdown, SDD/DDD/TDD/E2E, full-stack implementation, verification, and documentation.
-
----
-
-## Live Demo | 在线演示
-
-中文：当前域名备案尚未完成，因此公网演示使用腾讯云 CVM 的临时 IP 地址。备案通过后可将域名解析到 Nginx，并补充 HTTPS 证书。
-
-English: The domain filing is not complete yet, so the public demo uses the Tencent Cloud CVM IP address. After filing, the domain can point to Nginx with HTTPS enabled.
-
-| Item | URL / Account |
+| | |
 |---|---|
-| Public demo | <http://49.232.207.220/> |
-| User login | <http://49.232.207.220/#/login> |
-| User account | `[DEMO_USER]` / `[DEMO_USER_PASSWORD]` |
-| Hidden admin login | <http://49.232.207.220/#/admin-login> |
-| Admin account | `[DEMO_ADMIN]` / `[DEMO_ADMIN_PASSWORD]` |
+| App | <https://52-203-52-72.sslip.io/> |
+| Sign up | <https://52-203-52-72.sslip.io/#/register> (email + a simple math captcha, no verification email) |
+| Admin dashboard | <https://52-203-52-72.sslip.io/#/admin-login> (admin accounts are created server-side) |
 
-中文：深色与浅色两套主题都已适配（WCAG AA 对比度，axe 自动扫描），界面可在中文 / English 之间切换，12 段旅程均有英文内容。
+Every push to `main` runs CI and, when it is green, deploys to the demo. The app follows your OS light/dark preference and browser language (中文 / English); both can be switched in the header.
 
-English: Both dark and light themes are supported (WCAG AA contrast, checked by automated axe scans), and the UI switches between Chinese and English, including English copy for all 12 journeys.
+![Journey detail, dark theme](docs/design/redesign-2026-10/detail-after.jpg)
 
-截图 / Screenshots: [docs/design/redesign-2026-10](docs/design/redesign-2026-10/README.md)
+More screenshots, before and after the 2026-10 redesign: [docs/design/redesign-2026-10](docs/design/redesign-2026-10/README.md)
 
-中文：公网演示账号属于临时演示凭据，演示结束后可轮换或关闭。真实环境不得在 README、Git history 或公开文档中保存明文密码；管理员账号应通过服务器侧 `cmd/admin-user` CLI 创建/提升，本地演示账号由 `scripts/deploy/local-one-click.sh` 在终端输出。本地 demo 数据库可删除 `data/*.db*` 后重新运行 `scripts/deploy/local-one-click.sh` 重置；公网 demo 凭据由服务器环境变量和 `scripts/deploy/init-demo-data.sh` 控制，不与生产凭据共用。
+---
 
-English: Public demo accounts are temporary demo credentials and can be rotated or disabled after use. Plaintext production credentials must never be stored in README, Git history, or public docs; admin users are created/promoted through the server-side `cmd/admin-user` CLI, while local demo accounts are printed by `scripts/deploy/local-one-click.sh`. To reset local demo data, remove `data/*.db*` and rerun `scripts/deploy/local-one-click.sh`; public demo credentials are controlled by server environment variables and `scripts/deploy/init-demo-data.sh`, separate from production credentials.
+## Features | 功能
+
+- **按心情、人格、幻想类型探索 | Discover by mood, MBTI or fantasy type**: search, mood shortcuts, fantasy-type facets and a filter panel (MBTI, adventure level, tags, visual style). Filters live in the URL, so a filtered view can be shared.
+- **旅行剧本 | Travel scripts**: every journey has a role, a mission and four clues (local guide, gear, risk, best-matched personalities), plus a booking "ticket".
+- **中英双语 | Bilingual**: UI strings in zh/en catalogs; journey content comes from the API in either language (`?lang=en`), and English searches match English copy.
+- **收藏与旅行人格 | Saved journeys and travel personality**: save journeys to your account; pick an MBTI type (or take a 5-question quiz with the guide) and get recommendations.
+- **模拟交易 | Simulated commerce**: tiered top-ups with a real bonus, in-page checkout with a points discount, a shortfall flow that tops up and returns you to the order, and a full ledger.
+- **向导 | Guide widget**: a rule-based travel guide (小旅 / Lumi) for recommendations and the personality quiz.
+- **后台 | Admin dashboard**: live metrics, most clicked and best-selling journeys, MBTI and gender distributions, audit counts, CSV export.
+- **两套主题都可读 | Accessible in both themes**: semantic colour tokens, WCAG AA contrast checked by axe in dark and light, keyboard navigation, skip link, `prefers-reduced-motion`.
+
+---
+
+## Tech stack | 技术栈
+
+| Layer | Technology |
+|---|---|
+| Backend | Go + Gin, pure Go (no CGO) |
+| Database | SQLite via `modernc.org/sqlite`, WAL mode, single-writer connection with busy retry |
+| Frontend | Vanilla HTML / CSS / JS hash SPA, no framework, no web fonts |
+| Auth | JWT + bcrypt + math captcha; public sign-up cannot create admins |
+| Analytics | Buffered, droppable event queue for non-critical events |
+| Audit | Persistent `audit_logs` for API errors, panics and frontend errors |
+| Media | Local static files, CDN-ready through `CDN_BASE_URL`; CSS/JS are fingerprinted (`?v=`) so long-lived caching is safe |
+| Tests | Go unit/integration, Go stress, k6, Playwright (desktop + mobile, axe) |
+| Delivery | GitHub Actions CI/CD to AWS Lightsail (Nginx + systemd) |
+
+### Database access
+
+The project uses `database/sql` with hand-written parameterised SQL in a repository layer instead of an ORM, so `db/schema.sql`, the queries and the tests stay directly auditable.
+
+- Orders, payments, top-ups and the ledger are synchronous SQL transactions and never go through the analytics buffer.
+- `repository.NewDB` enables WAL, foreign keys and a busy timeout, and limits the pool to one connection; `retryBusy` retries short SQLite lock contention.
+- Journey copy lives in `journeys` (Chinese) with English in `journey_translations`; seed data upserts both on every start, so existing databases pick up content changes.
+
+---
+
+## Architecture | 架构
 
 ```mermaid
 flowchart LR
-    browser["外部浏览器"] --> cvm["Tencent Cloud CVM<br/>49.232.207.220:80"]
-    cvm --> nginx["Nginx reverse proxy"]
-    nginx --> spa["Hash SPA"]
-    nginx --> api["Go API<br/>127.0.0.1:8080"]
-    api --> sqlite[("SQLite<br/>/var/lib/100-journeys/app.db")]
-```
-
----
-
-## Product Position | 产品定位
-
-中文：本项目不是传统旅行列表站，而是“桃源百旅”方向的内容型 MVP，围绕以下已实现能力构建。
-
-English: The app is not a generic travel listing site. It is a compact content MVP built around:
-
-- **情绪 / MBTI / 人设探索 | Mood / MBTI / persona discovery**: 搜索、情绪 chips、MBTI、幻想标签进入旅程。
-- **故事卡片浏览 | Story-card browsing**: 图片卡片进入角色、任务、线索、风险和准备建议。
-- **AI 宠物旅伴 | AI travel companion**: 规则引擎向导提供 5 题 MBTI 测验和按人格推荐，结果保存到账户。
-- **收藏与旅行人格 | Saved journeys & travel personality**: 收藏旅程、在「我的」中查看；MBTI 保存到账户并用于推荐与后台统计。
-- **模拟交易 | Simulated commerce**: 注册、档位充值（真实赠送入账）、页内下单确认、余额不足补差额后回到订单、钱包支付、交易流水。
-- **中英双语 | Bilingual**: 界面与旅程内容支持中文 / English（`?lang=en`），默认跟随浏览器语言。
-- **后台证据闭环 | Admin evidence loop**: 管理员查看真实统计、点击、购买、性别/MBTI、审计日志，并导出 CSV/JSON。
-
----
-
-## Tech Stack | 技术栈
-
-| Layer | Technology | Constraint |
-|---|---|---|
-| Backend | Go + Gin | Pure Go, no CGO |
-| Database | SQLite via `modernc.org/sqlite` | WAL mode, single-writer boundary, busy retry |
-| Frontend | Vanilla HTML / CSS / JS | Hash SPA, no React/Vue |
-| Auth | JWT + bcrypt + math captcha | Public registration cannot create admin |
-| Analytics | Buffered P2 event queue | Drops are allowed only for non-critical analytics |
-| Audit | Persistent `audit_logs` | API errors, panic, and frontend errors |
-| Static media | Local-first JPG/SVG assets, CDN-ready fallback | Nginx/CDN recommended; `CDN_BASE_URL` is fallback for missing local media |
-| Tests | Go tests, Go stress, k6, Playwright | k6/Nginx baseline verified; Playwright 63/63 passing (desktop + Pixel 7, axe WCAG scans in both themes) |
-| CI/CD | GitHub Actions | Full-stack smoke added; remote run pending after push |
-| Image assets | image2 + local JPG/SVG assets | image2 was used as an image generation/material tool; it is not the core code-development tool |
-
----
-
-## Database Access | 数据库访问
-
-中文：项目没有使用 GORM。数据库层采用 Go 标准 `database/sql`、`modernc.org/sqlite` 和 repository/service 分层。这样做的原因是本项目强调 SQLite、schema/API 契约、测试证据和可审计 SQL；手写参数化 SQL 更容易直接证明 `db/schema.sql`、API 行为和测试结果一致。
-
-English: The project does not use GORM. It uses Go `database/sql`, `modernc.org/sqlite`, and repository/service layers so the SQLite schema, API contract, SQL statements, and tests remain directly auditable.
-
-- 注册写入：`AuthHandler.Register` 校验验证码、用户名、密码和邮箱唯一性，然后 bcrypt 生成 `password_hash`，最后由 `UserRepository.Create` 用参数化 SQL 写入 `users`。
-- P0/P1 写入：用户、订单、钱包支付、交易流水使用同步 SQL 和事务，不进入 analytics buffer。
-- SQLite 并发：`repository.NewDB` 开启 WAL、foreign keys、busy timeout，并将连接限制为单连接；`retryBusy` 对 SQLite busy/lock 做短重试。
-- P2 buffer：`analytics.Buffer` 只处理点击、搜索、筛选、宠物回复等非关键事件，默认容量 `32768`，批量写入 `analytics_events`；满了只丢 P2，不影响注册、下单或支付。
-
----
-
-## System DAG | 系统设计 DAG
-
-```mermaid
-flowchart LR
-    user["Guest / User / Admin"] --> nginx["Nginx or CDN static edge"]
+    user["Guest / User / Admin"] --> nginx["Nginx (TLS, rate limits, static cache)"]
     nginx --> spa["Hash SPA: HTML / CSS / JS"]
     nginx --> api["Go Gin API"]
     spa --> api
-    api --> mw["Middleware: CORS / RequestID / JWT / Audit"]
+    api --> mw["Middleware: CORS / Request ID / JWT / Audit"]
     mw --> handlers["Handlers"]
-    handlers --> services["Services: Journey / AI / Media"]
+    handlers --> services["Services: Journey (i18n) / Media / AI"]
     handlers --> repos["Repositories"]
     services --> repos
     repos --> sqlite[("SQLite WAL")]
-    handlers --> buffer["Analytics Buffer P2"]
+    handlers --> buffer["Analytics buffer"]
     buffer --> sqlite
-    mw --> audit["P1 SQL audit: audit_logs"]
+    mw --> audit["audit_logs"]
     audit --> sqlite
-    handlers --> eventbus["In-process Event Bus"]
-    eventbus --> logs["Process/reverse-proxy runtime logs"]
-    admin["Server-side admin CLI"] --> sqlite
-    backup["backup-sqlite.sh"] --> sqlite
 ```
 
-中文：`audit_logs` 是 SQLite 中的审计表，只保存 API 请求证据、API 错误、panic 和前端 client error。高频原始运行日志，例如 Go stdout/stderr、本地一键启动的 `tmp/local-one-click/server.log`、Nginx access/error log、systemd/journal，保留为文件或进程日志，避免把 SQLite 变成通用日志仓库。
-
-English: `audit_logs` is the SQLite audit table for API request evidence, API errors, panics, and frontend client errors. High-volume raw runtime logs, such as Go stdout/stderr, local one-click `tmp/local-one-click/server.log`, Nginx access/error logs, and systemd/journal output, remain file/process logs so SQLite is not turned into a general log sink.
+Entity-relationship diagram (generated from `db/schema.sql`): [docs/generated/database-er.mmd](docs/generated/database-er.mmd)
 
 ---
 
-## User Cases | 用户用例
+## API | 接口
 
-```mermaid
-flowchart LR
-    guest["Guest"] --> browse["Browse home"]
-    guest --> explore["Search and filter journeys"]
-    guest --> detail["Read journey detail"]
-    guest --> register["Register with captcha"]
-    guest --> login["Login"]
-
-    register --> authed["Authenticated registered user"]
-    login --> authed
-    cookie["Remembered token auto login"] --> authed
-
-    authed --> explore
-    authed --> logout["Logout"]
-    authed --> user["Registered user capabilities"]
-    user --> pet["AI pet chat and MBTI quiz"]
-    user --> recharge["Recharge WonderCoin"]
-    user --> order["Create order"]
-    user --> pay["Pay order"]
-    user --> profile["View profile, orders, ledger"]
-
-    admin["Admin"] --> adminLogin["Hidden admin login"]
-    admin --> dashboard["Real dashboard metrics"]
-    admin --> export["Export CSV / JSON"]
-    admin --> audit["Review audit and analytics"]
-```
-
----
-
-## Database ER Diagram | 数据库 ER 图
-
-```mermaid
-erDiagram
-    JOURNEYS ||--o{ JOURNEY_TAGS : has
-    TAGS ||--o{ JOURNEY_TAGS : categorizes
-    JOURNEYS ||--o{ JOURNEY_MBTI : matches
-    MBTI_TYPES ||--o{ JOURNEY_MBTI : assigned
-    USERS ||--o{ USER_POINTS_HISTORY : earns
-    USERS ||--o{ USER_SAVED_JOURNEYS : saves
-    JOURNEYS ||--o{ USER_SAVED_JOURNEYS : saved_as
-    USERS ||--o{ ORDERS : places
-    ORDERS ||--o{ ORDER_ITEMS : contains
-    JOURNEYS ||--o{ ORDER_ITEMS : snapshots
-    USERS ||--o{ TRANSACTIONS : has
-    ORDERS ||--o{ TRANSACTIONS : generates
-    USERS ||--o{ ANALYTICS_EVENTS : may_emit
-
-    JOURNEYS {
-        int id PK
-        string title
-        string slug UK
-        string fantasy_type
-        string visual_style
-        int adventure_index
-        int risk_level
-        int price
-    }
-
-    USERS {
-        int id PK
-        string username
-        string email UK
-        string password_hash
-        string role
-        int points
-        int balance
-        string gender
-    }
-
-    ORDERS {
-        int id PK
-        string order_no UK
-        int user_id FK
-        string status
-        int total_amount
-        datetime paid_at
-    }
-
-    ORDER_ITEMS {
-        int id PK
-        int order_id FK
-        int journey_id FK
-        string journey_title
-        int unit_price
-        int quantity
-    }
-
-    TRANSACTIONS {
-        int id PK
-        int user_id FK
-        int order_id FK
-        string txn_type
-        int amount
-        int balance_after
-    }
-
-    ANALYTICS_EVENTS {
-        int id PK
-        string event_type
-        string journey_slug
-        int user_id FK
-        string mbti_type
-        string gender
-    }
-
-    AUDIT_LOGS {
-        int id PK
-        string request_id
-        string level
-        string source
-        string path
-        int status_code
-    }
-```
-
-Full generated ER source: [`docs/generated/database-er.mmd`](docs/generated/database-er.mmd)
-
----
-
-## Delivery Gantt | 交付时间线
-
-```mermaid
-gantt
-    title 100 Journeys Delivery Timeline
-    dateFormat  YYYY-MM-DD
-    axisFormat  %m-%d
-    section Foundation
-    Skeleton and governance        :done, p0, 2026-05-13, 1d
-    SDD schema and API contract    :done, p1, 2026-05-13, 1d
-    DDD vanilla SPA implementation :done, p2, 2026-05-13, 1d
-    TDD and E2E baseline           :done, p3, 2026-05-13, 1d
-    section Feature Expansion
-    Auth, profile, order, payment  :done, p4, 2026-05-13, 1d
-    v1.2 UX and operations pass    :done, p5, 2026-05-13, 1d
-    section Production Readiness
-    Taoyuan frontend redesign      :done, p6, 2026-05-14, 1d
-    Admin analytics and audit      :done, p7, 2026-05-14, 1d
-    Stress matrix and runbooks     :done, p8, 2026-05-14, 1d
-    k6 and Nginx verification      :done, p9, 2026-05-14, 1d
-```
-
----
-
-## API Surface | API 概览
-
-中文：JSON API 使用统一响应信封 `{ data, error, total?, page?, limit? }`；`/api/admin/export?format=csv` 是 CSV 明确例外。
-
-English: JSON API responses use the standard envelope `{ data, error, total?, page?, limit? }`; `/api/admin/export?format=csv` is the explicit CSV exception.
+JSON responses use one envelope: `{ data, error, total?, page?, limit? }`. The CSV export is the only exception.
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
-| `GET` | `/api/journeys` | Public | List journeys with search/filter/pagination |
+| `GET` | `/api/journeys` | Public | Search, filter and paginate journeys (`lang=zh` or `en`) |
 | `GET` | `/api/journeys/:slug` | Public | Journey detail |
 | `GET` | `/api/tags`, `/api/mbti` | Public | Filter taxonomies |
-| `POST` | `/api/auth/register`, `/api/auth/login` | Public | Captcha-aware auth |
-| `GET` | `/api/auth/me` | JWT | Current profile |
-| `POST` | `/api/auth/avatar` | JWT | Avatar upload |
-| `POST` | `/api/orders` | JWT | Create multi-item order |
-| `POST` | `/api/orders/:id/pay` | JWT | Atomic wallet payment |
-| `POST` | `/api/payments/recharge` | JWT | Simulated WonderCoin recharge |
-| `GET` | `/api/admin/stats` | Admin | Real dashboard stats |
-| `GET` | `/api/admin/export` | Admin | CSV/JSON export |
-| `POST` | `/api/analytics/events` | Public/JWT | Buffered P2 analytics |
-| `POST` | `/api/audit/client-error` | Public/JWT | Frontend error audit |
+| `POST` | `/api/auth/register`, `/api/auth/login` | Public | Captcha-protected auth |
+| `GET` | `/api/auth/me` | JWT | Current user |
+| `GET` `PUT` `DELETE` | `/api/auth/saved[/:slug]` | JWT | Saved journeys |
+| `PUT` | `/api/auth/mbti` | JWT | Save travel personality |
+| `POST` | `/api/orders`, `/api/orders/:id/pay` | JWT | Create and pay orders |
+| `GET` | `/api/payments/tiers` | Public | Top-up tiers and bonuses |
+| `POST` | `/api/payments/recharge` | JWT | Simulated top-up |
+| `GET` | `/api/admin/stats`, `/api/admin/export` | Admin | Dashboard data and CSV/JSON export |
 
-Full generated route matrix: [`docs/generated/api-routes.md`](docs/generated/api-routes.md)
+Full contract: [docs/schema/api-contract.md](docs/schema/api-contract.md) · generated route list: [docs/generated/api-routes.md](docs/generated/api-routes.md)
 
 ---
 
-## Quick Start | 快速启动
+## Run locally | 本地运行
+
+Requires Go 1.26+.
 
 ```bash
 git clone https://github.com/LibertychaserUS/100-journeys.git
 cd 100-journeys
-git switch main
-
-go mod tidy
 scripts/deploy/local-one-click.sh
 ```
 
-Then open:
+The script initialises SQLite with the journeys, demo users, admins, orders and dashboard data, picks free ports, and prints the URL and the local demo accounts. Stop it with `scripts/deploy/local-one-click.sh --stop`. Guide: [docs/ops/LOCAL_ONE_CLICK_GUIDE.md](docs/ops/LOCAL_ONE_CLICK_GUIDE.md)
 
-```text
-The URL printed by the script, for example http://127.0.0.1:18080/
-```
-
-Create or promote an admin account server-side:
+Or run just the server (default port 8080, database `./data/app.db`):
 
 ```bash
-ADMIN_PASSWORD='<set-via-env-or-secret-manager>' \
-go run ./cmd/admin-user \
-  -db ./data/app.db \
-  -email '<admin-email>' \
-  -username '<admin-username>'
+go run ./cmd/server
 ```
 
-Generate deterministic demo data for dashboard review:
+Create or promote an admin account:
 
 ```bash
-scripts/deploy/init-demo-data.sh ./data/demo.db
+ADMIN_PASSWORD='<from your secret store>' go run ./cmd/admin-user \
+  -db ./data/app.db -email '<admin-email>' -username '<admin-username>'
 ```
-
-The demo generator creates 50 ordinary users and 3 admin users with bcrypt password hashes, local GitHub-style default avatars, complete required profile fields, paid orders, wallet transactions, saved journeys, analytics events, and audit evidence. Usernames may repeat in product terms; ownership is bound to the server-side account identity, not displayed as an internal database ID.
-
-Demo accounts after initialization are printed by `scripts/deploy/init-demo-data.sh` and `scripts/deploy/local-one-click.sh`. Public demo credentials should be rotated or disabled after use.
-
-## One-Click Local Deploy | 本地一键部署
-
-中文：本地验收推荐直接使用一键脚本。脚本会初始化 SQLite、演示用户、管理员、订单、流水和后台统计数据，并自动选择空闲端口。如果默认 `18080/18081` 被占用，会自动顺延到下一个可用端口；连续递增 5 次仍不可用时，会说明现实原因并退出。
-
-English: For local review, use the one-click script. It initializes SQLite, demo users, admins, orders, transactions, and dashboard evidence, then auto-selects free ports when the defaults are occupied.
-
-```bash
-scripts/deploy/local-one-click.sh
-```
-
-Stop it:
-
-```bash
-scripts/deploy/local-one-click.sh --stop
-```
-
-Full local guide: [`docs/ops/LOCAL_ONE_CLICK_GUIDE.md`](docs/ops/LOCAL_ONE_CLICK_GUIDE.md)
 
 ---
 
-## Verification | 验证方式
-
-核心检查 | Core checks:
+## Tests | 测试
 
 ```bash
-GOCACHE="$PWD/.cache/go-build" go test ./...
-GOCACHE="$PWD/.cache/go-build" go vet ./...
+go test ./...
+go vet ./...
 find web/js -name '*.js' -exec node --check {} \;
 ```
 
-Medium-site Go stress profile:
-
-```bash
-STRESS_PUBLIC_REQUESTS=3000 \
-STRESS_ANALYTICS_EVENTS=20000 \
-STRESS_USERS=100 \
-STRESS_ORDERS=500 \
-STRESS_ADMIN_REQUESTS=300 \
-STRESS_IMAGE_REQUESTS=2000 \
-GOCACHE="$PWD/.cache/go-build" \
-go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
-```
-
-Nginx + k6 本地验证 | Local Nginx + k6:
-
-```bash
-scripts/nginx/render-local-config.sh 18080 18081
-nginx -t -c "$PWD/deploy/nginx.local.conf" -p "$PWD/.nginx"
-
-BASE_URL=http://127.0.0.1:18080 VUS=200 DURATION=30s k6 run tests/load/public-content-flow.k6.js
-BASE_URL=http://127.0.0.1:18080 VUS=80 DURATION=30s k6 run tests/load/order-payment-audit.k6.js
-BASE_URL=http://127.0.0.1:18080 VUS=300 DURATION=30s k6 run tests/load/image-static-cache.k6.js
-```
-
-Playwright E2E (desktop Chromium + Pixel 7, including axe accessibility scans):
+Playwright (desktop Chromium + Pixel 7, including axe WCAG 2.1 A/AA scans in both themes):
 
 ```bash
 cd e2e
@@ -405,101 +155,36 @@ npx playwright install chromium
 npx playwright test
 ```
 
-Current evidence status | 当前证据状态:
-
-| Area | Status |
-|---|---|
-| Go unit/integration | Passing: `go test ./...` |
-| Go vet | Passing: `go vet ./...` |
-| JS syntax | Passing: `node --check` over `web/js`, `e2e/tests`, and `tests/load` |
-| Go stress target profile | Passing: `ok .../tests/stress 1.660s` |
-| k6 | Local Nginx baseline recorded; post-fix smoke passed through one-click Nginx URL with trailing slash; Tencent Cloud public-IP smoke passed within Nginx rate limit |
-| Browser visual audit | Captured real desktop/mobile pages, profile, recharge, and admin dashboard screenshots from local Nginx |
-| Playwright | Passing: `63 passed` on 2026-10-18 (desktop + mobile projects, axe WCAG 2.1 AA in dark and light themes) |
-| Nginx/CDN | Local Nginx verified; Tencent Cloud Nginx reverse proxy deployed at `http://49.232.207.220/`; public API is rate-limited; HTTPS waits for filed domain |
-| CI/CD | `.github/workflows/ci.yml` added; remote GitHub Actions result pending after push |
-
----
-
-## Deployment Position | 部署口径
-
-中文：GitHub Pages 实际不可作为本项目可用演示入口。当前 Pages URL 只能返回静态 HTML，但项目页位于 `/100-journeys/` 子路径下，页面中的 `/static/...` 资源请求会落到站点根路径而返回 404；同时 GitHub Pages 不能运行 Go API，也不能持久化 SQLite。因此完整可用演示以腾讯云公网地址为准。
-
-English: GitHub Pages is not a usable demo entry for this project. The current Pages URL can return static HTML, but the project is served under `/100-journeys/` while the SPA requests `/static/...` assets from the site root, which returns 404. GitHub Pages also cannot run the Go API or persist SQLite. The working full-stack demo is the Tencent Cloud public IP.
-
-Deployment paths:
-
-| Path | Fit | Notes |
-|---|---|---|
-| Tencent Cloud CVM public IP | Current external demo | Go + SQLite + Nginx on `http://49.232.207.220/`; no domain filing required for IP demo |
-| Tencent Cloud filed domain | Formal China mainland domain path | Requires ICP filing before domain points to mainland CVM |
-| Local/demo | Development proof | `go run`, SQLite file, local generated images |
-| Alibaba Cloud mainland ECS | Alternative China-access candidate after ICP | Requires ICP filing for formal mainland-domain service |
-| Alibaba Cloud HK/Singapore | Possible no-mainland-ICP host | Full-stack deployable, mainland access still best-effort |
-| Railway/Fly/Render paid small instance | Low-ops full-stack option | Needs paid persistent storage for reliable SQLite |
-| GitHub Pages | Not usable as demo | Static HTML may load, but root `/static/...` assets and `/api/...` calls return 404; no Go API or SQLite runtime |
-| Vercel static asset preview | Possible for the dynamic Hash SPA shell only | Current Go + SQLite full stack is not Vercel-native without external API/storage redesign |
-| CDN/R2/OSS for images | Future media layer | Mirror public assets and use `CDN_BASE_URL` as a missing-local fallback or edge cache source |
-
-Current demo URL: <http://49.232.207.220/>
-
-Hidden admin route: <http://49.232.207.220/#/admin-login>
-
-Current choice: Tencent Cloud CVM public IP demo. Formal domain deployment waits for ICP filing and HTTPS certificate setup.
-
-当前选择：腾讯云 CVM 公网 IP 演示。正式域名部署等待备案和 HTTPS 证书配置。
-
-Operational docs:
-
-- [`docs/ops/PRODUCTION_READINESS.md`](docs/ops/PRODUCTION_READINESS.md)
-- [`docs/ops/DISASTER_RECOVERY.md`](docs/ops/DISASTER_RECOVERY.md)
-- [`docs/ops/LOAD_TEST_RESULTS.md`](docs/ops/LOAD_TEST_RESULTS.md)
-- [`docs/ops/LOCAL_ONE_CLICK_GUIDE.md`](docs/ops/LOCAL_ONE_CLICK_GUIDE.md)
-- [`deploy/nginx.conf`](deploy/nginx.conf)
-
----
-
-## Documentation Evidence | 文档证据
-
-| Artifact | Purpose |
-|---|---|
-| [`docs/PRD.md`](docs/PRD.md) | Current product requirements derived from implemented behavior |
-| [`docs/INITIAL_PRD.md`](docs/INITIAL_PRD.md) | Initial product requirement baseline |
-| [`docs/BDD-spec.md`](docs/BDD-spec.md) | Given/When/Then business behavior scenarios |
-| [`docs/schema/SDD-spec.md`](docs/schema/SDD-spec.md) | Schema/API-driven requirements baseline |
-| [`docs/ui-components/DDD-spec.md`](docs/ui-components/DDD-spec.md) | UI component/design description baseline |
-| [`docs/testing/TDD-spec.md`](docs/testing/TDD-spec.md) | Test plan and RED/GREEN evidence |
-| [`docs/SAMPLE_DATA.md`](docs/SAMPLE_DATA.md) | Seed data quality explanation and generated sample CSV pointers |
-| [`docs/ops/LOAD_TEST_RESULTS.md`](docs/ops/LOAD_TEST_RESULTS.md) | Nginx and k6 execution evidence |
-| [`docs/workflow/AI_DEVELOPMENT_WORKFLOW.md`](docs/workflow/AI_DEVELOPMENT_WORKFLOW.md) | Claude Code + Kimi API workflow explanation |
-| [`docs/workflow/DOCUMENTATION_EVOLUTION.md`](docs/workflow/DOCUMENTATION_EVOLUTION.md) | Documentation history and Git-stage evolution |
-| [`docs/SUBMISSION.md`](docs/SUBMISSION.md) | Delivery checklist and archive list |
-| [`docs/generated/`](docs/generated/) | Code-derived diagrams and route/test matrices |
-| [`docs/prompts/prompt-log.md`](docs/prompts/prompt-log.md) | Prompt trace |
-| [`app.xlsx`](app.xlsx) | Test-case spreadsheet |
-
-Regenerate code-derived docs:
+Stress and load:
 
 ```bash
-python3 scripts/docs/generate_project_artifacts.py
+go test -tags stress ./tests/stress -run TestStress -count=1 -timeout=360s
+
+scripts/nginx/render-local-config.sh 18080 18081
+BASE_URL=http://127.0.0.1:18080 VUS=200 DURATION=30s k6 run tests/load/public-content-flow.k6.js
 ```
 
----
-
-## Known Boundaries | 已知边界
-
-- `user_saved_journeys` exists, but full favorite API UX still needs final completion or explicit local-only scope.
-- SQLite is acceptable for this MVP and medium single-node demo, not for unlimited high-concurrency production.
-- Analytics events are P2 and may degrade under extreme pressure; P0 orders/payments do not use the lossy buffer.
-- Local Go static image serving is not the production plan; use Nginx/CDN/R2 for image traffic. The current service resolves local assets first and falls back to `CDN_BASE_URL` only when a local file is missing.
-- Production must use HTTPS; local HTTP is only a Nginx/k6 test fixture.
-- k6 baseline, visual browser audit, and full scripted Playwright E2E have been refreshed locally; Tencent Cloud HTTP demo has been smoke-tested, while HTTPS waits for filed domain setup.
-- Without ICP filing, do not claim formal mainland China deployment on Alibaba Cloud mainland resources.
+Results and profiles: [docs/ops/LOAD_TEST_RESULTS.md](docs/ops/LOAD_TEST_RESULTS.md) · test plan and IDs: [docs/testing/TDD-spec.md](docs/testing/TDD-spec.md)
 
 ---
 
-## Package | 打包材料
+## Deployment | 部署
 
-中文：完整交付材料包含源码压缩包、Markdown 文档、Prompt 记录、工作流说明、GitHub 仓库链接和公网演示地址。
+Production runs on AWS Lightsail behind Nginx with HTTPS, a systemd service, a separate data disk and nightly SQLite backups. CI deploys `main` automatically after all checks pass. Runbook: [docs/ops/AWS_LIGHTSAIL_RUNBOOK.md](docs/ops/AWS_LIGHTSAIL_RUNBOOK.md) · recovery: [docs/ops/DISASTER_RECOVERY.md](docs/ops/DISASTER_RECOVERY.md)
 
-English: The complete package includes the source archive, Markdown documentation, prompt records, workflow explanation, GitHub repository link, and public demo URL.
+GitHub Pages cannot host this app (it needs the Go API and SQLite).
+
+---
+
+## Documentation | 文档
+
+| Document | Content |
+|---|---|
+| [docs/ui-components/DDD-spec.md](docs/ui-components/DDD-spec.md) | Design system, colour roles, components, page lifecycle |
+| [docs/schema/SDD-spec.md](docs/schema/SDD-spec.md) | Requirements and data schema |
+| [docs/schema/api-contract.md](docs/schema/api-contract.md) | API contract |
+| [docs/testing/TDD-spec.md](docs/testing/TDD-spec.md) | Test plan and test case IDs |
+| [docs/generated/](docs/generated/README.md) | Routes, ER diagram and sample data generated from code |
+| [docs/ops/](docs/ops/) | Deployment, load testing and recovery |
+
+Orders, coins and points are simulated: there are no real payments or bookings.

@@ -7,16 +7,22 @@
 .admin-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .admin-metric { padding: 16px 18px; border-radius: var(--radius-card); background: var(--color-surface); border: 1px solid var(--color-line); min-width: 0; }
 .admin-metric p { font-size: var(--text-sm); color: var(--color-text-3); }
-.admin-metric b { display: block; margin-top: 6px; font-size: var(--text-xl); font-weight: var(--weight-bold); overflow-wrap: anywhere; }
+.admin-metric b { display: block; margin-top: 6px; font-size: clamp(1rem, 2.2vw, var(--text-xl)); font-weight: var(--weight-bold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .admin-panels { margin-top: var(--space-5); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .admin-panel { padding: 18px; border-radius: var(--radius-card); background: var(--color-surface); border: 1px solid var(--color-line); min-width: 0; }
 .admin-panel h2 { font-size: var(--text-md); margin-bottom: 14px; }
 .admin-list { display: grid; gap: 12px; font-size: var(--text-sm); color: var(--color-text-2); }
 .admin-bar { display: grid; gap: 6px; }
-.admin-bar__top { display: flex; justify-content: space-between; gap: 10px; }
+.admin-bar__top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 10px; }
 .admin-bar__top span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-text); }
 .admin-bar__top em { font-style: normal; color: var(--color-text-3); white-space: nowrap; }
 .admin-empty { color: var(--color-text-3); }
+.admin-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.admin-tile { padding: 8px; border-radius: 8px; background: var(--color-surface-2); display: grid; gap: 4px; }
+.admin-tile b { font-size: var(--text-sm); letter-spacing: .06em; color: var(--color-text); }
+.admin-tile span { font-size: var(--text-xs); color: var(--color-text-3); }
+.admin-tile .bar { height: 4px; background: var(--color-line); }
+.admin-tile--wide { grid-column: span 2; }
 .admin-users { display: grid; gap: 10px; }
 .admin-users li { display: flex; justify-content: space-between; gap: 10px; }
 .admin-users span { min-width: 0; color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

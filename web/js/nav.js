@@ -10,7 +10,15 @@ const Nav = (() => {
   const theme = () => document.documentElement.getAttribute('data-theme') || 'dark';
 
   function setTheme(next) {
-    document.documentElement.setAttribute('data-theme', next);
+    const root = document.documentElement;
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      root.classList.add('theme-switching');
+      clearTimeout(setTheme._t);
+      setTheme._t = setTimeout(() => root.classList.remove('theme-switching'), 320);
+    }
+    root.setAttribute('data-theme', next);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', next === 'dark' ? '#0d0f13' : '#f3f3f1');
     try { localStorage.setItem('theme', next); } catch {}
     const focused = document.activeElement && document.activeElement.id;
     render();
@@ -58,7 +66,7 @@ const Nav = (() => {
           <button class="icon-btn hide-sm" id="nav-theme" type="button" aria-label="${esc(t(dark ? 'nav.themeToLight' : 'nav.themeToDark'))}">${UI.icon(dark ? 'sun' : 'moon')}</button>
           ${authed ? `
             <a class="nav__wallet" id="nav-wallet" href="#/recharge" aria-label="${esc(t('nav.wallet', { n: balance }))}">
-              <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="24" height="24"><b class="num">${balance}</b> ${esc(t('common.coins'))}
+              <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="24" height="24"><b class="num">${balance}</b><span class="nav__wallet-unit"> ${esc(t('common.coins'))}</span>
             </a>
             <button class="nav__user hide-sm" id="nav-user" type="button" aria-haspopup="menu" aria-expanded="${menuOpen}" aria-controls="nav-menu-list" aria-label="${esc(t('nav.account'))}">
               <img src="${avatar}" alt="" width="30" height="30"><span>${name}</span>

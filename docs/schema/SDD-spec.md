@@ -38,7 +38,7 @@
 | 游客 | 快速理解产品并浏览幻想旅程 | `journeys`、`GET /api/journeys`、`#/`、`#/explore` |
 | 注册用户 | 保存身份、钱包、积分、订单和流水 | `users`、`orders`、`transactions`、JWT 路由 |
 | 管理员 | 查看真实指标并导出证据 | `admin_repo.go`、`analytics_events`、`audit_logs` |
-| 审阅者 | 审计开发过程、测试和交付物 | `docs/generated/`、`docs/testing/`、`app.xlsx` |
+| 维护者 / 代码审阅者 | 理解架构、测试证据和生成文档 | `docs/generated/`、`docs/testing/`、`app.xlsx` |
 | 维护者 | 本地运行、部署、备份、恢复 | `deploy/nginx.conf`、`scripts/backup-sqlite.sh`、`docs/ops/` |
 
 ## 3. 系统需求
@@ -126,23 +126,18 @@ JSON envelope:
 
 ## 6. 部署与环境约束
 
-当前交付路径：
+生产路径（详见 `docs/ops/AWS_LIGHTSAIL_RUNBOOK.md`）：
 
 ```text
 外部浏览器
--> Tencent Cloud CVM public IP: 49.232.207.220
--> Nginx reverse proxy / static cache
--> Go Gin API
--> SQLite WAL on persistent disk
--> backup-sqlite.sh
+-> AWS Lightsail (HTTPS, Nginx reverse proxy / static cache)
+-> Go Gin API (systemd)
+-> SQLite WAL on a separate data disk
+-> nightly backups
 ```
 
-中国大陆访问：
-
-- 当前已提供腾讯云公网 IP 演示，不使用未备案域名解析到中国大陆服务器。
-- 正式域名访问需完成 ICP 备案后再解析到腾讯云 CVM，并配置 HTTPS。
-- 阿里云中国大陆正式公网域名部署同样通常需要 ICP 备案；未备案不作为正式域名交付路线。
-- 非大陆地域可部署全栈，但大陆访问仍需实测，不等于国内优化。
+- `main` 上每次推送先跑 CI（Go、Playwright、k6 smoke），全绿后自动部署。
+- 中国大陆正式域名访问需要 ICP 备案；非大陆地域部署不等于国内访问优化，需要实测。
 
 ## 7. 验证要求
 
@@ -174,10 +169,9 @@ JSON envelope:
 
 ## 9. SDD 准入结论
 
-当前 SDD 基线可以支撑“中型独立站 MVP，具备明确生产边界”的提交口径。不得声称：
+当前 SDD 基线对应“中型独立站 MVP，具备明确生产边界”。不得声称：
 
 - 已接入真实支付。
 - 已保证中国大陆高速访问。
-- 已完成收藏全链路。
 - 已达到无限生产级。
 - 本地 HTTP 压测等于生产 HTTPS 部署。

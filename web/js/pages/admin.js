@@ -77,16 +77,16 @@ Pages.Admin = {
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
       set('admin-stat-users', I18n.num(s.total_users));
       set('admin-stat-journeys', I18n.num(s.total_journeys));
-      set('admin-stat-balance', UI.coins(s.total_balance));
+      set('admin-stat-balance', I18n.num(s.total_balance));
       set('admin-stat-points', I18n.num(s.total_points));
       set('admin-stat-orders', `${I18n.num(s.paid_orders)} / ${I18n.num(s.total_orders)}`);
-      set('admin-stat-revenue', UI.coins(s.gross_revenue));
+      set('admin-stat-revenue', I18n.num(s.gross_revenue));
       set('admin-stat-audit-errors', `${I18n.num(s.audit_errors)} / ${I18n.num(s.audit_logs)}`);
       set('admin-stat-events', I18n.num(s.analytics_events));
       set('admin-updated', t('admin.synced', { time: I18n.time(new Date()) }));
       this._bars('admin-top-clicked', s.top_clicked_journeys, 'admin.noClicks', false);
       this._bars('admin-top-purchased', s.top_purchased_journeys, 'admin.noPaid', true);
-      this._dist('admin-mbti', s.mbti_distribution, (l) => (l === 'unknown' || !l ? t('gender.unknown') : l));
+      this._tiles('admin-mbti', s.mbti_distribution);
       this._dist('admin-gender', s.gender_distribution, (l) => this._gender(l));
       this._dist('admin-purchase-gender', s.purchase_gender_distribution, (l) => this._gender(l));
       this._users(usersRes.data || []);
@@ -110,7 +110,7 @@ Pages.Admin = {
     el.innerHTML = rows.map((r) => {
       const width = Math.max(4, Math.round(((r.count || 0) / max) * 100));
       const tail = revenue ? `${UI.coins(r.revenue || 0)}${typeof r.rate === 'number' ? ` · ${Math.round(r.rate * 100)}%` : ''}` : t('admin.times', { n: r.count || 0 });
-      return `<div class="admin-bar"><div class="admin-bar__top"><span>${UI.esc((this._titles && this._titles.map.get(r.slug)) || r.title || r.slug)}</span><em class="num">${UI.esc(tail)}</em></div><div class="bar"><b style="width:${width}%"></b></div></div>`;
+      return `<div class="admin-bar"><div class="admin-bar__top"><span title="${UI.esc((this._titles && this._titles.map.get(r.slug)) || r.title || r.slug)}">${UI.esc((this._titles && this._titles.map.get(r.slug)) || r.title || r.slug)}</span><em class="num">${UI.esc(tail)}</em></div><div class="bar"><b style="width:${width}%"></b></div></div>`;
     }).join('');
   },
 
@@ -122,6 +122,18 @@ Pages.Admin = {
       const pct = Math.round((r.percent || 0) * 100);
       return `<div class="admin-bar"><div class="admin-bar__top"><span>${UI.esc(label(r.label))}</span><em class="num">${I18n.num(r.count)} · ${pct}%</em></div><div class="bar"><b style="width:${Math.max(3, pct)}%"></b></div></div>`;
     }).join('');
+  },
+
+  // MBTI as a compact 4×4 grid so the panel stays as tall as its neighbours.
+  _tiles(id, rows) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!rows || !rows.length) { el.innerHTML = `<p class="admin-empty">${UI.esc(t('admin.empty'))}</p>`; return; }
+    const max = Math.max(...rows.map((r) => r.count || 0), 1);
+    el.innerHTML = `<div class="admin-tiles">${rows.map((r) => {
+      const unknown = r.label === 'unknown' || !r.label;
+      return `<div class="admin-tile ${unknown ? 'admin-tile--wide' : ''}"><b>${UI.esc(unknown ? t('gender.unknown') : r.label)}</b><span class="num">${I18n.num(r.count)} · ${Math.round((r.percent || 0) * 100)}%</span><span class="bar"><b style="width:${Math.max(6, Math.round(((r.count || 0) / max) * 100))}%"></b></span></div>`;
+    }).join('')}</div>`;
   },
 
   _users(users) {

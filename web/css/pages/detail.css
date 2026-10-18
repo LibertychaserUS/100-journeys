@@ -6,7 +6,7 @@
 
 .detail-hero { position: relative; isolation: isolate; overflow: hidden; color: var(--color-on-media); background: #07080b; padding-block: calc(var(--nav-h) + var(--space-6)) var(--space-7); }
 .detail-hero__bg { position: absolute; inset: -60px; z-index: -2; background: var(--cover) center / cover; filter: blur(48px) saturate(120%); opacity: .7; }
-.detail-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(6, 7, 10, .92) 0%, rgba(6, 7, 10, .72) 50%, rgba(6, 7, 10, .45) 100%); }
+.detail-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, var(--color-bg) 0, transparent 56px), linear-gradient(90deg, rgba(6, 7, 10, .92) 0%, rgba(6, 7, 10, .72) 50%, rgba(6, 7, 10, .45) 100%); }
 .detail-hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 400px); gap: var(--space-8); align-items: end; }
 .detail-hero__poster { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-card); box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .08); }
 .detail-hero--loading .skeleton { background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.09), rgba(255,255,255,.04)); background-size: 200% 100%; }
@@ -63,13 +63,15 @@
 .bookbar { display: none; }
 
 @media (max-width: 960px) {
+  .detail-hero__grid { grid-template-columns: minmax(0, 1fr) 240px; gap: var(--space-6); }
+  .detail-hero__title { font-size: clamp(2rem, 5.2vw, 2.75rem); }
   .detail-body { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
   .ticket { position: static; }
 }
 @media (max-width: 760px) {
   .detail-hero { min-height: 76vh; display: flex; align-items: flex-end; padding-block: calc(var(--nav-h) + var(--space-4)) var(--space-6); }
   .detail-hero__bg { display: none; }
-  .detail-hero::after { background: linear-gradient(0deg, rgba(6, 7, 10, .96) 0%, rgba(6, 7, 10, .5) 50%, rgba(6, 7, 10, .15) 100%); }
+  .detail-hero::after { background: linear-gradient(0deg, var(--color-bg) 0, rgba(6, 7, 10, .96) 48px, rgba(6, 7, 10, .5) 55%, rgba(6, 7, 10, .15) 100%); }
   .detail-hero__grid { grid-template-columns: minmax(0, 1fr); width: 100%; }
   .detail-hero__poster { position: absolute; inset: 0; z-index: -2; height: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
   .detail-hero--loading .detail-hero__poster { display: none; }

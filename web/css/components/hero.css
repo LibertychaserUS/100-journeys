@@ -9,6 +9,8 @@
 }
 .home-hero__img { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
 .home-hero__particles { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+/* Photo dissolves into the page instead of ending on a hard edge (matters most in the light theme). */
+.home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 72px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--color-bg)); }
 .home-hero__shade {
   position: absolute; inset: 0; z-index: -2;
   background:

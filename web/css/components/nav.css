@@ -61,6 +61,11 @@ body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { backgroun
 .menu__meta { padding: 8px 12px 6px; font-size: var(--text-xs); color: var(--color-text-3); }
 
 .nav__menu-btn { display: none; }
+@media (max-width: 420px) {
+  .nav__wallet-unit { display: none; }
+  .nav__brand { letter-spacing: 0; gap: 8px; }
+  .nav__actions { gap: 6px; }
+}
 
 /* Mobile drawer */
 .drawer {

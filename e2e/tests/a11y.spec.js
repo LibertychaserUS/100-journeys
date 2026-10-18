@@ -47,6 +47,24 @@ test.describe('Theme', () => {
     expect(bg).toBe('rgb(243, 243, 241)');
   });
 
+  // E2E-A11Y-THEME-001: switching theme at runtime keeps every page readable (not only on first load)
+  for (const [name, url, ready] of [['detail', '/#/journey/iceland-lava-tunnel-cycling', '.chapter h2'], ['explore', '/#/explore', '.journey-card[data-slug]']]) {
+    test(`${name} stays AA after toggling dark -> light -> dark`, async ({ page }) => {
+      await freshPage(page);
+      await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+      await page.goto(url);
+      await expect(page.locator(ready).first()).toBeVisible();
+      for (const expected of ['light', 'dark']) {
+        await page.locator('#nav-theme').click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', expected);
+        await expect(page.locator('html')).not.toHaveClass(/theme-switching/); // transition finished
+        await expect(page.locator('#nav-theme')).toBeFocused(); // focus survives the nav re-render
+        const results = await new AxeBuilder({ page }).withTags(['wcag2aa']).withRules(['color-contrast']).analyze();
+        expect(results.violations.map((v) => v.id), expected).toEqual([]);
+      }
+    });
+  }
+
   test('keyboard users can skip to content', async ({ page }) => {
     await freshPage(page);
     await page.goto('/#/explore');

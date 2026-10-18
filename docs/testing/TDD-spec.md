@@ -173,11 +173,11 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-AUTH-*` | `e2e/tests/auth.spec.js` | 表单与 label；注册跳转；字段级校验；有效登录；错误密码显示中文提示（旧版为 `HTTP 401`）；验证码错误落在验证码字段；账户菜单 Esc 还原焦点；登出；`?next=` 回跳 | 通过 |
 | `E2E-ORDER-001..006` | `e2e/tests/orders.spec.js` | 档位与赠送；赠送到账；页内确认支付；余额不足 → 充值 → 回到订单支付；「我的」中继续支付待支付订单；访客下单引导登录；10 用户顺序注册；出现原生 `confirm/alert` 即失败 | 通过 |
 | `E2E-I18N-001..002` | `e2e/tests/i18n.spec.js` | 切换英文后界面与旅程内容均为英文并记住；英文浏览器默认英文，英文搜索命中 | 通过 |
-| `E2E-A11Y-*` | `e2e/tests/a11y.spec.js` | 深浅两套主题 × 7 个页面 axe WCAG 2.1 A/AA 零违规；主题切换持久化；跳到正文 | 通过 |
+| `E2E-A11Y-*` | `e2e/tests/a11y.spec.js` | 深浅两套主题 × 7 个页面 axe WCAG 2.1 A/AA 零违规；运行时切换主题后再次扫描对比度并保持焦点；主题切换持久化；跳到正文 | 通过 |
 | `E2E-PERSONA-001..002`、`E2E-PET-001` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；向导 5 题测验保存；向导推荐与 Esc 关闭还原焦点 | 通过 |
 | `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
 
-运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 63 个用例）。
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 65 个用例）。
 
 ### 4.4 Go Stress 矩阵
 
