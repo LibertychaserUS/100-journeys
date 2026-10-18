@@ -11,6 +11,9 @@
 | `POST` | `/api/analytics/events` | Public | `cmd/server/main.go` |
 | `POST` | `/api/audit/client-error` | Public | `cmd/server/main.go` |
 | `POST` | `/api/auth/avatar` | JWT | `cmd/server/main.go` |
+| `GET` | `/api/auth/compositions` | JWT | `internal/handler/compose_handler.go` |
+| `POST` | `/api/auth/compositions` | JWT | `internal/handler/compose_handler.go` |
+| `DELETE` | `/api/auth/compositions/:id` | JWT | `internal/handler/compose_handler.go` |
 | `POST` | `/api/auth/login` | Public | `cmd/server/main.go` |
 | `PUT` | `/api/auth/mbti` | JWT | `internal/handler/me_handler.go` |
 | `GET` | `/api/auth/me` | JWT | `cmd/server/main.go` |
@@ -19,6 +22,8 @@
 | `DELETE` | `/api/auth/saved/:slug` | JWT | `internal/handler/me_handler.go` |
 | `PUT` | `/api/auth/saved/:slug` | JWT | `internal/handler/me_handler.go` |
 | `GET` | `/api/captcha` | Public | `cmd/server/main.go` |
+| `GET` | `/api/compose/fragments` | Public | `internal/handler/compose_handler.go` |
+| `GET` | `/api/compositions/:code` | Public | `internal/handler/compose_handler.go` |
 | `GET` | `/api/health` | Public | `cmd/server/main.go` |
 | `GET` | `/api/journeys` | Public | `cmd/server/main.go` |
 | `GET` | `/api/journeys/:slug` | Public | `cmd/server/main.go` |

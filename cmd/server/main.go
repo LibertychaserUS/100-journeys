@@ -12,6 +12,7 @@ import (
 
 	"github.com/100-journeys/app/internal/ai"
 	"github.com/100-journeys/app/internal/analytics"
+	"github.com/100-journeys/app/internal/compose"
 	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/handler"
@@ -73,6 +74,15 @@ func main() {
 		log.Fatalf("sync content: %v", err)
 	}
 
+	// Paper slips of the compose game (internal/compose/fragments.json).
+	fragments, err := compose.Load()
+	if err != nil {
+		log.Fatalf("load compose fragments: %v", err)
+	}
+	if problems := compose.Validate(fragments); len(problems) > 0 {
+		log.Fatalf("compose fragments are invalid: %s", strings.Join(problems, "; "))
+	}
+
 	// Event bus subscribers
 	eventbus.Default.Subscribe(eventbus.UserRegistered, func(evt eventbus.Event) {
 		log.Printf("[Event] user registered: uid=%v username=%s", evt.Data["user_id"], evt.Data["username"])
@@ -118,6 +128,7 @@ func main() {
 	captchaH := handler.NewCaptchaHandler(captchaStore)
 	auditH := handler.NewAuditHandler(db)
 	meH := handler.NewMeHandler(userRepo, svc)
+	composeH := handler.NewComposeHandler(repository.NewCompositionRepository(db), fragments, svc)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -174,6 +185,9 @@ func main() {
 
 		// Saved journeys + travel personality (protected)
 		handler.MeRoutes(api, meH)
+
+		// Compose game: slips and share links (public), kept tickets (protected)
+		handler.ComposeRoutes(api, composeH)
 
 		// Admin (protected + admin role)
 		handler.AdminRoutes(api, adminH)

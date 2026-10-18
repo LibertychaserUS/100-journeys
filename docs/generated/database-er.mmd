@@ -12,6 +12,7 @@ erDiagram
     USERS ||--o{ TRANSACTIONS : has
     ORDERS ||--o{ TRANSACTIONS : generates
     USERS ||--o{ ANALYTICS_EVENTS : may_emit
+    USERS ||--o{ COMPOSITIONS : keeps
 
     JOURNEYS {
         int id PK
@@ -185,4 +186,18 @@ erDiagram
         int journey_id FK
         string option_key
         datetime updated_at
+    }
+
+    COMPOSITIONS {
+        string id PK
+        string code UK
+        int user_id FK
+        string place
+        string hour
+        string season
+        string stay
+        string ritual
+        string keepsake
+        datetime created_at
+        string additional_fields
     }

@@ -1,6 +1,6 @@
 /**
  * router.js — hash router with a page lifecycle.
- * Routes: / | /explore | /journey/:slug | /login | /register | /profile | /recharge
+ * Routes: / | /explore | /journey/:slug | /compose | /compose/:code | /login | /register | /profile | /recharge
  *         /admin-login | /admin | /about | anything else → 404
  *
  * Page contract: render(ctx), optional update(ctx) for query-only changes on the same
@@ -127,6 +127,8 @@ Router.define('/journey/:slug', Pages.Detail);
 Router.define('/find', Pages.Find);
 Router.define('/guide', Pages.Guide);
 Router.define('/space', Pages.Space);
+Router.define('/compose', Pages.Compose);
+Router.define('/compose/:code', Pages.Compose);
 Router.define('/login', Pages.Login);
 Router.define('/register', Pages.Register);
 Router.define('/profile', Pages.Profile);

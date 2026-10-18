@@ -3,7 +3,7 @@
 **标准**: ISO/IEC/IEEE 29148:2018 — Requirements Engineering
 **项目**: 100种不可思议的旅行 · Lightweight Content MVP
 **状态**: 与当前代码对齐
-**源码依据**: `cmd/server/main.go`、`internal/handler/*.go`、`internal/model/*.go`
+**源码依据**: `cmd/server/main.go`、`internal/handler/*.go`、`internal/model/*.go`、`internal/compose/`
 **生成证据**: `docs/generated/api-routes.md`
 
 ---
@@ -525,6 +525,34 @@ JWT 用户接口要求已登录；管理员接口还要求 `role = "admin"`。
 
 **响应 `200`**: `{ "data": { "mbti_type": "INFP", "choices": { … 账户里全部选择 … }, "skipped": ["unknown-slug"] }, "error": null }`。访客类型非空时覆盖账户类型（最近一次选择）；不存在的入口或选项跳过并列在 `skipped`；非法类型 `400`。
 
+### 4.10 画一个自己的入口（compose 小游戏）
+
+纸笺来自 `internal/compose/fragments.json`（编译进二进制，启动时校验）。六组：`place`、`hour`、`season`、`stay`、`ritual`、`keepsake`；`hour` / `season` / `stay` 的 key 取自内容词表（`content.Times` / `Seasons` / `Paces`），`place` 可以带一个入口 `slug`。key 会随票保存，不能改名。
+
+**`GET /api/compose/fragments?lang=`**（公开）
+
+`data` 为按组排列的纸笺数组：`{ group, key, text, sub?, phrase, realm?, slug?, image_url? }`。`phrase` 是它在票面句子里的写法（缺省同 `text`）；有 `slug` 的地方带服务层解析的封面 `image_url`。票面句子由前端按 `compose.t.*` 模板确定性拼出，不需要网络。
+
+**`GET /api/auth/compositions`**（JWT）：当前用户收起的票，按 `created_at` 倒序；无票时为 `[]`。
+
+**`POST /api/auth/compositions`**（JWT）
+
+```json
+{ "id": "4b1d0c4e-3a52-4c0e-9f6a-2f7d1e0c9a11", "picks": { "place": "uyuni", "hour": "predawn" }, "created_at": "2026-10-01T08:30:00Z" }
+```
+
+`id` 由客户端生成，是幂等键：同一用户再次提交同一 `id`（登录后回放访客的票、或以后补完空行）会更新 `picks` 并保留原 `code` 与 `created_at`，返回 `200`；首次提交返回 `201`。`created_at` 可省略（为空或晚于当前时间时取服务器时间）。
+
+| 状态码 | `error` |
+|---|---|
+| `400` | `invalid composition` / `invalid composition id`（8–64 位字母数字或 `-`）/ `composition needs at least one slip` / `unknown slip <group>:<key>` / `composition limit reached`（每个账户 200 张） |
+| `401` | 未登录 |
+| `409` | `composition id already used`（该 id 属于别人的票） |
+
+**`DELETE /api/auth/compositions/:id`**（JWT）：撕掉自己的票，返回 `{ "id": "…", "deleted": true }`；不存在或不属于自己返回 `404` + `composition not found`。撕掉后分享链接失效。
+
+**`GET /api/compositions/:code`**（公开，只读分享）：`{ code, picks, created_at }`，不含 `id` 与用户信息。`code` 为 12 位小写字母数字（服务器用 `crypto/rand` 生成，去掉易混字符），格式不符或不存在返回 `404` + `composition not found`。
+
 ---
 
 ## 5. 订单接口
@@ -793,6 +821,15 @@ CSV 模式不使用 JSON 信封。
 ### 8.4 Transaction
 
 流水类型来自当前模型常量：`recharge`、`purchase`、`refund`、`bonus`。`amount` 为正表示入账，为负表示扣款。
+
+### 8.5 Composition
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `id` | string | 客户端生成的幂等键，只返回给票的主人 |
+| `code` | string | 分享码，12 位 |
+| `picks` | object | 每组选中的纸笺 key，空着的组不出现 |
+| `created_at` / `updated_at` | string | RFC 3339（UTC）；`created_at` 是第一次收起的时间 |
 
 ---
 

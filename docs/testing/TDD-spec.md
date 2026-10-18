@@ -59,6 +59,8 @@
 | 后台管理 | `GET /api/admin/users`、`GET /api/admin/stats`、`GET /api/admin/export` | JWT + admin | `IT-ADMIN-*`、`LOAD-K6-ADMIN-*`、`STRESS-ADMIN-*` |
 | 订单 | `POST /api/orders`、`GET /api/orders`、`GET /api/orders/:id`、`POST /api/orders/:id/pay` | JWT | `UT-REPO-ORDER-*`、`IT-ORDER-*`、`E2E-ORDER-*`、`STRESS-ORDER-*` |
 | 支付 | `POST /api/payments/recharge`、`GET /api/payments/transactions` | JWT | `IT-PAYMENT-*`、`E2E-ORDER-*`、`LOAD-K6-ORDER-*` |
+| 画一个自己的入口 | `GET /api/compose/fragments`、`GET /api/compositions/:code` | 否 | `UT-COMPOSE-*`、`IT-API-COMPOSE-*`、`E2E-COMPOSE-*` |
+| 收起的票 | `GET /api/auth/compositions`、`POST /api/auth/compositions`、`DELETE /api/auth/compositions/:id` | JWT | `IT-API-COMPOSE-*`、`E2E-COMPOSE-003..004` |
 
 ### 2.2 前端 Hash 路由
 
@@ -69,6 +71,7 @@
 | `#/` | `Pages.Home` | `E2E-HOME-*` |
 | `#/explore` | `Pages.Explore` | `E2E-EXPLORE-*` |
 | `#/journey/:slug` | `Pages.Detail` | `E2E-DETAIL-*`、`E2E-ORDER-*` |
+| `#/compose`、`#/compose/:code` | `Pages.Compose` | `E2E-COMPOSE-*`、`E2E-A11Y-COMPOSE-001` |
 | `#/login` | `Pages.Login` | `E2E-AUTH-*` |
 | `#/register` | `Pages.Register` | `E2E-AUTH-*` |
 | `#/profile` | `Pages.Profile` | `E2E-AUTH-*`、`E2E-ORDER-*` |
@@ -152,6 +155,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `UT-ANALYTICS-002` | 漏斗事件类型 | 每个漏斗步骤都是已登记事件，未知类型被丢弃 | 后台漏斗不会因为事件被拒而缺步 |
 | `UT-REPO-MIGRATE-001` | `Migrate` | 旧库的 analytics_events CHECK 只有 5 种类型 | 重建表后接受新类型，旧数据与 4 个索引保留，再次迁移不变 |
 | `UT-REPO-USER-CHOICE-001` | `UserRepository.SetChoice/ListChoices` | 同一入口重复选择 | 后一次覆盖，按 slug 返回 |
+| `UT-COMPOSE-001..004` | `internal/compose` | 纸笺：六组各至少 3 张、组内 key 唯一、中英文都有、时辰/季节/停留用内容词表、realm 合法、只有地方能链入口；地方的 slug 在 seed + 同步后的库里存在；复用 `content.Lint` 抓说教词；`Localize` 语言与 phrase 回退、`Set.Has` | 所有纸笺可上线，坏数据逐条报出 |
 | `UT-ANALYTICS-001` | analytics buffer | 覆盖 flush 持久化和五位数 burst 接收 | 未超过容量时不丢事件 |
 
 ### 4.2 集成测试矩阵
@@ -180,6 +184,11 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `IT-API-AI-002` | 向导接口 + DeepSeek | 英文、带类型；超长消息 | `source: deepseek`，只推荐真实旅程且标题为英文，提示词为英文并带类型；1001 字 400 |
 | `IT-API-SAVED-001..003` | 收藏 | 收藏/幂等/取消/本地化/未登录/不存在 | `/api/auth/saved` 往返一致 |
 | `IT-API-MBTI-001` | 保存人格 | 合法与非法代码 | `/auth/me` 返回保存的 `mbti_type` |
+| `IT-API-COMPOSE-001` | 纸笺接口 | 公开、按组顺序、`?lang=en` 本地化、地方带入口封面、想象中的地方无封面 | `/api/compose/fragments` 与 `fragments.json` 一致 |
+| `IT-API-COMPOSE-002` | 收起票的幂等 | 同一 `id` 重放返回 `200` 且分享码不变，补完空行更新 `picks`，访客的 `created_at` 保留 | 回放访客作品不会产生重复票 |
+| `IT-API-COMPOSE-003` | 分享链接 | 公开只读、不含 `id` 与用户；未知、格式错误、过长的 code 均 `404` | 链接不可猜、不泄露主人 |
+| `IT-API-COMPOSE-004` | 校验 | 空票、未知纸笺、纸笺放错组、非法 id（含注入串）、非 JSON 返回 `400`；未登录 `401`；空列表为 `[]` | 无效数据不入库 |
+| `IT-API-COMPOSE-005` | 归属 | 他人不能覆盖（`409`）、删除（`404`）或列出别人的票；主人撕掉后分享链接 `404` | 票只属于主人 |
 | `IT-API-PAY-001..003` | 充值档位与赠送 | 档位公开、档位赠送入账两条流水、自定义金额无赠送 | 余额 = 本金 + 赠送 |
 | `IT-API-AUTH-POINTS-001` | 每日登录奖励 | 同日多次登录 | 只奖励一次 |
 | `UT-WEB-001..003` | `internal/webapp` | 配置注入与转义、资源版本号、文件变化后版本变化 | 不残留占位符，不可注入 script |
@@ -202,11 +211,13 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-AUTH-*` | `e2e/tests/auth.spec.js` | 表单与 label；注册跳转；字段级校验；有效登录；错误密码显示中文提示（旧版为 `HTTP 401`）；验证码错误落在验证码字段；账户菜单 Esc 还原焦点；登出；`?next=` 回跳 | 通过 |
 | `E2E-ORDER-001..006` | `e2e/tests/orders.spec.js` | 档位与赠送；赠送到账；页内确认支付；余额不足 → 充值 → 回到订单支付；「我的」中继续支付待支付订单；访客下单引导登录；10 用户顺序注册；出现原生 `confirm/alert` 即失败 | 通过 |
 | `E2E-I18N-001..002` | `e2e/tests/i18n.spec.js` | 切换英文后界面与旅程内容均为英文并记住；英文浏览器默认英文，英文搜索命中 | 通过 |
-| `E2E-A11Y-*` | `e2e/tests/a11y.spec.js` | 深浅两套主题 × 15 个页面/状态（含三种详情场景）（含类型牌、小旅对话三种状态、你的空间与空状态） axe WCAG 2.1 A/AA 零违规；运行时切换主题后再次扫描对比度并保持焦点；主题切换持久化；跳到正文 | 通过 |
+| `E2E-A11Y-*` | `e2e/tests/a11y.spec.js` | 深浅两套主题 × 15 个页面/状态（含三种详情场景）（含类型牌、小旅对话三种状态、你的空间与空状态） axe WCAG 2.1 A/AA 零违规；运行时切换主题后再次扫描对比度并保持焦点；主题切换持久化；跳到正文；另含 `#/compose` 与 `E2E-A11Y-COMPOSE-001`（拼票后两套主题再扫描） | 通过 |
 | `E2E-PERSONA-001..002`、`E2E-PET-001..004` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；从向导窗口进入小旅的六步对话并保存到账户；向导推荐与 Esc 关闭还原焦点；模型回复显示文字与真实旅程链接；没有模型回复或被限流（429）时用本地规则回答且不残留输入中提示 | 通过 |
-| `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
+| `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面（含 `#/compose`）无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
+| `E2E-COMPOSE-001..007` | `e2e/tests/compose.spec.js` | 鼠标：点选与拖进灯框、空行虚线、点票面取回、换一张、收起后盖章、「再画一张」与「打开」、两步撕掉（无原生弹窗）、`compose_start` / `compose_complete` 埋点；纯键盘：每组一个 Tab 停靠、方向键/Home 在组内移动、回车与空格放入、退格取回并播报、Tab 到「收起」；访客收起 → 刷新仍在 → 注册后回放进账户、本地清空；分享：收起并复制链接、退出登录后票随账户离开、访客打开只读、未知 code 显示找不到；动效：放入时纸笺飞到票面那一行、墨迹在落下后才显现，减少动态时没有飞行、墨迹、进度条与印章动画；中英文模板各自成句、切换语言保留作品；探索页入口卡与「随机给我一张」 | 通过 |
+| `E2E-COMPOSE-008` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机上票在纸笺上方、每组纸笺横向滚动而页面不横向滚动、票滚出视野时底部条显示进度并能回到票上 | 通过 |
 
-运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 99 个用例）。
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 111 个用例）。
 
 ### 4.4 Go Stress 矩阵
 

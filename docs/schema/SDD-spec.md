@@ -66,6 +66,8 @@
 | `FR-SDD-017` | 档位充值必须实际入账赠送，并在流水中单独记录。 | Must | `GET /api/payments/tiers`、`IT-API-PAY-001..003` |
 | `FR-SDD-018` | 每日登录奖励同一 UTC 日只发放一次。 | Should | `IT-API-AUTH-POINTS-001` |
 | `FR-SDD-019` | `index.html` 中的 CSS/JS 链接必须带资源版本号，避免 immutable 缓存导致新旧资源混用。 | Must | `internal/webapp`、`UT-WEB-001..003` |
+| `FR-SDD-020` | 访客必须能用纸笺拼出自己的票（地方、时辰、季节、停留多久、小仪式、带走什么），空行可留、以后再补；票面句子按语言模板在前端确定性生成。 | Should | `internal/compose`、`#/compose`、`UT-COMPOSE-001..004`、`E2E-COMPOSE-*` |
+| `FR-SDD-021` | 收起的票必须以客户端生成的 id 幂等保存，访客的票在登录后回放进账户而不重复；分享码不可猜，分享页只读且不暴露主人。 | Must | `compositions`、`IT-API-COMPOSE-001..005` |
 
 ### 3.2 非功能需求
 
@@ -90,7 +92,7 @@
 当前核心表：
 
 - 内容域：`journeys`、`journey_translations`、`tags`、`journey_tags`、`mbti_types`、`journey_mbti`
-- 用户域：`users`、`user_points_history`、`user_saved_journeys`
+- 用户域：`users`、`user_points_history`、`user_saved_journeys`、`compositions`
 - 交易域：`orders`、`order_items`、`transactions`
 - 观测域：`analytics_events`、`audit_logs`
 
@@ -102,6 +104,7 @@
 - `journeys` 保存基础语言（中文）内容；`journey_translations` 按 `(journey_id, locale)` 覆盖其他语言，空字段回退到基础内容。英文译文在 `db/seed.sql` 中以 upsert 写入，已有数据库启动时也会同步。
 - 每段旅程一张封面（`image_path`），卡片与详情页共用；seed 中的幂等 `UPDATE` 让已有数据库同步新封面。
 - `user_saved_journeys` 由 `/api/auth/saved` 读写。
+- `compositions` 是 compose 小游戏收起的票：主键为客户端生成的 `id`（幂等键），`code` 为唯一分享码，六列各存一组纸笺的 key（空串表示空着）；纸笺本身在 `internal/compose/fragments.json`，不入库。
 
 ## 5. 接口契约
 
