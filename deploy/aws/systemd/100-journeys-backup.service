@@ -1,0 +1,9 @@
+[Unit]
+Description=100 Journeys SQLite online backup
+RequiresMountsFor=/var/lib/100-journeys
+
+[Service]
+Type=oneshot
+User=journeys
+Group=journeys
+ExecStart=/opt/100-journeys/current/deploy/aws/server/backup.sh

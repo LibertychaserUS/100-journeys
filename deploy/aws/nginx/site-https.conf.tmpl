@@ -1,0 +1,33 @@
+# 100 Journeys, HTTPS with HTTP -> HTTPS redirect.
+# Rendered by deploy/aws/server/render-nginx.sh to /etc/nginx/sites-available/100-journeys.
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name __SERVER_NAME__ _;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+    }
+
+    location / {
+        return 301 https://__SERVER_NAME__$request_uri;
+    }
+}
+
+server {
+    # Ubuntu 24.04 ships nginx 1.24, which still uses the listen-level http2 flag.
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    server_name __SERVER_NAME__;
+
+    ssl_certificate /etc/letsencrypt/live/__SERVER_NAME__/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/__SERVER_NAME__/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:journeys_ssl:10m;
+    ssl_session_timeout 1d;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    include /etc/nginx/snippets/100-journeys-locations.conf;
+}

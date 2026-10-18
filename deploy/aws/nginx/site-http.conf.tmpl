@@ -1,0 +1,14 @@
+# 100 Journeys, HTTP only. Used before a certificate exists.
+# Rendered by deploy/aws/server/render-nginx.sh to /etc/nginx/sites-available/100-journeys.
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name __SERVER_NAME__ _;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+    }
+
+    include /etc/nginx/snippets/100-journeys-locations.conf;
+}

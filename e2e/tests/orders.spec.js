@@ -40,7 +40,12 @@ test.describe('Order & Payment Flow', () => {
     const slug = await page.locator('.journey-card').first().getAttribute('data-slug');
     await page.goto(`/#/journey/${slug}`);
     await expect(page.locator('#detail-cta-buy')).toBeVisible();
-    await page.locator('#detail-cta-buy').click();
+    // Wait for the payment itself: the nav already shows a balance after recharge,
+    // so it cannot tell whether /pay has finished (matters on high-latency targets).
+    await Promise.all([
+      page.waitForResponse((r) => /\/api\/orders\/\d+\/pay$/.test(new URL(r.url()).pathname) && r.ok()),
+      page.locator('#detail-cta-buy').click(),
+    ]);
     await expect(page.locator('#nav-user')).toContainText('币');
 
     await page.evaluate(() => Router.navigate('#/profile'));
