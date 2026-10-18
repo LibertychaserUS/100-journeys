@@ -61,6 +61,16 @@ test.describe('Detail Page', () => {
     await context.close();
   });
 
+  // E2E-SEO-001: crawlers get a real robots.txt and a sitemap of every journey's share page
+  test('robots.txt and the sitemap list the journeys', async ({ page }) => {
+    const robots = await (await page.request.get('/robots.txt')).text();
+    expect(robots).toContain('User-agent: *');
+    expect(robots).toMatch(/Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/);
+    const res = await page.request.get('/sitemap.xml');
+    expect(res.headers()['content-type']).toContain('xml');
+    expect(await res.text()).toContain(`/j/${SLUG}</loc>`);
+  });
+
   // E2E-SHARE-001: a journey share link carries its preview tags and opens the journey
   test('share links preview the journey and open it', async ({ page }) => {
     const html = await (await page.request.get(`/j/${SLUG}`)).text();

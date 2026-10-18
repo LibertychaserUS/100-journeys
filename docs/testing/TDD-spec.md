@@ -196,6 +196,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-ADMIN-FUNNEL-001` | `e2e/tests/space.spec.js` | 后台漏斗面板六个步骤、访客数与比例 | 通过 |
 | `E2E-MOBILE-005` | `e2e/tests/mobile.spec.js` | 手机两次点击进入空间，无横向滚动，抽屉菜单有“我的空间” | 通过 |
 | `E2E-SCENES-001..002` | `e2e/tests/detail.spec.js` | 详情页按旅程自己的美术数据挂载标志动作、质感、节拍，向下滚动光线弧变化，场景里没有导游式标签；减少动态效果时所有场景立即可读 | 通过 |
+| `E2E-SEO-001` | `e2e/tests/detail.spec.js` | robots.txt 有效并指向 sitemap，sitemap 列出每段旅程的分享页 | 通过 |
 | `E2E-SHARE-001` | `e2e/tests/detail.spec.js` | /j/:slug 带该旅程的分享标签且只有一组，打开后进入旅程详情，页面标题为旅程名 | 通过 |
 | `E2E-DETAIL-001..008` | `e2e/tests/detail.spec.js` | 入口编号、开放时间、身份/章节/岔路/尾声/真实与虚构按 API 渲染，本地化徽章、匹配度 5/5、章节默认可见；岔路选择写入票面并在刷新后保留；返回；分享写入剪贴板；404；访客收藏提示登录；收藏持久化并出现在「我的」；未知路由 404 | 通过 |
 | `E2E-AUTH-*` | `e2e/tests/auth.spec.js` | 表单与 label；注册跳转；字段级校验；有效登录；错误密码显示中文提示（旧版为 `HTTP 401`）；验证码错误落在验证码字段；账户菜单 Esc 还原焦点；登出；`?next=` 回跳 | 通过 |
@@ -205,7 +206,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-PERSONA-001..002`、`E2E-PET-001..004` | `e2e/tests/persona.spec.js` | 个人页选择 MBTI 保存到账户；从向导窗口进入小旅的六步对话并保存到账户；向导推荐与 Esc 关闭还原焦点；模型回复显示文字与真实旅程链接；没有模型回复或被限流（429）时用本地规则回答且不残留输入中提示 | 通过 |
 | `E2E-MOBILE-001..004` | `e2e/tests/mobile.spec.js`（Pixel 7） | 手机菜单有登录/注册；主要页面无横向滚动；筛选面板为底部抽屉；底部预订条下单 | 通过 |
 
-运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 98 个用例）。
+运行：`cd e2e && npx playwright test`（`chromium` 桌面 1440×900 + `mobile` Pixel 7，共 99 个用例）。
 
 ### 4.4 Go Stress 矩阵
 

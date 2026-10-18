@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -235,6 +236,36 @@ func main() {
 			c.Data(http.StatusOK, ctype, body)
 		}
 	}
+	// Crawlers: a real robots.txt, and a sitemap of every journey's share page (the SPA's hash
+	// routes are invisible to them; /j/:slug carries each journey's title, hook and image).
+	originOf := func(c *gin.Context) string {
+		scheme := "http"
+		if c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		return scheme + "://" + c.Request.Host
+	}
+	r.GET("/robots.txt", func(c *gin.Context) {
+		c.Header("Cache-Control", "public, max-age=3600")
+		c.String(http.StatusOK, "User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: %s/sitemap.xml\n", originOf(c))
+	})
+	r.GET("/sitemap.xml", func(c *gin.Context) {
+		journeys, _, err := svc.ListJourneys(c.Request.Context(), model.JourneyFilter{Page: 1, Limit: 100})
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		origin := originOf(c)
+		var b strings.Builder
+		b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>` + "\n" + `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n")
+		b.WriteString("  <url><loc>" + origin + "/</loc></url>\n")
+		for _, j := range journeys {
+			b.WriteString("  <url><loc>" + origin + "/j/" + url.PathEscape(j.Slug) + "</loc><lastmod>" + j.UpdatedAt.UTC().Format("2006-01-02") + "</lastmod></url>\n")
+		}
+		b.WriteString("</urlset>\n")
+		c.Header("Cache-Control", "public, max-age=3600")
+		c.Data(http.StatusOK, "application/xml; charset=utf-8", []byte(b.String()))
+	})
 	r.GET("/bundle/app.css", serveBundle("css"))
 	r.GET("/bundle/app.js", serveBundle("js"))
 
