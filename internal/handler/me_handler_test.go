@@ -2,12 +2,14 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
 
+	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
@@ -26,6 +28,7 @@ func setupMeTestRouter(t *testing.T) (*gin.Engine, *service.CaptchaStore) {
 	t.Cleanup(func() { db.Close() })
 	require.NoError(t, repository.Migrate(db, filepath.Join(projectRoot, "db/schema.sql")))
 	require.NoError(t, repository.Seed(db, filepath.Join(projectRoot, "db/seed.sql")))
+	require.NoError(t, content.Sync(context.Background(), db))
 
 	userRepo := repository.NewUserRepository(db)
 	svc := service.NewJourneyService(repository.NewJourneyRepository(db), &service.LocalProvider{BaseURL: "/static/assets/images"})
@@ -105,7 +108,7 @@ func TestMe_SavedJourneys_Localized(t *testing.T) {
 	w, resp := doJSON(t, r, "GET", "/api/auth/saved?lang=en", token, nil)
 	require.Equal(t, http.StatusOK, w.Code)
 	item := resp["data"].([]interface{})[0].(map[string]interface{})
-	assert.Equal(t, "Walking the Mirror of Uyuni", item["title"])
+	assert.Equal(t, authored(t, "bolivia-salt-flat-trek").EN.Title, item["title"])
 }
 
 // IT-API-SAVED-003: unknown journeys and anonymous callers are rejected.

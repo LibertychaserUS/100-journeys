@@ -429,3 +429,85 @@ func (r *sqliteJourneyRepo) ApplyTranslations(ctx context.Context, journeys []mo
 	}
 	return rows.Err()
 }
+
+// LoadContent fills Entrance and Content for journeys that have authored content.
+// The requested locale wins; Chinese base content is the fallback.
+func (r *sqliteJourneyRepo) LoadContent(ctx context.Context, journeys []model.Journey, locale string, full bool) error {
+	if len(journeys) == 0 {
+		return nil
+	}
+	if locale == "" {
+		locale = "zh"
+	}
+	idMap := make(map[int64]int, len(journeys))
+	ids := make([]interface{}, 0, len(journeys))
+	placeholders := make([]string, 0, len(journeys))
+	for i, j := range journeys {
+		idMap[j.ID] = i
+		ids = append(ids, j.ID)
+		placeholders = append(placeholders, "?")
+	}
+	in := strings.Join(placeholders, ",")
+
+	rows, err := r.db.QueryContext(ctx, fmt.Sprintf(`
+		SELECT journey_id, no, realm, pace, scale, seasons, time_of_day, cover_license, cover_source
+		FROM journey_entrances WHERE journey_id IN (%s)`, in), ids...)
+	if err != nil {
+		return fmt.Errorf("load entrances: %w", err)
+	}
+	for rows.Next() {
+		var id int64
+		var e model.JourneyEntrance
+		var seasons string
+		if err := rows.Scan(&id, &e.No, &e.Realm, &e.Pace, &e.Scale, &seasons, &e.Time, &e.CoverLicense, &e.CoverSource); err != nil {
+			rows.Close()
+			return fmt.Errorf("scan entrance: %w", err)
+		}
+		_ = json.Unmarshal([]byte(seasons), &e.Seasons)
+		if !full {
+			e.CoverLicense, e.CoverSource = "", ""
+		}
+		if idx, ok := idMap[id]; ok {
+			entrance := e
+			journeys[idx].Entrance = &entrance
+		}
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	args := append([]interface{}{locale}, ids...)
+	crows, err := r.db.QueryContext(ctx, fmt.Sprintf(`
+		SELECT journey_id, locale, body FROM journey_content
+		WHERE (locale = ? OR locale = 'zh') AND journey_id IN (%s)`, in), args...)
+	if err != nil {
+		return fmt.Errorf("load content: %w", err)
+	}
+	defer crows.Close()
+	for crows.Next() {
+		var id int64
+		var loc, body string
+		if err := crows.Scan(&id, &loc, &body); err != nil {
+			return fmt.Errorf("scan content: %w", err)
+		}
+		idx, ok := idMap[id]
+		if !ok {
+			continue
+		}
+		// Keep the requested locale if we already have it; otherwise take what we got (zh fallback).
+		if existing := journeys[idx].Content; existing != nil && existing.Locale == locale {
+			continue
+		}
+		var c model.JourneyContent
+		if err := json.Unmarshal([]byte(body), &c); err != nil {
+			return fmt.Errorf("decode content for journey %d: %w", id, err)
+		}
+		c.Locale = loc
+		if !full {
+			c = model.JourneyContent{Opens: c.Opens, Role: c.Role, Locale: loc}
+		}
+		journeys[idx].Content = &c
+	}
+	return crows.Err()
+}

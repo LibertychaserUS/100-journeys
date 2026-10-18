@@ -20,3 +20,9 @@ type JourneyRepository interface {
 type JourneyTranslator interface {
 	ApplyTranslations(ctx context.Context, journeys []model.Journey, locale string) error
 }
+
+// JourneyContentLoader attaches authored entrance metadata and localized content.
+// full=false keeps only the summary (opens, role) for list views.
+type JourneyContentLoader interface {
+	LoadContent(ctx context.Context, journeys []model.Journey, locale string, full bool) error
+}

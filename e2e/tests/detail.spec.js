@@ -8,18 +8,43 @@ test.describe('Detail Page', () => {
     await freshPage(page);
   });
 
-  // E2E-DETAIL-001: hero, chapters and the booking ticket render with real data
+  // E2E-DETAIL-001: hero, the authored story and the booking ticket render with real data
   test('detail page renders journey content', async ({ page }) => {
+    const { data: j } = await (await page.request.get(`/api/journeys/${SLUG}`)).json();
+    const c = j.content;
     await page.goto(`/#/journey/${SLUG}`);
-    await expect(page.locator('.detail-hero__title')).toHaveText('徒步穿越玻利维亚盐沼');
+    await expect(page.locator('.detail-hero__title')).toHaveText(j.title);
+    await expect(page.locator('.detail-hero__no')).toContainText(`第 ${j.entrance.no} 号入口`);
     await expect(page.locator('.detail-hero__badge')).toHaveText('独处治愈'); // localized, not "solitude"
-    await expect(page.locator('.chapter')).toHaveCount(3);
-    await expect(page.locator('#clue-card .clue')).toHaveCount(4);
+    await expect(page.locator('.detail-hero__opens dd')).toHaveText(c.opens);
+    // prologue + chapters + fork + ending
+    await expect(page.locator('.chapter')).toHaveCount(c.chapters.length + 3);
+    await expect(page.locator('#ch-role')).toHaveText(c.role);
+    await expect(page.locator('.fork__option')).toHaveCount(c.choice.options.length);
+    await expect(page.locator('.prep .clue')).toHaveCount(3);
+    await expect(page.locator('.truth__facts li')).toHaveCount(c.facts.length);
+    await expect(page.locator('.truth__facts a').first()).toHaveAttribute('rel', /noopener/);
     await expect(page.locator('#detail-ticket')).toContainText('匹配 5/5'); // 1–5 score, not "5%"
     await expect(page.locator('#detail-cta-buy')).toBeVisible();
     await expect(page.locator('#detail-cta-save')).toBeVisible();
     // Story text is visible without scrolling into view (no reveal-to-black)
     await expect(page.locator('.chapter p').first()).toHaveCSS('opacity', '1');
+  });
+
+  // E2E-DETAIL-008: the fork shows what you leave with, marks the ticket and is remembered
+  test('choosing at the fork updates the ticket and persists', async ({ page }) => {
+    const { data: j } = await (await page.request.get(`/api/journeys/${SLUG}`)).json();
+    const option = j.content.choice.options[1];
+    await page.goto(`/#/journey/${SLUG}`);
+    await expect(page.locator('#ticket-keeps')).toHaveClass(/is-empty/);
+    const btn = page.locator(`.fork__option[data-key="${option.key}"]`);
+    await btn.click();
+    await expect(btn).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#fork-keeps')).toContainText(option.keeps);
+    await expect(page.locator('#ticket-keeps')).toHaveText(option.keeps);
+    await page.reload();
+    await expect(page.locator(`.fork__option[data-key="${option.key}"]`)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#ticket-keeps')).not.toHaveClass(/is-empty/);
   });
 
   // E2E-DETAIL-002: back returns to the previous page

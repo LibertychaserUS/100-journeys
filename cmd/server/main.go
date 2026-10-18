@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/100-journeys/app/internal/ai"
+	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/analytics"
 	"github.com/100-journeys/app/internal/eventbus"
 	"github.com/100-journeys/app/internal/handler"
@@ -64,6 +65,10 @@ func main() {
 	}
 	if err := repository.Seed(db, "db/seed.sql"); err != nil {
 		log.Fatalf("seed db: %v", err)
+	}
+	// Authored journeys (internal/content/entrances/*.json) override the seed rows they describe.
+	if err := content.Sync(context.Background(), db); err != nil {
+		log.Fatalf("sync content: %v", err)
 	}
 
 	// Event bus subscribers

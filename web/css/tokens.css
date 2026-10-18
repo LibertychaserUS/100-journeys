@@ -87,6 +87,7 @@
   --color-action:       #f2c46d;  /* lantern gold */
   --color-on-action:    #1d1405;  /* 11.2:1 on action */
   --color-action-hover: #f7d48c;
+  --color-action-soft:  rgba(242, 196, 109, .10);  /* selected option fill */
   --color-focus:        #f2c46d;
   --color-mood:         #f3aebd;  /* blossom, 7.7:1 on its tint */
   --color-mood-bg:      rgba(243, 174, 189, .12);
@@ -116,6 +117,7 @@
   --color-action:       #1a1c21;  /* lantern in daylight: ink button */
   --color-on-action:    #fbe1a6;  /* 13.3:1 */
   --color-action-hover: #2b2e35;
+  --color-action-soft:  rgba(26, 28, 33, .05);
   --color-focus:        #a86a12;  /* 4.0:1 against bg (non-text ≥ 3:1) */
   --color-mood:         #a3384f;
   --color-mood-bg:      rgba(163, 56, 79, .08);

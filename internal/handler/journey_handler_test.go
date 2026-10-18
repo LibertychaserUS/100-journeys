@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/100-journeys/app/internal/ai"
 	"github.com/100-journeys/app/internal/model"
+	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"
@@ -36,6 +38,9 @@ func setupTestRouter(t *testing.T) *gin.Engine {
 	}
 	if err := repository.Seed(db, filepath.Join(projectRoot, "db/seed.sql")); err != nil {
 		t.Fatalf("seed: %v", err)
+	}
+	if err := content.Sync(context.Background(), db); err != nil {
+		t.Fatalf("sync content: %v", err)
 	}
 
 	repo := repository.NewJourneyRepository(db)
@@ -389,7 +394,7 @@ func TestHandler_GetJourney_DefaultChinese(t *testing.T) {
 	r := setupTestRouter(t)
 	resp := getLocalizedJSON(t, r, "/api/journeys/bolivia-salt-flat-trek")
 	j := resp["data"].(map[string]interface{})
-	if j["title"] != "徒步穿越玻利维亚盐沼" {
+	if j["title"] != authored(t, "bolivia-salt-flat-trek").ZH.Title {
 		t.Errorf("expected Chinese title, got %v", j["title"])
 	}
 	if j["locale"] != "zh" {
@@ -402,10 +407,11 @@ func TestHandler_GetJourney_English(t *testing.T) {
 	r := setupTestRouter(t)
 	resp := getLocalizedJSON(t, r, "/api/journeys/bolivia-salt-flat-trek?lang=en-US")
 	j := resp["data"].(map[string]interface{})
-	if j["title"] != "Walking the Mirror of Uyuni" {
+	en := authored(t, "bolivia-salt-flat-trek").EN
+	if j["title"] != en.Title {
 		t.Errorf("unexpected English title: %v", j["title"])
 	}
-	if j["region"] != "South America · Bolivia" {
+	if j["region"] != en.Region {
 		t.Errorf("unexpected English region: %v", j["region"])
 	}
 	if story, _ := j["story"].(string); story == "" {
@@ -459,4 +465,74 @@ func TestHandler_GetJourney_MBTIOrderedByScore(t *testing.T) {
 		}
 		last = score
 	}
+}
+
+// IT-API-CONTENT-001: detail carries the authored entrance and full localized content;
+// the list only carries the summary lines.
+func TestHandler_AuthoredContent(t *testing.T) {
+	r := setupTestRouter(t)
+	e := authored(t, "bolivia-salt-flat-trek")
+
+	resp := getLocalizedJSON(t, r, "/api/journeys/bolivia-salt-flat-trek?lang=en")
+	j := resp["data"].(map[string]interface{})
+	entrance, ok := j["entrance"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("expected entrance on detail, got %v", j["entrance"])
+	}
+	if int(entrance["no"].(float64)) != e.Entrance.No || entrance["realm"] != e.Entrance.Realm {
+		t.Errorf("unexpected entrance: %v", entrance)
+	}
+	c, ok := j["content"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("expected content on detail, got %v", j["content"])
+	}
+	if c["locale"] != "en" || c["role"] != e.EN.Role {
+		t.Errorf("unexpected content locale/role: %v / %v", c["locale"], c["role"])
+	}
+	if chapters, _ := c["chapters"].([]interface{}); len(chapters) != len(e.EN.Chapters) {
+		t.Errorf("expected %d chapters, got %d", len(e.EN.Chapters), len(chapters))
+	}
+	if facts, _ := c["facts"].([]interface{}); len(facts) == 0 {
+		t.Error("expected sourced facts on detail")
+	}
+
+	all, err := content.Load()
+	if err != nil {
+		t.Fatalf("load content: %v", err)
+	}
+	opens := map[string]string{}
+	for _, a := range all {
+		opens[a.Slug] = a.ZH.Opens
+	}
+	resp = getLocalizedJSON(t, r, "/api/journeys?limit=50")
+	for _, it := range resp["data"].([]interface{}) {
+		item := it.(map[string]interface{})
+		want, isAuthored := opens[item["slug"].(string)]
+		if !isAuthored {
+			if item["content"] != nil {
+				t.Errorf("unauthored journey %v should not carry content", item["slug"])
+			}
+			continue
+		}
+		c := item["content"].(map[string]interface{})
+		if c["opens"] != want || c["chapters"] != nil {
+			t.Errorf("list should only carry the zh summary for %v, got %v", item["slug"], c)
+		}
+	}
+}
+
+// authored returns the authored entrance for slug, so assertions follow the content files.
+func authored(t *testing.T, slug string) content.Entrance {
+	t.Helper()
+	all, err := content.Load()
+	if err != nil {
+		t.Fatalf("load content: %v", err)
+	}
+	for _, e := range all {
+		if e.Slug == slug {
+			return e
+		}
+	}
+	t.Fatalf("no authored entrance %q", slug)
+	return content.Entrance{}
 }
