@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
-const { freshPage } = require('./helpers');
+const { freshPage, registerAndLogin } = require('./helpers');
 
 // Pages scanned in both themes. Hero imagery is excluded only from contrast checks over photos.
 const PAGES = [
@@ -32,6 +32,18 @@ for (const theme of ['dark', 'light']) {
     }
   });
 }
+
+// E2E-A11Y-AUTH-001: signed-in chrome (wallet, account menu) and the profile page
+test('signed-in profile has no WCAG A/AA violations', async ({ page }) => {
+  await freshPage(page);
+  await registerAndLogin(page, { prefix: 'axe' });
+  await page.goto('/#/profile');
+  await expect(page.locator('.profile-name')).not.toHaveText('加载中…');
+  await page.waitForLoadState('networkidle');
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  const summary = results.violations.map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`);
+  expect(summary, summary.join('\n')).toEqual([]);
+});
 
 test.describe('Theme', () => {
   test('theme toggle switches and persists', async ({ page }) => {

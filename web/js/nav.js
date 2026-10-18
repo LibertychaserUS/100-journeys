@@ -62,13 +62,13 @@ const Nav = (() => {
           ${user && user.role === 'admin' ? link('#/admin', 'nav.admin', 'admin', 'id="nav-admin"') : ''}
         </nav>
         <div class="nav__actions">
-          <button class="icon-btn nav__lang hide-sm" id="nav-lang" type="button" aria-label="${esc(t('nav.langSwitch'))}" lang="${I18n.lang === 'zh' ? 'en' : 'zh-CN'}">${esc(t('nav.langShort'))}</button>
+          <button class="icon-btn nav__lang hide-sm" id="nav-lang" type="button" aria-label="${esc(`${t('nav.langShort')} · ${t('nav.langSwitch')}`)}" lang="${I18n.lang === 'zh' ? 'en' : 'zh-CN'}">${esc(t('nav.langShort'))}</button>
           <button class="icon-btn hide-sm" id="nav-theme" type="button" aria-label="${esc(t(dark ? 'nav.themeToLight' : 'nav.themeToDark'))}">${UI.icon(dark ? 'sun' : 'moon')}</button>
           ${authed ? `
             <a class="nav__wallet" id="nav-wallet" href="#/recharge" aria-label="${esc(t('nav.wallet', { n: balance }))}">
               <img src="${API.mediaUrl('generated/guide-light-128.png')}" alt="" width="24" height="24"><b class="num">${balance}</b><span class="nav__wallet-unit"> ${esc(t('common.coins'))}</span>
             </a>
-            <button class="nav__user hide-sm" id="nav-user" type="button" aria-haspopup="menu" aria-expanded="${menuOpen}" aria-controls="nav-menu-list" aria-label="${esc(t('nav.account'))}">
+            <button class="nav__user hide-sm" id="nav-user" type="button" aria-haspopup="menu" aria-expanded="${menuOpen}" aria-controls="nav-menu-list" aria-label="${name ? `${name} · ` : ''}${esc(t('nav.account'))}">
               <img src="${avatar}" alt="" width="30" height="30"><span>${name}</span>
             </button>` : `
             <a class="btn btn--ghost btn--sm" id="nav-login" href="#/login">${esc(t('nav.login'))}</a>
