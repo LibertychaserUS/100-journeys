@@ -609,24 +609,51 @@ func (h *RoadHandler) Rack(c *gin.Context) {
 	lang := service.NormalizeLocale(c.Query("lang"))
 	day := h.now().UTC().Format("2006-01-02")
 	key := "rack|" + slug + "|" + hour + "|" + lang + "|" + day
-	if body, ok := h.cache.get(key); ok {
-		c.Data(http.StatusOK, "application/json; charset=utf-8", body)
-		return
+	body, ok := h.cache.get(key)
+	if !ok {
+		gen := h.cache.generation()
+		rows, err := h.repo.RackCandidates(c.Request.Context(), slug, 200)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load rack"))
+			return
+		}
+		picked := h.rotate(rows, slug+"|"+day+"|"+hour, hour, 6)
+		items := make([]TicketView, len(picked))
+		for i, p := range picked {
+			items[i] = h.view(p, lang)
+			items[i].OpenNow = hour != "" && p.Picks.Hour == hour
+		}
+		body, _ = json.Marshal(newDataEnvelope(items))
+		h.cache.put(key, body, gen, 10*time.Minute)
 	}
-	gen := h.cache.generation()
-	rows, err := h.repo.RackCandidates(c.Request.Context(), slug, 200)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load rack"))
-		return
+	// Signed in, your own tickets for this door hang first (the line stays at six).
+	if uid := viewer(c); uid > 0 {
+		own, err := h.repo.OwnRack(c.Request.Context(), uid, slug, 2)
+		if err == nil && len(own) > 0 {
+			var env struct {
+				Data []TicketView `json:"data"`
+			}
+			if json.Unmarshal(body, &env) == nil {
+				items := make([]TicketView, 0, 6)
+				seen := map[string]bool{}
+				for _, p := range own {
+					v := h.view(p, lang)
+					v.Mine, v.OpenNow = true, hour != "" && p.Picks.Hour == hour
+					items = append(items, v)
+					seen[p.Code] = true
+				}
+				for _, v := range env.Data {
+					if len(items) >= 6 {
+						break
+					}
+					if !seen[v.Code] && v.AID != own[0].AuthorHash {
+						items = append(items, v)
+					}
+				}
+				body, _ = json.Marshal(newDataEnvelope(items))
+			}
+		}
 	}
-	picked := h.rotate(rows, slug+"|"+day+"|"+hour, hour, 6)
-	items := make([]TicketView, len(picked))
-	for i, p := range picked {
-		items[i] = h.view(p, lang)
-		items[i].OpenNow = hour != "" && p.Picks.Hour == hour
-	}
-	body, _ := json.Marshal(newDataEnvelope(items))
-	h.cache.put(key, body, gen, 10*time.Minute)
 	c.Data(http.StatusOK, "application/json; charset=utf-8", body)
 }
 
@@ -1101,7 +1128,7 @@ func RoadRoutes(api *gin.RouterGroup, h *RoadHandler) {
 	pub.Use(middleware.OptionalJWT())
 	pub.GET("/station", h.Station)
 	pub.GET("/station/tickets/:code", h.Ticket)
-	api.GET("/entrances/:slug/rack", h.Rack)
+	pub.GET("/entrances/:slug/rack", h.Rack)
 	api.GET("/space/:type/drifted", h.Drifted)
 	api.GET("/lamps/:kind/:id", h.Light)
 

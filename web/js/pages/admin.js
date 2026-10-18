@@ -43,6 +43,11 @@ Pages.Admin = {
             ${metric('admin.m.audit', 'admin-stat-audit-errors')}
             ${metric('admin.m.events', 'admin-stat-events')}
           </div>
+          <section class="admin-panel admin-panel--road" aria-labelledby="admin-road-title">
+            <h2 id="admin-road-title">${esc(t('admin.road.title'))}</h2>
+            <p class="admin-road__lead">${esc(t('admin.road.lead'))}</p>
+            <div id="admin-road">${esc(t('common.loading'))}</div>
+          </section>
           <div class="admin-panels">
             ${panel('admin.p.funnel', 'admin-funnel', 'admin-panel--funnel')}
             ${panel('admin.p.clicked', 'admin-top-clicked')}
@@ -55,6 +60,7 @@ Pages.Admin = {
         </div>
       </div>`;
     document.getElementById('admin-export-csv').addEventListener('click', () => this._exportCSV());
+    Staff.mount(document.getElementById('admin-road'));
     await this._load();
     if (seq !== this._seq) return;
     this._timer = setInterval(() => { if (!document.hidden) this._load(); }, 5000);

@@ -36,6 +36,7 @@ Pages.Detail = {
         UI.setMeta({ title: res.data.title, description: res.data.story_hook });
         this._renderPage(res.data);
         if (res.data.content) {
+          RoadEnd.mount(res.data);
           Guest.markOpened(res.data.slug);
           if (API.isLoggedIn()) this._syncChoice(res.data, seq);
         }
@@ -55,6 +56,7 @@ Pages.Detail = {
 
   destroy() {
     this._seq++;
+    RoadEnd.destroy();
     if (this._onSession) window.removeEventListener('session:updated', this._onSession);
     this._onSession = null;
     Scenes.destroy();
@@ -370,6 +372,8 @@ Pages.Detail = {
             </div>
           </aside>
         </div>
+
+        ${c ? '<div class="road-end container" id="road-end"></div>' : ''}
 
         <div class="bookbar" id="detail-bookbar">
           <div class="bookbar__price"><b class="num">${esc(UI.coins(j.price))}</b><span class="num" data-balance>${user ? esc(t('detail.balance', { n: I18n.num(user.balance) })) : ''}</span></div>

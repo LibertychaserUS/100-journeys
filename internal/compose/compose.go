@@ -64,8 +64,9 @@ type Localized struct {
 	Slug     string `json:"slug,omitempty"`
 	ImageURL string `json:"image_url,omitempty"`
 	Unlock   string `json:"unlock,omitempty"`
-	No       int    `json:"no,omitempty"`   // the door it belongs to (place, keepsake)
-	Door     *Door  `json:"door,omitempty"` // where to rub it, for the tray's outlines
+	No       int    `json:"no,omitempty"`    // the door it belongs to (place, keepsake)
+	Doors    []int  `json:"doors,omitempty"` // every door that hands it out
+	Door     *Door  `json:"door,omitempty"`  // the first of them, for the tray's outlines
 }
 
 // Load reads the embedded slips in file order.
@@ -145,7 +146,7 @@ func (f Fragment) Localize(lang string) Localized {
 	if phrase == "" {
 		phrase = t.Text
 	}
-	l := Localized{Group: f.Group, Key: f.Key, Text: t.Text, Sub: t.Sub, Phrase: phrase, Realm: f.Realm, Slug: f.Slug, Unlock: f.Unlock, No: f.EntranceNo}
+	l := Localized{Group: f.Group, Key: f.Key, Text: t.Text, Sub: t.Sub, Phrase: phrase, Realm: f.Realm, Slug: f.Slug, Unlock: f.Unlock, No: f.EntranceNo, Doors: f.Doors}
 	if f.door != nil {
 		l.Door = f.door.localize(lang)
 	}

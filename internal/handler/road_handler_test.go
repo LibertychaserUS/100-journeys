@@ -189,6 +189,12 @@ func TestRoad_RubPostAndFind(t *testing.T) {
 	code, resp = g.do(t, "GET", "/api/entrances/bolivia-salt-flat-trek/rack", "", nil)
 	require.Equal(t, http.StatusOK, code)
 	assert.Len(t, resp["data"], 1)
+	// Its author always finds both of their tickets on the line, marked as theirs.
+	code, resp = g.do(t, "GET", "/api/entrances/norway-aurora-hunt/rack?hour=predawn", author, nil)
+	require.Equal(t, http.StatusOK, code)
+	mineOnRack := resp["data"].([]interface{})
+	require.Len(t, mineOnRack, 2)
+	assert.Equal(t, true, mineOnRack[0].(map[string]interface{})["mine"])
 
 	code, resp = g.do(t, "GET", "/api/space/INFP/drifted", "", nil)
 	require.Equal(t, http.StatusOK, code)

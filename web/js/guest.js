@@ -10,7 +10,9 @@
  *     opened: [slug],                 // entrances they have opened
  *     dialog: { step, answers },      // the guide's conversation, so it can be resumed
  *     invite: '' | 'dismissed',       // the home invitation
- *     composed: [ ...tickets ] }      // journeys pieced together in the compose game
+ *     composed: [ ...tickets ],       // journeys pieced together in the compose game
+ *     rubbings: { [slipId]: slug },   // slips rubbed at the end of a door (the Ticket Road)
+ *     lamps: { ['kind:id']: lamp } }  // lamps lit before signing in, or before arriving
  *
  * Signed in, the account is the source of truth for the type and fork picks: the first time a
  * session becomes signed in, pending guest picks are merged into it once (POST /auth/guest/merge).
@@ -24,7 +26,7 @@ var Guest = (() => {
       return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
     } catch { return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`; }
   };
-  const empty = () => ({ v: 1, vid: randomId(), mbti: '', mbti_source: '', choices: {}, opened: [], dialog: null, invite: '', composed: [] });
+  const empty = () => ({ v: 1, vid: randomId(), mbti: '', mbti_source: '', choices: {}, opened: [], dialog: null, invite: '', composed: [], rubbings: {}, lamps: {} });
   let memory = null;
   let account = null; // signed-in fork picks, loaded on demand
   let merging = null;
@@ -35,7 +37,7 @@ var Guest = (() => {
     try {
       const raw = JSON.parse(localStorage.getItem(KEY) || 'null');
       if (raw && raw.v === 1) {
-        state = { ...state, ...raw, choices: { ...(raw.choices || {}) }, opened: [...(raw.opened || [])], composed: [...(raw.composed || [])] };
+        state = { ...state, ...raw, choices: { ...(raw.choices || {}) }, opened: [...(raw.opened || [])], composed: [...(raw.composed || [])], rubbings: { ...(raw.rubbings || {}) }, lamps: { ...(raw.lamps || {}) } };
         if (!state.vid) state.vid = randomId();
       }
     } catch {}

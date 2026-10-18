@@ -10,6 +10,7 @@ const PAGES = [
   ['detail (descent)', '/#/journey/iceland-lava-tunnel-cycling', '.detail-hero__title'],
   ['detail (aurora)', '/#/journey/norway-aurora-hunt', '.detail-hero__title'],
   ['compose', '/#/compose', '#compose-tray .slip'],
+  ['station', '/#/station', '.station__title'],
   ['login', '/#/login', '#login-form'],
   ['register', '/#/register', '#register-form'],
   ['about', '/#/about', '.about-head'],
@@ -56,7 +57,7 @@ for (const theme of ['dark', 'light']) {
     await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await registerAndLogin(page, { prefix: `axecompose${theme}`, next: '/compose' });
-    for (const id of ['place-back-alley', 'hour-blue-hour', 'ritual-postcard']) await page.locator(`#slip-${id}`).click();
+    for (const id of ['place-back-alley', 'season-midnight-sun', 'ritual-postcard']) await page.locator(`#slip-${id}`).click();
     await page.locator('#compose-share').click();
     await expect(page.locator('#compose-mine .kept')).toHaveCount(1);
     await expect(page.locator('#compose-ticket .cticket__stamp')).toBeVisible();

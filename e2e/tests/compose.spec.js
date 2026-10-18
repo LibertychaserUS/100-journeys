@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { freshPage, registerAndLogin, logout } = require('./helpers');
+const { freshPage, registerAndLogin, logout, walked, walkedAccount } = require('./helpers');
 
 const ZH_TITLE = '雨季的乌尤尼，天亮前一刻钟，你有一整天不必赶路。';
 
@@ -26,6 +26,7 @@ const line = (page, group) => page.locator(`#compose-ticket .cline[data-group="$
 test.describe('Compose: draw your own entrance', () => {
   test.beforeEach(async ({ page }) => {
     await freshPage(page);
+    await walked(page); // the slips these tests use are rubbed at doors 1, 2, 3, 6, 8, 20 and 44
   });
 
   // E2E-COMPOSE-001: mouse path — click and drag slips in, take one back, keep the ticket with a stamp
@@ -95,8 +96,8 @@ test.describe('Compose: draw your own entrance', () => {
     await page.keyboard.press('ArrowRight');
     await expect(slip(page, 'place', 'snaefellsnes-tube')).toBeFocused();
     await page.keyboard.press('ArrowLeft');
-    await page.keyboard.press('ArrowLeft'); // wraps to the last place
-    await expect(page.locator('#compose-tray [data-group="place"] .slip').last()).toBeFocused();
+    await page.keyboard.press('ArrowLeft'); // wraps to the end of the pile: the outline of a door not walked yet
+    await expect(page.locator('#compose-tray .slips[data-group="place"] :is(.slip, .slip-outline)').last()).toBeFocused();
     await page.keyboard.press('Home');
     await expect(slip(page, 'place', 'uyuni')).toBeFocused();
     await page.keyboard.press('Enter');
@@ -163,6 +164,7 @@ test.describe('Compose: draw your own entrance', () => {
   test('share link opens a read-only ticket', async ({ page, context, browser }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await registerAndLogin(page, { prefix: 'sharer', next: '/compose' });
+    await walkedAccount(page);
     await slip(page, 'place', 'back-alley').click();
     await slip(page, 'hour', 'midnight').click();
     await slip(page, 'keepsake', 'echo').click();

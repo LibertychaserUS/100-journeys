@@ -119,11 +119,14 @@ const Compose = (() => {
       const value = opts.editable
         ? `<button type="button" class="cline__take" data-take="${g}" aria-label="${esc(t('compose.ticket.takeBack', { text: f.text }))}">${esc(f.text)}</button>`
         : esc(f.text);
-      return `<div class="cline${g === opts.fresh ? ' is-new' : ''}" data-group="${g}" style="--k:${k}">${label}<dd>${value}</dd></div>`;
+      const no = opts.marks && opts.marks[g];
+      const mark = no ? `<span class="cline__mark" title="${esc(t('stub.postmark', { n: no }))}"><span aria-hidden="true">№${no}</span><span class="sr-only">${esc(t('stub.postmark', { n: no }))}</span></span>` : '';
+      return `<div class="cline${g === opts.fresh ? ' is-new' : ''}" data-group="${g}" style="--k:${k}">${label}<dd>${value}${mark}</dd></div>`;
     };
     return `
       <div class="cticket${opts.mini ? ' cticket--mini' : ''}${opts.stamped ? ' is-stamped' : ''}${opts.reveal ? ' is-revealing' : ''}" ${realm ? `data-realm="${esc(realm)}"` : ''}>
         ${img}
+        ${opts.transfer ? `<span class="cticket__transfer">${esc(t('compose.transfer'))}</span>` : ''}
         ${opts.stamped ? `<div class="cticket__stamp${opts.stampNew ? ' is-new' : ''}" aria-hidden="true"><span>${esc(t('compose.stamp.a'))}</span><span>${esc(t('compose.stamp.b'))}</span><span class="num">${esc(stampDate(ticket.created_at))}</span></div>` : ''}
         <div class="cticket__body">
           <p class="cticket__label">${[opts.mini || opts.stamped ? '' : t('compose.ticket.label'), realmLabel, opts.stamped ? t('compose.ticket.kept', { date: I18n.date(ticket.created_at, false) }) : ''].filter(Boolean).map(esc).join(' · ')}</p>
@@ -146,9 +149,9 @@ const Compose = (() => {
   const dropGuest = (id) => Guest.update((s) => { s.composed = (s.composed || []).filter((x) => x.id !== id); });
   const saveGuest = (ticket) => Guest.update((s) => {
     const rest = (s.composed || []).filter((x) => x.id !== ticket.id);
-    s.composed = [...rest, { id: ticket.id, created_at: ticket.created_at, picks: { ...ticket.picks } }];
+    s.composed = [...rest, { id: ticket.id, created_at: ticket.created_at, picks: { ...ticket.picks }, parent_code: ticket.parent_code || '' }];
   });
-  const payload = (ticket) => ({ id: ticket.id, picks: ticket.picks, created_at: ticket.created_at });
+  const payload = (ticket) => ({ id: ticket.id, picks: ticket.picks, created_at: ticket.created_at, parent_code: ticket.parent_code || '' });
 
   /** Account tickets plus guest tickets not synced yet (local: true), newest first. */
   async function list() {
@@ -233,6 +236,10 @@ Pages.Compose = {
   _list: [],
   _state: null,
   _mine: [],
+  _all: [],
+  _held: {},
+  _doors: null,
+  _posted: {},
   _drag: null,
   _suppressClick: false,
   _cleanup: [],
@@ -252,12 +259,18 @@ Pages.Compose = {
           <div class="compose__grid"><div class="compose-tray">${[0, 1, 2].map(() => '<div class="line skeleton" style="height:52px;margin-bottom:18px"></div>').join('')}</div><div class="cticket-skeleton skeleton"></div></div>
         </div>
       </div>`;
-    Compose.fragments()
-      .then((list) => {
+    Promise.all([Compose.fragments(), Road.rubbed().catch(() => ({})), Road.posted().catch(() => ({}))])
+      .then(async ([list, held, posted]) => {
         if (seq !== this._seq) return;
-        this._list = list;
+        this._all = list;
         this._by = Compose.index(list);
+        this._doors = Road.doorIndex(list);
+        this._held = held;
+        this._posted = { ...posted };
         this._state = this._loadDraft();
+        const from = ctx.query && ctx.query.get('from');
+        if (from) await this._setOut(from, seq);
+        if (seq !== this._seq) return;
         this._renderGame(main);
         this._loadMine(seq);
       })
@@ -282,7 +295,7 @@ Pages.Compose = {
 
   // ---------- state ----------
   _fresh() {
-    return { id: Compose.newId(), picks: {}, order: [], created_at: '', code: '', kept: false, everKept: false, started: false, account: false };
+    return { id: Compose.newId(), picks: {}, order: [], created_at: '', code: '', kept: false, everKept: false, started: false, account: false, parent_code: '' };
   },
 
   _loadDraft() {
@@ -305,8 +318,63 @@ Pages.Compose = {
   _motion() { return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; },
 
   // ---------- page ----------
+  /** Slips you hold (rubbed, near or open), plus whatever is on the ticket already. */
+  _holds(f) { return Road.owns(f, this._held) || this._state.picks[f.group] === f.key; },
+
+  /** Outlines of the slips still behind other doors: one per door for places and keepsakes,
+   *  one per slip for hours and seasons (they open at several doors). */
+  _outlines(g) {
+    const locked = this._all.filter((f) => f.group === g && !this._holds(f));
+    const seen = new Set();
+    const out = [];
+    locked.forEach((f) => {
+      const no = f.no || (f.door && f.door.no);
+      if (!no) return;
+      const id = g === 'place' || g === 'keepsake' ? `door:${no}` : `slip:${f.key}`;
+      if (seen.has(id)) return;
+      seen.add(id);
+      out.push({ id, no, f });
+    });
+    return out.sort((a, b) => a.no - b.no);
+  },
+
+  _outlinesHTML(g) {
+    const esc = UI.esc;
+    const list = this._outlines(g);
+    if (!list.length) return '';
+    const shown = list.slice(0, 6);
+    return `${shown.map((o) => `<button type="button" class="slip-outline" data-outline="${esc(o.id)}" data-group="${g}" aria-expanded="false" tabindex="-1">№${o.no}<span class="sr-only"> · ${esc(t('compose.outline.aria', { n: o.no }))}</span></button>`).join('')}${list.length > shown.length ? `<span class="outlines__more">${esc(t('compose.outline.more', { n: list.length - shown.length }))}</span>` : ''}`;
+  },
+
+  _toggleOutline(btn) {
+    const esc = UI.esc;
+    const box = btn.closest('.tray-group');
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    box.querySelectorAll('.slip-outline').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+    box.querySelector('.outline-pop')?.remove();
+    if (open) return;
+    const o = this._outlines(btn.dataset.group).find((x) => x.id === btn.dataset.outline);
+    const d = o && (o.f.door || this._doors.byNo[o.no]);
+    if (!d) return;
+    btn.setAttribute('aria-expanded', 'true');
+    const pop = document.createElement('p');
+    pop.className = 'outline-pop';
+    pop.setAttribute('role', 'note');
+    pop.innerHTML = `<span>${esc(t('compose.outline.where', { n: d.no, realm: t(`entrance.realm.${d.realm}`), opens: d.opens }))}</span><a class="link" href="#/journey/${encodeURIComponent(d.slug)}">${esc(t('compose.outline.go'))}</a>`;
+    box.appendChild(pop);
+  },
+
+  _marks(picks = this._state.picks) { return Road.postmarks(picks, this._by, this._held, this._doors); },
+
+  /** Posted tickets are frozen: the station shows what was hung. */
+  _frozen() {
+    const s = this._state;
+    return !!(s.code && ['live', 'hidden'].includes(this._posted[s.code]));
+  },
+
   _renderGame(main) {
     const esc = UI.esc;
+    this._list = this._all.filter((f) => this._holds(f));
     const groups = Compose.GROUPS.map((g, gi) => {
       const slips = this._list.filter((f) => f.group === g);
       const tilt = (i) => [-2, 1.5, -1, 2, -1.5, 1][i % 6];
@@ -314,8 +382,9 @@ Pages.Compose = {
       return `
         <section class="tray-group" data-group="${g}" aria-labelledby="tray-${g}" style="--i:${gi}">
           <h2 id="tray-${g}">${esc(t(`compose.group.${g}`))} <span>${esc(t(`compose.group.${g}.sub`))}</span></h2>
-          <div class="slips" role="toolbar" aria-labelledby="tray-${g}"${help}>
-            ${slips.map((f, i) => `<button type="button" class="slip" style="--r:${tilt(i)}deg" id="slip-${g}-${esc(f.key)}" data-group="${g}" data-key="${esc(f.key)}" aria-pressed="false" tabindex="-1"><span class="slip__text">${esc(f.text)}</span>${f.sub ? `<small>${esc(f.sub)}</small>` : ''}</button>`).join('')}
+          <div class="slips" role="toolbar" data-group="${g}" aria-labelledby="tray-${g}"${help}>
+            ${slips.map((f, i) => `<button type="button" class="slip" style="--r:${tilt(i)}deg" id="slip-${g}-${esc(f.key)}" data-group="${g}" data-key="${esc(f.key)}" aria-pressed="false" tabindex="-1"><span class="slip__text">${esc(f.text)}</span>${f.sub ? `<small>${esc(f.sub)}</small>` : ''}${Road.owns(f, this._held) ? '' : `<span class="slip__borrowed">${esc(t('compose.borrowed'))}</span>`}</button>`).join('')}
+            ${this._outlinesHTML(g)}
           </div>
         </section>`;
     }).join('');
@@ -379,7 +448,7 @@ Pages.Compose = {
     const tray = main.querySelector('#compose-tray');
     tray.addEventListener('keydown', (e) => this._onTrayKey(e));
     tray.addEventListener('focusin', (e) => {
-      const slip = e.target.closest('.slip');
+      const slip = e.target.closest('.slip, .slip-outline');
       if (slip) this._rove(slip);
     });
     tray.addEventListener('pointerdown', (e) => this._onPointerDown(e));
@@ -388,8 +457,10 @@ Pages.Compose = {
     this._listen(document, 'touchmove', (e) => { if (this._drag && this._drag.active) e.preventDefault(); }, { passive: false });
     this._listen(window, 'session:updated', (e) => {
       if (!e.detail && this._state.account) this._new({ focus: false });
+      this._refreshHeld();
       this._loadMine(this._seq);
     });
+    this._listen(window, 'road:rubbed', () => this._refreshHeld());
     this._listen(window, 'compose:synced', (e) => {
       this._loadMine(this._seq);
       UI.toast(t('compose.toast.synced', { n: e.detail.moved }));
@@ -398,6 +469,8 @@ Pages.Compose = {
 
   _onClick(e) {
     if (this._suppressClick) { e.preventDefault(); return; }
+    const outline = e.target.closest('.slip-outline');
+    if (outline) { this._toggleOutline(outline); return; }
     const slip = e.target.closest('.slip');
     if (slip) { this._toggle(slip.dataset.group, slip.dataset.key); return; }
     const take = e.target.closest('[data-take]');
@@ -414,6 +487,9 @@ Pages.Compose = {
       case 'share-kept': this._shareKept(id, btn); break;
       case 'tear': this._tear(id, btn); break;
       case 'peek': this._peek(); break;
+      case 'post': this._post(btn.dataset.code || this._state.code); break;
+      case 'unpost': this._unpost(btn.dataset.code || this._state.code); break;
+      case 'ledger': Road.ledgerSheet(btn.dataset.code || this._state.code); break;
       default:
     }
   },
@@ -427,6 +503,7 @@ Pages.Compose = {
   _place(group, key, { announce = 'placed', from = null } = {}) {
     const f = this._by[group] && this._by[group][key];
     if (!f) return;
+    if (this._frozen()) { UI.toast(t('compose.postedHint')); return; }
     const s = this._state;
     const slip = document.getElementById(`slip-${group}-${key}`);
     const origin = from || (slip && { rect: slip.getBoundingClientRect(), tilt: parseFloat(slip.style.getPropertyValue('--r')) || 0 });
@@ -502,6 +579,7 @@ Pages.Compose = {
     const s = this._state;
     const key = s.picks[group];
     if (!key) return;
+    if (this._frozen()) { UI.toast(t('compose.postedHint')); return; }
     const f = this._by[group][key];
     const picks = { ...s.picks };
     delete picks[group];
@@ -558,7 +636,7 @@ Pages.Compose = {
     const ticket = this._mine.find((x) => x.id === id);
     if (!ticket) return;
     const picks = Compose.clean(ticket.picks, this._by);
-    this._state = { ...this._fresh(), id: ticket.id, picks, order: Compose.GROUPS.filter((g) => picks[g]), created_at: ticket.created_at, code: ticket.code || '', kept: true, everKept: true, started: true, account: !ticket.local };
+    this._state = { ...this._fresh(), id: ticket.id, picks, order: Compose.GROUPS.filter((g) => picks[g]), created_at: ticket.created_at, code: ticket.code || '', kept: true, everKept: true, started: true, account: !ticket.local, parent_code: ticket.parent_code || '' };
     this._saveDraft();
     this._syncTray();
     this._renderTicket();
@@ -576,7 +654,7 @@ Pages.Compose = {
     const btn = document.getElementById('compose-keep');
     if (btn) btn.setAttribute('aria-busy', 'true');
     try {
-      const saved = await Compose.keep({ id: s.id, picks: s.picks, created_at: s.created_at });
+      const saved = await Compose.keep({ id: s.id, picks: s.picks, created_at: s.created_at, parent_code: s.parent_code });
       if (saved.created_at) s.created_at = saved.created_at;
       s.id = saved.id || s.id;
       s.code = saved.code || '';
@@ -668,14 +746,14 @@ Pages.Compose = {
     const picks = this._state.picks;
     document.querySelectorAll('#compose-tray .slips').forEach((row) => {
       const slips = [...row.querySelectorAll('.slip')];
-      const group = slips[0] && slips[0].dataset.group;
-      let current = slips.find((b) => b.tabIndex === 0);
+      const group = row.dataset.group;
+      let current = [...row.querySelectorAll('.slip, .slip-outline')].find((b) => b.tabIndex === 0);
       // Touch only what changed: every slip carries a drop-shadow filter, so restyling all of them costs a frame.
       slips.forEach((b) => {
         const on = String(picks[group] === b.dataset.key);
         if (b.getAttribute('aria-pressed') !== on) b.setAttribute('aria-pressed', on);
       });
-      if (!current) current = slips.find((b) => b.dataset.key === picks[group]) || slips[0];
+      if (!current) current = slips.find((b) => b.dataset.key === picks[group]) || slips[0] || row.querySelector('.slip-outline');
       if (current) this._rove(current);
     });
     const n = this._count();
@@ -687,7 +765,7 @@ Pages.Compose = {
   },
 
   _rove(slip) {
-    slip.closest('.slips').querySelectorAll('.slip').forEach((b) => {
+    slip.closest('.slips').querySelectorAll('.slip, .slip-outline').forEach((b) => {
       const want = b === slip ? 0 : -1;
       if (b.tabIndex !== want) b.tabIndex = want;
     });
@@ -704,7 +782,8 @@ Pages.Compose = {
     const active = document.activeElement;
     const keepFocus = focus || (active && foot.contains(active) ? active.id : '');
 
-    box.innerHTML = Compose.ticketHTML(s, this._by, { editable: true, fresh, cleared, stamped: s.kept, stampNew, headingId: 'compose-ticket-title' });
+    const marks = this._marks();
+    box.innerHTML = Compose.ticketHTML(s, this._by, { editable: true, fresh, cleared, stamped: s.kept, stampNew, headingId: 'compose-ticket-title', marks, transfer: Road.transfer(marks) });
     let hint;
     if (s.kept) hint = t('compose.hint.kept');
     else if (s.everKept) hint = t('compose.hint.dirty');
@@ -720,7 +799,8 @@ Pages.Compose = {
         ${primary}
         <button class="icon-btn icon-btn--square" type="button" id="compose-share" data-action="share" aria-label="${esc(t('compose.share'))}" ${n ? '' : 'disabled'}>${UI.icon('share')}</button>
         <button class="icon-btn icon-btn--square" type="button" id="compose-shuffle" data-action="shuffle" aria-label="${esc(t('compose.shuffle'))}" title="${esc(t('compose.shuffle'))}">${UI.icon('refresh')}</button>
-      </div>`;
+      </div>
+      ${this._stationRow()}`;
     const peek = document.getElementById('compose-peek-btn');
     if (peek) {
       const title = n ? Compose.plainTitle(s, this._by) : t('compose.ticket.blank');
@@ -769,10 +849,13 @@ Pages.Compose = {
       </div>
       ${list.length ? `<ul class="compose-mine__list">${list.map((x, i) => `
         <li class="kept${x.local ? ' is-local' : ''}${x.id === freshId ? ' is-new' : ''}" data-id="${esc(x.id)}">
-          ${Compose.ticketHTML(x, this._by, { mini: true, stamped: true, headingId: `kept-${i}` })}
+          ${Compose.ticketHTML(x, this._by, { mini: true, stamped: true, headingId: `kept-${i}`, transfer: Road.transfer(this._marks(x.picks)) })}
           <div class="kept__actions">
             ${x.local ? `<span class="kept__tag">${esc(t('compose.mine.localTag'))}</span>` : ''}
+            ${x.code && this._posted[x.code] ? `<span class="kept__tag kept__tag--posted">${esc(t({ live: 'compose.posted', hidden: 'compose.hiddenTag', removed: 'compose.removedTag' }[this._posted[x.code]]))}</span>` : ''}
             <button class="btn btn--ghost btn--sm" type="button" data-action="open" data-id="${esc(x.id)}" aria-describedby="kept-${i}">${esc(t('compose.mine.open'))}</button>
+            ${x.code && !this._posted[x.code] ? `<button class="btn btn--quiet btn--sm" type="button" data-action="post" data-code="${esc(x.code)}" aria-describedby="kept-${i}">${esc(t('compose.post'))}</button>` : ''}
+            ${x.code && this._posted[x.code] === 'live' ? `<button class="btn btn--quiet btn--sm" type="button" data-action="ledger" data-code="${esc(x.code)}" aria-describedby="kept-${i}">${esc(t('compose.ledger'))}</button>` : ''}
             ${x.code ? `<button class="icon-btn" type="button" data-action="share-kept" data-id="${esc(x.id)}" aria-label="${esc(t('compose.share'))}" aria-describedby="kept-${i}">${UI.icon('share')}</button>` : ''}
             <button class="btn btn--quiet btn--sm kept__tear" type="button" data-action="tear" data-id="${esc(x.id)}" aria-describedby="kept-${i}">${esc(t('compose.mine.tear'))}</button>
           </div>
@@ -781,9 +864,9 @@ Pages.Compose = {
 
   // ---------- keyboard ----------
   _onTrayKey(e) {
-    const slip = e.target.closest('.slip');
+    const slip = e.target.closest('.slip, .slip-outline');
     if (!slip) return;
-    const slips = [...slip.closest('.slips').querySelectorAll('.slip')];
+    const slips = [...slip.closest('.slips').querySelectorAll('.slip, .slip-outline')];
     const i = slips.indexOf(slip);
     let next = null;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = slips[(i + 1) % slips.length];
@@ -962,5 +1045,113 @@ Pages.Compose = {
             <div class="state__actions"><a class="btn btn--primary" href="#/compose">${esc(t('compose.shared.cta'))}</a></div>
           </div></div></section>`;
       });
+  },
+
+  // ---------- the station ----------
+  /** Under the kept ticket: hang it at the station, or how it hangs there. */
+  _stationRow() {
+    const esc = UI.esc;
+    const s = this._state;
+    if (!s.kept || !s.account || !s.code) return '';
+    const status = this._posted[s.code];
+    if (status === 'live') {
+      return `<div class="compose__posted"><span class="tagline">${esc(t('compose.posted'))}</span><a class="link" href="#/station">${esc(t('nav.station'))}</a><button type="button" class="btn btn--quiet btn--sm" data-action="ledger">${esc(t('compose.ledger'))}</button><button type="button" class="btn btn--quiet btn--sm" data-action="unpost" id="compose-unpost">${esc(t('compose.unpost'))}</button></div>`;
+    }
+    if (status === 'hidden') return `<div class="compose__posted"><span class="tagline">${esc(t('compose.hiddenTag'))}</span><button type="button" class="btn btn--quiet btn--sm" data-action="unpost">${esc(t('compose.unpost'))}</button></div>`;
+    if (status === 'removed') return `<div class="compose__posted"><span class="tagline">${esc(t('compose.removedTag'))}</span></div>`;
+    return `<div class="compose__posted"><button type="button" class="btn btn--ghost btn--sm" data-action="post" id="compose-post">${esc(t('compose.post'))}</button></div>`;
+  },
+
+  async _refreshHeld() {
+    try { this._held = await Road.rubbed(); } catch { return; }
+    try { this._posted = { ...(await Road.posted(true)) }; } catch {}
+    if (!document.getElementById('compose-tray')) return;
+    const main = document.getElementById('main-content');
+    this._teardown();
+    this._renderGame(main);
+    this._loadMine(this._seq);
+  },
+
+  /** #/compose?from=<code>: set out with the slips of a station ticket. */
+  async _setOut(code, seq) {
+    try {
+      const res = await API.stationTicket(code);
+      if (seq !== this._seq) return;
+      const picks = Compose.clean(res.data.picks, this._by);
+      this._state = { ...this._fresh(), picks, order: Compose.GROUPS.filter((g) => picks[g]), parent_code: res.data.mine ? '' : code, started: true };
+      this._saveDraft();
+      API.track('ticket_depart', picks.place && this._by.place[picks.place] ? this._by.place[picks.place].slug : '', { code });
+      setTimeout(() => UI.toast(t('compose.toast.from')), 0);
+    } catch {}
+    Router.replaceQuery({});
+  },
+
+  async _post(code) {
+    const esc = UI.esc;
+    if (!code) return;
+    if (!API.isLoggedIn()) { Road.needSignIn('compose.post.signIn', '/compose'); return; }
+    const ticket = this._mine.find((x) => x.code === code) || (this._state.code === code ? this._state : null);
+    if (ticket && Object.keys(Compose.clean(ticket.picks, this._by)).length < 3) { UI.toast(t('compose.post.needSlips')); return; }
+    const user = Session.user || await Session.load(true);
+    let band = user && user.age_band;
+    if (!band) band = await Road.ageSheet();
+    if (!band) return;
+    if (band === 'under14') { UI.toast(t('compose.age.under14')); return; }
+    const voc = await Road.vocab();
+    const chosen = new Set();
+    const sheet = UI.sheet({
+      label: t('compose.post.title'),
+      wide: true,
+      render: () => `
+        <form class="road-sheet" id="post-form">
+          <h2>${esc(t('compose.post.title'))}</h2>
+          <p class="road-sheet__lead">${esc(t('compose.post.lead'))}</p>
+          <div class="tag-picker" role="group" aria-labelledby="post-tags-label" aria-describedby="post-tags-help">
+            <p class="tag-picker__kind" id="post-tags-label">${esc(t('compose.post.tags'))} · <span id="post-tags-help">${esc(t('compose.post.tagsHelp', { n: voc.max_tags }))}</span></p>
+            ${['world', 'mood', 'practice'].map((k) => `<div><p class="tag-picker__kind">${esc(t(`station.tagKind.${k}`))}</p><div class="tag-picker__row">${voc.tags.filter((x) => x.kind === k).map((x) => `<button type="button" class="ltag ltag--btn" data-tag="${esc(x.key)}" aria-pressed="false">${esc(x.label)}</button>`).join('')}</div></div>`).join('')}
+          </div>
+          <div class="road-sheet__actions"><button type="button" class="btn btn--ghost" data-close>${esc(t('common.cancel'))}</button><button type="submit" class="btn btn--primary" data-autofocus>${esc(t('compose.post.submit'))}</button></div>
+        </form>`,
+    });
+    sheet.el.querySelectorAll('.ltag--btn').forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.tag;
+      if (chosen.has(k)) chosen.delete(k);
+      else if (chosen.size < voc.max_tags) chosen.add(k);
+      sheet.el.querySelectorAll('.ltag--btn').forEach((x) => {
+        x.setAttribute('aria-pressed', String(chosen.has(x.dataset.tag)));
+        x.disabled = !chosen.has(x.dataset.tag) && chosen.size >= voc.max_tags;
+      });
+    }));
+    sheet.el.querySelector('#post-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submit = sheet.el.querySelector('button[type="submit"]');
+      submit.setAttribute('aria-busy', 'true');
+      try {
+        await API.postTicket(code, [...chosen]);
+        sheet.close();
+        Road.forgetPosted();
+        this._posted = { ...this._posted, [code]: 'live' };
+        API.track('ticket_publish', '', { tags: chosen.size });
+        UI.toast(t('compose.toast.posted'), { href: '#/station?sort=new', label: t('nav.station') });
+        this._renderTicket({ focus: 'compose-unpost' });
+        this._loadMine(this._seq);
+      } catch (err) {
+        submit.removeAttribute('aria-busy');
+        UI.toast(Road.error(err));
+      }
+    });
+  },
+
+  async _unpost(code) {
+    try {
+      await API.unpostTicket(code);
+      Road.forgetPosted();
+      const next = { ...this._posted };
+      delete next[code];
+      this._posted = next;
+      UI.toast(t('compose.toast.unposted'));
+      this._renderTicket({ focus: 'compose-post' });
+      this._loadMine(this._seq);
+    } catch (err) { UI.toast(Road.error(err)); }
   },
 };

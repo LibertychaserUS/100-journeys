@@ -159,12 +159,13 @@ erDiagram
         string event_type
         string 'arrive',
         string 'fork_choose',
+        string 'rub',
+        string 'ticket_depart',
         string journey_slug
         int user_id FK
         string mbti_type
         string gender
-        string metadata
-        datetime created_at
+        string additional_fields
     }
 
     AUDIT_LOGS {
@@ -199,5 +200,53 @@ erDiagram
         string ritual
         string keepsake
         datetime created_at
+        string additional_fields
+    }
+
+    RUBBINGS {
+        int user_id FK
+        string frag
+        string slug
+        datetime created_at
+        string )
+        string CREATE
+        string code PK
+        int user_id FK
+        string author_hash
+        string alias_slug
+        string additional_fields
+    }
+
+    TICKET_POST_ENTRANCES {
+        string slug
+        string code FK
+        string )
+        string CREATE
+        string code FK
+        string tag
+        int pos
+        string )
+        string CREATE
+    }
+
+    TICKET_BORROWS {
+        string code
+        int user_id FK
+        datetime created_at
+        string )
+        string CREATE
+    }
+
+    ARRIVALS {
+        int user_id FK
+        string work_kind
+        string work_id
+        datetime first_view_at
+        datetime arrived_at
+        string )
+        string CREATE
+        int id PK
+        string work_kind
+        string work_id
         string additional_fields
     }

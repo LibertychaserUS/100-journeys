@@ -29,6 +29,7 @@ const API = (() => {
       const e = new Error((body && (body.error || body.message)) || `HTTP ${res.status}`);
       e.status = res.status;
       e.apiError = body && body.error;
+      e.body = body;
       if (res.status === 401 && storedToken() && path.startsWith('/auth/')) {
         // Expired or revoked token: drop it so the UI shows the signed-out state.
         clearToken();
@@ -132,6 +133,30 @@ const API = (() => {
     keepComposition: (ticket) => post('/auth/compositions', ticket),
     deleteComposition: (id) => authed(`/auth/compositions/${encodeURIComponent(id)}`, { method: 'DELETE' }),
     getComposition: (code) => request(`/compositions/${encodeURIComponent(code)}`),
+
+    // The Ticket Road. Public reads send the token when there is one, so blocked authors stay out.
+    roadVocab: () => request(`/road/vocab${qs(withLang())}`),
+    station: (params = {}) => authed(`/station${qs(withLang(params))}`),
+    stationTicket: (code) => authed(`/station/tickets/${encodeURIComponent(code)}${qs(withLang())}`),
+    rack: (slug, hour) => authed(`/entrances/${encodeURIComponent(slug)}/rack${qs(withLang({ hour }))}`),
+    drifted: (type) => request(`/space/${encodeURIComponent(type)}/drifted${qs(withLang())}`),
+    light: (kind, id) => request(`/lamps/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`),
+    myLamp: (kind, id) => authed(`/auth/lamps/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`),
+    lightLamp: (lamp) => post('/auth/lamps', lamp),
+    ledger: (kind, id) => authed(`/auth/ledger/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`),
+    rubbings: () => authed('/auth/rubbings'),
+    rub: (slug, option) => post('/auth/rubbings', { slug, option }),
+    mergeRubbings: (rubbings) => post('/auth/rubbings/merge', { rubbings }),
+    arrive: (kind, id, step) => post('/auth/arrivals', { kind, id, step }),
+    setAgeBand: (band) => authed('/auth/age-band', { method: 'PUT', body: JSON.stringify({ age_band: band }) }),
+    myPosts: () => authed('/auth/tickets/posted'),
+    postTicket: (code, tags) => authed(`/auth/tickets/${encodeURIComponent(code)}/post${qs(withLang())}`, { method: 'POST', body: JSON.stringify({ tags }) }),
+    unpostTicket: (code) => authed(`/auth/tickets/${encodeURIComponent(code)}/post`, { method: 'DELETE' }),
+    report: (kind, id, reason) => post('/auth/reports', { kind, id, reason }),
+    blocks: () => authed('/auth/blocks'),
+    block: (aid, on = true) => authed(`/auth/blocks/${encodeURIComponent(aid)}`, { method: on ? 'PUT' : 'DELETE' }),
+    roadQueue: () => authed(`/admin/road/queue${qs(withLang())}`),
+    roadReview: (code, action) => post(`/admin/road/posts/${encodeURIComponent(code)}`, { action }),
 
     // Orders
     createOrder: (items) => post('/orders', { items }),

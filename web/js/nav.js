@@ -29,6 +29,7 @@ const Nav = (() => {
     const path = (window.location.hash.replace(/^#/, '').split('?')[0]) || '/';
     if (path.startsWith('/explore') || path.startsWith('/journey')) return 'explore';
     if (path.startsWith('/space') || path.startsWith('/find') || path.startsWith('/guide')) return 'space';
+    if (path.startsWith('/station')) return 'station';
     if (path.startsWith('/profile') || path.startsWith('/recharge')) return 'me';
     if (path.startsWith('/admin')) return 'admin';
     if (path.startsWith('/about')) return 'about';
@@ -58,6 +59,7 @@ const Nav = (() => {
         </a>
         <nav class="nav__links" aria-label="${esc(t('nav.main'))}">
           ${link('#/explore', 'nav.explore', 'explore')}
+          ${link('#/station', 'nav.station', 'station', 'id="nav-station"')}
           ${link('#/space', 'nav.space', 'space', 'id="nav-space"')}
           ${link('#/about', 'nav.about', 'about')}
           ${user && user.role === 'admin' ? link('#/admin', 'nav.admin', 'admin', 'id="nav-admin"') : ''}
@@ -90,6 +92,7 @@ const Nav = (() => {
           <div class="container">
             <nav class="drawer__links" aria-label="${esc(t('nav.main'))}">
               ${link('#/explore', 'nav.explore', 'explore')}
+              ${link('#/station', 'nav.station', 'station')}
               ${link('#/space', 'nav.space', 'space')}
               ${authed ? link('#/profile', 'nav.me', 'me') : ''}
               ${link('#/about', 'nav.about', 'about')}

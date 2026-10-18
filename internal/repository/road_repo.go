@@ -619,6 +619,22 @@ func (r *RoadRepository) RackCandidates(ctx context.Context, slug string, limit 
 	return list, r.attachTags(ctx, list)
 }
 
+// OwnRack is the traveller's own live tickets that borrowed from door slug: an author always
+// finds their ticket on the line, however full it is.
+func (r *RoadRepository) OwnRack(ctx context.Context, uid int64, slug string, limit int) ([]PostRow, error) {
+	rows, err := r.db.QueryContext(ctx, `SELECT `+postColumns+postFrom+`
+		JOIN ticket_post_entrances e ON e.code = p.code
+		WHERE e.slug = ? AND p.user_id = ? AND p.status = 'live' ORDER BY p.posted_at DESC LIMIT ?`, slug, uid, limit)
+	if err != nil {
+		return nil, err
+	}
+	list, err := scanPosts(rows)
+	if err != nil {
+		return nil, err
+	}
+	return list, r.attachTags(ctx, list)
+}
+
 // DriftCandidates are live tickets that borrowed from doors written for type code (content
 // affinity of 4 or more). The authors' own types are never read.
 func (r *RoadRepository) DriftCandidates(ctx context.Context, code string, limit int) ([]PostRow, error) {
