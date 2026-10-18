@@ -7,6 +7,8 @@ const PAGES = [
   ['home', '/#/', '.home-hero__title'],
   ['explore', '/#/explore', '.journey-card[data-slug]'],
   ['detail', '/#/journey/bolivia-salt-flat-trek', '.detail-hero__title'],
+  ['detail (descent)', '/#/journey/iceland-lava-tunnel-cycling', '.detail-hero__title'],
+  ['detail (aurora)', '/#/journey/norway-aurora-hunt', '.detail-hero__title'],
   ['login', '/#/login', '#login-form'],
   ['register', '/#/register', '#register-form'],
   ['about', '/#/about', '.about-head'],
@@ -29,6 +31,11 @@ for (const theme of ['dark', 'light']) {
         await page.goto(url);
         await expect(page.locator(ready).first()).toBeVisible();
         await page.waitForLoadState('networkidle');
+        // Scroll scenes reveal on entry; scan them as a reader who has scrolled through sees them.
+        if (await page.locator('.scenes').count()) {
+          await page.evaluate(() => document.querySelectorAll('.scene').forEach((s) => s.classList.add('is-in')));
+          await page.waitForTimeout(1400);
+        }
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
           .exclude('.home-hero__particles')

@@ -19,7 +19,7 @@ test.describe('Find your type → your space', () => {
 
     await expect(page).toHaveURL(/#\/space$/);
     await expect(page.locator('.space__head h1')).toContainText('INFP');
-    await expect(page.locator('.space__reveal')).toBeVisible();
+    await expect(page.locator('#space-form svg[data-lumi="INFP"]')).toBeVisible();
     await expect(page.locator('#space-picks .journey-card').first()).toBeVisible();
     await expect(page.locator('#space-first')).toBeVisible();
     await expect(page.locator('#nav-space')).toHaveAttribute('aria-current', 'page');
