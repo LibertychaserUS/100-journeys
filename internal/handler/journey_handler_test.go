@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/100-journeys/app/internal/ai"
-	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/content"
+	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/gin-gonic/gin"

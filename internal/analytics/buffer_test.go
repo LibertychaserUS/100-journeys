@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
 	"github.com/stretchr/testify/require"
 )
@@ -71,4 +72,16 @@ func closeBuffer(t *testing.T, buffer *Buffer) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	require.NoError(t, buffer.Close(ctx))
+}
+
+// UT-ANALYTICS-002: every funnel step is an accepted event type.
+func TestFunnelStepsAreAllowed(t *testing.T) {
+	for _, step := range model.FunnelSteps {
+		if !isAllowedEvent(step) {
+			t.Errorf("funnel step %q is not an allowed event type", step)
+		}
+	}
+	if isAllowedEvent("made_up") {
+		t.Error("unknown event types must be dropped")
+	}
 }

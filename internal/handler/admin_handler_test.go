@@ -514,3 +514,44 @@ func assertTopPurchasedRates(t *testing.T, raw interface{}) {
 }
 
 const onePixelPNGBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lw9Z5AAAAABJRU5ErkJggg=="
+
+// IT-API-FUNNEL-001: the admin funnel counts distinct visitors per step, in step order.
+func TestAdmin_Stats_Funnel(t *testing.T) {
+	r, db, events := setupAdminFullStackTestRouter(t)
+	token, userID := registerUserThroughHTTP(t, r, "FunnelAdmin", "funnel-admin@example.com", "prefer_not_to_say")
+	setUserRoleAndMBTI(t, db, userID, model.RoleAdmin, "INTJ", 1, 0)
+	admin, err := repository.NewUserRepository(db).GetByID(t.Context(), userID)
+	require.NoError(t, err)
+	adminToken, err := middleware.GenerateToken(admin)
+	require.NoError(t, err)
+
+	send := func(vid, step string) {
+		postJSON(t, r, "POST", "/api/analytics/events", token, model.AnalyticsEventRequest{
+			Type: step, Metadata: fmt.Sprintf(`{"vid":%q}`, vid),
+		}, http.StatusAccepted)
+	}
+	for i := 0; i < 4; i++ {
+		vid := fmt.Sprintf("v%d", i)
+		send(vid, "arrive")
+		send(vid, "arrive") // repeat visits count once
+		if i < 3 {
+			send(vid, "path_pick")
+		}
+		if i < 2 {
+			send(vid, "type_found")
+			send(vid, "space_enter")
+		}
+	}
+	require.NoError(t, events.Flush(context.Background()))
+
+	data := getJSON(t, r, "/api/admin/stats", adminToken, http.StatusOK)
+	funnel := data["funnel"].([]interface{})
+	require.Len(t, funnel, len(model.FunnelSteps))
+	want := map[string]float64{"arrive": 4, "path_pick": 3, "type_found": 2, "space_enter": 2, "entrance_open": 0, "register": 0}
+	for i, raw := range funnel {
+		step := raw.(map[string]interface{})
+		assert.Equal(t, model.FunnelSteps[i], step["step"])
+		assert.Equal(t, want[step["step"].(string)], step["visitors"], step["step"])
+	}
+	assert.Equal(t, 75.0, funnel[1].(map[string]interface{})["rate"])
+}

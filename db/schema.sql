@@ -217,7 +217,9 @@ CREATE INDEX IF NOT EXISTS idx_transactions_order   ON transactions(order_id);
 
 CREATE TABLE IF NOT EXISTS analytics_events (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    event_type      TEXT    NOT NULL CHECK(event_type IN ('journey_view', 'journey_click', 'pet_reply', 'search', 'filter')),
+    event_type      TEXT    NOT NULL CHECK(event_type IN ('journey_view', 'journey_click', 'pet_reply', 'search', 'filter',
+                                                      'arrive', 'path_pick', 'type_found', 'space_enter', 'entrance_open',
+                                                      'fork_choose', 'compose_start', 'compose_complete', 'register')),
     journey_slug    TEXT,
     user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
     mbti_type       TEXT,
@@ -255,3 +257,17 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX IF NOT EXISTS idx_audit_logs_level      ON audit_logs(level);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_request_id ON audit_logs(request_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
+
+-- =============================================================
+-- Fork choices (v1.5.0): what a signed-in reader picked at each
+-- authored journey's fork. Guests keep theirs in localStorage and
+-- merge them on sign-in.
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS journey_choices (
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    journey_id  INTEGER NOT NULL REFERENCES journeys(id) ON DELETE CASCADE,
+    option_key  TEXT    NOT NULL CHECK(length(option_key) BETWEEN 1 AND 32),
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, journey_id)
+);

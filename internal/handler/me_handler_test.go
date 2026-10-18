@@ -141,3 +141,58 @@ func TestMe_UpdateMBTI(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Equal(t, "invalid mbti type", resp["error"])
 }
+
+// IT-API-CHOICE-001: fork picks are validated against the authored options and stored per account.
+func TestMe_Choices(t *testing.T) {
+	r, captcha := setupMeTestRouter(t)
+	token := registerAndGetToken(t, r, captcha)
+	e := authored(t, "bolivia-salt-flat-trek")
+	key := e.ZH.Choice.Options[1].Key
+
+	w, resp := doJSON(t, r, "GET", "/api/auth/choices", token, nil)
+	require.Equal(t, http.StatusOK, w.Code)
+	assert.Empty(t, resp["data"])
+
+	w, _ = doJSON(t, r, "PUT", "/api/auth/choices/bolivia-salt-flat-trek", token, map[string]string{"key": key})
+	require.Equal(t, http.StatusOK, w.Code)
+	w, _ = doJSON(t, r, "PUT", "/api/auth/choices/bolivia-salt-flat-trek", token, map[string]string{"key": "not-an-option"})
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	w, _ = doJSON(t, r, "PUT", "/api/auth/choices/no-such-journey", token, map[string]string{"key": key})
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	w, _ = doJSON(t, r, "PUT", "/api/auth/choices/bolivia-salt-flat-trek", "", map[string]string{"key": key})
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+
+	w, resp = doJSON(t, r, "GET", "/api/auth/choices", token, nil)
+	require.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, map[string]interface{}{"bolivia-salt-flat-trek": key}, resp["data"])
+}
+
+// IT-API-MERGE-001: guest state merges into the account once, idempotently, skipping what doesn't exist.
+func TestMe_MergeGuest(t *testing.T) {
+	r, captcha := setupMeTestRouter(t)
+	token := registerAndGetToken(t, r, captcha)
+	key := authored(t, "bolivia-salt-flat-trek").ZH.Choice.Options[0].Key
+	body := map[string]interface{}{
+		"mbti_type": "infp",
+		"choices":   map[string]string{"bolivia-salt-flat-trek": key, "no-such-journey": "x", "norway-aurora-hunt": "x"},
+	}
+	for i := 0; i < 2; i++ {
+		w, resp := doJSON(t, r, "POST", "/api/auth/guest/merge", token, body)
+		require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+		data := resp["data"].(map[string]interface{})
+		assert.Equal(t, "INFP", data["mbti_type"])
+		assert.Equal(t, map[string]interface{}{"bolivia-salt-flat-trek": key}, data["choices"])
+		assert.ElementsMatch(t, []interface{}{"no-such-journey", "norway-aurora-hunt"}, data["skipped"])
+	}
+	w, resp := doJSON(t, r, "GET", "/api/auth/me", token, nil)
+	require.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "INFP", resp["data"].(map[string]interface{})["mbti_type"])
+
+	// Empty guest state keeps the account's type.
+	w, resp = doJSON(t, r, "POST", "/api/auth/guest/merge", token, map[string]interface{}{})
+	require.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "INFP", resp["data"].(map[string]interface{})["mbti_type"])
+
+	w, _ = doJSON(t, r, "POST", "/api/auth/guest/merge", token, map[string]interface{}{"mbti_type": "ABCD"})
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
