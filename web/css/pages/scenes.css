@@ -73,7 +73,7 @@
 .on-media .scene__prose p { color: rgba(246, 241, 232, .88); }
 
 /* The opening: full bleed, title low, a scroll cue */
-.scene--hero { min-height: 100svh; align-items: end; padding-block: calc(var(--nav-h) + var(--space-6)) clamp(48px, 10vh, 112px); background: #07080b; }
+.scene--hero { min-height: 100svh; align-items: end; padding-block: calc(var(--nav-h) + var(--space-4) + 64px) clamp(48px, 10vh, 112px); background: #07080b; } /* top padding keeps a long title clear of the back/share bar */
 .scene__media--hero img { transform: translate3d(0, calc(var(--p, .5) * 18%), 0) scale(calc(1.06 + var(--p, .5) * .1)); }
 .scene__scrim--hero { background: linear-gradient(0deg, hsl(var(--arc-h) calc(var(--arc-s) * .8%) var(--sky-l)) 0%, rgba(6, 7, 10, .55) 22%, rgba(6, 7, 10, .2) 60%, rgba(6, 7, 10, .45) 100%), linear-gradient(90deg, rgba(6, 7, 10, .65) 0%, transparent 65%); }
 .scene__inner--hero { display: grid; gap: var(--space-6); }
@@ -206,7 +206,7 @@
 }
 @media (max-width: 760px) {
   .scene { min-height: auto; padding-block: 96px; }
-  .scene--hero { min-height: 92svh; }
+  .scene--hero { min-height: 92svh; padding-block: calc(var(--nav-h) + 12px + 56px) 40px; }
   .scene--bleed { min-height: 88svh; }
   .scene__top { top: calc(var(--nav-h) + 12px); }
   .scene__frame { aspect-ratio: 4 / 3; }

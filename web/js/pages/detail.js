@@ -325,7 +325,7 @@ Pages.Detail = {
           <div class="container scene__inner scene__inner--hero on-media">
             <div class="detail-hero__text">
               ${e ? `<p class="detail-hero__no num" data-reveal>${esc(t('entrance.no', { n: String(e.no).padStart(3, '0') }))}${realm ? ` · ${esc(realm)}` : ''}</p>` : ''}
-              <h1 class="detail-hero__title" data-reveal>${String(j.title).split(' · ').map((part) => `<span class="nowrap">${esc(part)}</span>`).join('<span class="detail-hero__dot"> · </span>')}</h1>
+              <h1 class="detail-hero__title" data-reveal>${String(j.title).split(' · ').map((part, i, all) => `<span class="nowrap">${esc(part)}${i < all.length - 1 ? '<span class="detail-hero__dot"> ·</span>' : ''}</span>`).join(' ')}</h1>
               ${j.story_hook ? `<p class="detail-hero__hook" data-reveal>${esc(I18n.lang === 'zh' ? `「${j.story_hook}」` : `“${j.story_hook}”`)}</p>` : ''}
               <ul class="detail-hero__moods" data-reveal>${(j.mood_keywords || []).map((m) => `<li class="chip chip--sm">#${esc(m)}</li>`).join('')}</ul>
               <dl class="detail-hero__facts" data-reveal>
