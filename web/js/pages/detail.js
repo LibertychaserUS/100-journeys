@@ -36,6 +36,7 @@ Pages.Detail = {
         UI.setMeta({ title: res.data.title, description: res.data.story_hook });
         this._renderPage(res.data);
         if (res.data.content) {
+          RoadEnd.mount(res.data);
           Guest.markOpened(res.data.slug);
           if (API.isLoggedIn()) this._syncChoice(res.data, seq);
         }
@@ -55,6 +56,7 @@ Pages.Detail = {
 
   destroy() {
     this._seq++;
+    RoadEnd.destroy();
     if (this._onSession) window.removeEventListener('session:updated', this._onSession);
     this._onSession = null;
     Scenes.destroy();
@@ -239,6 +241,7 @@ Pages.Detail = {
           <h2 id="prep-title">${esc(t(c ? 'detail.prep' : 'detail.ch3.title'))}</h2>
           <div class="clues">${clues}</div>
         </section>
+        ${c ? '<div class="road-end" id="road-end"></div>' : ''}
         <p class="detail-fine">${esc(t('detail.fine'))}</p>
       </div>`;
   },

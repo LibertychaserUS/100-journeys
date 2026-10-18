@@ -32,6 +32,17 @@ Pages.Register = {
           <p class="field__error" id="reg-gender-error" hidden></p>
         </div>
         <div class="field">
+          <label for="reg-age">${esc(t('register.age'))}</label>
+          <div class="input input--select">
+            <select id="reg-age" required aria-describedby="reg-age-help reg-age-error">
+              <option value="">${esc(t('register.agePick'))}</option>
+              ${['under14', '14-17', '18+'].map((b) => `<option value="${b}">${esc(t(`age.${b}`))}</option>`).join('')}
+            </select>
+          </div>
+          <p class="field__help" id="reg-age-help">${esc(t('register.ageHelp'))}</p>
+          <p class="field__error" id="reg-age-error" hidden></p>
+        </div>
+        <div class="field">
           <span class="field__label" id="reg-avatar-label">${esc(t('register.avatar'))}</span>
           <div class="auth-avatar">
             <span class="auth-avatar__preview" id="reg-avatar-preview">${UI.icon('image')}</span>
@@ -78,6 +89,7 @@ Pages.Register = {
       'reg-email': !v.email ? t('err.required') : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email) ? '' : t('err.email')),
       'reg-password': !v.password ? t('err.required') : (/^[A-Za-z0-9!@#$%^&*()_+=,.?/-]{8,72}$/.test(v.password) && /[A-Za-z]/.test(v.password) && /\d/.test(v.password) ? '' : t('err.password')),
       'reg-gender': v.gender ? '' : t('err.gender'),
+      'reg-age': v.age ? '' : t('err.ageBand'),
       'reg-captcha': v.captcha ? '' : t('err.required'),
       'reg-avatar': v.avatar && v.avatar.size > 512 * 1024 ? t('err.avatarSize') : '',
     };
@@ -93,6 +105,7 @@ Pages.Register = {
       email: form.querySelector('#reg-email').value.trim(),
       password: form.querySelector('#reg-password').value,
       gender: form.querySelector('#reg-gender').value,
+      age: form.querySelector('#reg-age').value,
       captcha: form.querySelector('#reg-captcha').value.trim(),
       avatar: form.querySelector('#reg-avatar').files[0],
     };
@@ -103,7 +116,7 @@ Pages.Register = {
     AuthForm.busy(submit, true, t('register.submitting'));
     try {
       const res = await API.register({
-        username: v.username, email: v.email, password: v.password, gender: v.gender,
+        username: v.username, email: v.email, password: v.password, gender: v.gender, age_band: v.age,
         captcha_id: form.querySelector('#reg-captcha-id').value, captcha_answer: v.captcha,
       });
       API.setToken(res.data.token);

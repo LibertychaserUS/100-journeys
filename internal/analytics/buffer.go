@@ -26,12 +26,25 @@ const (
 	EventComposeStart    = "compose_start"
 	EventComposeComplete = "compose_complete"
 	EventRegister        = "register"
+
+	// The Ticket Road.
+	EventRub           = "rub"
+	EventStationEnter  = "station_enter"
+	EventStationFilter = "station_filter"
+	EventTicketFlip    = "ticket_flip"
+	EventTicketPublish = "ticket_publish"
+	EventTicketDepart  = "ticket_depart"
+	EventLampOpen      = "lamp_open"
+	EventLampLight     = "lamp_light"
+	EventRackView      = "rack_view"
 )
 
 var allowedEvents = map[string]bool{
 	EventJourneyView: true, EventJourneyClick: true, EventPetReply: true, EventSearch: true, EventFilter: true,
 	EventArrive: true, EventPathPick: true, EventTypeFound: true, EventSpaceEnter: true, EventEntranceOpen: true,
 	EventForkChoose: true, EventComposeStart: true, EventComposeComplete: true, EventRegister: true,
+	EventRub: true, EventStationEnter: true, EventStationFilter: true, EventTicketFlip: true, EventTicketPublish: true,
+	EventTicketDepart: true, EventLampOpen: true, EventLampLight: true, EventRackView: true,
 }
 
 type Event struct {

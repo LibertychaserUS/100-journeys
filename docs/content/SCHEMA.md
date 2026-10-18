@@ -186,14 +186,32 @@ Guests keep their state in `localStorage.guest_state` (see `web/js/guest.js`):
   mbti: 'INFP',                 // '' until chosen
   mbti_source: 'self' | 'pet',  // how it was chosen
   choices: { 'bolivia-salt-flat-trek': 'postcard' },   // fork picks per slug
-  composed: [ /* tickets from the compose game, each with a client-generated id */ ] }
+  composed: [ /* tickets from the compose game, each with a client-generated id */ ],
+  rubbings: { 'place:tromso': 'norway-aurora-hunt' },  // slips rubbed at the end of a door
+  lamps: { 'ticket:k3…': { kind, id, real, moved, fit, stamp, flags } } }  // lit before signing in or arriving
 ```
 
 It also holds `vid` (anonymous visitor id), `opened` (entrances opened), `dialog` (the guide's walk,
 so it can resume) and `invite`. On sign-in `guest.js` sends `mbti` and `choices` once to
 `POST /api/auth/guest/merge` and clears them locally; signed in, the account is the source of truth
 (`Guest.mbti()`, `Guest.pick()`, `Guest.choose()`). `composed` tickets are replayed to the compose API,
-which must be idempotent on the ticket `id`.
+which must be idempotent on the ticket `id`. `rubbings` go to `POST /api/auth/rubbings/merge` (only
+slips the named door really hands out are kept) and `lamps` are lit again once the traveller has
+arrived (a ticket's back turned over for eight seconds; a journey read through).
+
+## Slips from entrances (the Ticket Road)
+
+Every entrance hands out slips at its end, derived by `compose.Build` — nothing to author:
+
+- its **place**: the place half of the title (`"镜面 · 乌尤尼盐沼"` → `乌尤尼盐沼`), the region as the
+  second line; a hand-written place in `fragments.json` with the same `slug` is used instead;
+- its **hour** (`entrance.time`) and **seasons** (`entrance.seasons`), unless `any`;
+- one **keepsake per fork option**, key `keep-<no>-<option key>`, text = the option's `keeps`
+  (at most 24 Chinese / 64 English characters; the English phrase is lower-cased to sit in a sentence).
+
+So `keeps` should read as a thing you leave with, and changing an option key renames a slip that
+tickets may already hold. Near places (no entrance) are held from the first visit; slips no door
+hands out (stays, rituals, plain keepsakes, a season no door opens in) are open to everyone.
 
 ## Funnel events
 

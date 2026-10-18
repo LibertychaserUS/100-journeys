@@ -40,8 +40,19 @@ func Migrate(db *sql.DB, schemaPath string) error {
 	if err := ensureDuplicateUsernamesAllowed(ctx, db); err != nil {
 		return err
 	}
-	// v1.5.0 widened the analytics event CHECK; older databases rebuild the table to pick it up.
-	rebuilt, err := ensureTableMatchesSchema(ctx, db, string(schema), "analytics_events", "'space_enter'")
+	// The Ticket Road (v1.6.0): the age band declared at sign-up, accounts the station master
+	// silenced, and the ticket a composition set out from.
+	for _, col := range []struct{ table, name, def string }{
+		{"users", "age_band", "TEXT NOT NULL DEFAULT ''"},
+		{"users", "silenced_at", "DATETIME"},
+		{"compositions", "parent_code", "TEXT NOT NULL DEFAULT ''"},
+	} {
+		if err := ensureColumn(ctx, db, col.table, col.name, col.def); err != nil {
+			return err
+		}
+	}
+	// v1.5.0 and v1.6.0 widened the analytics event CHECK; older databases rebuild the table to pick it up.
+	rebuilt, err := ensureTableMatchesSchema(ctx, db, string(schema), "analytics_events", "'rack_view'")
 	if err != nil {
 		return err
 	}

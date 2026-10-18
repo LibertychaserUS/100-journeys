@@ -1276,6 +1276,9 @@ const I18n = (() => {
 
   function onChange(fn) { listeners.push(fn); }
 
+  /** Adds strings for one language; features keep their copy in their own file (js/road/i18n.js). */
+  function extend(code, entries) { Object.assign(dict[code], entries); }
+
   const locale = () => (lang === 'zh' ? 'zh-CN' : 'en-US');
 
   function num(n) { return Number(n || 0).toLocaleString(locale()); }
@@ -1318,7 +1321,7 @@ const I18n = (() => {
   }
 
   return {
-    t, setLang, onChange, num, date, time, error,
+    t, setLang, onChange, extend, num, date, time, error,
     get lang() { return lang; },
     get apiLang() { return lang; },
   };

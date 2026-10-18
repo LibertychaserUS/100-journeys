@@ -10,6 +10,7 @@
 | `/find` | find |
 | `/guide` | guide |
 | `/space` | space |
+| `/station` | station |
 | `/compose` | compose |
 | `/compose/:code` | compose/:code |
 | `/login` | login |

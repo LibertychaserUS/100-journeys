@@ -555,6 +555,37 @@ JWT 用户接口要求已登录；管理员接口还要求 `role = "admin"`。
 
 ---
 
+### 4.11 票路（拓印、夜站、点灯、门边票夹、站务）
+
+全部取值都是内嵌词表里的 key（纸笺、印刷标签、印章、勘误、举报理由），没有自由文本。作者只以「入口角色 · 四位数」出现，`aid` 是账户 id 的 HMAC，不能反推。写接口都经过按账户的令牌桶（突发 20，每分钟 40），超出返回 `429` + `Retry-After`。
+
+| 接口 | 鉴权 | 说明 |
+|---|---|---|
+| `GET /api/road/vocab?lang=` | 否 | 印刷标签（`world` / `mood` / `practice`）、8 枚印章、4 个勘误、举报理由、三根灯芯 |
+| `GET /api/compose/fragments` | 否 | 每张纸笺多了 `unlock`（`starter` / `open` / `finish` / `fork:<选项>`）、`no`（所属入口）、`doors`（能拓到它的入口）、`door`（第一个入口的编号、slug、境、开放时间、角色）。每扇门的地方和岔路上“带走的东西”（`keep-<编号>-<选项>`）从入口文件派生 |
+| `POST /api/auth/rubbings` `{slug, option?}` | JWT | 拓下一扇门：它的地方、时辰、季节和所选岔路的纸笺；同一事务里记下“抵达”。返回 `rubbed`（这扇门给的全部）和 `fresh`（新拓到的） |
+| `GET /api/auth/rubbings` | JWT | `{ "<group:key>": "<拓自的入口 slug>" }` |
+| `POST /api/auth/rubbings/merge` `{rubbings}` | JWT | 访客本地的拓印并入账户，幂等；那扇门并不给的纸笺列在 `skipped` |
+| `POST /api/auth/arrivals` `{kind, id, step}` | JWT | `journey` 的 `view` / `end`，`ticket` 的 `view`（翻到背面） |
+| `PUT /api/auth/age-band` `{age_band}` | JWT | 老账户补报年龄段，只能报一次（`409`） |
+| `POST /api/auth/tickets/:code/post` `{tags}` | JWT | 挂上票台：至少三行纸笺、最多 5 个印刷标签；`409 age band needed`、`403 station closed under 14`、`403`（被站务撤下的票不能再挂）、`429`（每天 10 张）。挂着的票不能改（`POST /api/auth/compositions` 返回 `409 composition is on the station`） |
+| `DELETE /api/auth/tickets/:code/post` | JWT | 取下来 |
+| `GET /api/auth/tickets/posted` | JWT | `{ code: "live" \| "hidden" \| "removed" }` |
+| `GET /api/station?realm=&season=&hour=&place=&tag=&q=&sort=bright\|new\|borrowed&cursor=&lang=` | 可选 | 一节车厢 24 张，`next` 为 keyset 游标。`q` 每个词都不少于 3 个字时走 FTS5 trigram，否则 LIKE。带令牌时去掉被屏蔽的作者 |
+| `GET /api/station/tickets/:code` | 可选 | 票的背面；作者本人能看到自己被熄灯的票（`status`） |
+| `GET /api/entrances/:slug/rack?hour=&lang=` | 否 | 门边票夹，最多 6 张，同一作者一张；`hour` 是访客本机算出的时辰桶，同时辰的票在前（`open_now`） |
+| `GET /api/space/:type/drifted?lang=` | 否 | 类型空间里风吹来的 3 张：它们借过的门为这个类型写过（`compatibility_score >= 4`），不读作者的类型 |
+| `GET /api/lamps/:kind/:id` | 否 | 公开的光：不满 5 位旅人时 `glow` / `count` 为 `null`；之后是五档光晕、人数、最亮的灯芯和最常被盖的两枚印章 |
+| `GET /api/auth/lamps/:kind/:id` | JWT | 自己的灯（含勘误，只回给本人）、`own`、`wait_s`（还要等几秒才算抵达，`-1` 为没打开过） |
+| `POST /api/auth/lamps` `{kind, id, real, moved, fit, stamp, flags}` | JWT | 点灯或 30 天内再调；`409 not arrived`（`data.wait_s`）、`403 own work`、`429`（每天 30 盏）。账龄满 72 小时并读完过一段旅程，灯才计权。返回公开的光 |
+| `GET /api/auth/ledger/:kind/:id` | JWT | 灯下账本：票的作者 / 旅程是站主；满 5 位后给出每根灯芯 1–5 档的分布、印章、勘误，不含是谁 |
+| `POST /api/auth/reports` `{kind: "ticket", id, reason}` | JWT | 交给站务；3 个账龄满 3 天的旅人交过后自动熄灯待审。回应不说是否熄灯 |
+| `GET` / `PUT` / `DELETE /api/auth/blocks[/:aid]` | JWT | 不再同站 |
+| `GET /api/admin/road/queue` | JWT + admin | 待审：已熄灯在前，含理由计数与可信人数 |
+| `POST /api/admin/road/posts/:code` `{action}` | JWT + admin | `restore` / `remove` / `silence`（撤下作者全部票，撤下其点过的灯并重算） |
+
+光的计算：每盏灯取拉过的灯芯平均值，`bright = (C·m + Σw·x) / (C + Σw)`，`C = 8`，`m` 为该类作品的加权平均（夜间重算，约 20 盏前停在 3）；排序用 `lower = bright − 1.28·sd / √(C + Σw)`；`glow = round((bright − 1) × 5 / 4)`。夜间（本地 04:00，启动后也算一次）按 500 行一批重算权重：账龄、是否读完过一段旅程、是否被禁言；互相给对方三张以上 4 分以上的两个账户，在这些灯上各降为半权。
+
 ## 5. 订单接口
 
 订单接口全部需要 JWT。
@@ -829,6 +860,7 @@ CSV 模式不使用 JSON 信封。
 | `id` | string | 客户端生成的幂等键，只返回给票的主人 |
 | `code` | string | 分享码，12 位 |
 | `picks` | object | 每组选中的纸笺 key，空着的组不出现 |
+| `parent_code` | string | 从哪张站台上的票出发（只在第一次收起时记下，不能是自己的票） |
 | `created_at` / `updated_at` | string | RFC 3339（UTC）；`created_at` 是第一次收起的时间 |
 
 ---

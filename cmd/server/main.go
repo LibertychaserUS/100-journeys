@@ -19,6 +19,8 @@ import (
 	"github.com/100-journeys/app/internal/middleware"
 	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
+	"github.com/100-journeys/app/internal/road"
+	"github.com/100-journeys/app/internal/road/light"
 	"github.com/100-journeys/app/internal/service"
 	"github.com/100-journeys/app/internal/webapp"
 	"github.com/gin-gonic/gin"
@@ -74,14 +76,29 @@ func main() {
 		log.Fatalf("sync content: %v", err)
 	}
 
-	// Paper slips of the compose game (internal/compose/fragments.json).
-	fragments, err := compose.Load()
+	// Paper slips of the compose game: the hand-written ones (internal/compose/fragments.json)
+	// plus what every entrance hands out at its end (its place and one keepsake per fork option).
+	written, err := compose.Load()
 	if err != nil {
 		log.Fatalf("load compose fragments: %v", err)
 	}
+	entrances, err := content.Load()
+	if err != nil {
+		log.Fatalf("load entrances: %v", err)
+	}
+	fragments := compose.Build(written, entrances)
 	if problems := compose.Validate(fragments); len(problems) > 0 {
 		log.Fatalf("compose fragments are invalid: %s", strings.Join(problems, "; "))
 	}
+	// The Ticket Road: printed tags, stamps, flags and report reasons (internal/road/*.json).
+	vocab, err := road.LoadVocab()
+	if err != nil {
+		log.Fatalf("load ticket road vocabulary: %v", err)
+	}
+	if problems := vocab.Validate(); len(problems) > 0 {
+		log.Fatalf("ticket road vocabulary is invalid: %s", strings.Join(problems, "; "))
+	}
+	catalog := road.NewCatalog(fragments, entrances, vocab, middleware.DeriveKey("ticket-road/author"))
 
 	// Event bus subscribers
 	eventbus.Default.Subscribe(eventbus.UserRegistered, func(evt eventbus.Event) {
@@ -128,7 +145,12 @@ func main() {
 	captchaH := handler.NewCaptchaHandler(captchaStore)
 	auditH := handler.NewAuditHandler(db)
 	meH := handler.NewMeHandler(userRepo, svc)
-	composeH := handler.NewComposeHandler(repository.NewCompositionRepository(db), fragments, svc)
+	compositions := repository.NewCompositionRepository(db)
+	composeH := handler.NewComposeHandler(compositions, fragments, svc)
+	roadH := handler.NewRoadHandler(repository.NewRoadRepository(db), compositions, catalog, light.Defaults())
+	nightly, stopNightly := context.WithCancel(context.Background())
+	defer stopNightly()
+	go roadH.Nightly(nightly, log.Printf)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -188,6 +210,9 @@ func main() {
 
 		// Compose game: slips and share links (public), kept tickets (protected)
 		handler.ComposeRoutes(api, composeH)
+
+		// The Ticket Road: the night station, lamps, racks by the door, rubbings, reports and blocks
+		handler.RoadRoutes(api, roadH)
 
 		// Admin (protected + admin role)
 		handler.AdminRoutes(api, adminH)

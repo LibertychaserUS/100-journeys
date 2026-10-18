@@ -9,6 +9,33 @@ async function freshPage(page) {
   });
 }
 
+/** The rubbings of a traveller who walked the doors the compose tests use (slip id -> door). */
+const WALKED = {
+  'place:uyuni': 'bolivia-salt-flat-trek', 'hour:predawn': 'bolivia-salt-flat-trek', 'season:rainy': 'bolivia-salt-flat-trek',
+  'place:snaefellsnes-tube': 'iceland-lava-tunnel-cycling', 'place:koyasan': 'japan-onsen-temple-meditation',
+  'place:tromso': 'norway-aurora-hunt', 'season:polar-night': 'norway-aurora-hunt', 'hour:night': 'norway-aurora-hunt',
+  'hour:dawn': 'patagonia-torres-del-paine-trek', 'hour:midnight': 'indonesia-ijen-blue-fire', 'hour:blue-hour': 'chongqing-liziba-monorail',
+};
+
+/** Guests start holding those slips (an existing guest state keeps everything else). */
+async function walked(page, rubbings = WALKED) {
+  await page.addInitScript((r) => {
+    try {
+      const s = JSON.parse(localStorage.getItem('guest_state') || 'null') || { v: 1 };
+      if (!s.rubbings || !Object.keys(s.rubbings).length) {
+        s.rubbings = r;
+        localStorage.setItem('guest_state', JSON.stringify(s));
+      }
+    } catch (e) {}
+  }, rubbings);
+}
+
+/** Signed in: rub the same doors in the account, then reload so the tray holds them. */
+async function walkedAccount(page, rubbings = WALKED) {
+  await page.evaluate(async (r) => { await API.mergeRubbings(r); }, rubbings);
+  await page.reload();
+}
+
 async function solveCaptcha(page, prefix) {
   const question = page.locator(`#${prefix}-captcha-q`);
   await expect(question).toHaveText(/\d+\s*[+-]\s*\d+/);
@@ -35,6 +62,7 @@ async function registerAndLogin(page, options = {}) {
   await page.locator('#reg-email').fill(email);
   await page.locator('#reg-password').fill(password);
   await page.locator('#reg-gender').selectOption(options.gender || 'prefer_not_to_say');
+  await page.locator('#reg-age').selectOption(options.ageBand || '18+');
   await solveCaptcha(page, 'reg');
   await page.locator('#register-form button[type="submit"]').click();
 
@@ -90,4 +118,4 @@ async function settle(page) {
   }));
 }
 
-module.exports = { freshPage, solveCaptcha, expectSignedIn, registerAndLogin, login, logout, recharge, settle };
+module.exports = { WALKED, walked, walkedAccount, freshPage, solveCaptcha, expectSignedIn, registerAndLogin, login, logout, recharge, settle };

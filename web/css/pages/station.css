@@ -1,0 +1,170 @@
+/* =============================================================
+   THE NIGHT STATION — #/station. A night hall in the dark theme; the same hall
+   at opening time in the light one. The hall's light follows the hour on the
+   station clock (data-hour), so dragging the hand sweeps the whole room.
+   ============================================================= */
+
+.station { --station-bg: var(--color-bg); --hall-a: #0e1422; --hall-b: #05070b; --hall-glow: rgba(242, 196, 109, .16); background: var(--station-bg); }
+[data-theme="light"] .station { --hall-a: #e9edf1; --hall-b: #f3f3f1; --hall-glow: rgba(214, 150, 60, .14); }
+/* The hour colours the hall. */
+.station[data-hour="predawn"]   { --hall-a: #0d1a33; --hall-glow: rgba(120, 170, 255, .2); }
+.station[data-hour="dawn"]      { --hall-a: #2a1a2e; --hall-glow: rgba(255, 160, 150, .2); }
+.station[data-hour="morning"]   { --hall-a: #1b2433; --hall-glow: rgba(240, 220, 170, .16); }
+.station[data-hour="noon"]      { --hall-a: #212634; --hall-glow: rgba(255, 245, 210, .2); }
+.station[data-hour="afternoon"] { --hall-a: #261f1a; --hall-glow: rgba(255, 196, 120, .18); }
+.station[data-hour="dusk"]      { --hall-a: #2d1a14; --hall-glow: rgba(255, 140, 70, .22); }
+.station[data-hour="blue-hour"] { --hall-a: #101a3a; --hall-glow: rgba(110, 140, 255, .24); }
+.station[data-hour="night"]     { --hall-a: #0b1020; --hall-glow: rgba(242, 196, 109, .16); }
+.station[data-hour="midnight"]  { --hall-a: #05070f; --hall-glow: rgba(180, 160, 255, .12); }
+[data-theme="light"] .station[data-hour="predawn"]   { --hall-a: #dfe7f5; }
+[data-theme="light"] .station[data-hour="dawn"]      { --hall-a: #f4e2e0; }
+[data-theme="light"] .station[data-hour="morning"]   { --hall-a: #eef0ea; }
+[data-theme="light"] .station[data-hour="noon"]      { --hall-a: #f6f4ea; }
+[data-theme="light"] .station[data-hour="afternoon"] { --hall-a: #f4ecdf; }
+[data-theme="light"] .station[data-hour="dusk"]      { --hall-a: #f4e1d2; }
+[data-theme="light"] .station[data-hour="blue-hour"] { --hall-a: #dfe3f4; }
+[data-theme="light"] .station[data-hour="night"]     { --hall-a: #e4e6ee; }
+[data-theme="light"] .station[data-hour="midnight"]  { --hall-a: #dcdde6; }
+
+.station__hall {
+  position: relative; overflow: hidden; padding: calc(var(--space-7) + 8px) 0 var(--space-6);
+  background: radial-gradient(70% 120% at 50% -10%, var(--hall-glow), transparent 60%), linear-gradient(180deg, var(--hall-a), var(--hall-b) 92%);
+  transition: background 700ms var(--ease);
+}
+.station__hall::after { /* the hall's ceiling lamps */
+  content: ""; position: absolute; inset: 0 0 auto; height: 140px; pointer-events: none;
+  background: radial-gradient(4px 4px at 12% 40%, rgba(255, 220, 160, .7), transparent 60%), radial-gradient(4px 4px at 31% 30%, rgba(255, 220, 160, .55), transparent 60%),
+    radial-gradient(4px 4px at 50% 36%, rgba(255, 220, 160, .7), transparent 60%), radial-gradient(4px 4px at 69% 30%, rgba(255, 220, 160, .55), transparent 60%), radial-gradient(4px 4px at 88% 40%, rgba(255, 220, 160, .7), transparent 60%);
+}
+[data-theme="light"] .station__hall::after { opacity: .25; }
+.station__hall-inner { position: relative; z-index: 1; display: grid; justify-items: start; gap: 12px; }
+.station__title { font-family: var(--font-story); font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.25rem); font-weight: 700; line-height: 1.05; letter-spacing: .04em; color: var(--color-text); }
+:lang(en) .station__title { letter-spacing: -.015em; }
+.station__lead { max-width: 30em; font-family: var(--font-story); font-size: var(--text-lg); line-height: 1.6; color: var(--color-text-2); }
+:lang(en) .station__lead { font-style: italic; }
+
+/* Split-flap clock: the station's time and hour bucket, flipping in on arrival. */
+.flapboard { display: inline-flex; align-items: center; gap: 14px; padding: 8px 10px; border-radius: 10px; background: #0a0b0e; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 10px 30px -14px rgba(0, 0, 0, .8); perspective: 400px; }
+.flapboard__time, .flapboard__hour { display: inline-flex; align-items: center; gap: 4px; }
+.flap { position: relative; display: inline-grid; place-items: center; min-width: 30px; height: 40px; padding: 0 6px; border-radius: 4px; background: linear-gradient(180deg, #23262e 0 49%, #1a1c22 51% 100%); color: #f6efe0; font-family: var(--font-mono); font-size: 24px; font-weight: 700; line-height: 1; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .6); }
+.flap::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0, 0, 0, .7); }
+.flap > span { display: block; animation: flap-in 560ms cubic-bezier(.3, .0, .2, 1) calc(var(--k) * 90ms + 120ms) both; transform-origin: 50% 50%; }
+.flap--word { min-width: 0; padding: 0 12px; font-family: var(--font-ui); font-size: 17px; letter-spacing: .1em; color: #f2c46d; }
+.flapboard__colon { color: #f6efe0; font-family: var(--font-mono); font-size: 22px; font-style: normal; animation: colon 2s steps(1) infinite; }
+@keyframes flap-in { from { transform: rotateX(-90deg); opacity: 0; } 60% { transform: rotateX(12deg); opacity: 1; } to { transform: none; } }
+@keyframes colon { 50% { opacity: .2; } }
+
+/* ---------- platforms ---------- */
+.station__platforms { position: sticky; top: var(--nav-h); z-index: var(--z-sticky); padding: 10px 0; background: color-mix(in srgb, var(--station-bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--color-line); }
+.platforms { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+.platforms::-webkit-scrollbar { display: none; }
+.platform {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px 8px 12px; white-space: nowrap;
+  border-radius: 8px; background: var(--color-surface); color: var(--color-text-2); box-shadow: inset 0 0 0 1px var(--color-line);
+  font-size: var(--text-sm); transition: color var(--dur-fast), background-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.platform:hover { color: var(--color-text); box-shadow: inset 0 0 0 1px var(--color-line-strong); }
+.platform[aria-pressed="true"] { color: var(--color-text); background: var(--color-surface-2); box-shadow: inset 0 0 0 1.5px var(--realm-hue, var(--color-action)); }
+.platform__lamp { width: 9px; height: 9px; border-radius: 50%; background: var(--realm-hue, var(--color-action)); opacity: .45; transition: opacity var(--dur-fast), box-shadow var(--dur-fast); }
+.platform[aria-pressed="true"] .platform__lamp { opacity: 1; box-shadow: 0 0 10px 2px color-mix(in srgb, var(--realm-hue, var(--color-action)) 70%, transparent); }
+[data-theme="light"] .platform__lamp { opacity: .8; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25); }
+.platform__no { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--color-text-3); }
+.platform--all .platform__lamp { background: var(--color-action); }
+
+/* ---------- the bar: enquiries, order, timetable ---------- */
+.station__body { padding-bottom: var(--space-8); }
+.station__bar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: end; gap: 12px 16px; padding-block: var(--space-5) var(--space-4); }
+.enquiry__label { display: block; margin-bottom: 6px; font-size: 12px; letter-spacing: .16em; color: var(--color-text-3); font-weight: 600; }
+:lang(en) .enquiry__label { letter-spacing: .12em; text-transform: uppercase; }
+.enquiry__field { display: flex; gap: 8px; }
+.enquiry__input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border-radius: var(--radius-control); background: var(--color-surface); color: var(--color-text); box-shadow: inset 0 0 0 1px var(--color-line-strong); font-size: var(--text-base); }
+.enquiry__input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.enquiry__field .btn { height: 44px; }
+.sortboard { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: #0a0b0e; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
+[data-theme="light"] .sortboard { background: var(--color-surface-2); box-shadow: inset 0 0 0 1px var(--color-line); }
+.sortboard__opt { min-height: 38px; padding: 0 14px; border-radius: 7px; font-size: var(--text-sm); color: rgba(246, 239, 224, .7); transition: background-color var(--dur-fast), color var(--dur-fast); }
+[data-theme="light"] .sortboard__opt { color: var(--color-text-2); }
+.sortboard__opt[aria-checked="true"] { background: linear-gradient(180deg, #2a2d35 0 49%, #22252c 51%); color: #f2c46d; font-weight: 600; }
+[data-theme="light"] .sortboard__opt[aria-checked="true"] { background: var(--color-surface); color: var(--color-text); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+.sortboard__opt:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.station__tt-btn { height: 44px; }
+.station__tt-btn[aria-expanded="true"] { box-shadow: inset 0 0 0 1.5px var(--color-action); }
+
+/* ---------- the timetable ---------- */
+.timetable { margin-bottom: var(--space-5); padding: var(--space-5); border-radius: 18px; background: var(--color-surface); box-shadow: inset 0 0 0 1px var(--color-line); }
+.timetable__grid { display: grid; grid-template-columns: 290px minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--space-5) var(--space-6); }
+.tt-block h3 { margin-bottom: 10px; font-size: 12px; letter-spacing: .16em; color: var(--color-text-3); font-weight: 600; }
+:lang(en) .tt-block h3 { letter-spacing: .12em; text-transform: uppercase; }
+.tt-block h3 + .ring + h3 { margin-top: 18px; }
+.ring { display: flex; flex-wrap: wrap; gap: 6px; }
+.ring__s[aria-pressed="true"] { background: var(--color-action); color: var(--color-on-action); border-color: transparent; }
+.destination select { width: 100%; }
+.luggage { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.luggage + .luggage { margin-top: 12px; }
+.luggage__kind { width: 100%; font-size: 12px; color: var(--color-text-2); }
+.timetable__foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--space-4); }
+
+/* The station clock: nine hours around a dial. Drag the hand, tap an hour, or use the keys. */
+.clock { --size: 232px; position: relative; width: var(--size); height: var(--size); margin: 6px 22px; touch-action: none; }
+.clock__face { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+.clock__rim { fill: #0a0b0e; stroke: rgba(255, 255, 255, .08); stroke-width: 1; }
+[data-theme="light"] .clock__rim { fill: #f7f5f0; stroke: rgba(20, 22, 28, .14); }
+.clock__arc { fill: rgba(255, 255, 255, .05); stroke: rgba(255, 255, 255, .06); transition: fill var(--dur) var(--ease); }
+[data-theme="light"] .clock__arc { fill: rgba(20, 22, 28, .04); stroke: rgba(20, 22, 28, .06); }
+.clock__arc.is-on { fill: color-mix(in srgb, #f2c46d 55%, transparent); }
+[data-theme="light"] .clock__arc.is-on { fill: rgba(26, 28, 33, .78); }
+.clock__hand { stroke: #f2c46d; stroke-width: 3; stroke-linecap: round; transform: rotate(var(--hand)); transition: transform 380ms cubic-bezier(.34, 1.56, .64, 1), opacity var(--dur); }
+[data-theme="light"] .clock__hand { stroke: #1a1c21; }
+.clock[data-any="true"] .clock__hand { opacity: .25; }
+.clock__pin { fill: #f2c46d; }
+[data-theme="light"] .clock__pin { fill: #1a1c21; }
+.clock__hours { position: absolute; inset: 0; pointer-events: none; }
+.clock__h {
+  position: absolute; left: 50%; top: 50%; width: 64px; margin: -10px 0 0 -32px; pointer-events: auto;
+  transform: rotate(var(--a)) translateY(calc(var(--size) * -.5 - 18px)) rotate(calc(var(--a) * -1));
+  font-size: 12px; line-height: 20px; text-align: center; color: var(--color-text-3); white-space: nowrap;
+}
+.clock__h[aria-pressed="true"] { color: var(--color-text); font-weight: 600; }
+.clock__dial {
+  position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%;
+  display: grid; place-items: center; padding: 8px; text-align: center; font-size: 12.5px; line-height: 1.3; color: var(--color-text);
+  background: radial-gradient(circle, var(--color-surface-2), var(--color-surface)); box-shadow: 0 0 0 1px var(--color-line-strong);
+}
+.clock__dial:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.tt-clock { padding: 18px 10px 0; }
+
+/* ---------- the racks ---------- */
+.racks { position: relative; }
+.racks__carriage { margin-bottom: 14px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; color: var(--color-text-3); }
+.racks__carriage:focus { outline: none; }
+.racks__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 28px 22px; }
+.racks__grid li { position: relative; animation: rack-in 520ms var(--ease) calc(min(var(--i), 12) * 40ms) both; }
+.racks__grid li::after { content: ""; position: absolute; left: -11px; right: -11px; bottom: -15px; height: 1px; background: var(--color-line); }
+@keyframes rack-in { from { opacity: 0; transform: translateY(10px); } }
+.racks__none { padding: var(--space-8) 0; }
+.trains { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: var(--space-7); }
+.trains__next { min-width: 180px; justify-content: center; }
+.trains__last { font-size: var(--text-sm); color: var(--color-text-3); }
+
+@media (max-width: 1080px) {
+  .timetable__grid { grid-template-columns: 290px minmax(0, 1fr); }
+  .tt-tags { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .station__hall { padding: var(--space-6) 0 var(--space-5); }
+  .flap { min-width: 24px; height: 34px; font-size: 20px; }
+  .flap--word { font-size: 15px; }
+  .station__bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .enquiry { grid-column: 1 / -1; }
+  .sortboard { overflow-x: auto; max-width: 100%; }
+  .sortboard__opt { padding: 0 10px; white-space: nowrap; }
+  .timetable { padding: var(--space-4); }
+  .timetable__grid { grid-template-columns: minmax(0, 1fr); }
+  .tt-clock { justify-self: center; }
+  .clock { --size: 220px; }
+  .racks__grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flap > span, .racks__grid li, .flapboard__colon { animation: none; }
+  .station__hall, .clock__hand, .clock__arc { transition: none; }
+}

@@ -1,0 +1,24 @@
+{
+  "stamps": [
+    { "key": "stopped",    "zh": "我停下来了",   "en": "I stopped here" },
+    { "key": "keep-it",    "zh": "想把它留下",   "en": "I want to keep it" },
+    { "key": "right-hour", "zh": "时辰刚好",     "en": "Right on the hour" },
+    { "key": "been-there", "zh": "像我去过",     "en": "As if I'd been" },
+    { "key": "held-breath","zh": "屏了一下气",   "en": "I held my breath" },
+    { "key": "go-now",     "zh": "想现在就出门", "en": "I want to go now" },
+    { "key": "someone",    "zh": "想起一个人",   "en": "Someone came to mind" },
+    { "key": "again",      "zh": "还会再来",     "en": "I'll come back" }
+  ],
+  "flags": [
+    { "key": "facts",      "zh": "事实对不上",   "en": "A fact doesn't hold" },
+    { "key": "hour",       "zh": "时辰不对",     "en": "The hour is off" },
+    { "key": "preachy",    "zh": "像在讲道理",   "en": "It lectures" },
+    { "key": "unreadable", "zh": "读不下去",     "en": "Hard to read on" }
+  ],
+  "reasons": [
+    { "key": "wrong",      "zh": "这张票不对劲", "en": "Something is off" },
+    { "key": "unsafe",     "zh": "让人不舒服",   "en": "It feels unsafe" },
+    { "key": "spam",       "zh": "在刷屏",       "en": "It's flooding" },
+    { "key": "copied",     "zh": "抄了别人的票", "en": "Copied from someone" }
+  ]
+}

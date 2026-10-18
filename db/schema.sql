@@ -219,7 +219,9 @@ CREATE TABLE IF NOT EXISTS analytics_events (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     event_type      TEXT    NOT NULL CHECK(event_type IN ('journey_view', 'journey_click', 'pet_reply', 'search', 'filter',
                                                       'arrive', 'path_pick', 'type_found', 'space_enter', 'entrance_open',
-                                                      'fork_choose', 'compose_start', 'compose_complete', 'register')),
+                                                      'fork_choose', 'compose_start', 'compose_complete', 'register',
+                                                      'rub', 'station_enter', 'station_filter', 'ticket_flip', 'ticket_publish',
+                                                      'ticket_depart', 'lamp_open', 'lamp_light', 'rack_view')),
     journey_slug    TEXT,
     user_id         INTEGER REFERENCES users(id) ON DELETE SET NULL,
     mbti_type       TEXT,
@@ -294,3 +296,155 @@ CREATE TABLE IF NOT EXISTS compositions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_compositions_user ON compositions(user_id, created_at);
+
+-- =============================================================
+-- The Ticket Road (v1.6.0): slips rubbed at the end of a door, the night station,
+-- lamps, the rack by the door, and the safety base. There is no free text anywhere:
+-- every stored value is a key from an embedded vocabulary (slips, printed tags,
+-- stamps, flags, report reasons). Authors appear only as an alias (a door's role
+-- and four digits); author_hash is an HMAC of the account id, never the id itself.
+-- =============================================================
+
+-- Slips a signed-in traveller rubbed ("group:key" from the compose catalog) and the door they
+-- were rubbed at, which is the postmark the ticket line shows. Guests keep theirs locally.
+CREATE TABLE IF NOT EXISTS rubbings (
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    frag        TEXT    NOT NULL CHECK(length(frag) BETWEEN 3 AND 80),
+    slug        TEXT    NOT NULL,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, frag)
+) WITHOUT ROWID;
+
+-- A kept ticket hung on the station and on the racks of the doors it borrowed from.
+-- Denormalised from the ticket's slips so every station read is one indexed query.
+CREATE TABLE IF NOT EXISTS ticket_posts (
+    code         TEXT    PRIMARY KEY REFERENCES compositions(code) ON DELETE CASCADE,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    author_hash  TEXT    NOT NULL,
+    alias_slug   TEXT    NOT NULL DEFAULT '',
+    alias_no     INTEGER NOT NULL DEFAULT 0,
+    status       TEXT    NOT NULL DEFAULT 'live' CHECK(status IN ('live', 'hidden', 'removed')),
+    realm        TEXT    NOT NULL DEFAULT '',
+    place        TEXT    NOT NULL DEFAULT '',
+    hour         TEXT    NOT NULL DEFAULT '',
+    season       TEXT    NOT NULL DEFAULT '',
+    marks        TEXT    NOT NULL DEFAULT '{}',
+    transfer     INTEGER NOT NULL DEFAULT 0,
+    search_text  TEXT    NOT NULL DEFAULT '',
+    borrowed     INTEGER NOT NULL DEFAULT 0,
+    posted_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at  DATETIME
+);
+
+CREATE INDEX IF NOT EXISTS idx_ticket_posts_new      ON ticket_posts(status, posted_at DESC, code DESC);
+CREATE INDEX IF NOT EXISTS idx_ticket_posts_realm    ON ticket_posts(status, realm, season, hour);
+CREATE INDEX IF NOT EXISTS idx_ticket_posts_place    ON ticket_posts(status, place);
+CREATE INDEX IF NOT EXISTS idx_ticket_posts_borrowed ON ticket_posts(status, borrowed DESC);
+CREATE INDEX IF NOT EXISTS idx_ticket_posts_user     ON ticket_posts(user_id);
+
+-- The doors a posted ticket borrowed slips from: the rack by each door reads this.
+CREATE TABLE IF NOT EXISTS ticket_post_entrances (
+    slug  TEXT NOT NULL,
+    code  TEXT NOT NULL REFERENCES ticket_posts(code) ON DELETE CASCADE,
+    PRIMARY KEY (slug, code)
+) WITHOUT ROWID;
+
+-- Printed tags on a posted ticket (keys from internal/road/tags.json, at most five).
+CREATE TABLE IF NOT EXISTS ticket_tags (
+    code  TEXT    NOT NULL REFERENCES ticket_posts(code) ON DELETE CASCADE,
+    tag   TEXT    NOT NULL,
+    pos   INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (code, tag)
+) WITHOUT ROWID;
+
+CREATE INDEX IF NOT EXISTS idx_ticket_tags_tag ON ticket_tags(tag, code);
+
+-- Who set out from someone else's ticket ("从这张票出发"), counted once per traveller.
+CREATE TABLE IF NOT EXISTS ticket_borrows (
+    code        TEXT    NOT NULL,
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (code, user_id)
+) WITHOUT ROWID;
+
+-- The enquiry desk: slip texts and tag labels of posted tickets in both languages.
+CREATE VIRTUAL TABLE IF NOT EXISTS station_fts USING fts5(code UNINDEXED, body, tokenize = 'trigram');
+
+-- When a signed-in traveller first opened a work and when they last reached its end; a lamp
+-- only counts after a real passage (reading time for journeys, a dwell on the ticket's back).
+CREATE TABLE IF NOT EXISTS arrivals (
+    user_id        INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    work_kind      TEXT    NOT NULL CHECK(work_kind IN ('ticket', 'journey')),
+    work_id        TEXT    NOT NULL,
+    first_view_at  DATETIME NOT NULL,
+    arrived_at     DATETIME,
+    PRIMARY KEY (user_id, work_kind, work_id)
+) WITHOUT ROWID;
+
+-- One lamp per traveller per work: three wicks (1-5, NULL = not rated), one preset stamp and
+-- private mismatch flags. weight is recomputed nightly (account age, arrival, reciprocity).
+-- The rater's type is deliberately not stored.
+CREATE TABLE IF NOT EXISTS lamps (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    work_kind   TEXT    NOT NULL CHECK(work_kind IN ('ticket', 'journey')),
+    work_id     TEXT    NOT NULL,
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    real        INTEGER CHECK(real BETWEEN 1 AND 5),
+    moved       INTEGER CHECK(moved BETWEEN 1 AND 5),
+    fit         INTEGER CHECK(fit BETWEEN 1 AND 5),
+    stamp       TEXT    NOT NULL DEFAULT '',
+    flags       TEXT    NOT NULL DEFAULT '',
+    weight      REAL    NOT NULL DEFAULT 0,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (work_kind, work_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_lamps_user ON lamps(user_id, created_at);
+
+-- Aggregates per work (Bayesian shrinkage towards the kind's mean; lower bound for sorting).
+CREATE TABLE IF NOT EXISTS lamp_totals (
+    work_kind   TEXT    NOT NULL,
+    work_id     TEXT    NOT NULL,
+    n           INTEGER NOT NULL DEFAULT 0,
+    w_sum       REAL    NOT NULL DEFAULT 0,
+    real_m      REAL    NOT NULL DEFAULT 0,
+    moved_m     REAL    NOT NULL DEFAULT 0,
+    fit_m       REAL    NOT NULL DEFAULT 0,
+    bright      REAL    NOT NULL DEFAULT 0,
+    lower       REAL    NOT NULL DEFAULT 0,
+    top_axis    TEXT    NOT NULL DEFAULT '',
+    top_stamps  TEXT    NOT NULL DEFAULT '',
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (work_kind, work_id)
+) WITHOUT ROWID;
+
+-- "交给站务": one report per traveller per work, with a preset reason. Three trusted
+-- reporters dim a ticket until the station master looks at it.
+CREATE TABLE IF NOT EXISTS reports (
+    work_kind    TEXT    NOT NULL CHECK(work_kind IN ('ticket')),
+    work_id      TEXT    NOT NULL,
+    reporter_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reason       TEXT    NOT NULL,
+    trusted      INTEGER NOT NULL DEFAULT 0,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    resolved_at  DATETIME,
+    PRIMARY KEY (work_kind, work_id, reporter_id)
+) WITHOUT ROWID;
+
+-- "不再同站": tickets by this author no longer appear for this traveller. Silent both ways.
+CREATE TABLE IF NOT EXISTS blocks (
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    author_hash  TEXT    NOT NULL,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, author_hash)
+) WITHOUT ROWID;
+
+-- Per-account daily caps (posts, lamps, reports), counted in the same transaction as the act.
+CREATE TABLE IF NOT EXISTS daily_caps (
+    user_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    day      TEXT    NOT NULL,
+    kind     TEXT    NOT NULL,
+    n        INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, day, kind)
+) WITHOUT ROWID;

@@ -21,6 +21,7 @@ type User struct {
 	MBTIType     string    `json:"mbti_type,omitempty"`
 	Gender       string    `json:"gender,omitempty"`
 	AvatarURL    string    `json:"avatar_url,omitempty"`
+	AgeBand      string    `json:"age_band"` // declared at sign-up: under14, 14-17 or 18+ ('' for older accounts)
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
@@ -30,12 +31,16 @@ func (u *User) IsAdmin() bool {
 	return u.Role == RoleAdmin
 }
 
+// AgeBands are the self-declared age bands (no birth year is asked for).
+var AgeBands = []string{"under14", "14-17", "18+"}
+
 // RegisterRequest holds incoming registration payload.
 type RegisterRequest struct {
 	Username      string `json:"username" binding:"required,min=2,max=30"`
 	Email         string `json:"email" binding:"required,email"`
 	Password      string `json:"password" binding:"required,min=6"`
 	Gender        string `json:"gender" binding:"required,oneof=female male non_binary prefer_not_to_say"`
+	AgeBand       string `json:"age_band" binding:"omitempty,oneof=under14 14-17 18+"`
 	CaptchaID     string `json:"captcha_id" binding:"required"`
 	CaptchaAnswer string `json:"captcha_answer" binding:"required"`
 }

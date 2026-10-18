@@ -29,6 +29,7 @@ Pages.Space = {
 
   destroy() {
     this._seq++;
+    if (this._drift) { this._drift.destroy(); this._drift = null; }
     if (this._onSession) window.removeEventListener('session:updated', this._onSession);
     this._onSession = null;
   },
@@ -106,6 +107,7 @@ Pages.Space = {
             <div class="section-head"><div><h2 id="space-keeps-title">${esc(t('space.keeps.title'))}</h2></div></div>
             <ul class="space__keeps" id="space-keeps"><li class="space__keeps-empty">${esc(t('space.keeps.empty'))}</li></ul>
           </section>
+          <div class="space__section space__drift" id="space-drift"></div>
           ${guest ? `
             <aside class="space__guest" aria-labelledby="space-guest-title">
               <div><h2 id="space-guest-title">${esc(t('space.guest.title'))}</h2><p>${esc(t('space.guest.text'))}</p></div>
@@ -122,6 +124,12 @@ Pages.Space = {
       </section>`;
 
     if (reveal) Lumi.condense(document.getElementById('space-form'), code, { size: formSize, label: formLabel });
+    // Three tickets the wind brought: they borrowed from doors written for this type (never the authors').
+    Compose.fragments().then((list) => {
+      const el = document.getElementById('space-drift');
+      if (!el) return;
+      this._drift = Rack.mount(el, { slug: `drift-${code}`, by: Compose.index(list), eyebrow: 'drift.eyebrow', kind: 'drift', source: () => API.drifted(code) });
+    }).catch(() => {});
     document.querySelector('.space').addEventListener('click', (e) => {
       const card = e.target.closest('#space-picks .journey-card, #space-first, #space-keeps a');
       if (card) API.track('entrance_open', card.dataset.slug || '', { from: 'space' });
