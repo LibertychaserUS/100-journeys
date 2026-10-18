@@ -2,7 +2,7 @@
 
 [![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
 [![Live demo](https://img.shields.io/badge/live%20demo-AWS%20Lightsail-f2c46d)](https://52-203-52-72.sslip.io/)
-[![E2E](https://img.shields.io/badge/Playwright-90%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
+[![E2E](https://img.shields.io/badge/Playwright-91%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
 
 中文：**桃源百旅** 是一个故事化的旅行灵感产品。用户不是从地图选目的地，而是从一种心情、一个 MBTI 人格或一类幻想世界出发，读一段带有临时身份、任务和线索的“旅行剧本”，再用虚拟币领取它。
 

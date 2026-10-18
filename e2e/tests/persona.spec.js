@@ -77,4 +77,16 @@ test.describe('Travel personality', () => {
     await expect(page.locator('#ai-pet-messages')).not.toContainText('server rules');
     await expect(page.locator('.ai-pet__typing')).toHaveCount(0);
   });
+
+  // E2E-PET-004: a rate-limited guide (429 from the edge) answers from its own rules
+  test('guide falls back when rate limited', async ({ page }) => {
+    await page.route('**/api/ai/chat', (route) => route.fulfill({ status: 429, json: { data: null, error: 'too many requests' } }));
+    await page.goto('/#/');
+    await page.locator('#ai-pet-avatar').click();
+    await page.locator('#ai-pet-input').fill('推荐旅行');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#ai-pet-chat [data-pet-action="recommend"]').last()).toBeVisible();
+    await expect(page.locator('.ai-pet__typing')).toHaveCount(0);
+    await expect(page.locator('#ai-pet-messages')).not.toContainText('too many requests');
+  });
 });
