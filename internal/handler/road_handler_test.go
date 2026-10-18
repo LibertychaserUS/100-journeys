@@ -325,6 +325,18 @@ func TestRoad_Lamps(t *testing.T) {
 	other := g.keep(t, author, "lamp-ticket-0002", map[string]string{"place": "tromso", "hour": "night", "stay": "day"}, "")
 	_, _ = g.do(t, "POST", "/api/auth/tickets/"+other+"/post", author, map[string]interface{}{})
 	assert.Equal(t, []string{share, other}, codes(g.station(t, "sort=bright")))
+	// A ticket lit low by five travellers sits below one nobody has lit yet (which starts at the mean).
+	dim := g.keep(t, author, "lamp-ticket-0003", map[string]string{"place": "koyasan", "hour": "predawn", "stay": "hour"}, "")
+	_, _ = g.do(t, "POST", "/api/auth/tickets/"+dim+"/post", author, map[string]interface{}{})
+	for _, tok := range riders {
+		_, _ = g.do(t, "POST", "/api/auth/arrivals", tok, map[string]string{"kind": "ticket", "id": dim, "step": "view"})
+	}
+	g.clock = g.clock.Add(9 * time.Second)
+	for _, tok := range riders {
+		code, resp = g.do(t, "POST", "/api/auth/lamps", tok, map[string]interface{}{"kind": "ticket", "id": dim, "real": 1, "moved": 1, "fit": 1})
+		require.Equal(t, http.StatusOK, code, resp)
+	}
+	assert.Equal(t, []string{share, other, dim}, codes(g.station(t, "sort=bright")))
 
 	code, _ = g.do(t, "POST", "/api/auth/lamps", riders[1], map[string]interface{}{"kind": "ticket", "id": share})
 	assert.Equal(t, http.StatusBadRequest, code, "a lamp needs a wick or a stamp")

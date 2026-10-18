@@ -169,7 +169,6 @@ I18n.extend('zh', {
   'block.lead': '这位旅人的票不会再出现在你的站台和门边。对方不会知道。',
   'block.do': '不再同站',
   'block.done': '不会再同站了。',
-  'block.undo': '撤销',
 
   'admin.road.title': '站务',
   'admin.road.lead': '被熄灯或被交给站务的票。',
@@ -361,7 +360,6 @@ I18n.extend('en', {
   'block.lead': 'This traveller’s tickets won’t appear on your platforms or by your doors again. They won’t know.',
   'block.do': 'Never share a platform',
   'block.done': 'You won’t share a platform again.',
-  'block.undo': 'Undo',
 
   'admin.road.title': 'Station staff',
   'admin.road.lead': 'Tickets that were dimmed or handed to the staff.',

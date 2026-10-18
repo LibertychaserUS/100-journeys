@@ -500,6 +500,8 @@ func (h *RoadHandler) Station(c *gin.Context) {
 		}
 		q.After = cur
 	}
+	// A ticket nobody has lit yet sits where every work starts: at the kind's mean, cautiously.
+	q.Unlit = light.Sum(nil, h.repo.Mean(light.KindTicket, h.rules.PriorMean), h.rules).Lower
 	lang := service.NormalizeLocale(c.Query("lang"))
 	uid := viewer(c)
 	if uid > 0 {
@@ -524,7 +526,7 @@ func (h *RoadHandler) Station(c *gin.Context) {
 	next := ""
 	if len(rows) > carriage {
 		rows = rows[:carriage]
-		next = encodeCursor(repository.CursorFor(rows[len(rows)-1], q.Sort))
+		next = encodeCursor(repository.CursorFor(rows[len(rows)-1], q.Sort, q.Unlit))
 	}
 	items := make([]TicketView, len(rows))
 	for i, p := range rows {

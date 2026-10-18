@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -504,6 +505,7 @@ type StationQuery struct {
 	After                           *StationCursor
 	Limit                           int
 	Blocked                         []string // author hashes to leave out
+	Unlit                           float64  // the lower bound a ticket nobody has lit yet starts at
 }
 
 // StationCursor is the keyset position: the sort value, the posting time and the code.
@@ -555,7 +557,7 @@ func (r *RoadRepository) Station(ctx context.Context, q StationQuery) ([]PostRow
 	num := "0"
 	switch q.Sort {
 	case "bright":
-		num = "COALESCE(lt.lower, 0)"
+		num = fmt.Sprintf("COALESCE(lt.lower, %s)", strconv.FormatFloat(q.Unlit, 'g', -1, 64))
 	case "borrowed":
 		num = "p.borrowed"
 	}
@@ -588,12 +590,15 @@ func (r *RoadRepository) Station(ctx context.Context, q StationQuery) ([]PostRow
 	return list, r.attachTags(ctx, list)
 }
 
-// CursorFor is the keyset position after row p in order sort.
-func CursorFor(p PostRow, sort string) StationCursor {
+// CursorFor is the keyset position after row p in order sort (unlit: where unlit tickets start).
+func CursorFor(p PostRow, sort string, unlit float64) StationCursor {
 	c := StationCursor{At: sqlTime(p.PostedAt), Code: p.Code}
 	switch sort {
 	case "bright":
-		c.Num = p.Totals.Lower
+		c.Num = unlit
+		if p.Lit {
+			c.Num = p.Totals.Lower
+		}
 	case "borrowed":
 		c.Num = float64(p.Borrowed)
 	}
