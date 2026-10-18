@@ -7,6 +7,7 @@ const PAGES = [
   ['home', '/#/', '.home-hero__title'],
   ['explore', '/#/explore', '.journey-card[data-slug]'],
   ['detail', '/#/journey/bolivia-salt-flat-trek', '.detail-hero__title'],
+  ['compose', '/#/compose', '#compose-tray .slip'],
   ['login', '/#/login', '#login-form'],
   ['register', '/#/register', '#register-form'],
   ['about', '/#/about', '.about-head'],
@@ -30,6 +31,33 @@ for (const theme of ['dark', 'light']) {
         expect(summary, summary.join('\n')).toEqual([]);
       });
     }
+  });
+}
+
+// E2E-A11Y-COMPOSE-001: the compose game mid-play (placed and blank lines, stamp, kept list) and the share view, both themes
+for (const theme of ['dark', 'light']) {
+  test(`compose with a kept ticket and its share view have no WCAG A/AA violations (${theme})`, async ({ page, context }) => {
+    await freshPage(page);
+    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await registerAndLogin(page, { prefix: `axecompose${theme}`, next: '/compose' });
+    for (const id of ['place-back-alley', 'hour-blue-hour', 'ritual-postcard']) await page.locator(`#slip-${id}`).click();
+    await page.locator('#compose-share').click();
+    await expect(page.locator('#compose-mine .kept')).toHaveCount(1);
+    await expect(page.locator('#compose-ticket .cticket__stamp')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    const scan = async () => {
+      const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+      return results.violations.map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(', ')}`);
+    };
+    let summary = await scan();
+    expect(summary, summary.join('\n')).toEqual([]);
+
+    await page.goto(await page.evaluate(() => navigator.clipboard.readText()));
+    await expect(page.locator('#shared-ticket-title')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    summary = await scan();
+    expect(summary, summary.join('\n')).toEqual([]);
   });
 }
 

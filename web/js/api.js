@@ -96,6 +96,13 @@ const API = (() => {
     saveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'PUT' }),
     unsaveJourney: (slug) => authed(`/auth/saved/${encodeURIComponent(slug)}`, { method: 'DELETE' }),
 
+    // Compose game: slips, kept tickets (signed in) and share links (public)
+    composeFragments: () => request(`/compose/fragments${qs(withLang())}`),
+    listCompositions: () => authed('/auth/compositions'),
+    keepComposition: (ticket) => post('/auth/compositions', ticket),
+    deleteComposition: (id) => authed(`/auth/compositions/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+    getComposition: (code) => request(`/compositions/${encodeURIComponent(code)}`),
+
     // Orders
     createOrder: (items) => post('/orders', { items }),
     listOrders: () => authed('/orders'),

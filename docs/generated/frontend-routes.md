@@ -7,6 +7,8 @@
 | `/` | home |
 | `/explore` | explore |
 | `/journey/:slug` | journey detail |
+| `/compose` | compose |
+| `/compose/:code` | compose/:code |
 | `/login` | login |
 | `/register` | register |
 | `/profile` | profile |

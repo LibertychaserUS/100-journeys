@@ -1,0 +1,248 @@
+/* =============================================================
+   COMPOSE — "画一个自己的入口": torn paper slips, the lantern-frame ticket,
+   kept tickets, the share view, and the invitation card on Explore.
+
+   Paper is a light surface in both themes, so inside it the role tokens are
+   re-pointed to ink (the same rule as the light theme: action becomes an ink
+   button). Paper colours are scoped to the components that use them.
+   ============================================================= */
+
+.slip, .cticket, .compose__frame, .compose-invite__slips {
+  --paper: #f4ecdc;
+  --paper-ink: #2a2117;      /* 13.9:1 on paper */
+  --paper-ink-2: #6a5c4b;    /*  5.5:1 on paper */
+  --paper-line: rgba(60, 40, 10, .24);
+  --seal: #a3302c;           /*  5.9:1 on paper */
+}
+[data-theme="light"] :is(.slip, .cticket, .compose__frame, .compose-invite__slips) { --paper: #fffaf0; }
+
+.cticket, .compose__frame {
+  --color-text: var(--paper-ink);
+  --color-text-2: var(--paper-ink-2);
+  --color-text-3: var(--paper-ink-2);
+  --color-line: var(--paper-line);
+  --color-line-strong: rgba(60, 40, 10, .38);
+  --color-action: #1d1a14;
+  --color-on-action: #fbe1a6;
+  --color-action-hover: #34302a;
+  --color-focus: #8a5a0f;
+  color: var(--paper-ink);
+}
+
+/* ---------- page ---------- */
+.compose__head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-6) var(--space-5); }
+.compose__head h1 { font-family: var(--font-story); font-size: var(--text-3xl); font-weight: 700; line-height: 1.2; }
+.compose__head p { margin-top: 6px; color: var(--color-text-2); font-size: var(--text-base); max-width: 36em; }
+.compose__progress { display: flex; align-items: center; gap: 10px; font-size: var(--text-sm); color: var(--color-text-3); white-space: nowrap; }
+.compose__bars { display: inline-flex; gap: 6px; }
+.compose__bars b { width: 22px; height: 4px; border-radius: 2px; background: var(--color-line-strong); transition: background var(--dur); }
+.compose__bars b.on { background: var(--color-action); }
+
+.compose__grid { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: var(--space-6) 40px; align-items: start; padding-bottom: var(--space-7); }
+
+/* ---------- tray ---------- */
+.compose__grid > * { min-width: 0; }
+.compose-tray { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+.tray-group { min-width: 0; }
+.tray-group h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; font-size: var(--text-sm); font-weight: var(--weight-semibold); letter-spacing: .14em; color: var(--color-text-3); }
+.tray-group h2 span { letter-spacing: 0; font-weight: var(--weight-normal); color: var(--color-text-2); }
+.slips { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px; margin: -4px; }
+
+/* A slip is a button with the torn paper drawn underneath, so the focus ring is never clipped. */
+.slip {
+  position: relative; isolation: isolate; display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  min-height: 46px; padding: 10px 16px 10px 14px; text-align: left;
+  font-family: var(--font-story); font-size: 15px; line-height: 1.35; color: var(--paper-ink);
+  transform: rotate(var(--r, 0deg)); transition: transform var(--dur) var(--ease), opacity var(--dur);
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .32));
+  touch-action: manipulation; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none;
+}
+.slip::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; background: var(--paper); border-radius: 2px;
+  clip-path: polygon(0 5%, 6% 0, 40% 3%, 72% 0, 100% 5%, 98% 52%, 100% 95%, 66% 100%, 30% 97%, 0 100%, 2% 50%);
+}
+.slip small { display: block; margin-top: 2px; font-family: var(--font-ui); font-size: 11px; line-height: 1.35; color: var(--paper-ink-2); }
+[data-theme="light"] .slip { filter: drop-shadow(0 3px 4px rgba(60, 40, 10, .16)) drop-shadow(0 0 1px rgba(60, 40, 10, .25)); }
+button.slip { cursor: grab; }
+button.slip:hover { transform: rotate(0deg) translateY(-2px); }
+.slip:focus-visible { outline-offset: 5px; border-radius: 3px; }
+/* Placed: the slip has gone into the frame and leaves its outline behind. */
+.slip[aria-pressed="true"] { color: var(--color-text-2); filter: none; transform: rotate(0deg); }
+.slip[aria-pressed="true"]::before { background: transparent; clip-path: none; border: 1.5px dashed var(--color-action); border-radius: 4px; }
+.slip[aria-pressed="true"] small { color: var(--color-text-3); }
+.slip.is-lifted { opacity: .4; }
+.slip--ghost { position: fixed; left: 0; top: 0; z-index: var(--z-overlay); pointer-events: none; transition: none; filter: drop-shadow(0 16px 18px rgba(0, 0, 0, .45)); }
+body.is-dragging-slip, body.is-dragging-slip * { cursor: grabbing !important; user-select: none; }
+
+/* ---------- the lantern frame ---------- */
+.compose__frame {
+  position: sticky; top: calc(var(--nav-h) + 20px); border-radius: 18px; background: var(--paper);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .7), 0 0 0 1px var(--paper-line);
+  transition: transform var(--dur) var(--ease), outline-color var(--dur);
+  outline: 2px dashed transparent; outline-offset: 6px;
+}
+[data-theme="light"] .compose__frame { box-shadow: 0 24px 60px -30px rgba(20, 22, 28, .35), 0 0 0 1px var(--paper-line); }
+.compose__frame.is-target { outline-color: var(--color-focus); }
+.compose__frame.is-over { outline-style: solid; transform: scale(1.012); }
+.compose__frame .cticket { box-shadow: none; border-radius: 18px 18px 0 0; }
+.compose__foot { position: relative; padding: 18px 24px 22px; }
+.compose__foot::before { content: ""; position: absolute; left: 16px; right: 16px; top: 0; border-top: 1.5px dashed var(--paper-line); }
+.compose__foot::after { content: ""; position: absolute; left: -1px; right: -1px; top: -10px; height: 20px; background: radial-gradient(circle at 0 50%, var(--color-bg) 9px, transparent 9.5px), radial-gradient(circle at 100% 50%, var(--color-bg) 9px, transparent 9.5px); pointer-events: none; }
+.compose__hint { font-size: var(--text-sm); line-height: 1.55; color: var(--paper-ink-2); }
+.compose__actions { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; }
+.compose__actions .btn { min-height: 48px; min-width: 0; }
+.compose__actions .icon-btn--square { width: 48px; height: 48px; }
+.compose__actions [data-copied="true"] { color: var(--color-ok); }
+
+/* ---------- ticket (game frame, share view, kept list) ---------- */
+.cticket { position: relative; overflow: hidden; border-radius: 18px; background: var(--paper); box-shadow: 0 24px 60px -30px rgba(0, 0, 0, .7), 0 0 0 1px var(--paper-line); }
+.cticket__img { position: relative; aspect-ratio: 16 / 10; background: var(--cover) center 60% / cover; }
+.cticket__img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--paper) 0%, transparent 55%); }
+.cticket__img--blank { background: none; display: grid; place-items: center; margin: 14px 14px 0; aspect-ratio: 16 / 9; border: 1.5px dashed var(--paper-line); border-radius: 12px; }
+.cticket__img--blank::after { content: none; }
+.cticket__img--blank[data-realm] { margin: 0; border: 0; border-radius: 0; aspect-ratio: 16 / 10; background: var(--realm-art); }
+.cticket__img--blank[data-realm]::after { content: ""; }
+.cticket__drop { max-width: 14em; padding: 0 16px; text-align: center; font-size: var(--text-sm); color: var(--paper-ink-2); }
+/* Places that are not an entrance get a painted sky of their realm instead of a photo. */
+[data-realm="city-rules"] { --realm-art:
+  radial-gradient(circle at 18% 46%, #ffd98a 0 2px, rgba(242, 196, 109, .35) 3px, transparent 14px),
+  radial-gradient(circle at 41% 40%, #ffd98a 0 2px, rgba(242, 196, 109, .3) 3px, transparent 12px),
+  radial-gradient(circle at 63% 35%, #ffd98a 0 1.5px, rgba(242, 196, 109, .25) 2.5px, transparent 10px),
+  radial-gradient(circle at 80% 31%, #ffd98a 0 1px, rgba(242, 196, 109, .2) 2px, transparent 8px),
+  linear-gradient(180deg, #161a2b 0%, #2a2c42 58%, #4a3f45 100%); }
+[data-realm="mirror-salt"] { --realm-art: linear-gradient(180deg, #cfd9e6, #f1e6d6 52%, #cdd8e5 53%, #eae2d4); }
+[data-realm="fire-stone"] { --realm-art: radial-gradient(circle at 50% 80%, rgba(255, 140, 70, .6), transparent 40%), linear-gradient(180deg, #1c1714, #3a2a22); }
+[data-realm="ice-night"] { --realm-art: radial-gradient(ellipse at 40% 30%, rgba(120, 230, 180, .45), transparent 50%), linear-gradient(180deg, #0c1622, #1d2a3a); }
+[data-realm="sand-stars"] { --realm-art: radial-gradient(circle at 70% 20%, rgba(255, 255, 255, .5) 0 1px, transparent 2px), linear-gradient(180deg, #151a33, #6b4a3a 70%, #b9875a); }
+[data-realm="mist-temple"] { --realm-art: linear-gradient(180deg, #d9dcd6, #a9b2ac 60%, #6f7c76); }
+[data-realm="water-deep"] { --realm-art: linear-gradient(180deg, #2a4a5a, #0f2733); }
+[data-realm="old-roads"] { --realm-art: linear-gradient(180deg, #c9b79a, #7d6a52); }
+
+.cticket__body { position: relative; padding: 18px 24px 22px; }
+/* Over a photo or a painted sky the text starts inside the fade. */
+.cticket__img:not(.cticket__img--blank) ~ .cticket__body, .cticket__img--blank[data-realm] ~ .cticket__body { margin-top: -36px; padding-top: 0; }
+.cticket__label { font-size: 11px; letter-spacing: .14em; color: var(--paper-ink-2); }
+.cticket__title { margin-top: 6px; font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.45; font-weight: 700; text-wrap: pretty; }
+:lang(en) .cticket__title { font-size: 1.3rem; }
+.cticket__placeholder { color: var(--paper-ink-2); font-weight: 400; }
+.cticket__story { margin-top: 8px; font-family: var(--font-story); font-size: var(--text-md); line-height: 1.6; }
+.ink.is-new { background: linear-gradient(transparent 62%, rgba(242, 196, 109, .5) 62%); animation: ink 1.2s var(--ease) both; }
+.cticket__lines { margin-top: 16px; display: grid; gap: 8px; }
+.cline { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: var(--text-base); }
+.cline dt { font-size: 11px; letter-spacing: .1em; color: var(--paper-ink-2); }
+:lang(en) .cline { grid-template-columns: 76px minmax(0, 1fr); }
+:lang(en) .cline dt, :lang(en) .cticket__label { letter-spacing: .06em; }
+.cline dd { font-family: var(--font-story); min-width: 0; }
+.cline__blank { display: block; height: 1.15em; border-bottom: 1.5px dashed var(--paper-line); }
+.cline.is-new dd { animation: ink 1.2s var(--ease) both; }
+.cline__take { padding: 2px 0; text-align: left; font: inherit; line-height: 1.4; border-radius: 3px; text-decoration-thickness: 1px; }
+.cline__take:hover { text-decoration: line-through; text-decoration-color: var(--paper-ink-2); }
+.cticket__link { display: inline-flex; align-items: center; gap: 4px; margin-top: 14px; font-size: var(--text-sm); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--paper-line); }
+.cticket__link:hover { text-decoration-color: currentColor; }
+.cticket__stamp {
+  position: absolute; z-index: 2; right: 18px; top: 18px; width: 76px; height: 76px; border-radius: 50%;
+  display: grid; place-content: center; text-align: center; gap: 1px;
+  border: 2px solid var(--seal); color: var(--seal); background: color-mix(in srgb, var(--paper) 90%, transparent);
+  font-family: var(--font-story); font-size: 12px; line-height: 1.25; transform: rotate(-14deg);
+}
+.cticket__stamp span:last-child { font-family: var(--font-ui); font-size: 11px; letter-spacing: .06em; }
+.cticket__stamp.is-new { animation: stamp .45s cubic-bezier(.3, 1.4, .5, 1) both; }
+
+@keyframes ink { from { filter: blur(3px); opacity: 0; letter-spacing: .2em; } }
+@keyframes stamp { from { transform: rotate(-24deg) scale(1.9); opacity: 0; } }
+
+/* Mini tickets in the kept list */
+.cticket--mini { border-radius: 14px; box-shadow: 0 16px 40px -24px rgba(0, 0, 0, .7), 0 0 0 1px var(--paper-line); }
+.cticket--mini .cticket__img { aspect-ratio: 16 / 6; }
+.cticket--mini .cticket__img--blank:not([data-realm]) { display: none; }
+.cticket--mini .cticket__body { padding: 14px 18px 18px; }
+.cticket--mini .cticket__img:not(.cticket__img--blank) ~ .cticket__body, .cticket--mini .cticket__img--blank[data-realm] ~ .cticket__body { margin-top: -20px; padding-top: 0; }
+.cticket--mini .cticket__title { font-size: var(--text-md); }
+.cticket--mini .cticket__story { font-size: var(--text-sm); }
+.cticket--mini .cticket__stamp { width: 56px; height: 56px; right: 12px; top: 10px; font-size: 10px; }
+.cticket--mini .cticket__stamp span:last-child { font-size: 9px; }
+
+/* Phones: progress bar while the ticket is scrolled away (reuses the bookbar spacing for toasts and the guide). */
+.compose-peek {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bookbar);
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: var(--color-nav-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 1px solid var(--color-line);
+}
+.compose-peek__btn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 14px; border-radius: var(--radius-control); background: var(--color-surface); border: 1px solid var(--color-line-strong); text-align: left; }
+.compose-peek__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-story); font-size: var(--text-base); }
+.compose-peek__n { font-size: var(--text-sm); color: var(--color-text-3); }
+.compose-peek__go { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-sm); font-weight: var(--weight-semibold); white-space: nowrap; }
+
+/* ---------- kept tickets ---------- */
+.compose-mine { padding-block: var(--space-6) var(--space-9); border-top: 1px solid var(--color-line); }
+.compose-mine__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; margin-bottom: var(--space-5); }
+.compose-mine h2 { font-family: var(--font-story); font-size: var(--text-2xl); font-weight: 700; }
+.compose-mine h2 .num { font-family: var(--font-ui); font-size: var(--text-base); font-weight: var(--weight-normal); color: var(--color-text-3); }
+.compose-mine__note, .compose-mine__empty { font-size: var(--text-base); color: var(--color-text-2); }
+.compose-mine__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-5); }
+.kept { display: grid; gap: 10px; align-content: start; }
+.kept__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kept__actions .icon-btn { width: 36px; height: 36px; }
+.kept__tag { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: var(--radius-pill); border: 1px solid var(--color-line-strong); font-size: var(--text-xs); color: var(--color-text-2); }
+.kept__tear[data-confirm="true"] { color: var(--color-danger); }
+
+/* ---------- share view ---------- */
+.compose-shared { max-width: 520px; padding-block: var(--space-6) var(--space-9); }
+.compose-shared__head { margin-bottom: var(--space-5); }
+.compose-shared__eyebrow { font-size: var(--text-xs); letter-spacing: .14em; color: var(--color-text-3); }
+.compose-shared__head h1 { margin-top: 6px; font-family: var(--font-story); font-size: var(--text-2xl); font-weight: 700; }
+.compose-shared__head p:last-child { margin-top: 6px; color: var(--color-text-2); font-size: var(--text-base); }
+.compose-shared__actions { margin-top: var(--space-5); display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.cticket-skeleton { height: 560px; border-radius: 18px; }
+
+/* ---------- invitation on Explore ---------- */
+.compose-invite-wrap { margin-top: calc(-1 * var(--space-7)); padding-bottom: var(--space-8); }
+.compose-invite {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-6);
+  padding: 28px 32px; border-radius: var(--radius-sheet); background: var(--color-surface); border: 1px solid var(--color-line);
+  transition: border-color var(--dur-fast);
+}
+.compose-invite:hover { border-color: var(--color-line-strong); }
+.compose-invite__eyebrow { font-size: var(--text-xs); letter-spacing: .14em; color: var(--color-text-3); }
+.compose-invite__title { margin-top: 6px; font-family: var(--font-story); font-size: var(--text-2xl); font-weight: 700; }
+.compose-invite__lead { margin-top: 8px; max-width: 34em; color: var(--color-text-2); font-size: var(--text-base); line-height: 1.7; }
+.compose-invite__cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-weight: var(--weight-semibold); }
+.compose-invite:hover .compose-invite__cta { text-decoration: underline; text-underline-offset: 4px; }
+.compose-invite__slips { display: grid; gap: 10px; justify-items: end; padding-right: 8px; }
+.compose-invite__slips .slip { font-size: 14px; min-height: 40px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ink.is-new, .cline.is-new dd, .cticket__stamp.is-new { animation: none; }
+  .slip, .compose__frame { transition: none; }
+  button.slip:hover { transform: rotate(var(--r, 0deg)); }
+}
+
+@media (max-width: 960px) {
+  .compose__grid { grid-template-columns: minmax(0, 1fr) 320px; gap: var(--space-5) 24px; }
+  .cticket__body { padding-inline: 20px; }
+  .compose__foot { padding-inline: 20px; }
+}
+
+@media (max-width: 760px) {
+  .compose__head { flex-direction: column; align-items: flex-start; padding-block: var(--space-5) var(--space-4); }
+  .compose__head h1 { font-size: var(--text-2xl); }
+  .compose__grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+  .compose__frame { position: relative; top: 0; order: -1; }
+  .cticket__img { aspect-ratio: 16 / 7; }
+  .cticket__img--blank { aspect-ratio: 16 / 5; }
+  .cticket__img--blank[data-realm] { aspect-ratio: 16 / 7; }
+  .cticket__title { font-size: var(--text-lg); }
+  .cticket__lines { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
+  .cline, :lang(en) .cline { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .compose-tray { gap: 16px; }
+  .slips {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 6px 16px 12px 4px; margin: -6px -16px -12px -4px;
+    scroll-padding-inline: 4px; overscroll-behavior-x: contain;
+  }
+  .slips::-webkit-scrollbar { display: none; }
+  .slip { flex: none; max-width: 78vw; }
+  .compose-invite { grid-template-columns: minmax(0, 1fr); padding: 22px 20px; gap: var(--space-4); }
+  .compose-invite__slips { grid-auto-flow: column; justify-content: start; justify-items: start; padding: 4px 0 8px; overflow: hidden; mask-image: linear-gradient(90deg, #000 80%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 80%, transparent); }
+  .compose-invite__slips .slip { white-space: nowrap; }
+  .compose-invite__title { font-size: var(--text-xl); }
+}

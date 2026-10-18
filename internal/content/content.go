@@ -233,10 +233,9 @@ func Validate(e Entrance) []string {
 	}
 
 	for _, lang := range []struct {
-		name   string
-		t      Text
-		banned []string
-	}{{"zh", e.ZH, bannedZH}, {"en", e.EN, bannedEN}} {
+		name string
+		t    Text
+	}{{"zh", e.ZH}, {"en", e.EN}} {
 		t := lang.t
 		for field, v := range map[string]string{"title": t.Title, "hook": t.Hook, "region": t.Region, "opens": t.Opens, "role": t.Role, "premise": t.Premise, "mission": t.Mission, "ending": t.Ending, "fiction": t.Fiction} {
 			if strings.TrimSpace(v) == "" {
@@ -266,15 +265,7 @@ func Validate(e Entrance) []string {
 			}
 		}
 		for _, s := range narrative(t) {
-			lower := strings.ToLower(s)
-			if m := mbtiCode.FindString(s); m != "" {
-				add("%s copy names a type (%s): %q", lang.name, m, short(s))
-			}
-			for _, w := range lang.banned {
-				if strings.Contains(lower, strings.ToLower(w)) {
-					add("%s copy tells instead of shows (%q): %q", lang.name, w, short(s))
-				}
-			}
+			p = append(p, Lint(lang.name, s)...)
 		}
 	}
 	if e.ZH.Choice != nil && e.EN.Choice != nil && !sameKeys(e.ZH.Choice.Options, e.EN.Choice.Options) {
@@ -282,6 +273,29 @@ func Validate(e Entrance) []string {
 	}
 	return p
 }
+
+// Lint applies the show-don't-tell rules to one piece of reader-facing copy in lang ("zh" or "en"):
+// no type codes and none of the trait or lecturing words. It returns readable problems, or nil.
+func Lint(lang, s string) []string {
+	var p []string
+	if m := mbtiCode.FindString(s); m != "" {
+		p = append(p, fmt.Sprintf("%s copy names a type (%s): %q", lang, m, short(s)))
+	}
+	banned := bannedEN
+	if lang == "zh" {
+		banned = bannedZH
+	}
+	lower := strings.ToLower(s)
+	for _, w := range banned {
+		if strings.Contains(lower, strings.ToLower(w)) {
+			p = append(p, fmt.Sprintf("%s copy tells instead of shows (%q): %q", lang, w, short(s)))
+		}
+	}
+	return p
+}
+
+// Contains reports whether v is one of the vocabulary values in list.
+func Contains(list []string, v string) bool { return contains(list, v) }
 
 // narrative is the reader-facing story copy that the show-don't-tell lint applies to.
 func narrative(t Text) []string {

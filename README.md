@@ -2,7 +2,7 @@
 
 [![CI/CD](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml/badge.svg)](https://github.com/LibertychaserUS/100-journeys/actions/workflows/ci.yml)
 [![Live demo](https://img.shields.io/badge/live%20demo-AWS%20Lightsail-f2c46d)](https://52-203-52-72.sslip.io/)
-[![E2E](https://img.shields.io/badge/Playwright-67%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
+[![E2E](https://img.shields.io/badge/Playwright-79%20tests%20%C2%B7%20axe%20WCAG%20AA-2ea44f)](docs/testing/TDD-spec.md)
 
 中文：**桃源百旅** 是一个故事化的旅行灵感产品。用户不是从地图选目的地，而是从一种心情、一个 MBTI 人格或一类幻想世界出发，读一段带有临时身份、任务和线索的“旅行剧本”，再用虚拟币领取它。
 
@@ -32,6 +32,7 @@ More screenshots, before and after the 2026-10 redesign: [docs/design/redesign-2
 
 - **按心情、人格、幻想类型探索 | Discover by mood, MBTI or fantasy type**: search, mood shortcuts, fantasy-type facets and a filter panel (MBTI, adventure level, tags, visual style). Filters live in the URL, so a filtered view can be shared.
 - **旅行剧本 | Travel scripts**: every journey has a role, a mission and four clues (local guide, gear, risk, best-matched personalities), plus a booking "ticket".
+- **画一个自己的入口 | Draw your own entrance**: piece a ticket together from paper slips (a place, an hour, a season, how long you stay, a small ritual, what you take home) by tapping, dragging or with the keyboard. The ticket's sentence comes from per-language templates, blanks can be filled in later, guests keep tickets on the device until they sign in, and a kept ticket can be shared by a read-only link (`#/compose`).
 - **中英双语 | Bilingual**: UI strings in zh/en catalogs; journey content comes from the API in either language (`?lang=en`), and English searches match English copy.
 - **收藏与旅行人格 | Saved journeys and travel personality**: save journeys to your account; pick an MBTI type (or take a 5-question quiz with the guide) and get recommendations.
 - **模拟交易 | Simulated commerce**: tiered top-ups with a real bonus, in-page checkout with a points discount, a shortfall flow that tops up and returns you to the order, and a full ledger.
@@ -102,6 +103,8 @@ JSON responses use one envelope: `{ data, error, total?, page?, limit? }`. The C
 | `GET` | `/api/auth/me` | JWT | Current user |
 | `GET` `PUT` `DELETE` | `/api/auth/saved[/:slug]` | JWT | Saved journeys |
 | `PUT` | `/api/auth/mbti` | JWT | Save travel personality |
+| `GET` | `/api/compose/fragments`, `/api/compositions/:code` | Public | Compose game slips; read-only shared ticket |
+| `GET` `POST` `DELETE` | `/api/auth/compositions[/:id]` | JWT | Kept tickets (POST is idempotent on the client id) |
 | `POST` | `/api/orders`, `/api/orders/:id/pay` | JWT | Create and pay orders |
 | `GET` | `/api/payments/tiers` | Public | Top-up tiers and bonuses |
 | `POST` | `/api/payments/recharge` | JWT | Simulated top-up |
