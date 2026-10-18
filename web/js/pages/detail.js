@@ -142,7 +142,7 @@ Pages.Detail = {
       return `
         <section ${attrs}>
           <div class="container scene__grid scene__grid--word">
-            <p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p>
+            ${this._img(j, 'scene', i) ? `<div class="scene__artcol"><p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p><figure class="scene__frame scene__frame--inset" data-reveal>${this._media(j, 'scene', i)}</figure></div>` : `<p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p>`}
             <div class="scene__text">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
           </div>
         </section>`;
@@ -302,13 +302,13 @@ Pages.Detail = {
     const pick = c ? this._choiceFor(j) : '';
     const kept = pick ? c.choice.options.find((o) => o.key === pick).keeps : '';
     const imgs = sc.images || {};
-    const backdrop = imgs.texture || imgs.hero || ''; // motifs that use an image never borrow the cover
+    const texture = imgs.texture ? ` style="background-image:url('${esc(imgs.texture).replace(/['()\\]/g, '')}')"` : '';
     const stat = (key, value, max) => `
       <div class="ticket__stat"><span>${esc(t(key))}</span><span class="bar" aria-hidden="true"><b style="width:${Math.round(((value || 0) / max) * 100)}%"></b></span><span class="num">${value || 0}/${max}</span></div>`;
 
     main.innerHTML = `
-      <article class="detail scenes motif-${esc(sc.motif || 'drift')} tex-${esc(sc.texture || 'none')}" data-backdrop="${esc(backdrop)}" style="--accent:${esc(sc.accent || '#f2c46d')}">
-        <div class="scenes__backdrop" aria-hidden="true"><div class="scenes__sky"></div><div class="scenes__motif"></div><div class="scenes__texture"></div></div>
+      <article class="detail scenes motif-${esc(sc.motif || 'drift')} tex-${esc(sc.texture || 'none')}" style="--accent:${esc(sc.accent || '#f2c46d')}">
+        <div class="scenes__backdrop" aria-hidden="true"><div class="scenes__sky"></div><div class="scenes__motif"></div><div class="scenes__texture${imgs.texture ? ' scenes__texture--image' : ''}"${texture}></div></div>
 
         <header class="scene scene--hero detail-hero" data-scene="hero">
           ${this._media(j, 'hero', 0, 'scene__media--bleed scene__media--hero')}

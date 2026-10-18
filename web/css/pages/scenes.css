@@ -20,6 +20,8 @@
 .scenes__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .scenes__texture { position: absolute; inset: 0; opacity: .5; mix-blend-mode: soft-light; background-size: 240px 240px; }
 [data-theme="light"] .scenes__texture { opacity: .35; mix-blend-mode: multiply; }
+.scenes .scenes__texture.scenes__texture--image { background-size: cover; background-position: center; background-repeat: no-repeat; opacity: .22; }
+[data-theme="light"] .scenes .scenes__texture.scenes__texture--image { opacity: .14; }
 
 /* Textures: procedural grain, tinted per material */
 .tex-salt .scenes__texture, .tex-ember .scenes__texture, .tex-stars .scenes__texture, .tex-sand .scenes__texture,
@@ -39,6 +41,10 @@
 .scene__inner--low { align-self: end; }
 .scene__grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
 .scene__grid--word { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.scene__artcol { display: grid; align-items: center; }
+.scene__artcol > * { grid-area: 1 / 1; }
+.scene__artcol .scene__art { position: relative; z-index: 1; }
+.scene__frame--inset { justify-self: end; width: min(280px, 56%); aspect-ratio: 4 / 5; margin-right: 4%; }
 .scene__grid--fork { grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); }
 
 /* Type: one display size for who you are and the ending, one for chapter titles, prose tuned per language */
@@ -135,7 +141,7 @@
 
 /* Mirror: sky above a rising horizon, the same sky reflected below */
 .mirror { position: absolute; inset: 0; --horizon: 62%; --still: 0; --glitter: 0; }
-.mirror__sky, .mirror__water { position: absolute; left: 0; right: 0; background-size: cover; background-position: center 30%; }
+.mirror__sky, .mirror__water { position: absolute; left: 0; right: 0; }
 .mirror__sky { top: 0; height: var(--horizon); -webkit-mask-image: linear-gradient(0deg, #000, transparent 85%); mask-image: linear-gradient(0deg, #000, transparent 85%); }
 .mirror__water { top: var(--horizon); bottom: 0; transform: scaleY(-1); transform-origin: top; filter: blur(calc((1 - var(--still)) * 6px)) saturate(1.1); opacity: calc((.1 + var(--still) * .3) * (.4 + var(--light) * .6)); -webkit-mask-image: linear-gradient(0deg, #000, transparent 90%); mask-image: linear-gradient(0deg, #000, transparent 90%); }
 .mirror__line { position: absolute; left: 0; right: 0; top: var(--horizon); height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 80%, white), transparent); opacity: calc(.3 + var(--still) * .6); }
@@ -145,14 +151,13 @@
 @keyframes glint { 0%, 100% { opacity: .15; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.2); } }
 .mirror { --light: .8; }
 .mirror__sky, .mirror__water { transition: opacity 1.2s var(--ease-out), filter 1.2s var(--ease-out); }
-.mirror__sky { opacity: calc(.12 + var(--light) * .24); }
 [data-theme="light"] .mirror__sky, [data-theme="light"] .mirror__water { opacity: .22; }
-.mirror--palette .mirror__sky, .mirror--palette .mirror__water { background:
+.mirror__sky, .mirror__water { background:
   radial-gradient(58% 10% at 28% 40%, hsl(var(--arc-h) calc(var(--arc-s) * 1%) 80% / .4) 0, transparent 70%),
   radial-gradient(44% 8% at 74% 54%, hsl(calc(var(--arc-h) + 24) calc(var(--arc-s) * 1%) 74% / .34) 0, transparent 70%),
   radial-gradient(72% 16% at 52% 84%, color-mix(in srgb, var(--accent) 46%, transparent) 0, transparent 72%),
   linear-gradient(180deg, hsl(var(--arc-h) calc(var(--arc-s) * .8%) 16%) 0%, hsl(var(--arc-h) calc(var(--arc-s) * 1%) 44%) 78%, color-mix(in srgb, var(--accent) 50%, hsl(var(--arc-h) 40% 62%)) 100%); }
-.mirror--palette .mirror__sky { opacity: calc(.3 + var(--light) * .4); }
+.mirror__sky { opacity: calc(.3 + var(--light) * .4); }
 .motif-mirror .scene--prologue .scene__display { -webkit-box-reflect: below -0.12em linear-gradient(transparent 55%, rgba(0, 0, 0, .22)); }
 
 /* Descent: daylight drains, a headlamp follows the pointer, a depth gauge counts down */

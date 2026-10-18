@@ -137,6 +137,10 @@ holds still, `grey` a faint first sign, `flare` the full moment, `vast` the spac
 are optional paths under `web/assets/images` (`generated/<slug>/hero.jpg`, `scene-1.jpg`…); the cover
 appears once, in the opening. Every other slot shows its own image; while one is empty, that scene
 shows a plate in the journey's palette (its tone on the arc, the accent, grain), never the cover again.
+Where each slot shows: `hero` the opening, full bleed, title over its lower left; `scenes[0]` a 4:5
+frame beside chapter 1; `scenes[1]` full bleed behind chapter 2's prose (lower left); `scenes[2]`
+a small 4:5 inset under chapter 3's outlined title; `fork` a square still life beside the choice;
+`ending` a small faded 4:5 keepsake; `texture` a material layer behind the whole page at low opacity.
 `content.ValidateScene` and `UT-CONTENT-SCENE-001` check every file.
 
 ## Vocabulary
