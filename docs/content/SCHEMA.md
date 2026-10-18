@@ -8,7 +8,7 @@ the database is rebuilt from them at startup.
 internal/content/entrances/NNN-slug.json   ← one file per journey (embedded with go:embed)
         │  content.Load + content.Validate (structure + show-don't-tell lint)
         ▼
-content.Sync (server start, after db/seed.sql; unchanged files are skipped by hash)
+content.Sync (server start, after db/seed.sql; every file is re-applied so a restart never reverts to the seed copy)
         ├─ journeys              base row (zh), cover, price, scores
         ├─ journey_translations  en title / subtitle / hook / region / moods
         ├─ journey_entrances     no, realm, pace, scale, seasons, time, cover licence

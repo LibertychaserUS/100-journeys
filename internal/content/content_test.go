@@ -160,3 +160,40 @@ func validSample() Entrance {
 		EN:       text("en"),
 	}
 }
+
+// IT-CONTENT-002: a restart (seed again, then sync) keeps the authored content, not the seed copy.
+func TestSync_SurvivesReseed(t *testing.T) {
+	db := testDB(t)
+	ctx := context.Background()
+	root, _ := filepath.Abs("../..")
+	for i := 0; i < 2; i++ { // first start, then a restart on the same database
+		if i > 0 {
+			if err := repository.Seed(db, filepath.Join(root, "db/seed.sql")); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if err := Sync(ctx, db); err != nil {
+			t.Fatalf("sync %d: %v", i, err)
+		}
+	}
+	entrances, _ := Load()
+	for _, e := range entrances {
+		var title, enTitle, cover string
+		if err := db.QueryRowContext(ctx, `
+			SELECT j.title, tr.title, j.image_path FROM journeys j
+			JOIN journey_translations tr ON tr.journey_id = j.id AND tr.locale = 'en' WHERE j.slug = ?`, e.Slug).Scan(&title, &enTitle, &cover); err != nil {
+			t.Fatal(err)
+		}
+		if title != e.ZH.Title || enTitle != e.EN.Title || cover != e.Cover.Path {
+			t.Errorf("%s reverted after restart: %q / %q / %q", e.Slug, title, enTitle, cover)
+		}
+		var mbti int
+		if err := db.QueryRowContext(ctx, `SELECT COUNT(*) FROM journey_mbti jm JOIN journeys j ON j.id = jm.journey_id WHERE j.slug = ?`, e.Slug).Scan(&mbti); err != nil || mbti != len(e.Journey.MBTI) {
+			t.Errorf("%s has %d MBTI rows after restart, want %d", e.Slug, mbti, len(e.Journey.MBTI))
+		}
+		var tags int
+		if err := db.QueryRowContext(ctx, `SELECT COUNT(*) FROM journey_tags jt JOIN journeys j ON j.id = jt.journey_id WHERE j.slug = ?`, e.Slug).Scan(&tags); err != nil || tags != len(e.Journey.Tags) {
+			t.Errorf("%s has %d tags after restart, want %d", e.Slug, tags, len(e.Journey.Tags))
+		}
+	}
+}

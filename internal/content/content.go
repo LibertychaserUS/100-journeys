@@ -299,8 +299,8 @@ func narrative(t Text) []string {
 	return out
 }
 
-// Sync upserts every entrance into the database. Unchanged files are skipped (content hash),
-// so restarts do not touch updated_at.
+// Sync upserts every entrance into the database on every start (after db/seed.sql). The content
+// hash is stored for reference only; it is never used to skip a file.
 func Sync(ctx context.Context, db *sql.DB) error {
 	entrances, err := Load()
 	if err != nil {
@@ -318,15 +318,9 @@ func Sync(ctx context.Context, db *sql.DB) error {
 }
 
 func syncOne(ctx context.Context, db *sql.DB, e Entrance) error {
-	var current string
-	err := db.QueryRowContext(ctx, `SELECT en.content_hash FROM journey_entrances en JOIN journeys j ON j.id = en.journey_id WHERE j.slug = ?`, e.Slug).Scan(&current)
-	if err == nil && current == e.hash {
-		return nil
-	}
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-
+	// Always re-apply: db/seed.sql runs on every start and rewrites the base rows, translations,
+	// covers, tags and MBTI pairs it knows, so skipping an unchanged file would let a restart
+	// revert the authored copy. Re-applying is idempotent and cheap (a few rows per entrance).
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

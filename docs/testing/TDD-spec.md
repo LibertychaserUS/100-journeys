@@ -164,7 +164,8 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `IT-API-I18N-001..004` | 双语内容 | `?lang=en` 列表/详情为英文、默认中文、英文与中文搜索 | 12 段旅程全部有英文，`locale` 字段正确 |
 | `IT-API-MEDIA-001` | 封面 | 每段旅程封面唯一 | 不再出现多段旅程共用一张图 |
 | `IT-API-MBTI-ORDER-001` | MBTI 匹配顺序 | `mbti_types` 按匹配度降序 | 「最匹配」取第一项 |
-| `IT-CONTENT-001` | `content.Sync` | 写入 journeys / 翻译 / 入口 / 结构化内容 / 标签 / MBTI，第二次同步不变 | 幂等，内容哈希未变则跳过 |
+| `IT-CONTENT-001` | `content.Sync` | 写入 journeys / 翻译 / 入口 / 结构化内容 / 标签 / MBTI，第二次同步不变 | 幂等 |
+| `IT-CONTENT-002` | 重启 | 同一数据库再跑一次 seed.sql 和 Sync | 标题、英文标题、封面、标签、MBTI 仍是入口文件里的，不回退到 seed |
 | `IT-API-CONTENT-001` | 入口内容 | 详情带 `entrance` 与完整 `content`，列表只带 `opens`、`role` | 字段与 JSON 文件一致，未写入口的旅程不带内容 |
 | `IT-API-CHOICE-001` | 岔路选择 | 合法选项 / 非法选项 / 未知入口 / 未登录 | 200 / 400 / 404 / 401，`GET` 返回账户里的选择 |
 | `IT-API-MERGE-001` | 访客合并 | 类型 + 选择（含不存在的入口），重复两次；空请求；非法类型 | 幂等；跳过项列在 `skipped`；空请求保留账户类型；非法类型 400 |
