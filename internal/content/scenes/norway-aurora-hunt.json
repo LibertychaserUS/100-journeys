@@ -1,0 +1,41 @@
+{
+  "slug": "norway-aurora-hunt",
+  "motif": "aurora",
+  "texture": "stars",
+  "arc": [
+    {
+      "h": 226,
+      "s": 48
+    },
+    {
+      "h": 170,
+      "s": 55
+    },
+    {
+      "h": 150,
+      "s": 50
+    },
+    {
+      "h": 275,
+      "s": 40
+    },
+    {
+      "h": 210,
+      "s": 30
+    }
+  ],
+  "accent": "#7ef0c4",
+  "beats": [
+    "",
+    "dark",
+    "grey",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

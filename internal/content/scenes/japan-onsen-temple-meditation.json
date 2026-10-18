@@ -1,0 +1,36 @@
+{
+  "slug": "japan-onsen-temple-meditation",
+  "motif": "mist",
+  "texture": "ink",
+  "arc": [
+    {
+      "h": 205,
+      "s": 14
+    },
+    {
+      "h": 160,
+      "s": 16
+    },
+    {
+      "h": 30,
+      "s": 40
+    },
+    {
+      "h": 210,
+      "s": 12
+    },
+    {
+      "h": 36,
+      "s": 45
+    }
+  ],
+  "accent": "#e8d3a8",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

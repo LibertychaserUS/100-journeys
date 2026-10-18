@@ -1,0 +1,36 @@
+{
+  "slug": "turkey-cappadocia-balloon",
+  "motif": "rise",
+  "texture": "haze",
+  "arc": [
+    {
+      "h": 230,
+      "s": 35
+    },
+    {
+      "h": 18,
+      "s": 55
+    },
+    {
+      "h": 30,
+      "s": 65
+    },
+    {
+      "h": 42,
+      "s": 70
+    },
+    {
+      "h": 205,
+      "s": 25
+    }
+  ],
+  "accent": "#ffb36b",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

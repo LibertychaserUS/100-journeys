@@ -1,6 +1,9 @@
 /**
- * Detail — poster-style hero, the journey as three chapters (role, mission, clues),
- * and the "travel script ticket" booking card (bottom booking bar on phones).
+ * Detail — the journey as a scroll of scenes: a full-bleed opening, who you are here, one scene
+ * per chapter, the fork, the ending, then the practical part and the "travel script ticket".
+ * Each journey brings its own art direction (j.scene: lighting arc, texture, signature motif,
+ * per-chapter beats and images), played by web/js/scenes.js. Without authored content the
+ * older story is staged the same way.
  */
 var Pages = window.Pages || {};
 
@@ -20,10 +23,9 @@ Pages.Detail = {
     const main = document.getElementById('main-content');
     document.body.dataset.mediaHeader = '';
     main.innerHTML = `
-      <article class="detail" aria-busy="true">
-        <header class="detail-hero detail-hero--loading"><div class="container detail-hero__grid">
-          <div class="detail-hero__text"><div class="line skeleton" style="height:14px;width:30%"></div><div class="line skeleton" style="height:56px;width:80%;margin-top:20px"></div><div class="line skeleton" style="height:20px;width:55%;margin-top:16px"></div></div>
-          <div class="detail-hero__poster skeleton"></div>
+      <article class="detail scenes" aria-busy="true">
+        <header class="scene scene--hero detail-hero detail-hero--loading"><div class="container scene__inner">
+          <div class="line skeleton" style="height:14px;width:30%"></div><div class="line skeleton" style="height:64px;width:70%;margin-top:20px"></div><div class="line skeleton" style="height:20px;width:45%;margin-top:16px"></div>
         </div></header>
       </article>`;
 
@@ -54,6 +56,9 @@ Pages.Detail = {
     this._seq++;
     if (this._onSession) window.removeEventListener('session:updated', this._onSession);
     this._onSession = null;
+    Scenes.destroy();
+    if (this._barObserver) this._barObserver.disconnect();
+    this._barObserver = null;
   },
 
   _sentences(text) {
@@ -84,112 +89,158 @@ Pages.Detail = {
     return t('detail.risk.high');
   },
 
-  _legacyStory(j) {
+  // Images for the scenes: the journey's own when it has them, otherwise the cover, framed
+  // differently per scene (crop and grade) so the scroll never repeats itself.
+  _img(j, slot, i = 0) {
+    const imgs = (j.scene && j.scene.images) || {};
+    if (slot === 'scene' && imgs.scenes && imgs.scenes[i]) return { src: imgs.scenes[i], own: true };
+    if (slot !== 'scene' && imgs[slot]) return { src: imgs[slot], own: true };
+    return { src: j.image_url, own: false };
+  },
+
+  _media(j, slot, i, cls = '') {
+    const { src, own } = this._img(j, slot, i);
+    return `<div class="scene__media ${cls}" data-grade="${own ? 'own' : `g${i % 3}`}"><img src="${UI.esc(src)}" alt="" loading="${slot === 'hero' ? 'eager' : 'lazy'}" decoding="async" ${slot === 'hero' ? 'fetchpriority="high"' : ''}></div>`;
+  },
+
+  _paras(list) { return (list || []).map((p) => `<p data-reveal>${UI.esc(p)}</p>`).join(''); },
+
+  /** One chapter as a scene; layouts rotate (split, full bleed, art word) so each feels its own. */
+  _chapterScene(j, ch, i, total) {
+    const esc = UI.esc;
+    const beats = (j.scene && j.scene.beats) || [];
+    const beat = beats[i] || '';
+    const layout = ['split', 'bleed', 'word'][i % 3];
+    const n = `${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+    const head = `<p class="scene__num num" data-reveal>${esc(n)}</p><h2 id="ch-${i + 1}" class="scene__title" data-reveal>${esc(ch.title)}</h2>`;
+    const attrs = `class="scene scene--chapter scene--${layout} chapter" data-scene="ch-${i + 1}" ${beat ? `data-beat="${esc(beat)}"` : ''} ${beat === 'dark' ? 'data-dark' : ''} aria-labelledby="ch-${i + 1}"`;
+    if (layout === 'bleed') {
+      return `
+        <section ${attrs}>
+          ${this._media(j, 'scene', i, 'scene__media--bleed')}
+          <div class="scene__scrim" aria-hidden="true"></div>
+          <div class="container scene__inner scene__inner--low on-media">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
+        </section>`;
+    }
+    if (layout === 'word') {
+      return `
+        <section ${attrs}>
+          <div class="container scene__grid scene__grid--word">
+            <p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p>
+            <div class="scene__text">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
+          </div>
+        </section>`;
+    }
+    return `
+      <section ${attrs}>
+        <div class="container scene__grid">
+          <figure class="scene__frame" data-reveal>${this._media(j, 'scene', i)}</figure>
+          <div class="scene__text">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
+        </div>
+      </section>`;
+  },
+
+  /** Authored entrances as scenes: who you are, each chapter, the fork, the ending. */
+  _authoredScenes(j) {
+    const esc = UI.esc;
+    const c = j.content;
+    const chapters = c.chapters || [];
+    const pick = this._choiceFor(j);
+    return `
+      <section class="scene scene--prologue chapter chapter--prologue" data-scene="prologue" aria-labelledby="ch-role">
+        <div class="container scene__inner scene__inner--narrow">
+          <p class="scene__eyebrow" data-reveal>${esc(t('detail.prologue'))}</p>
+          <h2 id="ch-role" class="scene__display" data-reveal>${esc(c.role)}</h2>
+          ${c.premise ? `<p class="scene__lead" data-reveal>${esc(c.premise)}</p>` : ''}
+          ${c.mission ? `<p class="mission" data-reveal><span>${esc(t('detail.missionLabel'))}</span>${esc(c.mission)}</p>` : ''}
+        </div>
+      </section>
+      ${chapters.map((ch, i) => this._chapterScene(j, ch, i, chapters.length)).join('')}
+      ${c.choice ? `
+      <section class="scene scene--fork chapter fork" id="fork" data-scene="fork" aria-labelledby="fork-q">
+        <div class="container scene__grid scene__grid--fork">
+          <figure class="scene__frame scene__frame--still" data-reveal>${this._media(j, 'fork', 3)}</figure>
+          <div class="scene__text">
+            <p class="scene__eyebrow" data-reveal>${esc(t('detail.choice.eyebrow'))}</p>
+            <h2 id="fork-q" class="scene__title" data-reveal>${esc(c.choice.prompt)}</h2>
+            <div class="fork__options" role="group" aria-labelledby="fork-q" data-reveal>
+              ${c.choice.options.map((o) => `<button type="button" class="fork__option" data-key="${esc(o.key)}" aria-pressed="${o.key === pick}"><span class="fork__lamp" aria-hidden="true"></span><span>${esc(o.label)}</span></button>`).join('')}
+            </div>
+            <p class="fork__keeps" id="fork-keeps" aria-live="polite" data-reveal>${esc(this._keepsText(c, pick))}</p>
+          </div>
+        </div>
+      </section>` : ''}
+      ${c.ending ? `
+      <section class="scene scene--ending chapter chapter--ending" data-scene="ending" aria-labelledby="ch-end">
+        <div class="container scene__inner scene__inner--narrow">
+          <figure class="scene__echo" data-reveal>${this._media(j, 'ending', 4)}</figure>
+          <p class="scene__eyebrow" id="ch-end" data-reveal>${esc(t('detail.ending'))}</p>
+          <p class="ending scene__display scene__display--prose" data-reveal>${esc(c.ending)}</p>
+        </div>
+      </section>` : ''}`;
+  },
+
+  /** Journeys without authored content: the older story, staged as two scenes. */
+  _legacyScenes(j) {
     const esc = UI.esc;
     const sentences = this._sentences(j.story);
     const half = Math.ceil(sentences.length / 2);
     const partA = sentences.slice(0, half).join('').trim() || j.subtitle || '';
     const partB = sentences.slice(half).join('').trim();
-    const mbti = (j.mbti_types || []).map((m) => m.mbti_type.code);
-    const top = mbti[0] || '';
-    const role = this._role(j);
     return `
-          <div class="detail-story">
-            <section class="chapter" aria-labelledby="ch1">
-              <span class="chapter__n" aria-hidden="true">01</span>
-              <div>
-                <p class="chapter__eyebrow">${esc(top ? t('detail.ch1For', { code: top }) : t('detail.ch1'))}</p>
-                <h2 id="ch1">${esc(role)}</h2>
-                <p>${esc(partA)}</p>
-              </div>
-            </section>
-            <section class="chapter" aria-labelledby="ch2">
-              <span class="chapter__n" aria-hidden="true">02</span>
-              <div>
-                <p class="chapter__eyebrow">${esc(t('detail.ch2'))}</p>
-                <h2 id="ch2">${esc(t('detail.mission'))}</h2>
-                ${partB ? `<p>${esc(partB)}</p>` : ''}
-              </div>
-            </section>
-            <section class="chapter" aria-labelledby="ch3" id="clue-card">
-              <span class="chapter__n" aria-hidden="true">03</span>
-              <div>
-                <p class="chapter__eyebrow">${esc(t('detail.ch3'))}</p>
-                <h2 id="ch3">${esc(t('detail.ch3.title'))}</h2>
-                <div class="clues">
-                  <div class="clue"><h3>${esc(t('detail.clue.guide'))}</h3><p>${esc(t('detail.clue.guideText', { region: UI.region(j) }))}</p></div>
-                  <div class="clue"><h3>${esc(t('detail.clue.gear'))}</h3><p>${esc(this._gear(j))}</p></div>
-                  <div class="clue"><h3>${esc(t('detail.clue.risk', { n: j.risk_level }))}</h3><p>${esc(this._riskText(j.risk_level))}</p></div>
-                  <div class="clue"><h3>${esc(t('detail.clue.match'))}</h3><p>${esc(mbti.join(' · '))}${mbti.length ? ' — ' : ''}${esc(t(j.obscurity_level > 7 ? 'detail.clue.matchQuiet' : 'detail.clue.matchOpen'))}</p></div>
-                </div>
-              </div>
-            </section>
-          </div>`;
+      <section class="scene scene--prologue chapter" data-scene="prologue" aria-labelledby="ch1">
+        <div class="container scene__inner scene__inner--narrow">
+          <p class="scene__eyebrow" data-reveal>${esc(t('detail.ch1'))}</p>
+          <h2 id="ch1" class="scene__display" data-reveal>${esc(this._role(j))}</h2>
+          <p class="scene__lead" data-reveal>${esc(partA)}</p>
+        </div>
+      </section>
+      ${partB ? `
+      <section class="scene scene--chapter scene--bleed chapter" data-scene="ch-1" aria-labelledby="ch2">
+        ${this._media(j, 'scene', 1, 'scene__media--bleed')}
+        <div class="scene__scrim" aria-hidden="true"></div>
+        <div class="container scene__inner scene__inner--low on-media">
+          <p class="scene__eyebrow" data-reveal>${esc(t('detail.ch2'))}</p>
+          <h2 id="ch2" class="scene__title" data-reveal>${esc(t('detail.mission'))}</h2>
+          <div class="scene__prose"><p data-reveal>${esc(partB)}</p></div>
+        </div>
+      </section>` : ''}`;
   },
 
-  /** Authored entrances: role and premise, the chapters, a fork, the ending, then what is real. */
-  _authoredStory(j) {
+  /** The practical part after the story: when to go, gear, risk, and what is real. */
+  _practical(j) {
     const esc = UI.esc;
-    const c = j.content;
+    const c = j.content && j.content.chapters ? j.content : null;
     const e = j.entrance || {};
-    const chapters = c.chapters || [];
-    const pick = this._choiceFor(j);
-    const n = (i) => String(i).padStart(2, '0');
-    const para = (list) => (list || []).map((p) => `<p>${esc(p)}</p>`).join('');
+    const mbti = (j.mbti_types || []).map((m) => m.mbti_type.code);
     const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
     const coverKey = `detail.cover.${e.cover_license}`;
     const coverLabel = t(coverKey) === coverKey ? e.cover_license : t(coverKey);
     const coverSource = /^https:\/\//.test(e.cover_source || '')
       ? `<a href="${esc(e.cover_source)}" target="_blank" rel="noopener noreferrer">${esc(host(e.cover_source))}</a>` : '';
+    const clues = c ? `
+        <div class="clue"><h3>${esc(t('detail.clue.opens'))}</h3><p>${esc(c.opens)}</p></div>
+        <div class="clue"><h3>${esc(t('detail.clue.gear'))}</h3><p>${esc(this._gear(j))}</p></div>
+        <div class="clue"><h3>${esc(t('detail.clue.risk', { n: j.risk_level }))}</h3><p>${esc(this._riskText(j.risk_level))}</p></div>` : `
+        <div class="clue"><h3>${esc(t('detail.clue.guide'))}</h3><p>${esc(t('detail.clue.guideText', { region: UI.region(j) }))}</p></div>
+        <div class="clue"><h3>${esc(t('detail.clue.gear'))}</h3><p>${esc(this._gear(j))}</p></div>
+        <div class="clue"><h3>${esc(t('detail.clue.risk', { n: j.risk_level }))}</h3><p>${esc(this._riskText(j.risk_level))}</p></div>
+        <div class="clue"><h3>${esc(t('detail.clue.match'))}</h3><p>${esc(mbti.join(' · '))}</p></div>`;
     return `
-          <div class="detail-story detail-story--authored">
-            <section class="chapter chapter--prologue" aria-labelledby="ch-role">
-              <span class="chapter__n" aria-hidden="true">00</span>
-              <div>
-                <p class="chapter__eyebrow">${esc(t('detail.prologue'))}</p>
-                <h2 id="ch-role">${esc(c.role)}</h2>
-                ${c.premise ? `<p>${esc(c.premise)}</p>` : ''}
-                ${c.mission ? `<p class="mission"><span>${esc(t('detail.missionLabel'))}</span>${esc(c.mission)}</p>` : ''}
-              </div>
-            </section>
-            ${chapters.map((ch, i) => `
-            <section class="chapter" aria-labelledby="ch-${i + 1}">
-              <span class="chapter__n" aria-hidden="true">${n(i + 1)}</span>
-              <div><h2 id="ch-${i + 1}">${esc(ch.title)}</h2>${para(ch.paragraphs)}</div>
-            </section>`).join('')}
-            ${c.choice ? `
-            <section class="chapter fork" aria-labelledby="fork-q" id="fork">
-              <span class="chapter__n" aria-hidden="true">${n(chapters.length + 1)}</span>
-              <div>
-                <p class="chapter__eyebrow">${esc(t('detail.choice.eyebrow'))}</p>
-                <h2 id="fork-q">${esc(c.choice.prompt)}</h2>
-                <div class="fork__options" role="group" aria-labelledby="fork-q">
-                  ${c.choice.options.map((o) => `<button type="button" class="fork__option" data-key="${esc(o.key)}" aria-pressed="${o.key === pick}">${esc(o.label)}</button>`).join('')}
-                </div>
-                <p class="fork__keeps" id="fork-keeps" aria-live="polite">${esc(this._keepsText(c, pick))}</p>
-              </div>
-            </section>` : ''}
-            ${c.ending ? `
-            <section class="chapter chapter--ending" aria-labelledby="ch-end">
-              <span class="chapter__n" aria-hidden="true">${n(chapters.length + (c.choice ? 2 : 1))}</span>
-              <div><p class="chapter__eyebrow" id="ch-end">${esc(t('detail.ending'))}</p><p class="ending">${esc(c.ending)}</p></div>
-            </section>` : ''}
-            <section class="prep" aria-labelledby="prep-title">
-              <h2 id="prep-title">${esc(t('detail.prep'))}</h2>
-              <div class="clues">
-                <div class="clue"><h3>${esc(t('detail.clue.opens'))}</h3><p>${esc(c.opens)}</p></div>
-                <div class="clue"><h3>${esc(t('detail.clue.gear'))}</h3><p>${esc(this._gear(j))}</p></div>
-                <div class="clue"><h3>${esc(t('detail.clue.risk', { n: j.risk_level }))}</h3><p>${esc(this._riskText(j.risk_level))}</p></div>
-              </div>
-            </section>
-            <aside class="truth" aria-labelledby="truth-title">
-              <h2 id="truth-title">${esc(t('detail.truth.title'))}</h2>
-              <h3>${esc(t('detail.truth.real'))}</h3>
-              <ul class="truth__facts">${(c.facts || []).map((f) => `<li>${esc(f.text)} <a href="${esc(f.source)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(t('detail.truth.sourceAria', { host: host(f.source) }))}">${esc(host(f.source))}</a></li>`).join('')}</ul>
-              ${c.fiction ? `<h3>${esc(t('detail.truth.fiction'))}</h3><p>${esc(c.fiction)}</p>` : ''}
-              ${e.cover_license ? `<p class="truth__cover">${esc(t('detail.truth.cover', { label: coverLabel }))}${coverSource ? ` · ${coverSource}` : ''}</p>` : ''}
-            </aside>
-          </div>`;
+      <div class="detail-story">
+        <section class="prep" aria-labelledby="prep-title" ${c ? '' : 'id="clue-card"'}>
+          <h2 id="prep-title">${esc(t(c ? 'detail.prep' : 'detail.ch3.title'))}</h2>
+          <div class="clues">${clues}</div>
+        </section>
+        ${c ? `
+        <aside class="truth" aria-labelledby="truth-title">
+          <h2 id="truth-title">${esc(t('detail.truth.title'))}</h2>
+          <h3>${esc(t('detail.truth.real'))}</h3>
+          <ul class="truth__facts">${(c.facts || []).map((f) => `<li>${esc(f.text)} <a href="${esc(f.source)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(t('detail.truth.sourceAria', { host: host(f.source) }))}">${esc(host(f.source))}</a></li>`).join('')}</ul>
+          ${c.fiction ? `<h3>${esc(t('detail.truth.fiction'))}</h3><p>${esc(c.fiction)}</p>` : ''}
+          ${e.cover_license ? `<p class="truth__cover">${esc(t('detail.truth.cover', { label: coverLabel }))}${coverSource ? ` · ${coverSource}` : ''}</p>` : ''}
+        </aside>` : ''}
+      </div>`;
   },
 
   _choiceFor(j) {
@@ -214,6 +265,8 @@ Pages.Detail = {
   _choose(j, key) {
     Guest.choose(j.slug, key).catch((err) => UI.toast(I18n.error(err)));
     API.track('fork_choose', j.slug, { key });
+    const btn = document.querySelector(`.fork__option[data-key="${CSS.escape(key)}"]`);
+    if (btn) { btn.classList.remove('is-lit'); void btn.offsetWidth; btn.classList.add('is-lit'); }
     this._reflectChoice(j, key);
   },
 
@@ -232,6 +285,7 @@ Pages.Detail = {
     const main = document.getElementById('main-content');
     const c = j.content && j.content.chapters ? j.content : null;
     const e = j.entrance;
+    const sc = j.scene || {};
     const mbti = (j.mbti_types || []).map((m) => m.mbti_type.code);
     const top = mbti[0] || '';
     const fantasy = UI.fantasyLabel(j.fantasy_type);
@@ -242,41 +296,49 @@ Pages.Detail = {
     const realm = e && t(realmKey) !== realmKey ? t(realmKey) : '';
     const pick = c ? this._choiceFor(j) : '';
     const kept = pick ? c.choice.options.find((o) => o.key === pick).keeps : '';
+    const hero = this._img(j, 'hero');
     const stat = (key, value, max) => `
       <div class="ticket__stat"><span>${esc(t(key))}</span><span class="bar" aria-hidden="true"><b style="width:${Math.round(((value || 0) / max) * 100)}%"></b></span><span class="num">${value || 0}/${max}</span></div>`;
 
     main.innerHTML = `
-      <article class="detail">
-        <header class="detail-hero" style="--cover:url('${esc(j.image_url)}')">
-          <div class="detail-hero__bg" aria-hidden="true"></div>
-          <div class="container detail-hero__grid">
+      <article class="detail scenes motif-${esc(sc.motif || 'drift')} tex-${esc(sc.texture || 'none')}" data-backdrop="${esc(hero.src)}" style="--accent:${esc(sc.accent || '#f2c46d')}">
+        <div class="scenes__backdrop" aria-hidden="true"><div class="scenes__sky"></div><div class="scenes__motif"></div><div class="scenes__texture"></div></div>
+
+        <header class="scene scene--hero detail-hero" data-scene="hero">
+          ${this._media(j, 'hero', 0, 'scene__media--bleed scene__media--hero')}
+          <div class="scene__scrim scene__scrim--hero" aria-hidden="true"></div>
+          <div class="container scene__top on-media">
+            <div class="detail-hero__top">
+              <button class="detail-hero__back" type="button" id="detail-back" aria-label="${esc(t('detail.backLabel'))}">${UI.icon('back')}<span>${esc(t('common.back'))}</span></button>
+              <nav class="detail-crumbs" aria-label="${esc(t('detail.breadcrumb'))}">
+                <a href="#/explore">${esc(t('nav.explore'))}</a><span aria-hidden="true">/</span>
+                <a href="#/explore?fantasy_type=${esc(j.fantasy_type)}" class="detail-hero__badge">${esc(fantasy)}</a><span aria-hidden="true">/</span>
+                <span>${esc(UI.region(j))}</span>
+              </nav>
+              <button class="detail-hero__share" type="button" id="detail-share-top" aria-label="${esc(t('detail.share'))}">${UI.icon('share')}</button>
+            </div>
+          </div>
+          <div class="container scene__inner scene__inner--hero on-media">
             <div class="detail-hero__text">
-              <div class="detail-hero__top">
-                <button class="detail-hero__back" type="button" id="detail-back" aria-label="${esc(t('detail.backLabel'))}">${UI.icon('back')}<span>${esc(t('common.back'))}</span></button>
-                <nav class="detail-crumbs" aria-label="${esc(t('detail.breadcrumb'))}">
-                  <a href="#/explore">${esc(t('nav.explore'))}</a><span aria-hidden="true">/</span>
-                  <a href="#/explore?fantasy_type=${esc(j.fantasy_type)}" class="detail-hero__badge">${esc(fantasy)}</a><span aria-hidden="true">/</span>
-                  <span>${esc(UI.region(j))}</span>
-                </nav>
-                <button class="detail-hero__share" type="button" id="detail-share-top" aria-label="${esc(t('detail.share'))}">${UI.icon('share')}</button>
-              </div>
-              ${e ? `<p class="detail-hero__no num">${esc(t('entrance.no', { n: e.no }))}${realm ? ` · ${esc(realm)}` : ''}</p>` : ''}
-              <h1 class="detail-hero__title">${esc(j.title)}</h1>
-              ${j.story_hook ? `<p class="detail-hero__hook">${esc(I18n.lang === 'zh' ? `「${j.story_hook}」` : `“${j.story_hook}”`)}</p>` : ''}
-              <ul class="detail-hero__moods">${(j.mood_keywords || []).map((m) => `<li class="chip chip--sm">#${esc(m)}</li>`).join('')}</ul>
-              <dl class="detail-hero__facts">
+              ${e ? `<p class="detail-hero__no num" data-reveal>${esc(t('entrance.no', { n: e.no }))}${realm ? ` · ${esc(realm)}` : ''}</p>` : ''}
+              <h1 class="detail-hero__title" data-reveal>${String(j.title).split(' · ').map((part) => `<span class="nowrap">${esc(part)}</span>`).join('<span class="detail-hero__dot"> · </span>')}</h1>
+              ${j.story_hook ? `<p class="detail-hero__hook" data-reveal>${esc(I18n.lang === 'zh' ? `「${j.story_hook}」` : `“${j.story_hook}”`)}</p>` : ''}
+              <ul class="detail-hero__moods" data-reveal>${(j.mood_keywords || []).map((m) => `<li class="chip chip--sm">#${esc(m)}</li>`).join('')}</ul>
+              <dl class="detail-hero__facts" data-reveal>
                 <div><dt>${esc(t('detail.facts.region'))}</dt><dd>${esc(UI.region(j))}</dd></div>
                 <div><dt>${esc(t('detail.facts.adventure'))}</dt><dd class="num">${j.adventure_index}/10</dd></div>
                 ${c && c.opens ? `<div class="detail-hero__opens"><dt>${esc(t('detail.facts.opens'))}</dt><dd>${esc(c.opens)}</dd></div>` : top ? `<div><dt>${esc(t('detail.facts.match'))}</dt><dd>${esc(top)}</dd></div>` : ''}
                 <div class="detail-hero__price"><dt>${esc(t('detail.facts.price'))}</dt><dd class="num">${esc(UI.coins(j.price))}</dd></div>
               </dl>
             </div>
-            <img class="detail-hero__poster" src="${esc(j.image_url)}" alt="" width="720" height="900" fetchpriority="high">
+            <a class="scene__cue" href="#${c ? 'ch-role' : 'ch1'}" data-cue>${esc(t('detail.cue'))}<span aria-hidden="true"></span></a>
           </div>
         </header>
 
+        ${c ? this._authoredScenes(j) : this._legacyScenes(j)}
+
         <div class="container detail-body">
-          ${c ? this._authoredStory(j) : this._legacyStory(j)}
+          ${this._practical(j)}
 
           <aside class="ticket" id="detail-ticket" aria-label="${esc(t('detail.ticketAria'))}">
             <div class="ticket__top">
@@ -311,6 +373,9 @@ Pages.Detail = {
       </article>`;
     document.body.dataset.bookbar = '';
     this._bind(j);
+    const article = main.querySelector('.scenes');
+    Scenes.mount(article, sc);
+    article.classList.add('is-armed');
   },
 
   _bind(j) {
@@ -324,6 +389,18 @@ Pages.Detail = {
     main.querySelector('#detail-share').addEventListener('click', (e) => this._share(j, e.currentTarget));
     main.querySelector('#detail-share-top').addEventListener('click', (e) => this._share(j, e.currentTarget));
     main.querySelectorAll('.fork__option').forEach((b) => b.addEventListener('click', () => this._choose(j, b.dataset.key)));
+    main.querySelector('[data-cue]').addEventListener('click', (e) => {
+      const target = document.getElementById(e.currentTarget.getAttribute('href').slice(1));
+      if (!target) return;
+      e.preventDefault();
+      target.closest('.scene').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+    // The booking bar appears once the opening has scrolled away (always shown on phones).
+    const bar = main.querySelector('#detail-bookbar');
+    if ('IntersectionObserver' in window) {
+      this._barObserver = new IntersectionObserver(([entry]) => bar.classList.toggle('is-visible', !entry.isIntersecting), { threshold: 0.05 });
+      this._barObserver.observe(main.querySelector('.scene--hero'));
+    } else bar.classList.add('is-visible');
   },
 
   _refreshBalance() {

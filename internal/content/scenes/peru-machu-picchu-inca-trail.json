@@ -1,0 +1,36 @@
+{
+  "slug": "peru-machu-picchu-inca-trail",
+  "motif": "map",
+  "texture": "paper",
+  "arc": [
+    {
+      "h": 150,
+      "s": 22
+    },
+    {
+      "h": 140,
+      "s": 28
+    },
+    {
+      "h": 35,
+      "s": 40
+    },
+    {
+      "h": 160,
+      "s": 25
+    },
+    {
+      "h": 45,
+      "s": 45
+    }
+  ],
+  "accent": "#d9e8a0",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

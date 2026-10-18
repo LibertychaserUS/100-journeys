@@ -1,0 +1,36 @@
+{
+  "slug": "morocco-sahara-camel-camp",
+  "motif": "sky-rotate",
+  "texture": "sand",
+  "arc": [
+    {
+      "h": 24,
+      "s": 70
+    },
+    {
+      "h": 14,
+      "s": 55
+    },
+    {
+      "h": 240,
+      "s": 45
+    },
+    {
+      "h": 250,
+      "s": 40
+    },
+    {
+      "h": 36,
+      "s": 60
+    }
+  ],
+  "accent": "#ffc27a",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

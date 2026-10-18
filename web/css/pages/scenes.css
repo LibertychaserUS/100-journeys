@@ -1,0 +1,161 @@
+/* =============================================================
+   SCENES — each journey as a scroll of scenes (web/js/scenes.js).
+   A fixed backdrop (sky · motif · texture) walks the journey's lighting arc
+   (--arc-h/--arc-s; lightness comes from the theme so text stays AA). Scenes
+   reveal once (is-in, staggered by --i) and drift with their pass (--p).
+   Only transform, opacity and filter animate.
+   ============================================================= */
+
+@property --arc-h { syntax: '<number>'; inherits: true; initial-value: 222; }
+@property --arc-s { syntax: '<number>'; inherits: true; initial-value: 30; }
+
+.scenes { --sky-l: 7%; --sky-l2: 12%; position: relative; isolation: isolate; transition: --arc-h 1.4s var(--ease-in-out), --arc-s 1.4s var(--ease-in-out); }
+[data-theme="light"] .scenes { --sky-l: 95%; --sky-l2: 89%; }
+
+.scenes__backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.scenes__sky { position: absolute; inset: 0; background:
+  radial-gradient(120% 80% at 70% 0%, hsl(var(--arc-h) calc(var(--arc-s) * 1%) var(--sky-l2)) 0, transparent 70%),
+  hsl(var(--arc-h) calc(var(--arc-s) * .8%) var(--sky-l)); }
+.scenes__motif { position: absolute; inset: 0; }
+.scenes__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scenes__texture { position: absolute; inset: 0; opacity: .5; mix-blend-mode: soft-light; background-size: 240px 240px; }
+[data-theme="light"] .scenes__texture { opacity: .35; mix-blend-mode: multiply; }
+
+/* Textures: procedural grain, tinted per material */
+.tex-salt .scenes__texture, .tex-ember .scenes__texture, .tex-stars .scenes__texture, .tex-sand .scenes__texture,
+.tex-ink .scenes__texture, .tex-caustics .scenes__texture, .tex-snow .scenes__texture, .tex-dust .scenes__texture,
+.tex-paper .scenes__texture, .tex-haze .scenes__texture, .tex-fog .scenes__texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.tex-salt .scenes__texture { background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,.5) 0 1px, transparent 1.5px), radial-gradient(circle at 70% 80%, rgba(255,255,255,.35) 0 1px, transparent 1.5px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 37px 41px, 53px 47px, 240px 240px; }
+.tex-ember .scenes__texture { opacity: .6; }
+.tex-ink .scenes__texture { opacity: .65; }
+
+/* --- A scene --- */
+.scene { position: relative; min-height: 100svh; display: grid; align-items: center; padding-block: clamp(96px, 16vh, 180px); overflow: clip; }
+.scene--chapter + .scene--chapter, .scene--prologue { min-height: 92svh; }
+.scene__inner { position: relative; width: 100%; }
+.scene__inner--narrow { max-width: 860px; }
+.scene__inner--low { align-self: end; }
+.scene__grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
+.scene__grid--word { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.scene__grid--fork { grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); }
+
+/* Type: one display size for who you are and the ending, one for chapter titles, prose tuned per language */
+.scene__eyebrow, .scene__num { font-size: var(--text-xs); letter-spacing: .22em; color: var(--color-text-3); }
+.scene__num { font-variant-numeric: tabular-nums; }
+.scene__display { margin-top: 14px; font-family: var(--font-story); font-weight: 700; font-size: clamp(2.75rem, 8vw, 7rem); line-height: 1.04; letter-spacing: -.01em; text-wrap: balance; }
+.scene__display--prose { font-size: clamp(1.625rem, 3.4vw, 2.75rem); font-weight: 400; line-height: 1.55; letter-spacing: 0; text-wrap: pretty; }
+:lang(en) .scene__display { line-height: .98; }
+:lang(en) .scene__display--prose { line-height: 1.35; }
+.scene__title { margin-top: 12px; font-family: var(--font-story); font-weight: 700; font-size: clamp(2rem, 4.6vw, 3.75rem); line-height: 1.12; text-wrap: balance; }
+.scene__lead { margin-top: var(--space-5); max-width: 34em; font-size: clamp(1.0625rem, 1.6vw, 1.25rem); line-height: 1.9; color: var(--color-text-2); text-wrap: pretty; }
+.scene__prose { margin-top: var(--space-5); max-width: 32em; display: grid; gap: 1em; }
+.scene__prose p { font-size: clamp(1rem, 1.3vw, 1.125rem); line-height: 1.95; color: var(--color-text-2); text-wrap: pretty; }
+:lang(en) .scene__lead, :lang(en) .scene__prose p { line-height: 1.7; }
+.scene__art { font-family: var(--font-story); font-weight: 700; font-size: clamp(5rem, 15vw, 13rem); line-height: .92; color: transparent; -webkit-text-stroke: 1.2px color-mix(in srgb, var(--accent) 70%, var(--color-text) 30%); text-wrap: balance; transform: translate3d(0, calc((var(--p, .5) - .5) * -60px), 0); }
+@supports not (-webkit-text-stroke: 1px red) { .scene__art { color: color-mix(in srgb, var(--accent) 35%, transparent); } }
+
+/* Media: framed (split), bleeding (full scene) and the hero; the cover is graded per scene when a journey has no image of its own */
+.scene__media { position: relative; overflow: hidden; }
+.scene__media img { width: 100%; height: 100%; object-fit: cover; transform: translate3d(0, calc((var(--p, .5) - .5) * -8%), 0) scale(1.14); will-change: transform; }
+.scene__media[data-grade="g0"] img { object-position: 50% 70%; }
+.scene__media[data-grade="g1"] img { object-position: 50% 30%; filter: saturate(.85) brightness(.9); }
+.scene__media[data-grade="g2"] img { object-position: 30% 50%; filter: contrast(1.08) saturate(1.1); }
+.scene__frame { margin: 0; aspect-ratio: 4 / 5; border-radius: 24px; overflow: hidden; box-shadow: 0 50px 120px -40px rgba(0, 0, 0, .7); }
+.scene__frame .scene__media { height: 100%; }
+.scene__frame--still { aspect-ratio: 1; }
+.scene__media--bleed { position: absolute; inset: 0; }
+.scene__scrim { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6, 7, 10, .9) 0%, rgba(6, 7, 10, .55) 40%, rgba(6, 7, 10, .1) 75%), linear-gradient(90deg, rgba(6, 7, 10, .6) 0%, transparent 60%); }
+.scene--bleed + .scene, .scene--hero + .scene { margin-top: -1px; }
+.on-media { color: var(--color-on-media); }
+.on-media .scene__eyebrow, .on-media .scene__num { color: rgba(246, 241, 232, .74); }
+.on-media .scene__prose p { color: rgba(246, 241, 232, .88); }
+
+/* The opening: full bleed, title low, a scroll cue */
+.scene--hero { min-height: 100svh; align-items: end; padding-block: calc(var(--nav-h) + var(--space-6)) clamp(48px, 10vh, 112px); background: #07080b; }
+.scene__media--hero img { transform: translate3d(0, calc(var(--p, .5) * 18%), 0) scale(calc(1.06 + var(--p, .5) * .1)); }
+.scene__scrim--hero { background: linear-gradient(0deg, hsl(var(--arc-h) calc(var(--arc-s) * .8%) var(--sky-l)) 0%, rgba(6, 7, 10, .55) 22%, rgba(6, 7, 10, .2) 60%, rgba(6, 7, 10, .45) 100%), linear-gradient(90deg, rgba(6, 7, 10, .65) 0%, transparent 65%); }
+.scene__inner--hero { display: grid; gap: var(--space-6); }
+.scene__top { position: absolute; top: calc(var(--nav-h) + var(--space-4)); left: 0; right: 0; z-index: 1; }
+.scene--hero .detail-hero__text { transform: translate3d(0, calc(var(--p, .5) * -60px), 0); }
+.scene__cue { justify-self: start; display: inline-flex; align-items: center; gap: 12px; font-size: var(--text-sm); color: rgba(246, 241, 232, .8); }
+.scene__cue span { width: 1px; height: 36px; background: linear-gradient(rgba(246, 241, 232, .9), transparent); }
+@media (prefers-reduced-motion: no-preference) { .scene__cue span { animation: scene-cue 2.4s var(--ease-in-out) infinite; transform-origin: top; } }
+@keyframes scene-cue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+/* The fork: choosing lights a small lamp */
+.fork__lamp { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--color-text-3); transform: translateY(2px); transition: background-color var(--dur) var(--ease-out), border-color var(--dur), box-shadow var(--dur-slow) var(--ease-out); }
+.fork__option[aria-pressed="true"] .fork__lamp { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 24px 4px color-mix(in srgb, var(--accent) 55%, transparent); }
+.fork__option::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20px 50%, color-mix(in srgb, var(--accent) 40%, transparent) 0, transparent 60%); opacity: 0; pointer-events: none; }
+.fork__option.is-lit::after { animation: fork-light 1.1s var(--ease-out); }
+@keyframes fork-light { 0% { opacity: 0; transform: scaleX(.2); transform-origin: left; } 30% { opacity: 1; } 100% { opacity: 0; transform: scaleX(1.6); transform-origin: left; } }
+
+/* The ending: a small, faded echo of the opening */
+.scene__echo { margin: 0 0 var(--space-6); width: min(220px, 50vw); aspect-ratio: 4 / 5; border-radius: 6px; overflow: hidden; transform: rotate(-3deg); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .6), 0 0 0 8px var(--color-surface); }
+.scene__echo .scene__media { height: 100%; }
+.scene__echo img { filter: grayscale(.6) sepia(.25) brightness(.95); transform: none; }
+
+/* Reveal: hidden only once the engine is armed (JS running), shown once, staggered */
+.is-armed .scene [data-reveal] { opacity: 0; transform: translate3d(0, 40px, 0); filter: blur(8px); transition: opacity var(--dur-scene) var(--ease-out), transform var(--dur-scene) var(--ease-out), filter var(--dur-scene) var(--ease-out); transition-delay: calc(var(--i, 0) * var(--stagger)); }
+.is-armed .scene.is-in [data-reveal] { opacity: 1; transform: none; filter: none; }
+.is-armed .scene__frame[data-reveal] { clip-path: inset(12% 8% 12% 8% round 24px); transition-property: opacity, transform, filter, clip-path; }
+.is-armed .scene.is-in .scene__frame[data-reveal] { clip-path: inset(0 round 24px); }
+.is-armed .scene.is-in .scene__art[data-reveal] { transform: translate3d(0, calc((var(--p, .5) - .5) * -60px), 0); }
+@media (prefers-reduced-motion: reduce) {
+  .is-armed .scene [data-reveal] { opacity: 1; transform: none; filter: none; clip-path: none; transition: none; }
+  .scene__media img, .scene__media--hero img, .scene__art, .scene--hero .detail-hero__text { transform: none !important; }
+}
+@media print { .is-armed .scene [data-reveal] { opacity: 1; transform: none; filter: none; } .scenes__backdrop { display: none; } }
+
+/* ---------- Motifs ---------- */
+
+/* Mirror: sky above a rising horizon, the same sky reflected below */
+.mirror { position: absolute; inset: 0; --horizon: 62%; --still: 0; --glitter: 0; }
+.mirror__sky, .mirror__water { position: absolute; left: 0; right: 0; background-size: cover; background-position: center 30%; }
+.mirror__sky { top: 0; height: var(--horizon); -webkit-mask-image: linear-gradient(0deg, #000, transparent 85%); mask-image: linear-gradient(0deg, #000, transparent 85%); }
+.mirror__water { top: var(--horizon); bottom: 0; transform: scaleY(-1); transform-origin: top; filter: blur(calc((1 - var(--still)) * 6px)) saturate(1.1); opacity: calc((.1 + var(--still) * .3) * (.4 + var(--light) * .6)); -webkit-mask-image: linear-gradient(0deg, #000, transparent 90%); mask-image: linear-gradient(0deg, #000, transparent 90%); }
+.mirror__line { position: absolute; left: 0; right: 0; top: var(--horizon); height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 80%, white), transparent); opacity: calc(.3 + var(--still) * .6); }
+.mirror__glitter { position: absolute; left: 0; right: 0; top: var(--horizon); bottom: 0; opacity: var(--glitter); transition: opacity 1.2s var(--ease-out); }
+.mirror__glitter i { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; background: #fff6e2; box-shadow: 0 0 6px 1px rgba(255, 236, 200, .8); }
+@media (prefers-reduced-motion: no-preference) { .mirror__glitter i { animation: glint 2.6s var(--ease-in-out) var(--d) infinite; } }
+@keyframes glint { 0%, 100% { opacity: .15; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.2); } }
+.mirror { --light: .8; }
+.mirror__sky, .mirror__water { transition: opacity 1.2s var(--ease-out), filter 1.2s var(--ease-out); }
+.mirror__sky { opacity: calc(.12 + var(--light) * .24); }
+[data-theme="light"] .mirror__sky, [data-theme="light"] .mirror__water { opacity: .22; }
+.motif-mirror .scene--prologue .scene__display { -webkit-box-reflect: below -0.12em linear-gradient(transparent 55%, rgba(0, 0, 0, .22)); }
+
+/* Descent: daylight drains, a headlamp follows the pointer, a depth gauge counts down */
+.descent { position: absolute; inset: 0; --depth: 0; }
+.descent__dark { position: absolute; inset: 0; background: #050302; opacity: calc(var(--depth) * .85); transition: opacity .6s linear; }
+.descent__lamp { position: absolute; inset: 0; background: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), color-mix(in srgb, var(--accent) 22%, transparent) 0, transparent calc(14% + var(--lamp, 1) * 18%)); opacity: var(--depth); }
+.descent__gauge { position: absolute; right: max(16px, 3vw); top: 50%; display: grid; justify-items: end; gap: 2px; transform: translateY(-50%); font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--accent) 70%, var(--color-text)); opacity: calc(.25 + var(--depth) * .75); }
+.descent__gauge b { font-family: var(--font-story); font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 400; }
+.descent__gauge span { font-size: var(--text-xs); letter-spacing: .2em; }
+.descent__gauge i { position: absolute; right: -10px; top: -120px; width: 1px; height: 240px; background: currentColor; transform-origin: top; opacity: .6; }
+.motif-descent .scene__media img { -webkit-mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 calc(18% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .25) calc(30% + var(--lamp, 1) * 55%)); mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 calc(18% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .25) calc(30% + var(--lamp, 1) * 55%)); }
+.motif-descent.is-lights-out .scene[data-dark] .scene__media img { -webkit-mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 9%, transparent 22%); mask-image: radial-gradient(circle at var(--lx, 50%) var(--ly, 45%), #000 0, #000 9%, transparent 22%); }
+[data-theme="light"] .descent__dark { opacity: calc(var(--depth) * .5); }
+.descent.is-vast .descent__lamp { background: radial-gradient(ellipse 80% 70% at 50% 40%, color-mix(in srgb, var(--accent) 16%, transparent) 0, transparent 70%); }
+
+/* Aurora: the canvas draws stars and curtains; the sky only needs to stay deep */
+.motif-aurora .scenes__canvas { opacity: .95; }
+[data-theme="light"] .motif-aurora .scenes__canvas { opacity: .7; }
+
+/* ---------- Layout on smaller screens ---------- */
+@media (max-width: 960px) {
+  .scene__grid, .scene__grid--word, .scene__grid--fork { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  .scene__frame { max-width: 520px; }
+}
+@media (max-width: 760px) {
+  .scene { min-height: auto; padding-block: 96px; }
+  .scene--hero { min-height: 92svh; }
+  .scene--bleed { min-height: 88svh; }
+  .scene__top { top: calc(var(--nav-h) + 12px); }
+  .scene__frame { aspect-ratio: 4 / 3; }
+  .scene__art { font-size: clamp(3.5rem, 22vw, 6rem); }
+  .descent__gauge { right: 10px; top: auto; bottom: 90px; transform: none; }
+  .descent__gauge i { display: none; }
+  .motif-descent .scene__media img { -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0, #000 calc(20% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .3) 80%); mask-image: radial-gradient(circle at 50% 45%, #000 0, #000 calc(20% + var(--lamp, 1) * 40%), rgba(0, 0, 0, .3) 80%); }
+}

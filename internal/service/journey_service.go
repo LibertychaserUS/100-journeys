@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/100-journeys/app/internal/content"
 	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
 )
@@ -67,7 +68,31 @@ func (s *JourneyService) GetJourneyLocalized(ctx context.Context, slug, lang str
 	}
 	*j = one[0]
 	j.ImageURL = s.media.ResolveURL(j.ImagePath)
+	j.Scene = s.scene(j.Slug)
 	return j, nil
+}
+
+// scene returns the journey's art direction with image URLs resolved, or nil.
+func (s *JourneyService) scene(slug string) *model.JourneyScene {
+	sc, ok := content.SceneFor(slug)
+	if !ok {
+		return nil
+	}
+	url := func(p string) string {
+		if p == "" {
+			return ""
+		}
+		return s.media.ResolveURL(p)
+	}
+	out := &model.JourneyScene{Motif: sc.Motif, Texture: sc.Texture, Accent: sc.Accent, Beats: sc.Beats}
+	for _, t := range sc.Arc {
+		out.Arc = append(out.Arc, model.SceneTone{H: t.H, S: t.S})
+	}
+	out.Images = model.SceneImages{Hero: url(sc.Images.Hero), Fork: url(sc.Images.Fork), Ending: url(sc.Images.Ending), Texture: url(sc.Images.Texture)}
+	for _, p := range sc.Images.Scenes {
+		out.Images.Scenes = append(out.Images.Scenes, url(p))
+	}
+	return out
 }
 
 // ListJourneysByIDs loads the given journeys and returns them in the order of ids.

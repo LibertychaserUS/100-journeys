@@ -1,0 +1,36 @@
+{
+  "slug": "patagonia-torres-del-paine-trek",
+  "motif": "map",
+  "texture": "paper",
+  "arc": [
+    {
+      "h": 215,
+      "s": 18
+    },
+    {
+      "h": 30,
+      "s": 35
+    },
+    {
+      "h": 210,
+      "s": 25
+    },
+    {
+      "h": 18,
+      "s": 50
+    },
+    {
+      "h": 200,
+      "s": 15
+    }
+  ],
+  "accent": "#f0b27a",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

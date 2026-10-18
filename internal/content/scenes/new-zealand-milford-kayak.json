@@ -1,0 +1,36 @@
+{
+  "slug": "new-zealand-milford-kayak",
+  "motif": "tide",
+  "texture": "fog",
+  "arc": [
+    {
+      "h": 190,
+      "s": 25
+    },
+    {
+      "h": 175,
+      "s": 30
+    },
+    {
+      "h": 200,
+      "s": 35
+    },
+    {
+      "h": 210,
+      "s": 25
+    },
+    {
+      "h": 160,
+      "s": 20
+    }
+  ],
+  "accent": "#a8e0d0",
+  "beats": [],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

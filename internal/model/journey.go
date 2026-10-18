@@ -23,12 +23,14 @@ type Journey struct {
 	Locale         string   `json:"locale"` // content language actually returned: "zh" (base) or a translation
 	// Entrance and Content come from internal/content (authored journeys). Content is complete on
 	// the detail endpoint; list endpoints only carry Content.Opens and Content.Role.
-	Entrance  *JourneyEntrance `json:"entrance,omitempty"`
-	Content   *JourneyContent  `json:"content,omitempty"`
-	Tags      []Tag            `json:"tags,omitempty"`
-	MBTITypes []JourneyMBTI    `json:"mbti_types,omitempty"`
-	CreatedAt time.Time        `json:"created_at"`
-	UpdatedAt time.Time        `json:"updated_at"`
+	Entrance *JourneyEntrance `json:"entrance,omitempty"`
+	Content  *JourneyContent  `json:"content,omitempty"`
+	// Scene is the journey's art direction for the immersive detail page (detail endpoint only).
+	Scene     *JourneyScene `json:"scene,omitempty"`
+	Tags      []Tag         `json:"tags,omitempty"`
+	MBTITypes []JourneyMBTI `json:"mbti_types,omitempty"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
 }
 
 type Tag struct {
@@ -123,4 +125,28 @@ type ContentOption struct {
 type ContentFact struct {
 	Text   string `json:"text"`
 	Source string `json:"source"`
+}
+
+// JourneyScene is the art direction of a journey's detail page, with image URLs resolved.
+// Empty image URLs mean "use the cover".
+type JourneyScene struct {
+	Motif   string      `json:"motif"`
+	Texture string      `json:"texture"`
+	Arc     []SceneTone `json:"arc"`
+	Accent  string      `json:"accent"`
+	Beats   []string    `json:"beats,omitempty"`
+	Images  SceneImages `json:"images"`
+}
+
+type SceneTone struct {
+	H int `json:"h"`
+	S int `json:"s"`
+}
+
+type SceneImages struct {
+	Hero    string   `json:"hero,omitempty"`
+	Scenes  []string `json:"scenes,omitempty"`
+	Fork    string   `json:"fork,omitempty"`
+	Ending  string   `json:"ending,omitempty"`
+	Texture string   `json:"texture,omitempty"`
 }

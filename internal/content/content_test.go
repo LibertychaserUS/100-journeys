@@ -197,3 +197,41 @@ func TestSync_SurvivesReseed(t *testing.T) {
 		}
 	}
 }
+
+// UT-CONTENT-SCENE-001: every scene file is valid, names a known motif and texture, points only
+// at images that exist, and every journey in the seed has one.
+func TestScenes_AreValid(t *testing.T) {
+	scenes, err := LoadScenes()
+	if err != nil {
+		t.Fatalf("load scenes: %v", err)
+	}
+	root, _ := filepath.Abs("../..")
+	got := map[string]bool{}
+	for _, s := range scenes {
+		for _, problem := range ValidateScene(s) {
+			t.Errorf("%s: %s", s.Slug, problem)
+		}
+		for _, img := range s.ImagePaths() {
+			if _, err := os.Stat(filepath.Join(root, "web/assets/images", img)); err != nil {
+				t.Errorf("%s: image %s not found", s.Slug, img)
+			}
+		}
+		got[s.Slug] = true
+	}
+	db := testDB(t)
+	rows, err := db.Query(`SELECT slug FROM journeys`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var slug string
+		_ = rows.Scan(&slug)
+		if !got[slug] {
+			t.Errorf("journey %s has no scene file", slug)
+		}
+	}
+	if s, ok := SceneFor("bolivia-salt-flat-trek"); !ok || s.Motif != "mirror" {
+		t.Errorf("SceneFor should find the salt flat's mirror, got %+v %v", s, ok)
+	}
+}

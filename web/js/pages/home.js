@@ -6,6 +6,19 @@ var Pages = window.Pages || {};
 
 Pages.Home = {
   _particles: null,
+  _scene: 0,
+  _timer: null,
+  _paused: false,
+  _onVisibility: null,
+
+  // The opening rotates through three entrances; each can be stepped into. Images fall back to
+  // what exists until the per-journey scene images arrive.
+  _scenes: [
+    { key: 'taoyuan', img: 'generated/hero-taoyuan-1600.jpg', set: 'generated/hero-taoyuan-960.jpg 960w, generated/hero-taoyuan-1600.jpg 1600w' },
+    { key: 'mirror', img: 'generated/card-salt-mirror.jpg', slug: 'bolivia-salt-flat-trek' },
+    { key: 'night', img: 'generated/card-sahara-stars.jpg', slug: 'morocco-sahara-camel-camp' },
+  ],
+  SCENE_MS: 6800,
 
   // Mood shortcuts map to real filters on Explore.
   _moods: [
@@ -20,22 +33,28 @@ Pages.Home = {
     const main = document.getElementById('main-content');
     document.body.dataset.mediaHeader = '';
     main.innerHTML = `
-      <section class="home-hero" aria-labelledby="hero-title">
-        <img class="home-hero__img" src="${API.mediaUrl('generated/hero-taoyuan-1600.jpg')}"
-             srcset="${API.mediaUrl('generated/hero-taoyuan-960.jpg')} 960w, ${API.mediaUrl('generated/hero-taoyuan-1600.jpg')} 1600w"
-             sizes="100vw" alt="" fetchpriority="high" decoding="async">
+      <section class="home-hero scene-${this._scenes[0].key}" aria-labelledby="hero-title" aria-roledescription="${esc(t('home.scenes.role'))}">
+        <div class="home-hero__slides" aria-hidden="true">
+          ${this._scenes.map((sc, i) => `<img class="home-hero__img ${i === 0 ? 'is-active' : ''}" data-scene="${i}" src="${API.mediaUrl(sc.img)}" ${sc.set ? `srcset="${sc.set.split(', ').map((x) => `${API.mediaUrl(x.split(' ')[0])} ${x.split(' ')[1]}`).join(', ')}" sizes="100vw"` : ''} alt="" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`).join('')}
+        </div>
         <canvas class="home-hero__particles" aria-hidden="true"></canvas>
         <div class="home-hero__shade" aria-hidden="true"></div>
         <div class="container home-hero__content">
           <p class="home-hero__eyebrow">${esc(t('brand.tagline'))}</p>
-          <h1 class="home-hero__title" id="hero-title">${esc(t('brand'))}</h1>
-          <p class="home-hero__lead">${esc(t('home.lead'))}</p>
+          <div class="home-hero__copy" aria-live="off">
+            <h1 class="home-hero__title" id="hero-title"><span class="home-hero__line">${esc(t('home.scene.taoyuan.title'))}</span></h1>
+            <p class="home-hero__lead"><span class="home-hero__line">${esc(t('home.scene.taoyuan.lead'))}</span></p>
+            <a class="home-hero__enter" id="hero-enter" href="#/" hidden>${esc(t('home.scenes.enter'))} ${UI.icon('arrow', 'icon--sm')}</a>
+          </div>
           <form class="home-hero__search" id="hero-search" role="search">
             ${UI.icon('search')}
             <label class="sr-only" for="hero-q">${esc(t('home.searchLabel'))}</label>
             <input id="hero-q" data-testid="search-input" type="search" name="q" autocomplete="off" placeholder="${esc(t('home.searchPlaceholder'))}">
             <button class="btn" type="submit">${esc(t('home.searchCta'))}</button>
           </form>
+          <div class="home-hero__dots" role="group" aria-label="${esc(t('home.scenes.label'))}">
+            ${this._scenes.map((sc, i) => `<button type="button" class="home-hero__dot" data-go="${i}" aria-label="${esc(t(`home.scene.${sc.key}.title`))}" aria-current="${i === 0}"><i></i></button>`).join('')}
+          </div>
           <div class="home-hero__moods">
             <span>${esc(t('home.moodsLabel'))}</span>
             ${this._moods.map((m) => `<a class="chip home-hero__chip" href="#/explore?${m.param}=${m.value}" data-filter-key="${m.param}" data-filter-value="${m.value}">${esc(t(m.key))}</a>`).join('')}
@@ -83,12 +102,62 @@ Pages.Home = {
     });
     UI.trackCardClicks(main.querySelector('#featured-grid'));
     this._particles = HeroParticles.start(main.querySelector('.home-hero'), main.querySelector('.home-hero__particles'));
+    this._setupScenes(main.querySelector('.home-hero'));
     this._loadFeatured();
   },
 
   destroy() {
     if (this._particles) this._particles.stop();
     this._particles = null;
+    clearTimeout(this._timer);
+    this._timer = null;
+    if (this._onVisibility) document.removeEventListener('visibilitychange', this._onVisibility);
+    this._onVisibility = null;
+  },
+
+  _setupScenes(hero) {
+    this._scene = 0;
+    this._paused = false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    hero.querySelector('.home-hero__dots').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-go]');
+      if (b) this._show(hero, Number(b.dataset.go), { user: true });
+    });
+    // Hovering or focusing the opening holds the current scene; a hidden tab holds it too.
+    const hold = (v) => () => { this._paused = v; if (!v) this._schedule(hero); else clearTimeout(this._timer); hero.classList.toggle('is-held', v); };
+    hero.addEventListener('pointerenter', hold(true));
+    hero.addEventListener('pointerleave', hold(false));
+    hero.addEventListener('focusin', hold(true));
+    hero.addEventListener('focusout', (e) => { if (!hero.contains(e.relatedTarget)) hold(false)(); });
+    this._onVisibility = () => { if (document.hidden) clearTimeout(this._timer); else this._schedule(hero); };
+    document.addEventListener('visibilitychange', this._onVisibility);
+    if (!reduce) { hero.classList.add('is-playing'); this._schedule(hero); }
+  },
+
+  _schedule(hero) {
+    clearTimeout(this._timer);
+    if (this._paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    this._timer = setTimeout(() => this._show(hero, (this._scene + 1) % this._scenes.length), this.SCENE_MS);
+  },
+
+  _show(hero, i, { user = false } = {}) {
+    if (!hero.isConnected) return;
+    const sc = this._scenes[i];
+    this._scene = i;
+    hero.className = hero.className.replace(/scene-\S+/, `scene-${sc.key}`);
+    hero.querySelectorAll('.home-hero__img').forEach((img) => img.classList.toggle('is-active', Number(img.dataset.scene) === i));
+    hero.querySelectorAll('.home-hero__dot').forEach((d) => d.setAttribute('aria-current', String(Number(d.dataset.go) === i)));
+    const copy = hero.querySelector('.home-hero__copy');
+    copy.classList.remove('is-in');
+    void copy.offsetWidth;
+    copy.querySelector('.home-hero__title .home-hero__line').textContent = t(`home.scene.${sc.key}.title`);
+    copy.querySelector('.home-hero__lead .home-hero__line').textContent = t(`home.scene.${sc.key}.lead`);
+    const enter = copy.querySelector('#hero-enter');
+    enter.hidden = !sc.slug;
+    if (sc.slug) enter.href = `#/journey/${encodeURIComponent(sc.slug)}`;
+    copy.classList.add('is-in');
+    if (user) hero.classList.add('is-held');
+    this._schedule(hero);
   },
 
   /** The first step of the core flow: find your type (self or with the guide), or browse. */

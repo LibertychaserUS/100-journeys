@@ -63,6 +63,11 @@
 
   /* --- Motion --- */
   --ease: cubic-bezier(.2, .7, .2, 1);
+  /* Motion system: out for arrivals, in-out for things that travel, a long settle for scenes */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --dur-scene: 1100ms;
+  --stagger: 90ms;
   --dur-fast: 150ms;
   --dur: 250ms;
   --dur-slow: 600ms;

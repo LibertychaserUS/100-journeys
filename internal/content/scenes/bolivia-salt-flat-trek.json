@@ -1,0 +1,40 @@
+{
+  "slug": "bolivia-salt-flat-trek",
+  "motif": "mirror",
+  "texture": "salt",
+  "arc": [
+    {
+      "h": 222,
+      "s": 40
+    },
+    {
+      "h": 258,
+      "s": 28
+    },
+    {
+      "h": 330,
+      "s": 34
+    },
+    {
+      "h": 24,
+      "s": 52
+    },
+    {
+      "h": 205,
+      "s": 22
+    }
+  ],
+  "accent": "#f6c9d6",
+  "beats": [
+    "dark",
+    "still",
+    "flare"
+  ],
+  "images": {
+    "hero": "",
+    "scenes": [],
+    "fork": "",
+    "ending": "",
+    "texture": ""
+  }
+}

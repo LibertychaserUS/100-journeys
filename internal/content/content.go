@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-//go:embed entrances/*.json
+//go:embed entrances/*.json scenes/*.json
 var files embed.FS
 
 // Entrance is one journey file.
