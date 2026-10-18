@@ -288,5 +288,161 @@ var Scenes = (() => {
     },
   };
 
+
+  // Extra motifs share helpers: the active beat, and one value eased toward a target.
+  const beatOf = (b, map, fallback) => (b && map[b] != null ? map[b] : fallback);
+  const ease = (cur, target, k = 0.08) => cur + (target - cur) * k;
+  const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
+
+  Object.assign(motifs, {
+    // 星轨 — a long exposure: stars wheel round the pole and their trails lengthen as the night goes on.
+    'sky-rotate': {
+      mount(ctx) {
+        const { c, g } = canvas(ctx, 0.5);
+        const stars = Array.from({ length: 260 }, () => ({ a: Math.random() * Math.PI * 2, r: Math.pow(Math.random(), 0.7), s: Math.random() * 1.1 + 0.4, hue: Math.random() < 0.2 ? 30 : 210 }));
+        ctx.sky = { turn: 0, trail: 0.02, glow: 0.4, cur: { trail: 0.02, glow: 0.4 } };
+        const draw = () => {
+          const w = c.width;
+          const h = c.height;
+          const st = ctx.sky;
+          st.cur.trail = ease(st.cur.trail, st.trail);
+          st.cur.glow = ease(st.cur.glow, st.glow);
+          g.clearRect(0, 0, w, h);
+          const cx = w * 0.5;
+          const cy = h * 0.12;
+          const R = Math.hypot(w, h);
+          const light = isLight();
+          g.lineCap = 'round';
+          for (const p of stars) {
+            const r = p.r * R;
+            const a0 = p.a + st.turn;
+            g.strokeStyle = `hsla(${p.hue}, 60%, ${light ? 35 : 88}%, ${(light ? 0.35 : 0.75) * st.cur.glow + 0.15})`;
+            g.lineWidth = p.s;
+            g.beginPath();
+            g.arc(cx, cy, r, a0, a0 + st.cur.trail);
+            g.stroke();
+          }
+          // The band of the Milky Way, brightest at the full moment.
+          const band = g.createLinearGradient(0, h * 0.9, w, h * 0.1);
+          band.addColorStop(0.35, 'rgba(255,255,255,0)');
+          band.addColorStop(0.5, `rgba(${light ? '120,110,160' : '230,225,255'}, ${0.12 * st.cur.glow})`);
+          band.addColorStop(0.65, 'rgba(255,255,255,0)');
+          g.fillStyle = band;
+          g.fillRect(0, 0, w, h);
+        };
+        ctx.sky.draw = draw;
+        if (ctx.reduce) { ctx.sky.trail = ctx.sky.cur.trail = 0.35; draw(); } else loop(ctx, draw);
+      },
+      update(ctx, { pageP, beat }) {
+        if (!ctx.sky) return;
+        ctx.sky.turn = pageP * 0.9;
+        ctx.sky.trail = ctx.reduce ? 0.35 : 0.02 + smooth(0.05, 0.95, pageP) * 0.9;
+        ctx.sky.glow = beatOf(beat, { dark: 1, grey: 0.6, flare: 1.4, vast: 1.2, still: 0.8 }, 0.5 + pageP * 0.5);
+        if (ctx.reduce && ctx.sky.draw) ctx.sky.draw();
+      },
+    },
+
+    // 雾 — layers of mist drift; thick in the dark, thinning as you climb, parting round a warm light.
+    mist: {
+      mount(ctx) {
+        ctx.layer.innerHTML = `<div class="mist">${[0, 1, 2, 3].map((i) => `<i class="mist__bank mist__bank--${i}"></i>`).join('')}<b class="mist__light"></b></div>`;
+      },
+      update(ctx, { pageP, beat }) {
+        const m = ctx.layer.firstElementChild;
+        if (!m) return;
+        const fog = beatOf(beat, { dark: 1, still: 0.85, grey: 0.75, flare: 0.25, vast: 0.15 }, 0.9 - pageP * 0.5);
+        const light = beatOf(beat, { flare: 1, vast: 0.7, grey: 0.3 }, smooth(0.6, 1, pageP) * 0.5);
+        m.style.setProperty('--fog', fog.toFixed(3));
+        m.style.setProperty('--glow', light.toFixed(3));
+        m.style.setProperty('--rise', `${(-pageP * 18).toFixed(2)}vh`);
+      },
+    },
+
+    // 潮 — the water rises up the page; light shafts and caustics below the surface.
+    tide: {
+      mount(ctx) {
+        ctx.layer.innerHTML = `<div class="tide"><div class="tide__water"><svg class="tide__surface" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 20 Q 75 6 150 20 T 300 20 T 450 20 T 600 20 T 750 20 T 900 20 T 1050 20 T 1200 20 V40 H0 Z"/></svg><i class="tide__caustics"></i><i class="tide__rays"></i></div></div>`;
+      },
+      update(ctx, { pageP, beat }) {
+        const t = ctx.layer.firstElementChild;
+        if (!t) return;
+        const level = beatOf(beat, { dark: 0.85, vast: 1, flare: 0.75, still: 0.6 }, 0.08 + smooth(0, 0.85, pageP) * 0.8);
+        t.style.setProperty('--level', (ctx.reduce ? 0.5 : level).toFixed(3));
+        t.style.setProperty('--rays', beatOf(beat, { flare: 1, vast: 0.8, still: 0.5 }, 0.3).toFixed(2));
+      },
+    },
+
+    // 辙 — snow falls; a sled track is drawn down the page, the snowfall thinning in the clear.
+    track: {
+      mount(ctx) {
+        const { c, g } = canvas(ctx, 0.5);
+        const flakes = Array.from({ length: 160 }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.6 + 0.6, v: Math.random() * 0.4 + 0.3, sway: Math.random() * 6 }));
+        ctx.snow = { rate: 1, cur: 1 };
+        ctx.layer.insertAdjacentHTML('beforeend', '<svg class="track" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M92 0 C 86 120, 97 220, 90 340 S 84 560, 92 680 S 96 880, 89 1000"/><path pathLength="1" d="M94.5 0 C 88.5 120, 99.5 220, 92.5 340 S 86.5 560, 94.5 680 S 98.5 880, 91.5 1000"/></svg>');
+        const draw = (t) => {
+          const w = c.width;
+          const h = c.height;
+          ctx.snow.cur = ease(ctx.snow.cur, ctx.snow.rate, 0.05);
+          g.clearRect(0, 0, w, h);
+          g.fillStyle = isLight() ? 'rgba(120,140,170,.55)' : 'rgba(245,250,255,.85)';
+          for (const f of flakes) {
+            if (!ctx.reduce) {
+              f.y += (f.v * ctx.snow.cur) / 260;
+              if (f.y > 1.02) { f.y = -0.02; f.x = Math.random(); }
+            }
+            const x = (f.x + Math.sin(t / 1400 + f.sway) * 0.01) * w;
+            g.globalAlpha = 0.25 + 0.75 * Math.min(1, ctx.snow.cur);
+            g.beginPath();
+            g.arc(x, f.y * h, f.r, 0, Math.PI * 2);
+            g.fill();
+          }
+          g.globalAlpha = 1;
+        };
+        ctx.snow.draw = draw;
+        if (ctx.reduce) draw(0); else loop(ctx, draw);
+      },
+      update(ctx, { pageP, beat }) {
+        const svg = ctx.layer.querySelector('.track');
+        if (svg) svg.style.setProperty('--drawn', (ctx.reduce ? 1 : smooth(0.02, 0.95, pageP)).toFixed(4));
+        if (ctx.snow) ctx.snow.rate = beatOf(beat, { dark: 1.6, still: 0.15, flare: 0.05, vast: 0.3, grey: 0.8 }, 1);
+      },
+    },
+
+    // 路线 — an old route is drawn as you go; each chapter lights the next milestone.
+    map: {
+      mount(ctx) {
+        const n = ctx.sections.length;
+        const pts = ctx.sections.map((_, i) => ({ x: 88 + ((i * 5) % 4) * 2 - 3, y: 40 + (i * 920) / Math.max(1, n - 1) })); // the right margin
+        const d = pts.map((p, i) => (i ? `S ${p.x - 5} ${p.y - 60}, ${p.x} ${p.y}` : `M ${p.x} ${p.y}`)).join(' ');
+        ctx.layer.innerHTML = `<div class="map"><i class="map__contours"></i><svg class="map__route" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true"><path class="map__ghost" d="${d}"/><path class="map__line" pathLength="1" d="${d}"/></svg>${pts.map((p, i) => `<i class="map__stop" data-i="${i}" style="left:${p.x}%;top:${(p.y / 10).toFixed(2)}%"></i>`).join('')}</div>`;
+      },
+      update(ctx, { pageP, active, beat }) {
+        const m = ctx.layer.firstElementChild;
+        if (!m) return;
+        m.style.setProperty('--drawn', (ctx.reduce ? 1 : smooth(0, 0.98, pageP)).toFixed(4));
+        m.style.setProperty('--contours', beatOf(beat, { vast: 0.15, flare: 0.5, dark: 0.9 }, 0.6).toFixed(2));
+        m.querySelectorAll('.map__stop').forEach((c) => c.classList.toggle('is-passed', Number(c.dataset.i) <= active));
+      },
+    },
+
+    // 升 — balloons lift off at dawn and climb as you scroll, catching the sun at the full moment.
+    rise: {
+      mount(ctx) {
+        const balloons = Array.from({ length: 11 }, (_, i) => {
+          const size = 18 + Math.random() * 46;
+          const side = i % 2 ? 78 + Math.random() * 18 : 2 + Math.random() * 18; // outer bands only
+          return `<i class="rise__b" style="--x:${side.toFixed(1)}%;--s:${size.toFixed(0)}px;--speed:${(0.5 + size / 60).toFixed(2)};--h:${[14, 28, 350, 42, 200][i % 5]};--delay:${(i / 11).toFixed(2)}"></i>`;
+        }).join('');
+        ctx.layer.innerHTML = `<div class="rise"><b class="rise__sun"></b>${balloons}</div>`;
+      },
+      update(ctx, { pageP, beat }) {
+        const r = ctx.layer.firstElementChild;
+        if (!r) return;
+        r.style.setProperty('--lift', (ctx.reduce ? 0.5 : pageP).toFixed(4));
+        r.style.setProperty('--sun', beatOf(beat, { flare: 1, vast: 0.8, still: 0.5, dark: 0 }, smooth(0.2, 0.7, pageP)).toFixed(3));
+      },
+    },
+  });
+
   return { mount, destroy, motifs, smooth, clamp };
 })();
