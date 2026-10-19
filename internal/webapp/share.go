@@ -67,3 +67,35 @@ func PreloadCover(src string) string {
 	return `<link rel="preload" as="image" type="image/avif" fetchpriority="high" href="` + html.EscapeString(base+".1120.avif") +
 		`" imagesrcset="` + html.EscapeString(set) + `" imagesizes="100vw" />`
 }
+
+// HomeMeta completes the shell's own share tags for the home page: absolute image and URL, a
+// canonical link, both locales, Twitter's title/description/image and a WebSite description.
+func HomeMeta(page, origin string) string {
+	esc := html.EscapeString
+	page = strings.Replace(page, `content="/static/`, `content="`+esc(origin)+`/static/`, -1)
+	title, desc, image := "", "", ""
+	if m := regexp.MustCompile(`<meta property="og:title" content="([^"]*)"`).FindStringSubmatch(page); m != nil {
+		title = m[1]
+	}
+	if m := regexp.MustCompile(`<meta property="og:description" content="([^"]*)"`).FindStringSubmatch(page); m != nil {
+		desc = m[1]
+	}
+	if m := regexp.MustCompile(`<meta property="og:image" content="([^"]*)"`).FindStringSubmatch(page); m != nil {
+		image = m[1]
+	}
+	home := esc(origin) + "/"
+	ld := `{"@context":"https://schema.org","@type":"WebSite","name":"桃源百旅 · 100 Journeys","url":"` + home +
+		`","inLanguage":["zh-CN","en"],"potentialAction":{"@type":"SearchAction","target":"` + home +
+		`#/explore?q={search_term_string}","query-input":"required name=search_term_string"}}`
+	tags := []string{
+		`<link rel="canonical" href="` + home + `" />`,
+		`<meta property="og:url" content="` + home + `" />`,
+		`<meta property="og:locale" content="zh_CN" />`,
+		`<meta property="og:locale:alternate" content="en_US" />`,
+		`<meta name="twitter:title" content="` + title + `" />`,
+		`<meta name="twitter:description" content="` + desc + `" />`,
+		`<meta name="twitter:image" content="` + image + `" />`,
+		`<script type="application/ld+json">` + ld + `</script>`,
+	}
+	return strings.Replace(page, "</head>", "  "+strings.Join(tags, "\n  ")+"\n</head>", 1)
+}

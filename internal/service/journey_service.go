@@ -42,6 +42,7 @@ func (s *JourneyService) ListJourneys(ctx context.Context, filter model.JourneyF
 	for i := range journeys {
 		journeys[i].ImageURL = s.media.ResolveURL(journeys[i].ImagePath)
 		journeys[i].HeroURL = s.heroURL(journeys[i].Slug)
+		withClock(&journeys[i])
 	}
 	return journeys, total, nil
 }
@@ -70,8 +71,20 @@ func (s *JourneyService) GetJourneyLocalized(ctx context.Context, slug, lang str
 	*j = one[0]
 	j.ImageURL = s.media.ResolveURL(j.ImagePath)
 	j.HeroURL = s.heroURL(j.Slug)
+	withClock(j)
 	j.Scene = s.scene(j.Slug)
 	return j, nil
+}
+
+// withClock adds the door's own time zone and opening months from its entrance file.
+func withClock(j *model.Journey) {
+	if j.Entrance == nil {
+		return
+	}
+	if e, ok := content.EntranceFor(j.Slug); ok {
+		j.Entrance.TZ = e.Entrance.TZ
+		j.Entrance.Months = e.Entrance.Months
+	}
 }
 
 // heroURL is the journey's own opening image from its scene file, or "".

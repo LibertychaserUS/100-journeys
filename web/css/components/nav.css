@@ -30,7 +30,9 @@ body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { backgroun
 .nav__links { display: flex; gap: var(--space-5); font-size: var(--text-base); color: var(--color-text-2); }
 .nav__links a { position: relative; padding: 6px 0; transition: color var(--dur-fast); }
 .nav__links a:hover, .nav__links a[aria-current="page"] { color: var(--color-text); }
-.nav__links a[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; border-radius: 2px; background: var(--color-action); }
+.nav__links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; border-radius: 2px; background: currentColor; opacity: .5; transform: scaleX(0); transform-origin: left; transition: transform 180ms var(--ease-out); }
+.nav__links a:hover::after { transform: scaleX(1); }
+.nav__links a[aria-current="page"]::after { opacity: 1; transform: none; background: var(--color-action); }
 [data-theme="light"] body:not([data-media-header]) .nav__links a[aria-current="page"]::after,
 [data-theme="light"] body[data-scrolled] .nav__links a[aria-current="page"]::after { background: var(--color-focus); }
 
@@ -67,7 +69,9 @@ body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { backgroun
   .nav__actions { gap: 6px; }
 }
 
-/* Mobile drawer */
+/* Mobile drawer: a modal sheet over a dimmed page */
+.drawer-scrim { position: fixed; inset: var(--nav-h) 0 0; z-index: calc(var(--z-nav) - 1); background: rgba(0, 0, 0, .5); animation: scrim-in 200ms var(--ease-out); }
+@keyframes scrim-in { from { opacity: 0; } }
 .drawer {
   position: fixed; inset: var(--nav-h) 0 auto; z-index: var(--z-nav);
   max-height: calc(100vh - var(--nav-h)); overflow: auto;
@@ -88,3 +92,4 @@ body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { backgroun
   .nav__menu-btn { display: inline-grid; }
   .nav__user span { display: none; }
 }
+body[data-drawer] .ai-pet { opacity: 0; pointer-events: none; }

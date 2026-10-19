@@ -1,6 +1,6 @@
 {
   "slug": "japan-onsen-temple-meditation",
-  "entrance": { "no": 3, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["winter"], "time": "predawn" },
+  "entrance": { "no": 3, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["winter"], "time": "predawn", "tz": "Asia/Tokyo", "months": [12, 1, 2] },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "minimal",
     "adventure_index": 3, "obscurity_level": 6, "risk_level": 1, "price": 8999,

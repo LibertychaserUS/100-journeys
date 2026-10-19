@@ -1,6 +1,6 @@
 {
   "slug": "korea-haeinsa-woodblocks",
-  "entrance": { "no": 23, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "predawn" },
+  "entrance": { "no": 23, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "predawn", "tz": "Asia/Seoul", "months": [9, 10, 11] },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "minimal",
     "adventure_index": 2, "obscurity_level": 5, "risk_level": 1, "price": 4999,

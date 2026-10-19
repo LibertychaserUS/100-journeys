@@ -1,6 +1,6 @@
 {
   "slug": "usa-bonneville-salt-flats",
-  "entrance": { "no": 17, "realm": "mirror-salt", "pace": "day", "scale": "far", "seasons": ["summer"], "time": "noon" },
+  "entrance": { "no": 17, "realm": "mirror-salt", "pace": "day", "scale": "far", "seasons": ["summer"], "time": "noon", "tz": "America/Denver", "months": [8] },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "minimal",
     "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 15999,

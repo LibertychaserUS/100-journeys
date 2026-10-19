@@ -47,12 +47,24 @@ p { text-wrap: pretty; }
 }
 
 .skip-link {
-  position: fixed; left: var(--space-4); top: -60px; z-index: calc(var(--z-nav) + 1);
+  position: fixed; left: var(--space-4); top: 0; z-index: calc(var(--z-nav) + 1);
   padding: 10px 16px; border-radius: var(--radius-control);
   background: var(--color-action); color: var(--color-on-action); font-weight: var(--weight-semibold);
-  transition: top var(--dur-fast);
+  transform: translateY(calc(-100% - 8px)); transition: transform var(--dur-fast);
 }
-.skip-link:focus { top: var(--space-3); }
+.skip-link:focus { transform: translateY(var(--space-3)); }
+
+/* Presses answer at once; the default grey tap flash is replaced by these. */
+html { -webkit-tap-highlight-color: transparent; }
+.btn, .chip, .home-atlas__chip, .home-hero__dot, .home-hero__pause { transition-property: transform, background-color, border-color, color, box-shadow, opacity; }
+.btn:active, .chip:active, .home-atlas__chip:active, .home-hero__pause:active { transform: scale(.97); transition-duration: 90ms; }
+
+@media (forced-colors: active) {
+  .home-hero__dot i { background: CanvasText !important; }
+  .home-hero__dot[aria-current="true"] i { background: Highlight !important; }
+  .door.is-selected, .door__link:focus-visible { outline: 3px solid Highlight; }
+  .door__lamp, .home-atlas__chip i, .door-card__meta i { forced-color-adjust: none; }
+}
 
 .icon { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .icon--sm { width: 14px; height: 14px; }
@@ -67,19 +79,27 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
 }
 
-/* Route transitions (View Transitions API): the nav stays put, pages cross-fade, and a clicked
-   journey card's image grows into the journey's opening. */
+/* Route transitions (View Transitions API): the nav stays put; the old page leaves before the new
+   one arrives (never two pages at once); a clicked journey's image or door grows into the journey's
+   opening, under its own scrim and title. */
 #main-nav { view-transition-name: site-nav; }
 .scene__media--hero img { view-transition-name: journey-hero; }
+.scene__scrim--hero { view-transition-name: journey-scrim; }
+.scene--hero .detail-hero__text { view-transition-name: journey-copy; }
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root) { animation: vt-out 240ms var(--ease-in-out) both; }
-  ::view-transition-new(root) { animation: vt-in 420ms var(--ease-out) both; }
+  ::view-transition-group(site-nav) { animation-duration: 0s; }
+  ::view-transition-old(root) { animation: vt-out 200ms cubic-bezier(.4, 0, 1, 1) both; }
+  ::view-transition-new(root) { animation: vt-in 420ms var(--ease-out) 160ms both; }
   ::view-transition-group(journey-hero) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
-  ::view-transition-old(journey-hero), ::view-transition-new(journey-hero) { animation-duration: 640ms; height: 100%; object-fit: cover; }
+  ::view-transition-old(journey-hero), ::view-transition-new(journey-hero) { animation-duration: 640ms; width: 100%; height: 100%; object-fit: cover; }
+  ::view-transition-new(journey-scrim) { animation: vt-fade 420ms var(--ease-out) 220ms both; }
+  ::view-transition-new(journey-copy) { animation: vt-in 520ms var(--ease-out) 280ms both; }
+  ::view-transition-old(journey-scrim), ::view-transition-old(journey-copy) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
-@keyframes vt-out { to { opacity: 0; filter: blur(4px); } }
+@keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; transform: translate3d(0, 14px, 0); } }
+@keyframes vt-fade { from { opacity: 0; } }
 
 /* <picture> wrappers (UI.picture) take no box of their own, so image rules apply to the <img>. */
 picture { display: contents; }

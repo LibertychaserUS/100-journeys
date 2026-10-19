@@ -9,3 +9,7 @@
 .about-stack { margin-top: var(--space-7); padding: var(--space-5); border-radius: var(--radius-card); background: var(--color-surface); border: 1px solid var(--color-line); display: grid; gap: 4px; max-width: 760px; }
 .about-stack .link-arrow { margin-top: 10px; }
 @media (max-width: 760px) { .about-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); } }
+
+/* The colophon: how it is made, quietly at the end */
+.about-colophon { margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--color-line); display: grid; gap: 10px; max-width: 44em; font-size: var(--text-sm); color: var(--color-text-3); line-height: 1.7; }
+.about-colophon b { color: var(--color-text-2); font-weight: var(--weight-semibold); margin-right: 6px; }

@@ -11,6 +11,38 @@ const Router = (() => {
   let current = null; // { route, key }
   let firstRender = true;
   let depth = 0; // in-app navigations, so "back" knows whether history.back() stays in the app
+  let routeHash = window.location.hash.startsWith('#/') ? window.location.hash : '#/';
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  // Each history entry keeps its scroll position and whatever the page saves (the selected door,
+  // the slide), so Back returns to the same place. Forward navigations start at the top.
+  const state = () => history.state || {};
+  function saveState(extra) {
+    history.replaceState({ ...state(), y: window.scrollY, ...extra }, '');
+  }
+
+  // A hash that is not a route (the skip link, an in-page anchor) moves focus and keeps the route.
+  function inPageAnchor() {
+    const h = window.location.hash;
+    if (!h || h === '#' || h.startsWith('#/')) return false;
+    let el = null;
+    try { el = document.getElementById(decodeURIComponent(h.slice(1))); } catch (e) { el = null; }
+    history.replaceState(history.state, '', routeHash);
+    if (el) {
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+      el.focus();
+    }
+    return true;
+  }
+
+  // The nav over a full-bleed opening turns solid once the opening is behind it.
+  function updateScrolled() {
+    if (!('mediaHeader' in document.body.dataset)) return;
+    const end = document.querySelector('[data-media-end]');
+    const limit = end ? end.offsetTop + end.offsetHeight - 80 : 24;
+    if (window.scrollY > limit) document.body.dataset.scrolled = '';
+    else delete document.body.dataset.scrolled;
+  }
 
   function define(pattern, page) {
     const keys = [];
@@ -37,6 +69,8 @@ const Router = (() => {
   }
 
   function resolve(force = false) {
+    if (inPageAnchor()) return;
+    routeHash = window.location.hash || '#/';
     const { path, query } = parse();
     const found = match(path);
     const ctx = { path, query, params: found ? found.params : {} };
@@ -58,10 +92,15 @@ const Router = (() => {
 
     const page = found ? found.route.page : null;
     const name = document.body.dataset.page;
+    const restoreY = typeof state().y === 'number' ? state().y : null;
     const run = () => {
       if (!force) window.scrollTo(0, 0);
       UI.setMeta({ title: name === 'home' ? '' : (t(`meta.page.${name}`) !== `meta.page.${name}` ? t(`meta.page.${name}`) : '') });
       const out = page ? page.render(ctx) : Pages.Error.render(404);
+      // Coming back to an entry (Back, Forward, a reload, a language switch): return to its place.
+      const back = force ? window.scrollY : restoreY;
+      if (back) requestAnimationFrame(() => requestAnimationFrame(() => { window.scrollTo(0, back); updateScrolled(); }));
+      else requestAnimationFrame(updateScrolled);
       // Wait briefly for an async page (detail) so the transition captures the new state.
       return out && typeof out.then === 'function' ? Promise.race([out, new Promise((r) => setTimeout(r, 700))]) : undefined;
     };
@@ -94,7 +133,8 @@ const Router = (() => {
   function replaceQuery(params) {
     const { path } = parse();
     const s = new URLSearchParams(params).toString();
-    history.replaceState(null, '', `#${path}${s ? `?${s}` : ''}`);
+    routeHash = `#${path}${s ? `?${s}` : ''}`;
+    history.replaceState(history.state, '', routeHash);
   }
 
   /** Safe in-app redirect target from a ?next= value. */
@@ -102,15 +142,15 @@ const Router = (() => {
     return value && /^\/[a-z0-9\-/?=&%._]*$/i.test(value) && !value.startsWith('//') ? value : fallback;
   }
 
-  window.addEventListener('hashchange', () => { depth++; resolve(); });
+  window.addEventListener('hashchange', () => { if (inPageAnchor()) return; depth++; resolve(); });
   window.addEventListener('DOMContentLoaded', () => resolve());
   I18n.onChange(() => resolve(true));
 
-  // Nav over media headers turns solid after a little scroll.
+  let saveTimer = 0;
   window.addEventListener('scroll', () => {
-    if (!document.body.dataset.mediaHeader) return;
-    if (window.scrollY > 24) document.body.dataset.scrolled = '';
-    else delete document.body.dataset.scrolled;
+    updateScrolled();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => saveState(), 150);
   }, { passive: true });
 
   function back(fallback = '/explore') {
@@ -118,7 +158,11 @@ const Router = (() => {
     else navigate(fallback);
   }
 
-  return { define, navigate, replaceQuery, safeNext, back, refresh: () => resolve(true), get query() { return parse().query; } };
+  return {
+    define, navigate, replaceQuery, safeNext, back, refresh: () => resolve(true), get query() { return parse().query; },
+    /** What the current history entry remembers (e.g. a page's own selection), and how to add to it. */
+    state, saveState,
+  };
 })();
 
 Router.define('/', Pages.Home);

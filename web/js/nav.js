@@ -6,6 +6,7 @@ const Nav = (() => {
   let footer;
   let menuOpen = false;
   let drawerOpen = false;
+  let drawerShown = false;
 
   const theme = () => document.documentElement.getAttribute('data-theme') || 'dark';
 
@@ -53,7 +54,7 @@ const Nav = (() => {
 
     el.innerHTML = `
       <div class="container nav">
-        <a class="nav__brand" href="#/" aria-label="${esc(t('brand'))}">
+        <a class="nav__brand" href="#/" aria-label="${esc(t('brand'))}"${activeSection() === '' && /^#?\/?$/.test(window.location.hash.split('?')[0]) ? ' aria-current="page"' : ''}>
           <img src="${API.mediaUrl('generated/brand-mark-128.png')}" alt="" width="28" height="28">
           <span>${esc(t('brand'))}</span>
         </a>
@@ -88,7 +89,8 @@ const Nav = (() => {
           <button role="menuitem" type="button" id="nav-logout">${UI.icon('logout')}${esc(t('nav.logout'))}</button>
         </div>` : ''}
       ${drawerOpen ? `
-        <div class="drawer" id="nav-drawer">
+        <div class="drawer-scrim" data-action="close" aria-hidden="true"></div>
+        <div class="drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="${esc(t('nav.main'))}">
           <div class="container">
             <nav class="drawer__links" aria-label="${esc(t('nav.main'))}">
               ${link('#/explore', 'nav.explore', 'explore')}
@@ -111,6 +113,9 @@ const Nav = (() => {
         </div>` : ''}
     `;
     document.body.dataset.auth = authed ? 'user' : 'guest';
+    const was = drawerShown;
+    drawerShown = drawerOpen;
+    syncDrawer(was);
   }
 
   function renderFooter() {
@@ -119,7 +124,7 @@ const Nav = (() => {
       <div class="container">
         <p class="site-footer__line"><span>${UI.esc(t('footer.line'))}</span><small>${UI.esc(t('footer.lineBy'))}</small></p>
         <span>${UI.esc(t('footer.note'))}</span>
-        <nav aria-label="Footer">
+        <nav aria-label="${UI.esc(t('nav.footer'))}">
           <a href="#/about">${UI.esc(t('nav.about'))}</a>
           <a href="#/explore">${UI.esc(t('nav.explore'))}</a>
           <a href="https://github.com/LibertychaserUS/100-journeys" rel="noopener" target="_blank">GitHub</a>
@@ -134,11 +139,40 @@ const Nav = (() => {
     render();
   }
 
+  // The drawer is modal: the page behind it is inert, focus starts inside and stays there, and a
+  // page may pause itself while it is open (drawer:toggle).
+  function syncDrawer(wasOpen) {
+    ['main-content', 'main-footer', 'skip-link', 'ai-pet'].forEach((id) => {
+      const node = document.getElementById(id);
+      if (node) node.inert = drawerOpen;
+    });
+    if (drawerOpen) document.body.dataset.drawer = '';
+    else delete document.body.dataset.drawer;
+    if (drawerOpen !== wasOpen) {
+      window.dispatchEvent(new CustomEvent('drawer:toggle', { detail: drawerOpen }));
+      if (drawerOpen) el.querySelector('#nav-drawer a, #nav-drawer button')?.focus();
+      else if (wasOpen && el.contains(document.activeElement) === false) document.getElementById('nav-menu')?.focus();
+    }
+  }
+
+  function trapTab(e) {
+    if (!drawerOpen || e.key !== 'Tab') return;
+    const items = [el.querySelector('#nav-menu'), ...el.querySelectorAll('#nav-drawer a, #nav-drawer button')].filter(Boolean);
+    const i = items.indexOf(document.activeElement);
+    const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i === -1 || i === items.length - 1 ? 0 : i + 1);
+    e.preventDefault();
+    items[next].focus();
+  }
+
   function onClick(e) {
-    const target = e.target.closest('button, a');
+    const target = e.target.closest('button, a, [data-action]');
     if (!target) return;
     const id = target.id;
-    if (id === 'nav-theme' || target.dataset.action === 'theme') return setTheme(theme() === 'dark' ? 'light' : 'dark');
+    if (target.dataset.action === 'close') { closeAll(); document.getElementById('nav-menu')?.focus(); return; }
+    if (id === 'nav-theme' || target.dataset.action === 'theme') {
+      if (drawerOpen) { drawerOpen = false; render(); document.getElementById('nav-menu')?.focus(); }
+      return setTheme(theme() === 'dark' ? 'light' : 'dark');
+    }
     if (id === 'nav-lang' || target.dataset.action === 'lang') {
       drawerOpen = false;
       I18n.setLang(I18n.lang === 'zh' ? 'en' : 'zh');
@@ -151,7 +185,7 @@ const Nav = (() => {
       if (menuOpen) el.querySelector('#nav-menu-list [role="menuitem"]')?.focus();
       return;
     }
-    if (id === 'nav-menu') { drawerOpen = !drawerOpen; menuOpen = false; render(); return; }
+    if (id === 'nav-menu') { drawerOpen = !drawerOpen; menuOpen = false; render(); if (!drawerOpen) document.getElementById('nav-menu')?.focus(); return; }
     if (id === 'nav-logout' || id === 'drawer-logout') {
       menuOpen = false;
       drawerOpen = false;
@@ -168,6 +202,7 @@ const Nav = (() => {
     if (!el) return;
     el.addEventListener('click', onClick);
     document.addEventListener('click', (e) => { if (menuOpen && !e.target.closest('#nav-user, #nav-menu-list')) closeAll(); });
+    document.addEventListener('keydown', trapTab);
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape' || (!menuOpen && !drawerOpen)) return;
       const opener = menuOpen ? 'nav-user' : 'nav-menu';

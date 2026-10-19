@@ -17,11 +17,10 @@ Pages.About = {
           <div class="about-grid">
             ${[1, 2, 3].map((n) => `<section><h2>${esc(t(`about.c${n}.title`))}</h2><p>${esc(t(`about.c${n}.text`))}</p></section>`).join('')}
           </div>
-          <section class="about-stack">
-            <h2>${esc(t('about.stack.title'))}</h2>
-            <p>${esc(t('about.stack.text'))}</p>
+          <footer class="about-colophon">
+            <p><b>${esc(t('about.stack.title'))}</b> ${esc(t('about.stack.text'))}</p>
             <a class="link-arrow" href="https://github.com/LibertychaserUS/100-journeys" target="_blank" rel="noopener">${esc(t('about.source'))} ${UI.icon('arrow', 'icon--sm')}</a>
-          </section>
+          </footer>
         </div>
       </div>`;
   },

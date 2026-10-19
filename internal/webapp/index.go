@@ -17,6 +17,8 @@ type Config struct {
 	APIBase      string `json:"apiBase"`
 	MediaBase    string `json:"mediaBase"`
 	AssetVersion string `json:"-"`
+	// Doors is how many entrances exist, so the home page can show it before any data loads.
+	Doors int `json:"doors,omitempty"`
 }
 
 const (

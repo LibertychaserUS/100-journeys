@@ -90,6 +90,8 @@ type JourneyEntrance struct {
 	Scale        string   `json:"scale"`
 	Seasons      []string `json:"seasons"`
 	Time         string   `json:"time"`
+	TZ           string   `json:"tz,omitempty"`     // the place's IANA time zone
+	Months       []int    `json:"months,omitempty"` // months it opens in, 1–12
 	CoverLicense string   `json:"cover_license,omitempty"`
 	CoverSource  string   `json:"cover_source,omitempty"`
 }

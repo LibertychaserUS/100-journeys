@@ -1,6 +1,6 @@
 {
   "slug": "heilongjiang-mohe-cold",
-  "entrance": { "no": 30, "realm": "ice-night", "pace": "day", "scale": "near", "seasons": ["winter"], "time": "dawn" },
+  "entrance": { "no": 30, "realm": "ice-night", "pace": "day", "scale": "near", "seasons": ["winter"], "time": "dawn", "tz": "Asia/Shanghai", "months": [12, 1] },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "raw",
     "adventure_index": 5, "obscurity_level": 4, "risk_level": 2, "price": 6999,

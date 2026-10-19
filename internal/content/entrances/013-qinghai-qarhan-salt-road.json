@@ -1,6 +1,6 @@
 {
   "slug": "qinghai-qarhan-salt-road",
-  "entrance": { "no": 13, "realm": "mirror-salt", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "noon" },
+  "entrance": { "no": 13, "realm": "mirror-salt", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "noon", "tz": "Asia/Shanghai", "months": [6, 7, 8] },
   "journey": {
     "fantasy_type": "visual", "visual_style": "minimal",
     "adventure_index": 4, "obscurity_level": 7, "risk_level": 2, "price": 6999,

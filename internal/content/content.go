@@ -18,6 +18,9 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
+	"time"
+	_ "time/tzdata" // each door's own time zone resolves on any server
 )
 
 //go:embed entrances/*.json scenes/*.json
@@ -43,6 +46,10 @@ type Meta struct {
 	Scale   string   `json:"scale"`
 	Seasons []string `json:"seasons"`
 	Time    string   `json:"time"`
+	// TZ is the place's IANA time zone and Months the months (1–12) it opens in, so "open now"
+	// is judged on the door's own clock and calendar, never the visitor's.
+	TZ     string `json:"tz"`
+	Months []int  `json:"months"`
 }
 
 // Base mirrors the columns of the journeys table plus tag and MBTI links.
@@ -133,6 +140,25 @@ var (
 	Tags         = []string{"extreme", "solitude", "visual", "culture", "hidden", "nature", "spiritual", "night"}
 )
 
+var (
+	bySlugOnce sync.Once
+	bySlug     map[string]Entrance
+)
+
+// EntranceFor returns the authored entrance for a journey slug (loaded once).
+func EntranceFor(slug string) (Entrance, bool) {
+	bySlugOnce.Do(func() {
+		bySlug = map[string]Entrance{}
+		if all, err := Load(); err == nil {
+			for _, e := range all {
+				bySlug[e.Slug] = e
+			}
+		}
+	})
+	e, ok := bySlug[slug]
+	return e, ok
+}
+
 // Load reads every embedded entrance, sorted by entrance number.
 func Load() ([]Entrance, error) {
 	paths, err := fs.Glob(files, "entrances/*.json")
@@ -200,6 +226,19 @@ func Validate(e Entrance) []string {
 	}
 	if e.Entrance.Time != "" && !contains(Times, e.Entrance.Time) {
 		add("unknown time %q", e.Entrance.Time)
+	}
+	if _, err := time.LoadLocation(e.Entrance.TZ); e.Entrance.TZ == "" || err != nil {
+		add("entrance needs its place's IANA time zone (tz), got %q", e.Entrance.TZ)
+	}
+	if len(e.Entrance.Months) == 0 {
+		add("entrance needs the months it opens in")
+	}
+	seen := map[int]bool{}
+	for _, m := range e.Entrance.Months {
+		if m < 1 || m > 12 || seen[m] {
+			add("months must be distinct values 1-12, got %d", m)
+		}
+		seen[m] = true
 	}
 	if !contains(FantasyTypes, e.Journey.FantasyType) {
 		add("unknown fantasy_type %q", e.Journey.FantasyType)
