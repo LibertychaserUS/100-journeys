@@ -1,15 +1,122 @@
 /* =============================================================
-   HOME — steps explainer + featured grid (one lead, four more)
+   HOME — the hundred doors, the invitation, five featured journeys
    ============================================================= */
 
-.home-steps { padding-block: var(--space-8) var(--space-6); }
-.home-steps__row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); border-top: 1px solid var(--color-line); padding-top: var(--space-5); }
-.home-step { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; align-content: start; }
-.home-step__n { grid-row: span 2; font-family: var(--font-story); font-size: var(--text-2xl); line-height: 1; color: var(--color-text-3); }
-.home-step h2 { font-size: var(--text-md); }
-.home-step p { font-size: var(--text-base); color: var(--color-text-2); }
+/* Each realm has its own lamp colour (used by the doors, the filter chips and the door card). */
+.home-atlas, .home-hero {
+  --realm-mirror-salt: #c9d6ec; --realm-fire-stone: #ef7d52; --realm-ice-night: #7fd8c8; --realm-sand-stars: #e9b764;
+  --realm-mist-temple: #c2b6dc; --realm-water-deep: #5c9ae0; --realm-city-rules: #f0a84a; --realm-old-roads: #c39a68;
+}
+[data-theme="light"] .home-atlas {
+  --realm-mirror-salt: #6f86ad; --realm-fire-stone: #c4532b; --realm-ice-night: #2f8f80; --realm-sand-stars: #a8741e;
+  --realm-mist-temple: #7a6aa3; --realm-water-deep: #2f6fb8; --realm-city-rules: #b56f12; --realm-old-roads: #8a6436;
+}
 
-.home-featured { padding-bottom: var(--space-9); }
+/* --- The hundred doors --- */
+.home-atlas { padding-block: var(--space-9) var(--space-8); }
+.home-atlas__head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-6); align-items: end; }
+.home-atlas__count { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-story); line-height: .86; color: var(--color-text); }
+.home-atlas__count b { font-size: clamp(4.5rem, 11vw, 8.75rem); font-weight: 700; letter-spacing: -.02em; }
+.home-atlas__count span { font-size: clamp(1.25rem, 2.4vw, 2rem); color: var(--color-text-3); }
+.home-atlas__intro { padding-bottom: 10px; }
+.home-atlas__intro h2 { font-family: var(--font-story); font-size: clamp(1.625rem, 3vw, 2.375rem); line-height: 1.25; text-wrap: balance; }
+.home-atlas__intro p { margin-top: 8px; max-width: 32em; color: var(--color-text-2); font-size: var(--text-md); }
+
+.home-atlas__filters { margin-top: var(--space-6); display: flex; flex-wrap: wrap; gap: 8px; }
+.home-atlas__chip { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--color-line-strong); background: transparent; color: var(--color-text-2); font-size: var(--text-sm); transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out), color var(--dur); }
+.home-atlas__chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--lamp); box-shadow: 0 0 10px color-mix(in srgb, var(--lamp) 60%, transparent); }
+.home-atlas__chip .num { color: var(--color-text-3); font-size: var(--text-xs); }
+.home-atlas__chip:hover { border-color: var(--color-text-3); color: var(--color-text); }
+.home-atlas__chip[aria-pressed="true"] { border-color: var(--color-text); color: var(--color-text); background: color-mix(in srgb, var(--lamp, var(--color-text)) 12%, transparent); }
+.home-atlas__chip[aria-pressed="true"] .num { color: var(--color-text-2); }
+
+.home-atlas__body { margin-top: var(--space-5); display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--space-6); align-items: start; }
+.home-atlas__grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; counter-reset: none; }
+.door { position: relative; aspect-ratio: 1; border-radius: 8px; border: 1px dashed color-mix(in srgb, var(--color-line-strong) 38%, transparent); }
+.door__no { position: absolute; left: 8px; top: 6px; font-size: 11px; letter-spacing: .06em; color: var(--color-text-3); opacity: .32; }
+.door.is-found { border-style: solid; border-color: var(--color-line-strong); --lamp: var(--realm-mirror-salt); }
+.door.is-found[data-realm="fire-stone"] { --lamp: var(--realm-fire-stone); }
+.door.is-found[data-realm="ice-night"] { --lamp: var(--realm-ice-night); }
+.door.is-found[data-realm="sand-stars"] { --lamp: var(--realm-sand-stars); }
+.door.is-found[data-realm="mist-temple"] { --lamp: var(--realm-mist-temple); }
+.door.is-found[data-realm="water-deep"] { --lamp: var(--realm-water-deep); }
+.door.is-found[data-realm="city-rules"] { --lamp: var(--realm-city-rules); }
+.door.is-found[data-realm="old-roads"] { --lamp: var(--realm-old-roads); }
+.door.is-found .door__no { opacity: 1; color: var(--color-text-2); }
+.door__link { position: absolute; inset: 0; border-radius: inherit; }
+.door__lamp { position: absolute; right: 8px; bottom: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--lamp); box-shadow: 0 0 0 0 transparent; transition: box-shadow var(--dur-slow) var(--ease-out), transform var(--dur) var(--ease-out); }
+.door.is-found { transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out); }
+.door.is-found:hover, .door.is-selected { border-color: var(--lamp); background: color-mix(in srgb, var(--lamp) 13%, transparent); }
+.door.is-found:hover .door__no, .door.is-selected .door__no { color: var(--color-text); }
+.door.is-found:hover .door__lamp, .door.is-selected .door__lamp { transform: scale(1.3); box-shadow: 0 0 14px 3px color-mix(in srgb, var(--lamp) 70%, transparent); }
+.door.is-found[data-open="true"] .door__lamp { box-shadow: 0 0 10px 1px color-mix(in srgb, var(--lamp) 55%, transparent); }
+.door.is-dim { opacity: .22; }
+.door__link:focus-visible { outline: 2px solid var(--lamp); outline-offset: 2px; }
+/* The doors light up in order the first time they come into view. */
+@media (prefers-reduced-motion: no-preference) {
+  .home-atlas__grid.will-light .door { opacity: 0; transform: translate3d(0, 6px, 0); }
+  .home-atlas__grid.will-light.is-lit .door { opacity: 1; transform: none; transition: opacity .5s var(--ease-out) calc(var(--i) * 7ms), transform .5s var(--ease-out) calc(var(--i) * 7ms); }
+  .home-atlas__grid.will-light.is-lit .door.is-dim { opacity: .22; }
+}
+
+/* The door the pointer or focus is on */
+.home-atlas__panel { position: sticky; top: calc(var(--nav-h) + var(--space-5)); min-height: 480px; }
+.door-card { display: grid; gap: var(--space-4); }
+.door-card__media { display: block; aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; background: var(--color-surface-2); box-shadow: 0 30px 70px -40px rgba(0, 0, 0, .7); }
+.door-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease-out); }
+.door-card:hover .door-card__media img { transform: scale(1.03); }
+.door-card__body { display: grid; gap: 8px; }
+.door-card__meta { display: flex; align-items: center; gap: 8px; font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-text-3); }
+.door-card__meta i { width: 7px; height: 7px; border-radius: 50%; background: var(--lamp); box-shadow: 0 0 10px color-mix(in srgb, var(--lamp) 60%, transparent); }
+.door-card__title { font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.3; color: var(--color-text); }
+.door-card__hook { color: var(--color-text-2); font-size: var(--text-base); line-height: 1.6; }
+.door-card__opens { display: grid; gap: 2px; font-size: var(--text-sm); color: var(--color-text-2); }
+.door-card__opens b { font-weight: var(--weight-semibold); font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-text-3); }
+.door-card__go { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: var(--text-sm); color: var(--color-text); text-decoration: underline; text-decoration-color: var(--color-line-strong); text-underline-offset: 4px; }
+.door-card:hover .door-card__go { text-decoration-color: currentColor; }
+@media (prefers-reduced-motion: no-preference) {
+  .door-card { animation: door-in .45s var(--ease-out); }
+}
+@keyframes door-in { from { opacity: .3; transform: translate3d(0, 6px, 0); } }
+
+@media (max-width: 960px) {
+  .home-atlas__body { grid-template-columns: minmax(0, 1fr); }
+  .home-atlas__panel { position: static; min-height: 0; }
+  .door-card { grid-template-columns: minmax(0, 38%) minmax(0, 1fr); align-items: center; }
+}
+@media (max-width: 760px) {
+  .home-atlas { padding-block: var(--space-7) var(--space-6); }
+  .home-atlas__head { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+  .home-atlas__filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); scrollbar-width: none; }
+  .home-atlas__filters::-webkit-scrollbar { display: none; }
+  .home-atlas__chip { flex: none; }
+  .home-atlas__grid { gap: 4px; }
+  .door { border-radius: 5px; }
+  .door__no { left: 3px; top: 2px; font-size: 9px; letter-spacing: 0; }
+  .door:not(.is-found) .door__no { display: none; }
+  .door__lamp { right: 4px; bottom: 4px; width: 5px; height: 5px; }
+  .door-card { gap: var(--space-3); }
+  .door-card__title { font-size: var(--text-lg); }
+}
+
+/* --- Invitation: find your type --- */
+.home-invite { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-5); align-items: center; padding-block: var(--space-6); border-block: 1px solid var(--color-line); }
+.home-invite__face { display: grid; filter: drop-shadow(0 0 18px rgba(242, 196, 109, .35)); }
+.home-invite__text h2 { font-family: var(--font-story); font-size: var(--text-2xl); line-height: 1.3; }
+.home-invite__text p { margin-top: 6px; color: var(--color-text-2); font-size: var(--text-base); max-width: 36em; }
+.home-invite__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 960px) {
+  .home-invite { grid-template-columns: auto minmax(0, 1fr); }
+  .home-invite__actions { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (max-width: 760px) {
+  .home-invite { gap: var(--space-4); padding-block: var(--space-5); }
+  .home-invite__text h2 { font-size: var(--text-xl); }
+  .home-invite__actions .btn { flex: 1 1 auto; }
+}
+
+/* --- Featured --- */
+.home-featured { padding-block: var(--space-8) var(--space-9); }
 .home-featured__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-auto-rows: minmax(300px, auto); gap: var(--space-5); }
 .home-featured__grid .feature-card--lead { grid-row: span 2; }
 
@@ -18,23 +125,6 @@
   .home-featured__grid .feature-card--lead { grid-column: span 2; grid-row: auto; min-height: 380px; }
 }
 @media (max-width: 760px) {
-  .home-steps { padding-block: var(--space-6) var(--space-4); }
-  .home-steps__row { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
+  .home-featured { padding-block: var(--space-6) var(--space-7); }
   .home-featured__grid { gap: var(--space-3); grid-auto-rows: minmax(220px, auto); }
-}
-
-/* Home invitation — the first step of the core flow */
-.home-invite { margin-top: var(--space-6); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-5); align-items: center; padding: 22px 26px; border-radius: var(--radius-sheet); background: var(--color-surface); border: 1px solid var(--color-line-strong); }
-.home-invite__face { display: grid; }
-.home-invite__text h2 { margin-top: 4px; font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.35; }
-.home-invite__text p:not(.eyebrow) { margin-top: 4px; color: var(--color-text-2); font-size: var(--text-base); max-width: 36em; }
-.home-invite__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.home-invite--back .home-invite__text h2 { margin-top: 0; }
-@media (max-width: 960px) {
-  .home-invite { grid-template-columns: auto minmax(0, 1fr); }
-  .home-invite__actions { grid-column: 1 / -1; justify-content: flex-start; }
-}
-@media (max-width: 760px) {
-  .home-invite { padding: 18px; gap: var(--space-4); }
-  .home-invite__actions .btn { flex: 1 1 auto; }
 }

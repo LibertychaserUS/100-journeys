@@ -117,6 +117,7 @@ const Nav = (() => {
     if (!footer) return;
     footer.innerHTML = `
       <div class="container">
+        <p class="site-footer__line"><span>${UI.esc(t('footer.line'))}</span><small>${UI.esc(t('footer.lineBy'))}</small></p>
         <span>${UI.esc(t('footer.note'))}</span>
         <nav aria-label="Footer">
           <a href="#/about">${UI.esc(t('nav.about'))}</a>

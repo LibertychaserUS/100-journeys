@@ -25,8 +25,17 @@
 @keyframes hero-line { from { opacity: 0; transform: translate3d(0, 28px, 0); filter: blur(6px); } }
 .home-hero__enter { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-base); color: #f6f1e8; text-decoration: underline; text-decoration-color: rgba(246, 241, 232, .4); text-underline-offset: 5px; }
 .home-hero__enter:hover { text-decoration-color: currentColor; }
-.home-hero__dots { margin-top: var(--space-5); display: flex; gap: 8px; }
-.home-hero__dot { width: 44px; height: 24px; display: grid; align-items: center; }
+.home-hero__foot { margin-top: var(--space-5); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-5); flex-wrap: wrap; }
+.home-hero__dots { display: flex; gap: 10px; }
+.home-hero__dot { width: 56px; min-height: 32px; display: grid; align-content: center; gap: 7px; }
+.home-hero__dot span { font-size: 11px; letter-spacing: .08em; text-align: left; color: rgba(246, 241, 232, .5); transition: color var(--dur) var(--ease-out); }
+.home-hero__dot[aria-current="true"] span, .home-hero__dot:hover span { color: #f6f1e8; }
+/* The visitor's own hour, and how many doors are open in it */
+.home-hero__now { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: var(--text-sm); color: rgba(246, 241, 232, .7); }
+.home-hero__now time { font-size: var(--text-lg); letter-spacing: .06em; color: #f6f1e8; }
+.home-hero__now span + span::before { content: "·"; margin-right: 12px; color: rgba(246, 241, 232, .4); }
+@media (prefers-reduced-motion: no-preference) { .home-hero__now time i { animation: hero-colon 2s steps(1, end) infinite; } }
+@keyframes hero-colon { 50% { opacity: .25; } }
 .home-hero__dot i { display: block; height: 2px; border-radius: 1px; background: rgba(246, 241, 232, .28); overflow: hidden; position: relative; }
 .home-hero__dot i::after { content: ""; position: absolute; inset: 0; background: #f6f1e8; transform: scaleX(0); transform-origin: left; }
 .home-hero__dot[aria-current="true"] i::after { transform: scaleX(1); }
@@ -45,7 +54,8 @@
 }
 .home-hero__content { padding-block: calc(var(--nav-h) + var(--space-7)) clamp(48px, 10vh, 112px); }
 .home-hero__eyebrow { font-size: var(--text-sm); letter-spacing: .14em; color: rgba(246, 241, 232, .72); }
-.home-hero__title { margin-top: 14px; font-family: var(--font-story); font-weight: 700; font-size: clamp(3rem, 8vw, 6.25rem); line-height: 1.02; letter-spacing: .04em; }
+.home-hero__title { margin-top: 14px; max-width: 11em; font-family: var(--font-story); font-weight: 700; font-size: clamp(3rem, 8vw, 6.25rem); line-height: 1.02; letter-spacing: .04em; text-wrap: balance; }
+.home-hero.scene-door .home-hero__title { font-size: clamp(2.5rem, 6.4vw, 5.25rem); line-height: 1.08; letter-spacing: .02em; }
 :lang(en) .home-hero__title { letter-spacing: 0; }
 .home-hero__lead { margin-top: 18px; max-width: 26em; font-size: clamp(1.125rem, 2.1vw, 1.5rem); line-height: 1.5; color: rgba(246, 241, 232, .92); text-wrap: balance; }
 

@@ -131,7 +131,8 @@ const UI = (() => {
   const slugOf = (a) => decodeURIComponent((a.getAttribute('href') || '').replace('#/journey/', '').split('?')[0]);
   ['pointerover', 'focusin', 'pointerdown'].forEach((type) => document.addEventListener(type, (e) => {
     const a = e.target.closest && e.target.closest(cardSel);
-    if (a) API.prefetchJourney(slugOf(a));
+    // Dense grids of links (the hundred doors) prefetch on press or focus only, not as the pointer sweeps.
+    if (a && !(type === 'pointerover' && a.hasAttribute('data-quiet'))) API.prefetchJourney(slugOf(a));
   }, { passive: true }));
   document.addEventListener('click', (e) => {
     const a = e.target.closest && e.target.closest(cardSel);
