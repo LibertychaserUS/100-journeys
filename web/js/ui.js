@@ -165,6 +165,10 @@ const UI = (() => {
     const from = a.dataset.vtFrom ? document.querySelector(a.dataset.vtFrom) : null;
     const img = from || a.querySelector('img') || (a.hasAttribute('data-vt-self') ? a : null);
     if (img) img.style.viewTransitionName = 'journey-hero';
+    // going through a door: a dark threshold between the pages, and from an arch the picture opens
+    // out of the arch's own shape (the router clears these when the transition ends)
+    document.documentElement.classList.add('vt-open');
+    document.documentElement.classList.toggle('vt-arch', !from && a.hasAttribute('data-vt-self'));
   });
 
   function trackCardClicks(root) {

@@ -177,13 +177,16 @@ Pages.Home = {
     this._userPaused = false;
     this._held = false;
     this._doors = new Map();
-    this._counted = false;
+    // re-rendered in place (a language switch): the page is already here, so nothing arrives again
+    this._swap = typeof Router !== 'undefined' && Router.swapping;
+    if (this._swap && this._lastSelected) this._pinned = this._lastSelected;
+    this._counted = this._swap;
     this._countPending = false;
     this._cleanups = [];
     const doors = (window.APP_CONFIG && APP_CONFIG.doors) || 48;
     const bootT = Math.round(performance.now());
     main.innerHTML = `
-      <section class="home-hero scene-taoyuan is-booting" data-media-end aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
+      <section class="home-hero scene-taoyuan${this._swap ? '' : ' is-booting'}" data-media-end aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
         <div class="home-hero__slides" aria-hidden="true">
           ${UI.picture(API.mediaUrl(this.BRAND.img), { sizes: 'max(100vw, 177.8svh)', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"' })}
         </div>
@@ -214,7 +217,7 @@ Pages.Home = {
       <section class="home-atlas" id="atlas" tabindex="-1" aria-labelledby="atlas-title">
         <div class="container">
           <header class="home-atlas__head">
-            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() ? 0 : doors}</b><span>/ 100</span></p>
+            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() && !this._swap ? 0 : doors}</b><span>/ 100</span></p>
             <div class="home-atlas__intro">
               <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title', { n: doors }))}</h2>
               <p class="home-atlas__legend"><i aria-hidden="true"></i>${esc(t('home.atlas.legend'))}</p>
@@ -308,6 +311,7 @@ Pages.Home = {
   },
 
   destroy() {
+    this._lastSelected = this._selected; // a re-render in place keeps the door being looked at
     if (this._particles) this._particles.stop();
     this._particles = null;
     clearTimeout(this._timer);
@@ -334,6 +338,9 @@ Pages.Home = {
       this._renderAtlas(journeys);
       this._renderFeatured(journeys);
       this._tick();
+      // the other language's doors, while nothing else is happening, so a switch is instant
+      const other = I18n.lang === 'zh' ? 'en' : 'zh';
+      (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => API.prefetchJourneys({ limit: 100 }, other));
       clearInterval(this._clock);
       this._clock = setInterval(() => this._tick(), 30000);
       const all = document.getElementById('featured-all');
@@ -667,7 +674,19 @@ Pages.Home = {
       drag = null;
     });
     section.querySelector('#door-card').addEventListener('click', () => this._closePeek());
-    if ('IntersectionObserver' in window) {
+    if (this._swap) {
+      grid.classList.add('is-lit', 'is-near');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) document.body.dataset.atlasInView = '';
+            else { delete document.body.dataset.atlasInView; this._closePeek(); }
+          });
+        }, { threshold: [0, 0.15], rootMargin: '0px 0px -10% 0px' });
+        io.observe(section);
+        this._cleanups.push(() => io.disconnect());
+      }
+    } else if ('IntersectionObserver' in window) {
       grid.classList.add('will-light');
       // The count climbs when the number itself comes into view, from 0, never from its final value.
       const counter = section.querySelector('.home-atlas__count');
@@ -918,7 +937,7 @@ Pages.Home = {
       window.addEventListener('scroll', onScroll, { passive: true });
       this._cleanups.push(() => window.removeEventListener('scroll', onScroll));
     }
-    if ('IntersectionObserver' in window && !this._reduce()) {
+    if ('IntersectionObserver' in window && !this._reduce() && !this._swap) {
       const items = main.querySelectorAll('.reveal, .home-close__quote, .home-invite');
       items.forEach((el) => el.classList.add('will-reveal'));
       const io = new IntersectionObserver((entries) => {
