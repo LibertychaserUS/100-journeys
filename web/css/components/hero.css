@@ -43,10 +43,8 @@
   position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .09; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-/* Dark theme: the photo dissolves into the page. Light theme: a deliberate edge instead of a grey band. */
-.home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 96px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--color-bg)); }
-[data-theme="light"] .home-hero { border-radius: 0 0 28px 28px; box-shadow: 0 40px 80px -64px rgba(20, 22, 28, .6); }
-[data-theme="light"] .home-hero::after { display: none; }
+/* The photo sinks into the night of the threshold that follows it (in both themes). */
+.home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 120px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, rgba(7, 8, 11, 0), #07080b); }
 
 .home-hero__content { padding-block: calc(var(--nav-h) + var(--space-7)) clamp(36px, 7vh, 80px); }
 .home-hero__copy { min-height: 0; transform: translate3d(0, calc(var(--exit) * -40px), 0); opacity: calc(1 - var(--exit) * 1.6); }

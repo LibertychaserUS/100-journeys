@@ -46,7 +46,7 @@ const Router = (() => {
     else delete document.body.dataset.scrolled;
     // Over the last stretch of the picture the bar darkens to night, so nothing on the picture
     // ever slides under a clear bar.
-    const scrim = end ? Math.min(1, Math.max(0, (window.scrollY - (limit - 320)) / 320)) : 0;
+    const scrim = end ? Math.min(1, Math.max(0, (window.scrollY - (limit - 480)) / 480)) : 0;
     document.body.style.setProperty('--nav-scrim', scrim.toFixed(3));
   }
 

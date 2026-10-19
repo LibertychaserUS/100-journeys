@@ -186,7 +186,7 @@ Pages.Home = {
     const doors = (window.APP_CONFIG && APP_CONFIG.doors) || 48;
     const bootT = Math.round(performance.now());
     main.innerHTML = `
-      <section class="home-hero scene-taoyuan${this._swap ? '' : ' is-booting'}" data-media-end aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
+      <section class="home-hero scene-taoyuan${this._swap ? '' : ' is-booting'}" aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
         <div class="home-hero__slides" aria-hidden="true">
           ${UI.picture(API.mediaUrl(this.BRAND.img), { sizes: 'max(100vw, 177.8svh)', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"' })}
         </div>
@@ -211,6 +211,13 @@ Pages.Home = {
             </div>
             <a class="home-hero__now" id="hero-now" href="#atlas" data-to-atlas data-now hidden></a>
           </div>
+        </div>
+      </section>
+
+      <section class="home-threshold" id="home-threshold" data-media-end aria-label="${esc(t('home.threshold.label'))}">
+        <div class="home-threshold__stage" data-layered>
+          <div class="home-threshold__arch" aria-hidden="true"><i></i></div>
+          ${['b1', 'b2', 'b3'].map((k, i) => `<p class="home-threshold__beat" style="--o:${i ? 0 : 1}">${esc(t(`home.threshold.${k}`))}</p>`).join('')}
         </div>
       </section>
 
@@ -261,6 +268,24 @@ Pages.Home = {
         </div>
         <div class="home-featured__grid" id="featured-grid" data-testid="journey-feed" aria-busy="true">
           ${Array.from({ length: 5 }, (_, i) => `<div class="feature-card feature-card--skeleton skeleton ${i === 0 ? 'feature-card--lead' : ''}" aria-hidden="true"></div>`).join('')}
+        </div>
+      </section>
+
+      <section class="home-behind" id="home-behind" aria-labelledby="behind-title" hidden>
+        <div class="container home-behind__inner">
+          <p class="eyebrow" id="behind-title">${esc(t('home.behind.eyebrow'))}</p>
+          <div id="behind-body"></div>
+        </div>
+      </section>
+
+      <section class="home-station" id="home-station" aria-labelledby="station-band-title">
+        <div class="container home-station__inner">
+          <div class="home-station__text">
+            <h2 id="station-band-title">${esc(t('home.station.title'))}</h2>
+            <p>${esc(t('station.lead'))}</p>
+            <a class="link-arrow" href="#/station">${esc(t('home.station.go'))} ${UI.icon('arrow', 'icon--sm')}</a>
+          </div>
+          <ul class="home-station__racks" id="home-station-racks" aria-busy="true"></ul>
         </div>
       </section>
 
@@ -338,6 +363,8 @@ Pages.Home = {
       this._renderAtlas(journeys);
       this._renderFeatured(journeys);
       this._tick();
+      this._renderBehind(journeys);
+      this._watchStation(document.getElementById('main-content'));
       // the other language's doors, while nothing else is happening, so a switch is instant
       const other = I18n.lang === 'zh' ? 'en' : 'zh';
       (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => API.prefetchJourneys({ limit: 100 }, other));
@@ -867,6 +894,7 @@ Pages.Home = {
       <span class="door-card__meta num">No.${String(e.no).padStart(3, '0')} <i aria-hidden="true"></i> ${esc(t(`entrance.realm.${e.realm}`))}</span>
       <strong class="door-card__title">${UI.titleHTML(j.title)}</strong>
       ${j.story_hook ? `<span class="door-card__hook">${esc(j.story_hook)}</span>` : ''}
+      ${j.content && j.content.role ? `<span class="door-card__role">${esc(t('home.door.role', { role: I18n.lang === 'zh' ? j.content.role : j.content.role.replace(/^The /, 'the ') }))}</span>` : ''}
       ${opens ? `<span class="door-card__opens"><b>${esc(t('detail.facts.opens'))}</b>${esc(opens)}</span>` : ''}
       <span class="door-card__clock${s.open ? ' is-open' : ''}"><span class="num">${esc(t('home.door.local', { time: `${s.hh}:${s.mm}` }))}</span><span>${esc(DoorClock.whenAt(s))}</span></span>
       ${s.needs ? `<span class="door-card__needs">${esc(DoorClock.needs(s))}</span>` : ''}
@@ -886,6 +914,66 @@ Pages.Home = {
     this._peekNo = 0;
     const panel = document.getElementById('atlas-panel');
     if (panel) panel.classList.remove('is-peek');
+  },
+
+  // --- Behind a door, and the Night Station --------------------------------------------------------
+
+  /** A few lines from behind a door that is open right now (or the next to open), in its own voice. */
+  async _renderBehind(journeys) {
+    const band = document.getElementById('home-behind');
+    if (!band) return;
+    const pick = this._soonest(journeys).find(({ j }) => j.content);
+    if (!pick) return;
+    try {
+      const { data: j } = await API.getJourney(pick.j.slug);
+      const para = j && j.content && j.content.chapters && j.content.chapters[0] && j.content.chapters[0].paragraphs[0];
+      if (!para || !band.isConnected) return;
+      const [name] = UI.titleParts(j.title);
+      const s = (this._state && this._state.get(j.entrance.no)) || DoorClock.state(j.entrance);
+      document.getElementById('behind-body').innerHTML = `
+        <blockquote class="home-behind__text"><p>${UI.esc(para)}</p></blockquote>
+        <a class="home-behind__door" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${UI.esc(j.slug)}">
+          <span class="num">No.${String(j.entrance.no).padStart(3, '0')}</span><b>${UI.esc(name)}</b><span>${UI.esc(DoorClock.when(s))}</span>${UI.icon('arrow', 'icon--sm')}
+        </a>`;
+      band.hidden = false;
+    } catch (e) { /* the band stays away */ }
+  },
+
+  /** Three tickets hanging at the Night Station, loaded when the band comes near. */
+  _watchStation(main) {
+    const band = main.querySelector('#home-station');
+    const racks = main.querySelector('#home-station-racks');
+    if (!band || !racks || typeof Road === 'undefined' || typeof Compose === 'undefined') { if (band) band.hidden = true; return; }
+    const load = async () => {
+      try {
+        const [list, , res] = await Promise.all([Compose.fragments(), Road.vocab(), API.station({ limit: 12 })]);
+        if (!racks.isConnected) return;
+        const by = Compose.index(list);
+        // three tickets from three different places
+        const seen = new Set();
+        const items = ((res && res.data && res.data.items) || []).filter((v) => {
+          const key = v.picks && v.picks.place;
+          if (!key || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }).slice(0, 3);
+        if (!items.length) { band.hidden = true; return; }
+        racks.innerHTML = items.map((v, i) => `<li style="--i:${i}">${Road.stubHTML(v, by)}</li>`).join('');
+        racks.setAttribute('aria-busy', 'false');
+        racks.addEventListener('click', (e) => {
+          const li = e.target.closest('li');
+          if (!li || !e.target.closest('button, a')) return;
+          const v = items[[...racks.children].indexOf(li)];
+          if (v && e.target.closest('.stub__open')) { e.preventDefault(); Road.open(v, by); }
+        });
+      } catch (e) { band.hidden = true; }
+    };
+    if (!('IntersectionObserver' in window)) { load(); return; }
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((en) => en.isIntersecting)) { io.disconnect(); load(); }
+    }, { rootMargin: '600px 0px' });
+    io.observe(band);
+    this._cleanups.push(() => io.disconnect());
   },
 
   // --- Opening next, and the close -------------------------------------------------------------
@@ -926,6 +1014,32 @@ Pages.Home = {
 
   _setupScroll(main) {
     const hero = main.querySelector('.home-hero');
+    // The threshold between the opening and the doors: the story of the marks in three beats, while
+    // an arch of light grows; it holds still on screen as the page scrolls through it.
+    const th = main.querySelector('#home-threshold');
+    if (th && !this._reduce()) {
+      const beats = [...th.querySelectorAll('.home-threshold__beat')];
+      let queued = false;
+      const ease = (x) => Math.min(1, Math.max(0, x));
+      const update = () => {
+        queued = false;
+        const span = Math.max(1, th.offsetHeight - window.innerHeight);
+        const p = ease(-th.getBoundingClientRect().top / span);
+        th.style.setProperty('--p', p.toFixed(3));
+        beats.forEach((b, i) => {
+          const a = i / 3;
+          const z = (i + 1) / 3;
+          const fadeIn = i === 0 ? 1 : ease((p - a) / 0.08);
+          const fadeOut = i === beats.length - 1 ? 1 : ease((z - p) / 0.08);
+          b.style.setProperty('--o', Math.min(fadeIn, fadeOut).toFixed(3));
+        });
+      };
+      const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      this._cleanups.push(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); });
+      update();
+    }
     if (!this._reduce()) {
       let queued = false;
       const apply = () => {
@@ -970,7 +1084,7 @@ Pages.Home = {
         ${face}
         <div class="home-invite__text">
           <h2 id="home-invite-title">${esc(t('invite.title'))}</h2>
-          ${quiet ? '' : `<p>${esc(t('invite.text'))}</p>`}
+          ${quiet ? '' : `<p>${esc(t('invite.text'))}</p><p class="home-invite__lumi">${esc(t('invite.lumi'))}</p>`}
         </div>
         <div class="home-invite__actions">
           <a class="btn btn--primary" id="invite-self" href="#/find" data-path="self">${esc(t('invite.self'))}</a>
