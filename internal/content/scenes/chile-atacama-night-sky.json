@@ -32,10 +32,14 @@
     "vast"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/chile-atacama-night-sky/hero.jpg",
+    "scenes": [
+      "",
+      "generated/chile-atacama-night-sky/scene-2.jpg",
+      "generated/chile-atacama-night-sky/scene-3.jpg"
+    ],
+    "fork": "generated/chile-atacama-night-sky/fork.jpg",
+    "ending": "generated/chile-atacama-night-sky/ending.jpg",
+    "texture": "generated/chile-atacama-night-sky/texture.jpg"
   }
 }

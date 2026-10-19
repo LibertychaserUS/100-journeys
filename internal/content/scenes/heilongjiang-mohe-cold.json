@@ -31,10 +31,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/heilongjiang-mohe-cold/hero.jpg",
+    "scenes": [
+      "generated/heilongjiang-mohe-cold/scene-1.jpg",
+      "generated/heilongjiang-mohe-cold/scene-2.jpg",
+      "generated/heilongjiang-mohe-cold/scene-3.jpg"
+    ],
+    "fork": "generated/heilongjiang-mohe-cold/fork.jpg",
+    "ending": "generated/heilongjiang-mohe-cold/ending.jpg",
+    "texture": "generated/heilongjiang-mohe-cold/texture.jpg"
   }
 }

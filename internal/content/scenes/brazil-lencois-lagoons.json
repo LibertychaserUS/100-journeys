@@ -31,10 +31,14 @@
     ""
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/brazil-lencois-lagoons/hero.jpg",
+    "scenes": [
+      "generated/brazil-lencois-lagoons/scene-1.jpg",
+      "generated/brazil-lencois-lagoons/scene-2.jpg",
+      "generated/brazil-lencois-lagoons/scene-3.jpg"
+    ],
+    "fork": "generated/brazil-lencois-lagoons/fork.jpg",
+    "ending": "generated/brazil-lencois-lagoons/ending.jpg",
+    "texture": "generated/brazil-lencois-lagoons/texture.jpg"
   }
 }

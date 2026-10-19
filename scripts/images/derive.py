@@ -20,15 +20,16 @@ from PIL import Image, ImageOps
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'web', 'assets', 'images', 'generated')
 
-# widths per kind of image
+# widths per kind of image (keep in step with UI.picture, ingest.py and UT-CONTENT-IMG-001)
 WIDTHS = {
     'cover': [480, 720],
     'card': [480, 720],
-    'hero': [960, 1600],
-    'scene': [960, 1600],
-    'ending': [960, 1600],
+    'hero': [960, 1536],
+    'scene-1': [960, 1536],
+    'scene-2': [960, 1536],
+    'scene-3': [600, 960],
     'fork': [600, 1024],
-    'texture': [600, 1024],
+    'ending': [600],
     'home': [960, 1600],
 }
 AVIF_Q = 52
@@ -43,16 +44,14 @@ def kind_of(name):
         return 'home'
     if base.startswith('hero-taoyuan'):
         return None  # the 960/1600 JPEGs are the fallbacks for the home opening
-    for k in WIDTHS:
-        if base == k or base.startswith(k + '-'):
-            return k
-    return None
+    return base if base in WIDTHS else None
 
 
 def save(img, path_base, width):
     w = min(width, img.width)
     h = round(img.height * w / img.width)
     out = img if w == img.width else img.resize((w, h), Image.LANCZOS)
+    # (scene slots keep a small JPEG fallback; their large AVIFs come from the originals via ingest.py)
     out.save(f'{path_base}.{width}.avif', 'AVIF', quality=AVIF_Q_LARGE if width >= 1000 else AVIF_Q)
 
 
@@ -102,6 +101,8 @@ def main():
                 covers.append(src)
             img = Image.open(src).convert('RGB')
             for w in WIDTHS[kind]:
+                if kind not in ('cover', 'card', 'home') and w > img.width:
+                    continue  # made from the original by ingest.py; never from the smaller fallback
                 target = f'{base}.{w}.avif'
                 if not args.force and os.path.exists(target) and os.path.getmtime(target) >= os.path.getmtime(src):
                     continue

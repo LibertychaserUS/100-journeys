@@ -31,10 +31,14 @@
     "vast"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/inner-mongolia-badain-jaran/hero.jpg",
+    "scenes": [
+      "generated/inner-mongolia-badain-jaran/scene-1.jpg",
+      "generated/inner-mongolia-badain-jaran/scene-2.jpg",
+      "generated/inner-mongolia-badain-jaran/scene-3.jpg"
+    ],
+    "fork": "generated/inner-mongolia-badain-jaran/fork.jpg",
+    "ending": "generated/inner-mongolia-badain-jaran/ending.jpg",
+    "texture": "generated/inner-mongolia-badain-jaran/texture.jpg"
   }
 }

@@ -35,9 +35,13 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "scenes": [
+      "generated/sichuan-jiuzhaigou-lakes/scene-1.jpg",
+      "",
+      "generated/sichuan-jiuzhaigou-lakes/scene-3.jpg"
+    ],
+    "fork": "generated/sichuan-jiuzhaigou-lakes/fork.jpg",
+    "ending": "generated/sichuan-jiuzhaigou-lakes/ending.jpg",
+    "texture": "generated/sichuan-jiuzhaigou-lakes/texture.jpg"
   }
 }

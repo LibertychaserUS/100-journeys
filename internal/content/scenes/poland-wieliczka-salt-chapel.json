@@ -35,10 +35,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/poland-wieliczka-salt-chapel/hero.jpg",
+    "scenes": [
+      "generated/poland-wieliczka-salt-chapel/scene-1.jpg",
+      "generated/poland-wieliczka-salt-chapel/scene-2.jpg",
+      "generated/poland-wieliczka-salt-chapel/scene-3.jpg"
+    ],
+    "fork": "generated/poland-wieliczka-salt-chapel/fork.jpg",
+    "ending": "generated/poland-wieliczka-salt-chapel/ending.jpg",
+    "texture": "generated/poland-wieliczka-salt-chapel/texture.jpg"
   }
 }

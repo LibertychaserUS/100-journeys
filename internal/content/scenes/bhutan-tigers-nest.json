@@ -35,10 +35,13 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
+    "hero": "generated/bhutan-tigers-nest/hero.jpg",
+    "scenes": [
+      "",
+      "generated/bhutan-tigers-nest/scene-2.jpg"
+    ],
     "fork": "",
-    "ending": "",
-    "texture": ""
+    "ending": "generated/bhutan-tigers-nest/ending.jpg",
+    "texture": "generated/bhutan-tigers-nest/texture.jpg"
   }
 }

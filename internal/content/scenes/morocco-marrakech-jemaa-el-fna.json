@@ -32,9 +32,13 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
+    "scenes": [
+      "generated/morocco-marrakech-jemaa-el-fna/scene-1.jpg",
+      "",
+      "generated/morocco-marrakech-jemaa-el-fna/scene-3.jpg"
+    ],
     "fork": "",
-    "ending": "",
-    "texture": ""
+    "ending": "generated/morocco-marrakech-jemaa-el-fna/ending.jpg",
+    "texture": "generated/morocco-marrakech-jemaa-el-fna/texture.jpg"
   }
 }

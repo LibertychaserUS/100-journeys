@@ -35,10 +35,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/singapore-supertree-night/hero.jpg",
+    "scenes": [
+      "generated/singapore-supertree-night/scene-1.jpg",
+      "generated/singapore-supertree-night/scene-2.jpg",
+      "generated/singapore-supertree-night/scene-3.jpg"
+    ],
+    "fork": "generated/singapore-supertree-night/fork.jpg",
+    "ending": "generated/singapore-supertree-night/ending.jpg",
+    "texture": "generated/singapore-supertree-night/texture.jpg"
   }
 }

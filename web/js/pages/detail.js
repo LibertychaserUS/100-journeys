@@ -116,7 +116,8 @@ Pages.Detail = {
       const no = kind === 'stub' && j.entrance && j.entrance.no ? `<span class="plate__no num">No.${String(j.entrance.no).padStart(3, '0')}</span><span class="plate__stamp"></span>` : '';
       return `<div class="scene__media scene__plate ${cls}" data-plate="${kind}"${style} aria-hidden="true"><span class="plate__light"></span>${no}</div>`;
     }
-    const sizes = { hero: '100vw', ending: '220px', fork: '(max-width: 960px) 100vw, 40vw' }[slot] || (cls.includes('bleed') ? '100vw' : '(max-width: 960px) 100vw, 45vw');
+    const sizes = { hero: '100vw', ending: '220px', fork: '(max-width: 960px) 100vw, 40vw' }[slot]
+      || (cls.includes('bleed') ? '100vw' : cls.includes('inset') ? '(max-width: 760px) 56vw, 280px' : '(max-width: 960px) 100vw, 45vw');
     return `<div class="scene__media ${cls}">${UI.picture(src, { sizes, eager: slot === 'hero' })}</div>`;
   },
 
@@ -144,7 +145,7 @@ Pages.Detail = {
       return `
         <section ${attrs}>
           <div class="container scene__grid scene__grid--word">
-            ${this._img(j, 'scene', i) ? `<div class="scene__artcol"><p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p><figure class="scene__frame scene__frame--inset" data-reveal>${this._media(j, 'scene', i)}</figure></div>` : `<p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p>`}
+            ${this._img(j, 'scene', i) ? `<div class="scene__artcol"><p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p><figure class="scene__frame scene__frame--inset" data-reveal>${this._media(j, 'scene', i, 'scene__media--inset', at)}</figure></div>` : `<p class="scene__art" aria-hidden="true" data-reveal>${esc(ch.title)}</p>`}
             <div class="scene__text">${head}<div class="scene__prose">${this._paras(ch.paragraphs)}</div></div>
           </div>
         </section>`;

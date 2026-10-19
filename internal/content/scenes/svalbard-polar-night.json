@@ -36,10 +36,14 @@
     "dark"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
+    "hero": "generated/svalbard-polar-night/hero.jpg",
+    "scenes": [
+      "generated/svalbard-polar-night/scene-1.jpg",
+      "generated/svalbard-polar-night/scene-2.jpg",
+      "generated/svalbard-polar-night/scene-3.jpg"
+    ],
     "fork": "",
-    "ending": "",
-    "texture": ""
+    "ending": "generated/svalbard-polar-night/ending.jpg",
+    "texture": "generated/svalbard-polar-night/texture.jpg"
   }
 }

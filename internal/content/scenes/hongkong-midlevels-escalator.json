@@ -31,10 +31,14 @@
     "vast"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/hongkong-midlevels-escalator/hero.jpg",
+    "scenes": [
+      "",
+      "generated/hongkong-midlevels-escalator/scene-2.jpg",
+      "generated/hongkong-midlevels-escalator/scene-3.jpg"
+    ],
+    "fork": "generated/hongkong-midlevels-escalator/fork.jpg",
+    "ending": "generated/hongkong-midlevels-escalator/ending.jpg",
+    "texture": "generated/hongkong-midlevels-escalator/texture.jpg"
   }
 }

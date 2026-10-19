@@ -32,9 +32,13 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "scenes": [
+      "generated/japan-chichibugahama-tide-mirror/scene-1.jpg",
+      "generated/japan-chichibugahama-tide-mirror/scene-2.jpg",
+      "generated/japan-chichibugahama-tide-mirror/scene-3.jpg"
+    ],
+    "fork": "generated/japan-chichibugahama-tide-mirror/fork.jpg",
+    "ending": "generated/japan-chichibugahama-tide-mirror/ending.jpg",
+    "texture": "generated/japan-chichibugahama-tide-mirror/texture.jpg"
   }
 }

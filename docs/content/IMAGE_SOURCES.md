@@ -12,7 +12,17 @@ The covers for entrances 6–48 were generated at 1120 × 1400 and resized to 72
 checked at full size for text, logos and recognisable faces; on `spain-camino-finisterre` a
 small made-up wordmark on the backpack was painted out.
 All 42 share a light grade to match the site: about 16% less saturation, slightly lifted and
-cooled shadows, a little fine grain.
+cooled shadows, a little fine grain. The covers of 027, 028 and 038 were replaced so they match
+their stories (nobody touches a fossil, nobody stands on the closed plateau, no lamps or scrolls
+inside a cave).
+
+The scroll-scene images of entrances 013–048 and the Ticket Road images were generated at
+1536 × 1024 (1024 × 1024 for fork and texture). Each was checked at full size for text, logos,
+faces, anatomy, geography and fit with its slot; the ones that failed were left out, so that
+scene shows a plate in the journey's palette until a new image exists. Four had a tiny mark
+painted out (a ticket bracket, a stencil on an antenna, thermometer ticks, a digit on a boot).
+`scripts/images/ingest.py` gives them the covers' grade and writes the JPEG fallback and AVIF
+sizes each slot is shown at.
 
 | File | Used by |
 |---|---|
@@ -65,6 +75,8 @@ cooled shadows, a little fine grain.
 | `generated/scotland-edinburgh-one-oclock-gun/cover.jpg` | 047 scotland-edinburgh-one-oclock-gun |
 | `generated/morocco-marrakech-jemaa-el-fna/cover.jpg` | 048 morocco-marrakech-jemaa-el-fna |
 | `generated/hero-taoyuan*.jpg` | home hero, sign-in |
+| `generated/<slug>/{hero,scene-1,scene-2,scene-3,fork,ending,texture}.jpg` | scroll scenes of entrances 013–048 |
+| `generated/road/*.jpg` | the Ticket Road: station hall, realm bands, rubbing stone |
 | `generated/brand-mark*.png`, `generated/guide-light*.png` | brand mark, guide |
 
 ## Earlier photographs: origin not recorded

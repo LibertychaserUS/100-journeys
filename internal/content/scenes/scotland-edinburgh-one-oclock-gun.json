@@ -34,9 +34,13 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
+    "scenes": [
+      "",
+      "generated/scotland-edinburgh-one-oclock-gun/scene-2.jpg",
+      "generated/scotland-edinburgh-one-oclock-gun/scene-3.jpg"
+    ],
     "fork": "",
-    "ending": "",
-    "texture": ""
+    "ending": "generated/scotland-edinburgh-one-oclock-gun/ending.jpg",
+    "texture": "generated/scotland-edinburgh-one-oclock-gun/texture.jpg"
   }
 }

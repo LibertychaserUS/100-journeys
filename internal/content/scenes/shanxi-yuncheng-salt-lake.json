@@ -35,10 +35,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/shanxi-yuncheng-salt-lake/hero.jpg",
+    "scenes": [
+      "generated/shanxi-yuncheng-salt-lake/scene-1.jpg",
+      "generated/shanxi-yuncheng-salt-lake/scene-2.jpg",
+      "generated/shanxi-yuncheng-salt-lake/scene-3.jpg"
+    ],
+    "fork": "generated/shanxi-yuncheng-salt-lake/fork.jpg",
+    "ending": "generated/shanxi-yuncheng-salt-lake/ending.jpg",
+    "texture": "generated/shanxi-yuncheng-salt-lake/texture.jpg"
   }
 }

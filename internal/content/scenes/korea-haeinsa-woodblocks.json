@@ -32,10 +32,14 @@
     "grey"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/korea-haeinsa-woodblocks/hero.jpg",
+    "scenes": [
+      "generated/korea-haeinsa-woodblocks/scene-1.jpg",
+      "generated/korea-haeinsa-woodblocks/scene-2.jpg",
+      "generated/korea-haeinsa-woodblocks/scene-3.jpg"
+    ],
+    "fork": "generated/korea-haeinsa-woodblocks/fork.jpg",
+    "ending": "generated/korea-haeinsa-woodblocks/ending.jpg",
+    "texture": "generated/korea-haeinsa-woodblocks/texture.jpg"
   }
 }

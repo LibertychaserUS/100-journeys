@@ -31,10 +31,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/yunnan-shaxi-tea-horse-road/hero.jpg",
+    "scenes": [
+      "generated/yunnan-shaxi-tea-horse-road/scene-1.jpg",
+      "generated/yunnan-shaxi-tea-horse-road/scene-2.jpg",
+      "generated/yunnan-shaxi-tea-horse-road/scene-3.jpg"
+    ],
+    "fork": "generated/yunnan-shaxi-tea-horse-road/fork.jpg",
+    "ending": "generated/yunnan-shaxi-tea-horse-road/ending.jpg",
+    "texture": "generated/yunnan-shaxi-tea-horse-road/texture.jpg"
   }
 }

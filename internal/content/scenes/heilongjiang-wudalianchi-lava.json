@@ -36,10 +36,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/heilongjiang-wudalianchi-lava/hero.jpg",
+    "scenes": [
+      "",
+      "generated/heilongjiang-wudalianchi-lava/scene-2.jpg",
+      "generated/heilongjiang-wudalianchi-lava/scene-3.jpg"
+    ],
+    "fork": "generated/heilongjiang-wudalianchi-lava/fork.jpg",
+    "ending": "generated/heilongjiang-wudalianchi-lava/ending.jpg",
+    "texture": "generated/heilongjiang-wudalianchi-lava/texture.jpg"
   }
 }

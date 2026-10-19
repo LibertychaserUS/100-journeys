@@ -33,9 +33,13 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "scenes": [
+      "generated/indonesia-ijen-blue-fire/scene-1.jpg",
+      "generated/indonesia-ijen-blue-fire/scene-2.jpg",
+      "generated/indonesia-ijen-blue-fire/scene-3.jpg"
+    ],
+    "fork": "generated/indonesia-ijen-blue-fire/fork.jpg",
+    "ending": "generated/indonesia-ijen-blue-fire/ending.jpg",
+    "texture": "generated/indonesia-ijen-blue-fire/texture.jpg"
   }
 }

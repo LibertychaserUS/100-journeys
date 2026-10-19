@@ -37,10 +37,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
+    "hero": "generated/spain-camino-finisterre/hero.jpg",
+    "scenes": [
+      "generated/spain-camino-finisterre/scene-1.jpg",
+      "generated/spain-camino-finisterre/scene-2.jpg",
+      "generated/spain-camino-finisterre/scene-3.jpg"
+    ],
     "fork": "",
-    "ending": "",
-    "texture": ""
+    "ending": "generated/spain-camino-finisterre/ending.jpg",
+    "texture": "generated/spain-camino-finisterre/texture.jpg"
   }
 }
