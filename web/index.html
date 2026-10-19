@@ -37,6 +37,11 @@
         if (bl !== 'zh' && bl !== 'en') bl = /^zh/i.test((navigator.languages && navigator.languages[0]) || navigator.language || 'zh') ? 'zh' : 'en';
         document.documentElement.setAttribute('data-boot', 'home');
         document.documentElement.setAttribute('data-boot-lang', bl);
+        // The opening title's font slices, so the first paint already uses the story serif.
+        // fonts:begin (written by scripts/fonts/build.py)
+        var fp = bl === 'zh' ? ["story-serif-700-02.4029c2ddf0.woff2", "story-serif-700-17.477f43758e.woff2"] : ["story-serif-latin-700.93f47e5b9e.woff2"];
+        fp.forEach(function (f) { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous'; l.href = '/static/assets/fonts/' + f; document.head.appendChild(l); });
+        // fonts:end
       }
       // A journey page starts fetching its data before the scripts arrive.
       var deep = /^#\/journey\/([a-z0-9-]+)/.exec(location.hash);
@@ -72,6 +77,7 @@
   </script>
 
   <!-- CSS layer order: tokens → global → layout → components → pages. ?v= is stamped by the server. -->
+  <link rel="stylesheet" href="/static/css/fonts.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/tokens.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/global.css?v=__ASSET_VERSION__" />
   <link rel="stylesheet" href="/static/css/layout.css?v=__ASSET_VERSION__" />
