@@ -1,6 +1,6 @@
 {
   "slug": "spain-camino-finisterre",
-  "entrance": { "no": 40, "realm": "old-roads", "pace": "multi-day", "scale": "far", "seasons": ["autumn"], "time": "dusk", "tz": "Europe/Madrid", "months": [9, 10] },
+  "entrance": { "no": 40, "realm": "old-roads", "pace": "multi-day", "scale": "far", "seasons": ["autumn"], "time": "dusk", "tz": "Europe/Madrid", "months": [9, 10], "lat": 42.88, "lon": -9.27, "window": { "sun": "set", "from": -30, "to": 15 } },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "raw",
     "adventure_index": 5, "obscurity_level": 3, "risk_level": 1, "price": 15999,

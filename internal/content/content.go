@@ -21,6 +21,8 @@ import (
 	"sync"
 	"time"
 	_ "time/tzdata" // each door's own time zone resolves on any server
+
+	"github.com/100-journeys/app/internal/model"
 )
 
 //go:embed entrances/*.json scenes/*.json
@@ -50,6 +52,10 @@ type Meta struct {
 	// is judged on the door's own clock and calendar, never the visitor's.
 	TZ     string `json:"tz"`
 	Months []int  `json:"months"`
+	// Lat/Lon place the door for its sun and moon; Window is when it opens on its days.
+	Lat    *float64          `json:"lat"`
+	Lon    *float64          `json:"lon"`
+	Window *model.DoorWindow `json:"window"`
 }
 
 // Base mirrors the columns of the journeys table plus tag and MBTI links.
@@ -239,6 +245,9 @@ func Validate(e Entrance) []string {
 			add("months must be distinct values 1-12, got %d", m)
 		}
 		seen[m] = true
+	}
+	for _, msg := range checkWindow(e.Entrance) {
+		add("%s", msg)
 	}
 	if !contains(FantasyTypes, e.Journey.FantasyType) {
 		add("unknown fantasy_type %q", e.Journey.FantasyType)
@@ -492,4 +501,67 @@ func short(s string) string {
 		return string(r[:24]) + "…"
 	}
 	return s
+}
+
+// Needs are the conditions a door can wait on that the site cannot see; each has its own words.
+var Needs = []string{"rain", "calm", "low-tide", "high-tide", "mist", "clear", "cloud-sea", "dawn-cloud", "drift-ice"}
+
+var hhmm = regexp.MustCompile(`^([01][0-9]|2[0-4]):[0-5][0-9]$`)
+var mmdd = regexp.MustCompile(`^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$`)
+
+// checkWindow returns what is wrong with an entrance's opening window, if anything.
+func checkWindow(m Meta) []string {
+	w := m.Window
+	if w == nil {
+		return []string{"entrance needs its opening window (window)"}
+	}
+	var out []string
+	kinds := 0
+	if w.At != "" || w.Until != "" {
+		kinds++
+		if !hhmm.MatchString(w.At) || !hhmm.MatchString(w.Until) {
+			out = append(out, fmt.Sprintf("window at/until must be HH:MM, got %q-%q", w.At, w.Until))
+		}
+	}
+	if w.Sun != "" {
+		kinds++
+		if w.Sun != "rise" && w.Sun != "set" && w.Sun != "noon" {
+			out = append(out, fmt.Sprintf("window sun must be rise, set or noon, got %q", w.Sun))
+		}
+		if w.From >= w.To {
+			out = append(out, fmt.Sprintf("window from (%d) must be before to (%d)", w.From, w.To))
+		}
+	}
+	if w.Moon != "" {
+		kinds++
+		if w.Moon != "dark" {
+			out = append(out, fmt.Sprintf("window moon must be dark, got %q", w.Moon))
+		}
+	}
+	if kinds != 1 {
+		out = append(out, "window needs exactly one of at/until, sun or moon")
+	}
+	if (w.Sun != "" || w.Moon != "" || len(w.MoonAge) > 0) && (m.Lat == nil || m.Lon == nil) {
+		out = append(out, "a window by the sun or moon needs the door's lat and lon")
+	}
+	if m.Lat != nil && (*m.Lat < -90 || *m.Lat > 90) || m.Lon != nil && (*m.Lon < -180 || *m.Lon > 180) {
+		out = append(out, "lat/lon out of range")
+	}
+	if len(w.MoonAge) > 0 && (len(w.MoonAge) != 2 || w.MoonAge[0] < 0 || w.MoonAge[1] > 29.6 || w.MoonAge[0] >= w.MoonAge[1]) {
+		out = append(out, fmt.Sprintf("window moon_age must be [min, max] within 0-29.6, got %v", w.MoonAge))
+	}
+	for _, d := range w.Days {
+		if d < 1 || d > 7 {
+			out = append(out, fmt.Sprintf("window days are ISO weekdays 1-7, got %d", d))
+		}
+	}
+	for _, x := range w.Except {
+		if !mmdd.MatchString(x) {
+			out = append(out, fmt.Sprintf("window except must be MM-DD, got %q", x))
+		}
+	}
+	if w.Needs != "" && !contains(Needs, w.Needs) {
+		out = append(out, fmt.Sprintf("unknown window needs %q", w.Needs))
+	}
+	return out
 }

@@ -1,6 +1,6 @@
 {
   "slug": "iceland-lava-tunnel-cycling",
-  "entrance": { "no": 2, "realm": "fire-stone", "pace": "day", "scale": "far", "seasons": ["winter"], "time": "afternoon", "tz": "Atlantic/Reykjavik", "months": [11, 12, 1, 2, 3] },
+  "entrance": { "no": 2, "realm": "fire-stone", "pace": "day", "scale": "far", "seasons": ["winter"], "time": "afternoon", "tz": "Atlantic/Reykjavik", "months": [11, 12, 1, 2, 3], "lat": 63.94, "lon": -21.4, "window": { "sun": "set", "from": -60, "to": 0 } },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "dramatic",
     "adventure_index": 7, "obscurity_level": 7, "risk_level": 3, "price": 19999,

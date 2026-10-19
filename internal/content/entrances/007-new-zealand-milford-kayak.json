@@ -1,6 +1,6 @@
 {
   "slug": "new-zealand-milford-kayak",
-  "entrance": { "no": 7, "realm": "water-deep", "pace": "day", "scale": "far", "seasons": ["any"], "time": "morning", "tz": "Pacific/Auckland", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  "entrance": { "no": 7, "realm": "water-deep", "pace": "day", "scale": "far", "seasons": ["any"], "time": "morning", "tz": "Pacific/Auckland", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": -44.67, "lon": 167.93, "window": { "at": "07:00", "until": "11:00", "needs": "rain" } },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "raw",
     "adventure_index": 7, "obscurity_level": 4, "risk_level": 3, "price": 22999,

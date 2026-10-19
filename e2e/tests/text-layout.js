@@ -88,6 +88,7 @@ async function textProblems(page) {
       for (let j = i + 1; j < boxes.length; j++) {
         const a = boxes[i], b = boxes[j];
         if (a.layer !== b.layer || a.el === b.el || a.el.contains(b.el) || b.el.contains(a.el)) continue;
+        if (a.el.closest('[data-layered]') && a.el.closest('[data-layered]') === b.el.closest('[data-layered]')) continue; // lines meant to cross-fade in one place
         const w = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
         const h = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
         if (w <= 2 || h <= 2) continue;

@@ -1,6 +1,6 @@
 {
   "slug": "greenland-dog-sled-solo",
-  "entrance": { "no": 5, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["winter"], "time": "noon", "tz": "America/Nuuk", "months": [1, 2, 3] },
+  "entrance": { "no": 5, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["winter"], "time": "noon", "tz": "America/Nuuk", "months": [1, 2, 3], "lat": 69.22, "lon": -51.1, "window": { "sun": "noon", "from": -60, "to": 60 } },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "raw",
     "adventure_index": 9, "obscurity_level": 8, "risk_level": 4, "price": 29999,

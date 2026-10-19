@@ -1,6 +1,6 @@
 {
   "slug": "heilongjiang-wudalianchi-lava",
-  "entrance": { "no": 18, "realm": "fire-stone", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "morning", "tz": "Asia/Shanghai", "months": [6, 7, 8] },
+  "entrance": { "no": 18, "realm": "fire-stone", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "morning", "tz": "Asia/Shanghai", "months": [6, 7, 8], "lat": 48.72, "lon": 126.12, "window": { "at": "07:30", "until": "09:00" } },
   "journey": {
     "fantasy_type": "visual", "visual_style": "raw",
     "adventure_index": 4, "obscurity_level": 6, "risk_level": 1, "price": 4999,

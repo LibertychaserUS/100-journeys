@@ -1,6 +1,6 @@
 {
   "slug": "guizhou-fanjingshan-summit",
-  "entrance": { "no": 22, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "morning", "tz": "Asia/Shanghai", "months": [3, 4, 5] },
+  "entrance": { "no": 22, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "morning", "tz": "Asia/Shanghai", "months": [3, 4, 5], "lat": 27.92, "lon": 108.7, "window": { "sun": "rise", "from": -30, "to": 45, "needs": "dawn-cloud" } },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "dramatic",
     "adventure_index": 6, "obscurity_level": 6, "risk_level": 3, "price": 5999,

@@ -24,20 +24,29 @@ test.describe('Explore Page', () => {
   test('shows journey cards on load', async ({ page }) => {
     const total = await apiCount(page, {});
     await expect(cards(page)).toHaveCount(shown(total));
-    await expect(page.locator('#explore-results')).toHaveText(`共 ${total} 段旅程`);
+    await expect(page.locator('#explore-results')).toHaveText(`${total} 扇门`);
     await expect(cards(page).first().locator('.journey-card__title')).toBeVisible();
     await expect(cards(page).first().locator('img')).toBeVisible();
   });
 
-  // E2E-EXPLORE-002: a fantasy chip filters the results (regression: results used to stay on skeletons)
-  test('fantasy type chip filters results', async ({ page }) => {
-    const expected = await apiCount(page, { fantasy_type: 'night' });
-    await page.locator('#filter-fantasy [data-value="night"]').click();
-    await expect(page).toHaveURL(/fantasy_type=night/);
-    await expect(page.locator('#filter-fantasy [data-value="night"]')).toHaveClass(/explore-chip--active/);
+  // E2E-EXPLORE-002: a realm chip filters the doors (regression: results used to stay on skeletons);
+  // "open now" keeps only the doors open on their own clocks
+  test('realm and open-now chips filter the doors', async ({ page }) => {
+    const expected = await apiCount(page, { realm: 'ice-night' });
+    expect(expected).toBeGreaterThan(0);
+    await page.locator('#filter-realm [data-value="ice-night"]').click();
+    await expect(page).toHaveURL(/realm=ice-night/);
+    await expect(page.locator('#filter-realm [data-value="ice-night"]')).toHaveClass(/explore-chip--active/);
     await expect(skeletons(page)).toHaveCount(0);
     await expect(cards(page)).toHaveCount(shown(expected));
-    await expect(page.locator('#explore-results')).toHaveText(`共 ${expected} 段旅程`);
+    await expect(page.locator('#explore-results')).toHaveText(`${expected} 扇门`);
+    await expect(cards(page).first()).toHaveAttribute('data-realm', 'ice-night');
+    await page.locator('#filter-realm [data-value=""]').click();
+    await page.locator('#filter-realm [data-key="now"]').click();
+    await expect(page).toHaveURL(/now=1/);
+    await expect(skeletons(page)).toHaveCount(0);
+    const states = await cards(page).locator('.journey-card__state').allTextContents();
+    expect(states.every((x) => x === '此刻开着')).toBe(true);
   });
 
   // E2E-EXPLORE-003: search box is reachable and keeps focus while typing (regression: hidden under the nav)
@@ -92,12 +101,12 @@ test.describe('Explore Page', () => {
 
   // E2E-EXPLORE-007: filters don't leak into a later visit from the nav (regression)
   test('filters reset when re-entering from the nav', async ({ page }) => {
-    await page.locator('#filter-fantasy [data-value="extreme"]').click();
-    await expect(page).toHaveURL(/fantasy_type=extreme/);
+    await page.locator('#filter-realm [data-value="fire-stone"]').click();
+    await expect(page).toHaveURL(/realm=fire-stone/);
     await page.goto('/#/');
     await page.locator('.nav__links a[href="#/explore"]').click();
     await expect(cards(page)).toHaveCount(PAGE_SIZE);
-    await expect(page.locator('#filter-fantasy [data-value=""]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#filter-realm [data-value=""]')).toHaveAttribute('aria-pressed', 'true');
   });
 
   // E2E-EXPLORE-008: a shared filtered link restores the same view

@@ -1,6 +1,6 @@
 {
   "slug": "australia-reef-coral-spawning",
-  "entrance": { "no": 36, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["spring"], "time": "night", "tz": "Australia/Brisbane", "months": [10, 11, 12] },
+  "entrance": { "no": 36, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["spring"], "time": "night", "tz": "Australia/Brisbane", "months": [10, 11, 12], "lat": -16.5, "lon": 146.0, "window": { "sun": "set", "from": 30, "to": 180, "moon_age": [16, 20.5] } },
   "journey": {
     "fantasy_type": "night", "visual_style": "surreal",
     "adventure_index": 5, "obscurity_level": 7, "risk_level": 2, "price": 17999,

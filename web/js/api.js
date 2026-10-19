@@ -95,9 +95,23 @@ const API = (() => {
     return promise;
   }
 
+  // Journey lists are authored content, so they keep for a minute too; the home page asks for the
+  // other language's list while idle, so a language switch does not wait on the network.
+  const listCache = new Map();
+  function cachedList(params, lang) {
+    const path = `/journeys${qs({ ...withLang(params), ...(lang ? { lang } : {}) })}`;
+    const hit = listCache.get(path);
+    if (hit && Date.now() - hit.at < 60000) return hit.promise;
+    const promise = request(path);
+    listCache.set(path, { at: Date.now(), promise });
+    promise.catch(() => listCache.delete(path));
+    return promise;
+  }
+
   return {
     // Journeys
-    getJourneys: (params = {}) => request(`/journeys${qs(withLang(params))}`),
+    getJourneys: (params = {}) => cachedList(params),
+    prefetchJourneys: (params = {}, lang) => { cachedList(params, lang).catch(() => {}); },
     getJourney: (slug) => cachedJourney(slug),
     prefetchJourney: (slug) => { cachedJourney(slug).catch(() => {}); },
     getTags: () => request('/tags'),

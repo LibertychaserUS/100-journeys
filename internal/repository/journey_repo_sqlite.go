@@ -255,6 +255,10 @@ func (r *sqliteJourneyRepo) buildWhere(filter model.JourneyFilter) (string, []in
 		conds = append(conds, "j.fantasy_type = ?")
 		args = append(args, filter.FantasyType)
 	}
+	if filter.Realm != "" {
+		conds = append(conds, "j.id IN (SELECT journey_id FROM journey_entrances WHERE realm = ?)")
+		args = append(args, filter.Realm)
+	}
 	if filter.AdventureMin > 0 {
 		conds = append(conds, "j.adventure_index >= ?")
 		args = append(args, filter.AdventureMin)

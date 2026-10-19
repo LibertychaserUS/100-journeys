@@ -55,7 +55,7 @@ const Nav = (() => {
     el.innerHTML = `
       <div class="container nav">
         <a class="nav__brand" href="#/" aria-label="${esc(t('brand'))}"${activeSection() === '' && /^#?\/?$/.test(window.location.hash.split('?')[0]) ? ' aria-current="page"' : ''}>
-          <img src="${API.mediaUrl('generated/brand-mark-128.png')}" alt="" width="28" height="28">
+          ${UI.mark()}
           <span>${esc(t('brand'))}</span>
         </a>
         <nav class="nav__links" aria-label="${esc(t('nav.main'))}">

@@ -42,6 +42,26 @@ test.describe('Mobile', () => {
     await expect(page.locator('.space__head h1')).toContainText('篝火边唱歌的人');
   });
 
+  // E2E-MOBILE-006: a tapped door shows in the sheet; another door takes its place there; only a
+  // second tap on the same door goes through it
+  test('door taps preview in the sheet before walking through', async ({ page }) => {
+    await page.goto('/#/');
+    const doors = page.locator('#atlas-grid .door.is-found a');
+    await page.locator('#atlas-grid').scrollIntoViewIfNeeded();
+    const a = doors.nth(8);
+    const b = doors.nth(2);
+    await a.tap();
+    await expect(page.locator('#atlas-panel')).toHaveClass(/is-peek/);
+    await expect(page).toHaveURL(/#\/$/);
+    const titleA = await page.locator('#door-body .door-card__title').textContent();
+    await b.tap();
+    await expect(page).toHaveURL(/#\/$/);
+    await expect(page.locator('#door-body .door-card__title')).not.toHaveText(titleA);
+    await expect(page.locator('#door-body .door-card__hook')).toBeVisible();
+    await b.tap();
+    await expect(page).toHaveURL(new RegExp(`#/journey/${await b.getAttribute('data-slug')}$`));
+  });
+
   // E2E-MOBILE-003: the filter panel opens as a sheet and applies filters
   test('explore filters open as a bottom sheet', async ({ page }) => {
     await page.goto('/#/explore');

@@ -57,3 +57,13 @@
   .explore-panel__foot { bottom: calc(-20px - env(safe-area-inset-bottom, 0px)); padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
   body.explore-panel-open::after { content: ""; position: fixed; inset: 0; z-index: calc(var(--z-sticky) - 1); background: var(--color-scrim); }
 }
+
+/* Explore speaks the doors' language: a story-serif title, realm chips with their colour, and the
+   lamp for "open now". */
+.explore__head h1 { font-family: var(--font-story); font-weight: 700; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.2; letter-spacing: .02em; }
+:root:lang(en) .explore__head h1 { letter-spacing: 0; }
+.explore__head p { font-family: var(--font-story); font-size: var(--text-lg); color: var(--color-text-2); }
+#filter-realm .explore-chip { display: inline-flex; align-items: center; gap: 8px; }
+#filter-realm .explore-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--lamp, var(--color-text-3)); }
+#filter-realm .explore-chip[data-value=""] i { display: none; }
+#filter-realm .explore-chip--now i { background: var(--lamp-open); box-shadow: 0 0 10px color-mix(in oklab, var(--lamp-open) 60%, transparent); }

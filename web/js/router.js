@@ -10,6 +10,8 @@ const Router = (() => {
   const routes = [];
   let current = null; // { route, key }
   let firstRender = true;
+  // True while a page re-renders in place (a language switch, a refresh): pages skip their arrival.
+  let swapping = false;
   let depth = 0; // in-app navigations, so "back" knows whether history.back() stays in the app
   let routeHash = window.location.hash.startsWith('#/') ? window.location.hash : '#/';
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -44,7 +46,7 @@ const Router = (() => {
     else delete document.body.dataset.scrolled;
     // Over the last stretch of the picture the bar darkens to night, so nothing on the picture
     // ever slides under a clear bar.
-    const scrim = end ? Math.min(1, Math.max(0, (window.scrollY - (limit - 320)) / 320)) : 0;
+    const scrim = end ? Math.min(1, Math.max(0, (window.scrollY - (limit - 480)) / 480)) : 0;
     document.body.style.setProperty('--nav-scrim', scrim.toFixed(3));
   }
 
@@ -100,7 +102,9 @@ const Router = (() => {
     const run = () => {
       if (!force) window.scrollTo(0, 0);
       UI.setMeta({ title: name === 'home' ? '' : (t(`meta.page.${name}`) !== `meta.page.${name}` ? t(`meta.page.${name}`) : '') });
-      const out = page ? page.render(ctx) : Pages.Error.render(404);
+      swapping = !!force && !firstRender;
+      let out;
+      try { out = page ? page.render(ctx) : Pages.Error.render(404); } finally { swapping = false; }
       // Coming back to an entry (Back, Forward, a reload, a language switch): return to its place.
       const back = force ? window.scrollY : restoreY;
       if (back) requestAnimationFrame(() => requestAnimationFrame(() => { window.scrollTo(0, back); updateScrolled(); }));
@@ -108,14 +112,19 @@ const Router = (() => {
       // Wait briefly for an async page (detail) so the transition captures the new state.
       return out && typeof out.then === 'function' ? Promise.race([out, new Promise((r) => setTimeout(r, 700))]) : undefined;
     };
-    const animate = !firstRender && !force && document.startViewTransition && document.visibilityState === 'visible'
+    const motion = document.startViewTransition && document.visibilityState === 'visible'
       && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const animate = !firstRender && motion;
     if (animate) {
+      // re-rendering in place is a quick crossfade of the words, not an arrival
+      const html = document.documentElement;
+      if (force) html.classList.add('vt-swap');
       // The update must run exactly once even if the browser never paints the old state
       // (an occluded window): fall back to a plain swap after a short wait.
       let ran = false;
       const once = () => { if (ran) return undefined; ran = true; return run(); };
       const vt = document.startViewTransition(once);
+      if (vt.finished) vt.finished.finally(() => html.classList.remove('vt-swap', 'vt-open', 'vt-arch'));
       setTimeout(() => { if (!ran) { if (vt.skipTransition) vt.skipTransition(); once(); } }, 350);
     } else run();
 
@@ -165,6 +174,7 @@ const Router = (() => {
 
   return {
     define, navigate, replaceQuery, safeNext, back, refresh: () => resolve(true), get query() { return parse().query; },
+    get swapping() { return swapping; },
     /** What the current history entry remembers (e.g. a page's own selection), and how to add to it. */
     state, saveState,
   };

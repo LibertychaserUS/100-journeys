@@ -1,6 +1,6 @@
 {
   "slug": "japan-chichibugahama-tide-mirror",
-  "entrance": { "no": 16, "realm": "mirror-salt", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "dusk", "tz": "Asia/Tokyo", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  "entrance": { "no": 16, "realm": "mirror-salt", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "dusk", "tz": "Asia/Tokyo", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": 34.23, "lon": 133.63, "window": { "sun": "set", "from": -40, "to": 10, "needs": "low-tide" } },
   "journey": {
     "fantasy_type": "visual", "visual_style": "surreal",
     "adventure_index": 1, "obscurity_level": 4, "risk_level": 1, "price": 3999,

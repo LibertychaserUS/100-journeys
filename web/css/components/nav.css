@@ -22,11 +22,18 @@ body[data-media-header]:not([data-scrolled]) #main-nav .nav {
   --color-line-strong: rgba(255, 255, 255, .34);
   --color-surface: rgba(255, 255, 255, .08);
 }
-body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { background: #f2c46d; color: #1d1405; }
+/* Over the picture the opening's own button is the one gold thing; signing in and up stay quiet
+   until the bar is solid, where the theme's primary takes over. */
+body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { background: transparent; color: var(--color-on-media); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .34); }
+body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary:hover { background: rgba(255, 255, 255, .1); }
+body[data-media-header]:not([data-scrolled]) #main-nav #nav-login { border-color: transparent; background: transparent; }
+body[data-media-header]:not([data-scrolled]) #main-nav #nav-login:hover { background: rgba(255, 255, 255, .08); }
 
 .nav { height: 100%; display: flex; align-items: center; gap: var(--space-6); }
-.nav__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text); font-weight: var(--weight-semibold); letter-spacing: .04em; white-space: nowrap; }
-.nav__brand img { width: 28px; height: 28px; }
+.nav__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text); white-space: nowrap; }
+.nav__brand .brand-mark { flex: none; width: 28px; height: 28px; }
+.nav__brand span { font-family: var(--font-story); font-weight: 700; font-size: 1.125rem; letter-spacing: .08em; }
+:root:lang(en) .nav__brand span { letter-spacing: .01em; }
 .nav__links { display: flex; gap: var(--space-5); font-size: var(--text-base); color: var(--color-text-2); }
 .nav__links a { position: relative; padding: 6px 0; transition: color var(--dur-fast); }
 .nav__links a:hover, .nav__links a[aria-current="page"] { color: var(--color-text); }

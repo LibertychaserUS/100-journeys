@@ -15,7 +15,8 @@ test.describe('Detail Page', () => {
     await page.goto(`/#/journey/${SLUG}`);
     await expect(page.locator('.detail-hero__title')).toHaveText(j.title);
     await expect(page.locator('.detail-hero__no')).toContainText(`No.${String(j.entrance.no).padStart(3, '0')}`);
-    await expect(page.locator('.detail-hero__badge')).toHaveText('独处治愈'); // localized, not "solitude"
+    await expect(page.locator('.detail-hero__badge')).toHaveText('镜与盐'); // the door's realm, localized
+    await expect(page.locator('.detail-hero__badge')).toHaveAttribute('href', '#/explore?realm=mirror-salt');
     await expect(page.locator('.detail-hero__opens dd')).toHaveText(c.opens);
     // prologue + chapters + fork + ending
     await expect(page.locator('.chapter')).toHaveCount(c.chapters.length + 3);

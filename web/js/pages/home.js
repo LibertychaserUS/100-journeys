@@ -7,53 +7,154 @@
  */
 var Pages = window.Pages || {};
 
-/** Each door's local time and whether it is open now, or how long until it opens. */
+/**
+ * Each door's own clock: its local time, whether it is open now, when it opens next (local time
+ * and how long from now), and what it waits on that the site cannot see. A door opens in its
+ * months, on its weekdays, never on its skipped dates, inside its window: a fixed local span, a
+ * span around its sunrise, solar noon or sunset (worked out from where it is), or the dark hours
+ * with the moon below the horizon.
+ */
 const DoorClock = (() => {
-  const WINDOWS = { midnight: [0, 3], predawn: [3, 5], dawn: [5, 7], morning: [7, 11], noon: [11, 14], afternoon: [13, 17], dusk: [17, 19], 'blue-hour': [18, 20], night: [19, 24], any: [0, 24] };
+  const BUCKETS = { midnight: [0, 180], predawn: [180, 300], dawn: [300, 420], morning: [420, 660], noon: [660, 840], afternoon: [780, 1020], dusk: [1020, 1140], 'blue-hour': [1080, 1200], night: [1140, 1440], any: [0, 1440] };
   const ALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const DAY = 1440;
   const formats = new Map();
+  const rad = Math.PI / 180;
 
-  function local(tz, now) {
+  // The door's wall clock: calendar date, weekday (ISO 1-7) and minute of the day.
+  function wall(tz, date) {
     if (!formats.has(tz)) {
       let f = null;
-      try { f = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }); } catch (e) { f = null; }
+      try { f = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', weekday: 'short', hourCycle: 'h23' }); } catch (e) { f = null; }
       formats.set(tz, f);
     }
     const f = formats.get(tz);
-    if (!f) return { month: now.getMonth() + 1, hour: now.getHours(), minute: now.getMinutes() };
+    if (!f) return { y: date.getFullYear(), m: date.getMonth() + 1, d: date.getDate(), wd: ((date.getDay() + 6) % 7) + 1, min: date.getHours() * 60 + date.getMinutes() };
     const p = {};
-    f.formatToParts(now).forEach((x) => { p[x.type] = x.value; });
-    return { month: Number(p.month), hour: Number(p.hour) % 24, minute: Number(p.minute) };
+    f.formatToParts(date).forEach((x) => { p[x.type] = x.value; });
+    const wd = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 }[p.weekday] || 1;
+    return { y: Number(p.year), m: Number(p.month), d: Number(p.day), wd, min: (Number(p.hour) % 24) * 60 + Number(p.minute) };
   }
 
-  /** { open, hh, mm, minutes (until it opens, same month), month (next month it opens) } */
+  // Minutes the door's clock runs ahead of UTC at a given instant.
+  function offset(tz, date) {
+    const w = wall(tz, date);
+    const asUTC = Date.UTC(w.y, w.m - 1, w.d, Math.floor(w.min / 60), w.min % 60);
+    return Math.round((asUTC - Math.floor(date.getTime() / 60000) * 60000) / 60000);
+  }
+
+  // Sunrise, solar noon and sunset, in minutes after 00:00 UTC of that date (NOAA's approximation,
+  // good to a minute or two). rise/set are null when the sun stays down (or up) all day.
+  function sun(lat, lon, y, m, d) {
+    const n = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 0)) / 864e5);
+    const g = (2 * Math.PI / 365) * (n - 1);
+    const eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+    const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+    const noon = 720 - 4 * lon - eq;
+    const c = Math.cos(90.833 * rad) / (Math.cos(lat * rad) * Math.cos(decl)) - Math.tan(lat * rad) * Math.tan(decl);
+    if (c > 1) return { noon, rise: null, set: null, up: false };
+    if (c < -1) return { noon, rise: null, set: null, up: true };
+    const ha = Math.acos(c) / rad;
+    return { noon, rise: noon - 4 * ha, set: noon + 4 * ha, up: true };
+  }
+
+  // Days since the last new moon at an instant.
+  const SYNODIC = 29.530588853;
+  const moonAge = (ms) => (((ms - Date.UTC(2000, 0, 6, 18, 14)) / 864e5) % SYNODIC + SYNODIC) % SYNODIC;
+
+  const hm = (x) => { const [h, m] = x.split(':').map(Number); return h * 60 + m; };
+
+  // The door's open spans on one of its days, in minutes from that day's local midnight.
+  function spans(e, y, m, d, off) {
+    const w = e.window;
+    if (!w) { const b = BUCKETS[e.time] || BUCKETS.any; return [b]; }
+    if (w.at) { const a = hm(w.at); let u = hm(w.until); if (u <= a) u += DAY; return [[a, u]]; }
+    const s = sun(e.lat, e.lon, y, m, d);
+    const midnightUTC = Date.UTC(y, m - 1, d) - off * 60000;
+    if (w.moon_age) {
+      const age = moonAge(midnightUTC + ((s.set != null ? s.set : s.noon) + off) * 60000);
+      if (age < w.moon_age[0] || age > w.moon_age[1]) return [];
+    }
+    if (w.sun) {
+      const base = w.sun === 'noon' ? (s.up ? s.noon : null) : s[w.sun];
+      return base == null ? [] : [[base + off + w.from, base + off + w.to]];
+    }
+    if (w.moon === 'dark') {
+      if (s.set == null || s.rise == null) return [];
+      const age = moonAge(Date.UTC(y, m - 1, d) + s.set * 60000);
+      const dusk = s.set + 80;
+      const dawn = s.rise + DAY - 80;
+      // the moon sets about 49 minutes later each night after new, and rises that much later after full
+      const [a, b] = age < 14.77 ? [Math.max(dusk, s.set + age * 48.8), dawn] : [dusk, Math.min(dawn, s.set + (age - 14.77) * 48.8)];
+      return b - a >= 30 ? [[a + off, b + off]] : [];
+    }
+    return [];
+  }
+
+  function allowed(e, y, m, d, wd) {
+    const months = e.months && e.months.length ? e.months : ALL;
+    if (!months.includes(m)) return false;
+    const w = e.window || {};
+    if (w.days && w.days.length && !w.days.includes(wd)) return false;
+    if (w.except && w.except.includes(`${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`)) return false;
+    return true;
+  }
+
+  const clock = (min) => { const x = ((Math.round(min) % DAY) + DAY) % DAY; return `${String(Math.floor(x / 60)).padStart(2, '0')}:${String(x % 60).padStart(2, '0')}`; };
+
+  /** { open, hh, mm, at (local opening time), minutes (until it opens), days, month, closes, needs } */
   function state(e, now = new Date()) {
     if (!e) return { open: false };
-    const l = local(e.tz || 'UTC', now);
-    const months = e.months && e.months.length ? e.months : ALL;
-    const [start, end] = WINDOWS[e.time] || WINDOWS.any;
-    const at = l.hour * 60 + l.minute;
-    const out = { hh: String(l.hour).padStart(2, '0'), mm: String(l.minute).padStart(2, '0') };
-    if (!months.includes(l.month)) {
-      out.open = false;
-      out.month = months.map((m) => [m, (m - l.month + 12) % 12]).sort((a, b) => a[1] - b[1])[0][0];
-      return out;
+    const tz = e.tz || 'UTC';
+    const here = wall(tz, now);
+    const off = offset(tz, now);
+    const out = { hh: String(Math.floor(here.min / 60)).padStart(2, '0'), mm: String(here.min % 60).padStart(2, '0'), needs: (e.window && e.window.needs) || '' };
+    for (let k = -1; k < 400; k += 1) {
+      const t0 = new Date(Date.UTC(here.y, here.m - 1, here.d + k));
+      const y = t0.getUTCFullYear(); const m = t0.getUTCMonth() + 1; const d = t0.getUTCDate(); const wd = ((t0.getUTCDay() + 6) % 7) + 1;
+      if (!allowed(e, y, m, d, wd)) continue;
+      for (const [a, b] of spans(e, y, m, d, off)) {
+        const start = k * DAY + a - here.min;
+        const end = k * DAY + b - here.min;
+        if (end <= 0) continue;
+        out.at = clock(a);
+        if (start <= 0) { out.open = true; out.closes = Math.round(end); return out; }
+        out.open = false;
+        out.minutes = Math.round(start);
+        if (start > 2 * DAY) {
+          // out of its season: name the month it comes back; in season: count the days
+          const months = e.months && e.months.length ? e.months : ALL;
+          if (!months.includes(here.m) || start > 31 * DAY) out.month = m;
+          else out.days = Math.round(start / DAY);
+        }
+        return out;
+      }
     }
-    out.open = at >= start * 60 && at < end * 60;
-    if (!out.open) out.minutes = at < start * 60 ? start * 60 - at : 24 * 60 - at + start * 60;
+    out.open = false;
+    out.month = (e.months && e.months[0]) || here.m;
     return out;
   }
 
-  /** "此刻开着" / "2 小时 10 分后开" / "12 月才开" */
+  /** The short form: "此刻开着" / "2 小时 10 分后开" / "3 天后开" / "12 月才开" */
   function when(s) {
     if (s.open) return t('home.door.open');
     if (s.month) return t('home.door.month', { m: I18n.lang === 'en' ? new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(2020, s.month - 1, 1)) : s.month });
+    if (s.days) return t('home.door.inDays', { n: s.days });
     const h = Math.floor(s.minutes / 60);
     const m = s.minutes % 60;
     return h ? t('home.door.in', { h, m }) : t('home.door.inMin', { m });
   }
 
-  return { state, when };
+  /** The long form, with the door's own opening time: "当地 07:00 开 · 还有 43 分钟" */
+  function whenAt(s) {
+    if (s.open || s.month || !s.at) return when(s);
+    return t('home.door.atIn', { at: s.at, rest: when(s) });
+  }
+
+  /** What the door waits on that the site cannot see, or '' */
+  const needs = (s) => (s && s.needs ? t(`home.door.needs.${s.needs}`) : '');
+
+  return { state, when, whenAt, needs, sun };
 })();
 
 Pages.Home = {
@@ -76,13 +177,16 @@ Pages.Home = {
     this._userPaused = false;
     this._held = false;
     this._doors = new Map();
-    this._counted = false;
+    // re-rendered in place (a language switch): the page is already here, so nothing arrives again
+    this._swap = typeof Router !== 'undefined' && Router.swapping;
+    if (this._swap && this._lastSelected) this._pinned = this._lastSelected;
+    this._counted = this._swap;
     this._countPending = false;
     this._cleanups = [];
     const doors = (window.APP_CONFIG && APP_CONFIG.doors) || 48;
     const bootT = Math.round(performance.now());
     main.innerHTML = `
-      <section class="home-hero scene-taoyuan is-booting" data-media-end aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
+      <section class="home-hero scene-taoyuan${this._swap ? '' : ' is-booting'}" aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
         <div class="home-hero__slides" aria-hidden="true">
           ${UI.picture(API.mediaUrl(this.BRAND.img), { sizes: 'max(100vw, 177.8svh)', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"' })}
         </div>
@@ -110,10 +214,17 @@ Pages.Home = {
         </div>
       </section>
 
+      <section class="home-threshold" id="home-threshold" data-media-end aria-label="${esc(t('home.threshold.label'))}">
+        <div class="home-threshold__stage" data-layered>
+          <div class="home-threshold__arch" aria-hidden="true"><i></i></div>
+          ${['b1', 'b2', 'b3'].map((k, i) => `<p class="home-threshold__beat" style="--o:${i ? 0 : 1}">${esc(t(`home.threshold.${k}`))}</p>`).join('')}
+        </div>
+      </section>
+
       <section class="home-atlas" id="atlas" tabindex="-1" aria-labelledby="atlas-title">
         <div class="container">
           <header class="home-atlas__head">
-            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() ? 0 : doors}</b><span>/ 100</span></p>
+            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() && !this._swap ? 0 : doors}</b><span>/ 100</span></p>
             <div class="home-atlas__intro">
               <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title', { n: doors }))}</h2>
               <p class="home-atlas__legend"><i aria-hidden="true"></i>${esc(t('home.atlas.legend'))}</p>
@@ -157,6 +268,24 @@ Pages.Home = {
         </div>
         <div class="home-featured__grid" id="featured-grid" data-testid="journey-feed" aria-busy="true">
           ${Array.from({ length: 5 }, (_, i) => `<div class="feature-card feature-card--skeleton skeleton ${i === 0 ? 'feature-card--lead' : ''}" aria-hidden="true"></div>`).join('')}
+        </div>
+      </section>
+
+      <section class="home-behind" id="home-behind" aria-labelledby="behind-title" hidden>
+        <div class="container home-behind__inner">
+          <p class="eyebrow" id="behind-title">${esc(t('home.behind.eyebrow'))}</p>
+          <div id="behind-body"></div>
+        </div>
+      </section>
+
+      <section class="home-station" id="home-station" aria-labelledby="station-band-title">
+        <div class="container home-station__inner">
+          <div class="home-station__text">
+            <h2 id="station-band-title">${esc(t('home.station.title'))}</h2>
+            <p>${esc(t('station.lead'))}</p>
+            <a class="link-arrow" href="#/station">${esc(t('home.station.go'))} ${UI.icon('arrow', 'icon--sm')}</a>
+          </div>
+          <ul class="home-station__racks" id="home-station-racks" aria-busy="true"></ul>
         </div>
       </section>
 
@@ -207,6 +336,7 @@ Pages.Home = {
   },
 
   destroy() {
+    this._lastSelected = this._selected; // a re-render in place keeps the door being looked at
     if (this._particles) this._particles.stop();
     this._particles = null;
     clearTimeout(this._timer);
@@ -233,6 +363,11 @@ Pages.Home = {
       this._renderAtlas(journeys);
       this._renderFeatured(journeys);
       this._tick();
+      this._renderBehind(journeys);
+      this._watchStation(document.getElementById('main-content'));
+      // the other language's doors, while nothing else is happening, so a switch is instant
+      const other = I18n.lang === 'zh' ? 'en' : 'zh';
+      (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => API.prefetchJourneys({ limit: 100 }, other));
       clearInterval(this._clock);
       this._clock = setInterval(() => this._tick(), 30000);
       const all = document.getElementById('featured-all');
@@ -432,11 +567,16 @@ Pages.Home = {
     if (token !== this._showToken || !hero.isConnected) return;
     const j = sc.j;
     const e = j && j.entrance;
-    copy.querySelector('#hero-eyebrow').textContent = e ? `No.${String(e.no).padStart(3, '0')} · ${t(`entrance.realm.${e.realm}`)}` : t('home.myth');
+    // a door's scene tells its own hour: its number and realm, its local time, and whether it is open
+    const ds = e && ((this._state && this._state.get(e.no)) || DoorClock.state(e));
+    copy.querySelector('#hero-eyebrow').textContent = e
+      ? [`No.${String(e.no).padStart(3, '0')}`, t(`entrance.realm.${e.realm}`), t('home.door.local', { time: `${ds.hh}:${ds.mm}` }), DoorClock.when(ds)].join(' · ')
+      : t('home.myth');
     copy.querySelector('.home-hero__title .home-hero__line').innerHTML = j ? UI.titleHTML(j.title) : UI.esc(t('home.scene.taoyuan.title'));
     copy.querySelector('#hero-lead').textContent = j ? (j.story_hook || j.subtitle || '') : t('home.scene.taoyuan.lead');
     const enter = hero.querySelector('#hero-enter');
-    enter.querySelector('#hero-enter-label').textContent = t(j ? 'home.stepDoor' : 'home.step');
+    // an open door is pushed open; a closed one can still be looked into
+    enter.querySelector('#hero-enter-label').textContent = t(j ? (ds.open ? 'home.stepDoor' : 'home.peekDoor') : 'home.step');
     if (j) {
       enter.href = `#/journey/${encodeURIComponent(j.slug)}`;
       enter.dataset.slug = j.slug;
@@ -507,7 +647,8 @@ Pages.Home = {
       if (!a) return;
       const no = Number(a.dataset.no);
       if (pointer === 'touch' || coarse) {
-        if (this._selected !== no || !this._peek) {
+        // (the tap's focus has already selected the door, so ask what the sheet is showing)
+        if (!this._peek || this._peekNo !== no) {
           e.preventDefault();
           this._select(no, { pin: true, peek: true });
         }
@@ -538,8 +679,41 @@ Pages.Home = {
       if (b) this._filterDoors(b.dataset.filter);
     });
     section.querySelector('#atlas-peek-close').addEventListener('click', () => this._closePeek());
+    // The sheet follows a finger down and lets go past a short pull or a quick flick.
+    const panel = section.querySelector('#atlas-panel');
+    let drag = null;
+    panel.addEventListener('touchstart', (e) => {
+      if (!this._peek || e.touches.length !== 1) return;
+      drag = { y: e.touches[0].clientY, t: performance.now(), dy: 0 };
+      panel.style.transition = 'none';
+    }, { passive: true });
+    panel.addEventListener('touchmove', (e) => {
+      if (!drag) return;
+      drag.dy = Math.max(0, e.touches[0].clientY - drag.y);
+      panel.style.transform = `translate3d(0, ${drag.dy}px, 0)`;
+    }, { passive: true });
+    panel.addEventListener('touchend', () => {
+      if (!drag) return;
+      const speed = drag.dy / Math.max(1, performance.now() - drag.t);
+      panel.style.transition = '';
+      panel.style.transform = '';
+      if (drag.dy > 64 || speed > 0.6) this._closePeek();
+      drag = null;
+    });
     section.querySelector('#door-card').addEventListener('click', () => this._closePeek());
-    if ('IntersectionObserver' in window) {
+    if (this._swap) {
+      grid.classList.add('is-lit', 'is-near');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) document.body.dataset.atlasInView = '';
+            else { delete document.body.dataset.atlasInView; this._closePeek(); }
+          });
+        }, { threshold: [0, 0.15], rootMargin: '0px 0px -10% 0px' });
+        io.observe(section);
+        this._cleanups.push(() => io.disconnect());
+      }
+    } else if ('IntersectionObserver' in window) {
       grid.classList.add('will-light');
       // The count climbs when the number itself comes into view, from 0, never from its final value.
       const counter = section.querySelector('.home-atlas__count');
@@ -720,22 +894,86 @@ Pages.Home = {
       <span class="door-card__meta num">No.${String(e.no).padStart(3, '0')} <i aria-hidden="true"></i> ${esc(t(`entrance.realm.${e.realm}`))}</span>
       <strong class="door-card__title">${UI.titleHTML(j.title)}</strong>
       ${j.story_hook ? `<span class="door-card__hook">${esc(j.story_hook)}</span>` : ''}
+      ${j.content && j.content.role ? `<span class="door-card__role">${esc(t('home.door.role', { role: I18n.lang === 'zh' ? j.content.role : j.content.role.replace(/^The /, 'the ') }))}</span>` : ''}
       ${opens ? `<span class="door-card__opens"><b>${esc(t('detail.facts.opens'))}</b>${esc(opens)}</span>` : ''}
-      <span class="door-card__clock${s.open ? ' is-open' : ''}"><span class="num">${esc(t('home.door.local', { time: `${s.hh}:${s.mm}` }))}</span><span>${esc(DoorClock.when(s))}</span></span>
-      <span class="door-card__go">${esc(t('home.stepDoor'))} ${UI.icon('arrow', 'icon--sm')}</span>`;
+      <span class="door-card__clock${s.open ? ' is-open' : ''}"><span class="num">${esc(t('home.door.local', { time: `${s.hh}:${s.mm}` }))}</span><span>${esc(DoorClock.whenAt(s))}</span></span>
+      ${s.needs ? `<span class="door-card__needs">${esc(DoorClock.needs(s))}</span>` : ''}
+      <span class="door-card__go">${esc(t(s.open ? 'home.stepDoor' : 'home.peekDoor'))} ${UI.icon('arrow', 'icon--sm')}</span>`;
   },
 
   _openPeek() {
     const panel = document.getElementById('atlas-panel');
     if (!panel || !window.matchMedia('(max-width: 960px)').matches) return;
     this._peek = true;
+    this._peekNo = this._selected;
     panel.classList.add('is-peek');
   },
 
   _closePeek() {
     this._peek = false;
+    this._peekNo = 0;
     const panel = document.getElementById('atlas-panel');
     if (panel) panel.classList.remove('is-peek');
+  },
+
+  // --- Behind a door, and the Night Station --------------------------------------------------------
+
+  /** A few lines from behind a door that is open right now (or the next to open), in its own voice. */
+  async _renderBehind(journeys) {
+    const band = document.getElementById('home-behind');
+    if (!band) return;
+    const pick = this._soonest(journeys).find(({ j }) => j.content);
+    if (!pick) return;
+    try {
+      const { data: j } = await API.getJourney(pick.j.slug);
+      const para = j && j.content && j.content.chapters && j.content.chapters[0] && j.content.chapters[0].paragraphs[0];
+      if (!para || !band.isConnected) return;
+      const [name] = UI.titleParts(j.title);
+      const s = (this._state && this._state.get(j.entrance.no)) || DoorClock.state(j.entrance);
+      document.getElementById('behind-body').innerHTML = `
+        <blockquote class="home-behind__text"><p>${UI.esc(para)}</p></blockquote>
+        <a class="home-behind__door" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${UI.esc(j.slug)}">
+          <span class="num">No.${String(j.entrance.no).padStart(3, '0')}</span><b>${UI.esc(name)}</b><span>${UI.esc(DoorClock.when(s))}</span>${UI.icon('arrow', 'icon--sm')}
+        </a>`;
+      band.hidden = false;
+    } catch (e) { /* the band stays away */ }
+  },
+
+  /** Three tickets hanging at the Night Station, loaded when the band comes near. */
+  _watchStation(main) {
+    const band = main.querySelector('#home-station');
+    const racks = main.querySelector('#home-station-racks');
+    if (!band || !racks || typeof Road === 'undefined' || typeof Compose === 'undefined') { if (band) band.hidden = true; return; }
+    const load = async () => {
+      try {
+        const [list, , res] = await Promise.all([Compose.fragments(), Road.vocab(), API.station({ limit: 12 })]);
+        if (!racks.isConnected) return;
+        const by = Compose.index(list);
+        // three tickets from three different places
+        const seen = new Set();
+        const items = ((res && res.data && res.data.items) || []).filter((v) => {
+          const key = v.picks && v.picks.place;
+          if (!key || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }).slice(0, 3);
+        if (!items.length) { band.hidden = true; return; }
+        racks.innerHTML = items.map((v, i) => `<li style="--i:${i}">${Road.stubHTML(v, by)}</li>`).join('');
+        racks.setAttribute('aria-busy', 'false');
+        racks.addEventListener('click', (e) => {
+          const li = e.target.closest('li');
+          if (!li || !e.target.closest('button, a')) return;
+          const v = items[[...racks.children].indexOf(li)];
+          if (v && e.target.closest('.stub__open')) { e.preventDefault(); Road.open(v, by); }
+        });
+      } catch (e) { band.hidden = true; }
+    };
+    if (!('IntersectionObserver' in window)) { load(); return; }
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((en) => en.isIntersecting)) { io.disconnect(); load(); }
+    }, { rootMargin: '600px 0px' });
+    io.observe(band);
+    this._cleanups.push(() => io.disconnect());
   },
 
   // --- Opening next, and the close -------------------------------------------------------------
@@ -776,6 +1014,35 @@ Pages.Home = {
 
   _setupScroll(main) {
     const hero = main.querySelector('.home-hero');
+    // The threshold between the opening and the doors: the story of the marks in three beats, while
+    // an arch of light grows; it holds still on screen as the page scrolls through it.
+    const th = main.querySelector('#home-threshold');
+    if (th && !this._reduce()) {
+      const beats = [...th.querySelectorAll('.home-threshold__beat')];
+      let queued = false;
+      const ease = (x) => Math.min(1, Math.max(0, x));
+      const update = () => {
+        queued = false;
+        const span = Math.max(1, th.offsetHeight - window.innerHeight);
+        const rect = th.getBoundingClientRect();
+        const p = ease(-rect.top / span);
+        // once the stage starts to leave, the last line goes before it rises to the bar
+        const leaving = ease((window.innerHeight - rect.bottom) / (window.innerHeight * 0.3));
+        th.style.setProperty('--p', p.toFixed(3));
+        beats.forEach((b, i) => {
+          const a = i / 3;
+          const z = (i + 1) / 3;
+          const fadeIn = i === 0 ? 1 : ease((p - a) / 0.08);
+          const fadeOut = i === beats.length - 1 ? 1 - leaving : ease((z - p) / 0.08);
+          b.style.setProperty('--o', Math.min(fadeIn, fadeOut).toFixed(3));
+        });
+      };
+      const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      this._cleanups.push(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); });
+      update();
+    }
     if (!this._reduce()) {
       let queued = false;
       const apply = () => {
@@ -787,7 +1054,7 @@ Pages.Home = {
       window.addEventListener('scroll', onScroll, { passive: true });
       this._cleanups.push(() => window.removeEventListener('scroll', onScroll));
     }
-    if ('IntersectionObserver' in window && !this._reduce()) {
+    if ('IntersectionObserver' in window && !this._reduce() && !this._swap) {
       const items = main.querySelectorAll('.reveal, .home-close__quote, .home-invite');
       items.forEach((el) => el.classList.add('will-reveal'));
       const io = new IntersectionObserver((entries) => {
@@ -820,7 +1087,7 @@ Pages.Home = {
         ${face}
         <div class="home-invite__text">
           <h2 id="home-invite-title">${esc(t('invite.title'))}</h2>
-          ${quiet ? '' : `<p>${esc(t('invite.text'))}</p>`}
+          ${quiet ? '' : `<p>${esc(t('invite.text'))}</p><p class="home-invite__lumi">${esc(t('invite.lumi'))}</p>`}
         </div>
         <div class="home-invite__actions">
           <a class="btn btn--primary" id="invite-self" href="#/find" data-path="self">${esc(t('invite.self'))}</a>

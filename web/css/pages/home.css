@@ -2,20 +2,10 @@
    HOME — the hundred doors, the invitation, the doors opening next, the close
    ============================================================= */
 
-/* Eight realms, spaced around the hue circle at one lightness per theme; lantern amber is kept
-   for "open right now" and the primary action. */
-.home-atlas, .home-featured, .home-close, .home-hero, .home-invite-section {
-  --realm-fire-stone: oklch(.72 .14 32); --realm-sand-stars: oklch(.8 .11 85); --realm-old-roads: oklch(.76 .1 125);
-  --realm-ice-night: oklch(.8 .09 180); --realm-water-deep: oklch(.72 .12 245); --realm-mirror-salt: oklch(.86 .025 260);
-  --realm-mist-temple: oklch(.74 .1 305); --realm-city-rules: oklch(.72 .14 358);
-  --lamp-open: #f2c46d;
+/* The realms' colours and the lamp are site tokens (tokens.css): the doors, Explore and the
+   journeys share them. */
+.home-atlas, .home-featured, .home-close, .home-hero, .home-invite-section, .home-behind, .home-station {
   --section-gap: clamp(96px, 12vh, 160px);
-}
-[data-theme="light"] .home-atlas, [data-theme="light"] .home-featured, [data-theme="light"] .home-close, [data-theme="light"] .home-invite-section {
-  --realm-fire-stone: oklch(.52 .15 32); --realm-sand-stars: oklch(.56 .11 85); --realm-old-roads: oklch(.52 .1 125);
-  --realm-ice-night: oklch(.53 .09 180); --realm-water-deep: oklch(.5 .13 245); --realm-mirror-salt: oklch(.5 .03 260);
-  --realm-mist-temple: oklch(.5 .11 305); --realm-city-rules: oklch(.52 .15 358);
-  --lamp-open: #b8690f;
 }
 
 /* Titles break between a name and its place, never inside either. */
@@ -25,6 +15,26 @@
 /* Reveals (added by script only when motion is allowed, so nothing is ever left hidden) */
 .will-reveal { opacity: 0; transform: translate3d(0, 24px, 0); }
 .will-reveal.is-in { opacity: 1; transform: none; transition: opacity .9s var(--ease-out), transform .9s var(--ease-out); }
+
+/* --- The threshold: the story of the marks, between the opening and the doors --- */
+.home-threshold { --p: 0; position: relative; height: 240vh; background: #07080b; color: var(--color-on-media); }
+.home-threshold__stage { position: sticky; top: 0; height: 100svh; display: grid; place-items: center; overflow: hidden; }
+.home-threshold__arch { grid-area: 1 / 1; position: relative; width: clamp(150px, 20vw, 280px); aspect-ratio: 3 / 4.2; border-radius: 999px 999px 0 0;
+  border: 1.5px solid rgba(242, 196, 109, calc(.22 + var(--p) * .5)); border-bottom: 0;
+  transform: translate3d(0, 6vh, 0) scale(calc(.72 + var(--p) * 1.5)); transform-origin: 50% 100%;
+  box-shadow: 0 0 calc(30px + var(--p) * 110px) calc(var(--p) * 18px) rgba(242, 196, 109, calc(.06 + var(--p) * .2)); }
+.home-threshold__arch i { position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(70% 60% at 50% 100%, rgba(242, 196, 109, calc(.08 + var(--p) * .32)), rgba(242, 196, 109, 0) 72%); }
+.home-threshold__beat { grid-area: 1 / 1; z-index: 1; max-width: 16em; padding-inline: 24px; text-align: center; font-family: var(--font-story); font-size: clamp(1.75rem, 4vw, 3.25rem); line-height: 1.4; letter-spacing: .02em; text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .6); opacity: var(--o, 1); transform: translate3d(0, calc((1 - var(--o, 1)) * 18px), 0); }
+:root:lang(en) .home-threshold__beat { letter-spacing: 0; }
+/* it ends in the page's own ground, so the doors come out of the night */
+.home-threshold::after { content: ""; position: absolute; inset: auto 0 0; height: 32vh; background: linear-gradient(to bottom, rgba(7, 8, 11, 0), var(--color-bg)); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .home-threshold { height: auto; }
+  .home-threshold__stage { position: static; height: auto; padding-block: 120px 160px; gap: var(--space-6); }
+  .home-threshold__beat { grid-area: auto; opacity: 1; transform: none; }
+  .home-threshold__arch { display: none; }
+}
 
 /* --- The hundred doors --- */
 .home-atlas { padding-block: var(--section-gap) calc(var(--section-gap) * .6); }
@@ -147,10 +157,13 @@
 .door-card__title { font-family: var(--font-story); font-size: var(--text-xl); line-height: 1.3; color: var(--color-text); }
 .door-card__title .t-place { display: block; margin-top: 2px; font-family: var(--font-ui); font-weight: 500; font-size: var(--text-sm); letter-spacing: .06em; color: var(--color-text-2); }
 .door-card__hook { color: var(--color-text-2); font-size: var(--text-base); line-height: 1.6; text-wrap: pretty; }
+.door-card__role { font-family: var(--font-story); font-size: var(--text-base); line-height: 1.5; color: var(--color-text); }
 .door-card__opens { display: grid; gap: 2px; font-size: var(--text-sm); color: var(--color-text-2); text-wrap: pretty; }
 .door-card__opens b { font-weight: var(--weight-semibold); font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-text-3); }
 .door-card__clock { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: var(--text-sm); color: var(--color-text-2); }
 .door-card__clock.is-open span:last-child { color: var(--color-text); }
+.door-card__needs { font-size: var(--text-sm); color: var(--color-text-3); font-style: italic; }
+.door-card__needs::before { content: ""; display: inline-block; width: 12px; height: 1px; margin-right: 8px; vertical-align: middle; background: currentColor; opacity: .6; }
 .door-card__clock.is-open span:last-child::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--lamp-open); box-shadow: 0 0 10px color-mix(in oklab, var(--lamp-open) 60%, transparent); }
 .door-card__go { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: var(--text-sm); color: var(--color-text); text-decoration: underline; text-decoration-color: var(--color-line-strong); text-underline-offset: 4px; }
 .door-card:hover .door-card__go { text-decoration-color: currentColor; }
@@ -167,10 +180,17 @@
     transform: translate3d(0, calc(100% + 32px), 0); visibility: hidden; transition: transform .28s var(--ease-out), visibility 0s linear .28s;
   }
   .home-atlas__panel.is-peek { transform: none; visibility: visible; transition: transform .28s var(--ease-out); }
+  /* a handle to pull it down by, and a soft shade above it so it reads as a layer (taps still reach
+     the doors, so another door simply takes its place) */
+  .home-atlas__panel { padding-top: 22px; touch-action: pan-x; }
+  .home-atlas__panel::before { content: ""; position: absolute; top: 8px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--color-line-strong); }
+  .home-atlas__panel.is-peek::after { content: ""; position: absolute; left: -12px; right: -12px; bottom: calc(100% - 1px); height: 30vh; background: linear-gradient(to top, rgba(5, 6, 8, .32), rgba(5, 6, 8, 0)); pointer-events: none; }
   .home-atlas__peek-close { display: grid; place-items: center; position: absolute; top: 8px; right: 8px; z-index: 1; width: 36px; height: 36px; border-radius: 50%; color: var(--color-text-2); }
   .door-card { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: start; padding-right: 32px; }
   .door-card__media { border-radius: 10px; box-shadow: none; }
-  .door-card__hook, .door-card__opens { display: none; }
+  .door-card__hook { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: var(--text-sm); line-height: 1.5; }
+  .door-card__opens { display: block; font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .door-card__opens b { display: inline; margin-right: 6px; }
   .door-card__title { font-size: var(--text-lg); }
   .door-card__go { display: inline-flex; min-height: 40px; padding: 0 16px; border-radius: 999px; background: #f2c46d; color: #1d1405; text-decoration: none; font-weight: var(--weight-semibold); }
 }
@@ -189,12 +209,45 @@
   .home-atlas__mist i { flex-basis: 100%; }
 }
 
+/* --- Behind a door: a few lines in its own voice --- */
+.home-behind { padding-block: calc(var(--section-gap) * .7) calc(var(--section-gap) * .5); }
+.home-behind__inner { display: grid; gap: var(--space-5); max-width: 52rem; }
+.home-behind__text p { font-family: var(--font-story); font-size: clamp(1.375rem, 2.4vw, 2rem); line-height: 1.75; color: var(--color-text); text-wrap: pretty; }
+:root:lang(en) .home-behind__text p { line-height: 1.5; }
+.home-behind__door { display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; color: var(--color-text-2); border-bottom: 1px solid var(--color-line-strong); padding-bottom: 6px; width: fit-content; transition: color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+.home-behind__door:hover { color: var(--color-text); border-color: currentColor; }
+.home-behind__door .num { font-size: var(--text-xs); letter-spacing: .08em; color: var(--color-text-3); }
+.home-behind__door b { font-family: var(--font-story); font-weight: 700; font-size: var(--text-lg); color: var(--color-text); }
+.home-behind__door span:not(.num) { font-size: var(--text-sm); }
+
+/* --- The Night Station: three tickets still hanging --- */
+.home-station { padding-block: calc(var(--section-gap) * .5); border-top: 1px solid var(--color-line); }
+.home-station__inner { display: grid; grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr); gap: var(--space-7); align-items: center; }
+.home-station__text { display: grid; gap: var(--space-3); justify-items: start; }
+.home-station__text h2 { font-family: var(--font-story); font-size: clamp(1.625rem, 2.6vw, 2.25rem); line-height: 1.25; }
+.home-station__text p { color: var(--color-text-2); text-wrap: pretty; }
+.home-station__racks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); min-height: 220px; }
+.home-station__racks > li { min-width: 0; }
+/* a ticket needs about 230px; narrower screens hang fewer of them */
+@media (max-width: 1200px) {
+  .home-station__racks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-station__racks > li:nth-child(n + 3) { display: none; }
+}
+@media (max-width: 960px) {
+  .home-station__inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+}
+@media (max-width: 600px) {
+  .home-station__racks { grid-template-columns: minmax(0, 1fr); }
+  .home-station__racks > li:nth-child(n + 2) { display: none; }
+}
+
 /* --- Invitation: find your type --- */
 .home-invite-section { padding-block: calc(var(--section-gap) * .5); }
 .home-invite { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-6); align-items: center; padding-block: var(--space-7); border-block: 1px solid var(--color-line); }
 .home-invite__face { display: grid; filter: drop-shadow(0 0 22px rgba(242, 196, 109, .35)); }
 .home-invite__text h2 { font-family: var(--font-story); font-size: clamp(1.625rem, 2.6vw, 2.25rem); line-height: 1.3; text-wrap: balance; }
 .home-invite__text p { margin-top: 8px; color: var(--color-text-2); font-size: var(--text-md); max-width: 34em; text-wrap: pretty; }
+.home-invite__text p.home-invite__lumi { margin-top: 12px; font-family: var(--font-story); font-size: var(--text-lg); color: var(--color-text); }
 .home-invite__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 /* A returning traveller's doors, each with where it stands now */
 .home-invite__doors { margin-top: var(--space-4); display: grid; gap: 2px; max-width: 40em; }
@@ -274,3 +327,4 @@ body[data-page="home"] .site-footer__line { display: none; }
 @media (max-width: 760px) {
   .home-close__inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
 }
+:root:lang(zh-CN) .door-card__needs { font-style: normal; }

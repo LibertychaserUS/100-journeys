@@ -1,6 +1,6 @@
 {
   "slug": "singapore-supertree-night",
-  "entrance": { "no": 45, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "night", "tz": "Asia/Singapore", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  "entrance": { "no": 45, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "night", "tz": "Asia/Singapore", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": 1.28, "lon": 103.86, "window": { "at": "19:45", "until": "20:00" } },
   "journey": {
     "fantasy_type": "visual", "visual_style": "minimal",
     "adventure_index": 1, "obscurity_level": 2, "risk_level": 1, "price": 3999,

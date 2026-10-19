@@ -1,6 +1,6 @@
 {
   "slug": "morocco-marrakech-jemaa-el-fna",
-  "entrance": { "no": 48, "realm": "city-rules", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "dusk", "tz": "Africa/Casablanca", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  "entrance": { "no": 48, "realm": "city-rules", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "dusk", "tz": "Africa/Casablanca", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": 31.63, "lon": -7.99, "window": { "sun": "set", "from": -30, "to": 60 } },
   "journey": {
     "fantasy_type": "culture", "visual_style": "dramatic",
     "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 8999,
