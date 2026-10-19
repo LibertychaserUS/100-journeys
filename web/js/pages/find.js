@@ -25,7 +25,7 @@ Pages.Find = {
                 ${codes.map((c) => `
                   <button class="type-card" type="button" data-code="${c}" aria-pressed="${c === current}">
                     ${Lumi.svg(c, { size: 56, still: true })}
-                    <span class="type-card__text"><b>${c}</b><span>${esc(MBTI.name(c))}</span></span>
+                    <span class="type-card__text"><b>${esc(MBTI.name(c))}</b><span>${esc(MBTI.trait(c))}</span><small class="type-card__code num">${c}</small></span>
                   </button>`).join('')}
               </div>`).join('')}
           </div>

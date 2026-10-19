@@ -244,7 +244,7 @@ Pages.Profile = {
         ${current ? `
           <div class="persona__result">
             <h3>${esc(current)} · ${esc(MBTI.name(current))}</h3>
-            <h4>${esc(t('persona.picks', { code: current }))}</h4>
+            <h4>${esc(t('persona.picks', { name: MBTI.name(current, true) }))}</h4>
             <div class="grid-cards persona__picks" id="persona-picks">${UI.skeletonCards(3)}</div>
           </div>` : ''}
       </div>`;
@@ -281,7 +281,7 @@ Pages.Profile = {
     try {
       await API.updateMBTI(code);
       await this._refreshUser();
-      this._renderPersona(t('persona.saved', { code }));
+      this._renderPersona(t('persona.saved', { name: MBTI.name(code) }));
     } catch (err) {
       btn.removeAttribute('aria-busy');
       UI.toast(I18n.error(err));

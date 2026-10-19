@@ -117,11 +117,11 @@ Pages.Guide = {
 
   _renderReveal(code, { condense = false } = {}) {
     const esc = UI.esc;
-    const label = `${code} · ${MBTI.name(code)}`;
+    const label = MBTI.name(code);
     this._shell(`
       <div class="guide__reveal" id="guide-reveal" tabindex="-1">
         <div class="guide__form" id="guide-form">${condense ? '' : Lumi.svg(code, { size: 168, label })}</div>
-        <h1><b>${esc(code)}</b><span>${esc(MBTI.name(code))}</span></h1>
+        <h1><b>${esc(MBTI.name(code))}</b><span>${esc(MBTI.trait(code))}</span></h1>
         <p class="guide__line guide__line--sm">${esc(t('guide.reveal.text'))}</p>
       </div>
       <div class="guide__actions">

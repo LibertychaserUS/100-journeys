@@ -4,14 +4,14 @@
 
 /* Eight realms, spaced around the hue circle at one lightness per theme; lantern amber is kept
    for "open right now" and the primary action. */
-.home-atlas, .home-featured, .home-close, .home-hero {
+.home-atlas, .home-featured, .home-close, .home-hero, .home-invite-section {
   --realm-fire-stone: oklch(.72 .14 32); --realm-sand-stars: oklch(.8 .11 85); --realm-old-roads: oklch(.76 .1 125);
   --realm-ice-night: oklch(.8 .09 180); --realm-water-deep: oklch(.72 .12 245); --realm-mirror-salt: oklch(.86 .025 260);
   --realm-mist-temple: oklch(.74 .1 305); --realm-city-rules: oklch(.72 .14 358);
   --lamp-open: #f2c46d;
   --section-gap: clamp(96px, 12vh, 160px);
 }
-[data-theme="light"] .home-atlas, [data-theme="light"] .home-featured, [data-theme="light"] .home-close {
+[data-theme="light"] .home-atlas, [data-theme="light"] .home-featured, [data-theme="light"] .home-close, [data-theme="light"] .home-invite-section {
   --realm-fire-stone: oklch(.52 .15 32); --realm-sand-stars: oklch(.56 .11 85); --realm-old-roads: oklch(.52 .1 125);
   --realm-ice-night: oklch(.53 .09 180); --realm-water-deep: oklch(.5 .13 245); --realm-mirror-salt: oklch(.5 .03 260);
   --realm-mist-temple: oklch(.5 .11 305); --realm-city-rules: oklch(.52 .15 358);
@@ -27,7 +27,7 @@
 .will-reveal.is-in { opacity: 1; transform: none; transition: opacity .9s var(--ease-out), transform .9s var(--ease-out); }
 
 /* --- The hundred doors --- */
-.home-atlas { padding-block: var(--section-gap) calc(var(--section-gap) * .6); scroll-margin-top: var(--nav-h); }
+.home-atlas { padding-block: var(--section-gap) calc(var(--section-gap) * .6); }
 .home-atlas:focus { outline: none; }
 .home-atlas__head { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(240px, 320px); gap: var(--space-6); align-items: end; }
 .home-atlas__count { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-story); line-height: .86; color: var(--color-text); }
@@ -38,7 +38,7 @@
 .home-atlas__legend { margin-top: 10px; display: flex; align-items: center; gap: 10px; color: var(--color-text-2); font-size: var(--text-md); }
 .home-atlas__legend i { width: 10px; height: 10px; border-radius: 50%; background: var(--lamp-open); box-shadow: 0 0 0 3px color-mix(in oklab, var(--lamp-open) 22%, transparent), 0 0 14px 2px color-mix(in oklab, var(--lamp-open) 55%, transparent); }
 .home-atlas__search { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 4px 4px 14px; margin-bottom: 10px; border-radius: 999px; border: 1px solid var(--color-line-strong); background: var(--color-surface); }
-.home-atlas__search:focus-within { border-color: var(--color-focus); box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-focus) 25%, transparent); }
+.home-atlas__search:focus-within { border-color: var(--color-focus); outline: 2px solid var(--color-focus); outline-offset: 3px; }
 .home-atlas__search .icon { color: var(--color-text-3); }
 .home-atlas__search input { flex: 1; min-width: 0; height: 34px; border: 0; outline: 0; background: transparent; color: var(--color-text); font-size: var(--text-base); text-overflow: ellipsis; }
 .home-atlas__search input::placeholder { color: var(--color-text-3); }
@@ -46,6 +46,8 @@
 
 .home-atlas__filters { margin-top: var(--space-6); display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); padding-bottom: 4px; }
 .home-atlas__filters::-webkit-scrollbar { display: none; }
+/* Wide screens show every realm at once; narrower ones scroll the row */
+@media (min-width: 1024px) { .home-atlas__filters { flex-wrap: wrap; overflow: visible; -webkit-mask-image: none; mask-image: none; } }
 .home-atlas__chip { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--color-line-strong); background: transparent; color: var(--color-text-2); font-size: var(--text-sm); }
 .home-atlas__chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--lamp, var(--color-text-2)); }
 .home-atlas__chip[data-filter="now"] i { background: var(--lamp-open); box-shadow: 0 0 10px color-mix(in oklab, var(--lamp-open) 60%, transparent); }
@@ -55,10 +57,10 @@
 .home-atlas__chip[aria-pressed="true"] .num { color: var(--color-text-2); }
 
 .home-atlas__body { margin-top: var(--space-5); display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--space-7); align-items: start; }
-.home-atlas__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px 8px; }
+.home-atlas__grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 14px 10px; }
 
 /* A door: an arch, its place in the realm's colour, its word at rest; a lit door is open now. */
-.door { position: relative; aspect-ratio: 3 / 4; --lamp: var(--realm-mirror-salt); }
+.door { position: relative; isolation: isolate; aspect-ratio: 3 / 4; container-type: inline-size; --lamp: var(--realm-mirror-salt); }
 .door:not(.is-found) { border-radius: 999px 999px 8px 8px; background: var(--color-surface-2); opacity: .45; }
 .door:not(.is-found) .door__no { display: none; }
 .door[data-realm="fire-stone"] { --lamp: var(--realm-fire-stone); }
@@ -72,30 +74,45 @@
   position: absolute; inset: 0; overflow: hidden; border-radius: 999px 999px 8px 8px;
   /* the number and the name are two rows in the flow, so a long name can never cover the number */
   display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16% 4px 8px;
-  background: color-mix(in oklab, var(--lamp) 34%, #0b0c10);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 50%, transparent);
+  /* every door is a window at night, in both themes: closed ones in one grey mist with their realm
+     as a thin arch line, open ones in full colour with the lamp lit inside */
+  background: #0f1115;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 42%, transparent);
   transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), opacity .3s var(--ease-out);
 }
-[data-theme="light"] .door__link { background: color-mix(in oklab, var(--lamp) 30%, #f6f4ef); }
-.door__arch { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(1) contrast(1.1); mix-blend-mode: luminosity; opacity: .62; }
+.door__arch { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(1) brightness(.72) contrast(1.05); opacity: .5; transition: opacity .4s var(--ease-out), filter .4s var(--ease-out); }
 .home-atlas__grid.is-near .door__arch { background-image: var(--thumb); }
-.door__link::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(5, 6, 8, .72)); }
-.door__no { position: relative; z-index: 1; text-align: center; font-size: .6875rem; letter-spacing: .06em; color: rgba(255, 255, 255, .78); }
+/* shade under the number and under the name, so white text holds on any picture */
+.door__link::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 9, 12, .62) 0%, rgba(8, 9, 12, 0) 30%, rgba(8, 9, 12, 0) 44%, rgba(8, 9, 12, .9) 100%); }
+.door__no { position: relative; z-index: 1; text-align: center; font-size: .75rem; letter-spacing: .06em; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, .8); }
 .door__word {
   position: relative; z-index: 1; max-width: 100%; text-align: center; font-family: var(--font-ui); font-weight: 500;
-  font-size: clamp(.6875rem, .78vw, .8125rem); line-height: 1.25; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
+  font-size: .75rem; line-height: 1.25; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .8);
   overflow-wrap: normal; hyphens: manual; text-wrap: balance;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
 }
-/* English names run to two or three words and long single words, more than a 50-60px arch holds at a
-   readable size. The tile carries the door's number as a plate; the name is in the card beside it
-   (hover, focus or tap) and in the door's label. */
+/* English names run to two or three words; an arch narrower than about 84px cannot hold them at a
+   readable size. There the tile carries the door's number as a plate, and the name is in the card
+   beside it (hover, focus or tap) and in the door's label. */
 :root:lang(en) .door__link { justify-content: flex-end; padding-bottom: 10px; }
 :root:lang(en) .door__word { display: none; }
-:root:lang(en) .door__no { font-family: var(--font-story); font-size: clamp(.875rem, 1vw, 1rem); font-weight: 700; letter-spacing: .04em; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); }
-.door[data-open="true"] .door__link { box-shadow: inset 0 0 0 1.5px var(--lamp-open), inset 0 -22px 30px -14px color-mix(in oklab, var(--lamp-open) 70%, transparent), 0 0 22px -6px color-mix(in oklab, var(--lamp-open) 70%, transparent); }
-.door[data-open="true"] .door__arch { filter: none; mix-blend-mode: normal; opacity: .9; }
+:root:lang(en) .door__no { font-family: var(--font-story); font-size: clamp(.875rem, 1vw, 1rem); font-weight: 700; letter-spacing: .04em; }
+@container (min-width: 84px) {
+  :root:lang(en) .door__link { justify-content: space-between; padding-bottom: 8px; }
+  :root:lang(en) .door__word { display: -webkit-box; }
+  :root:lang(en) .door__no { font-family: var(--font-ui); font-size: .75rem; font-weight: 400; letter-spacing: .06em; }
+}
+/* A lit door: full colour, a warm light low in the arch, a slow candle breath */
+.door[data-open="true"] .door__arch { filter: none; opacity: .95; }
+.door[data-open="true"] .door__link { box-shadow: inset 0 0 0 1.5px var(--lamp-open), inset 0 -28px 34px -16px color-mix(in oklab, var(--lamp-open) 75%, transparent), 0 0 26px -6px color-mix(in oklab, var(--lamp-open) 75%, transparent); }
+.door[data-open="true"] .door__link::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 45% at 50% 100%, color-mix(in oklab, var(--lamp-open) 55%, transparent), transparent 70%); mix-blend-mode: screen; pointer-events: none; }
+[data-theme="light"] .door[data-open="true"]::before { content: ""; position: absolute; inset: -16px -12px; z-index: -1; border-radius: 999px 999px 24px 24px; background: radial-gradient(closest-side, rgba(242, 196, 109, .55), rgba(242, 196, 109, 0)); pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .door[data-open="true"] .door__link::before { animation: door-candle 4s ease-in-out infinite alternate; animation-delay: calc(var(--i, 0) * -370ms); }
+}
+@keyframes door-candle { 0% { opacity: .7; } 45% { opacity: 1; } 70% { opacity: .82; } 100% { opacity: .95; } }
 .door.is-found:hover .door__link, .door.is-selected .door__link { transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--lamp), 0 16px 30px -18px rgba(0, 0, 0, .8); }
+.door.is-found:not([data-open="true"]):is(:hover, .is-selected) .door__arch { filter: grayscale(.4) brightness(.9); opacity: .78; }
 .door.is-found .door__link:active { transform: scale(.96); transition-duration: 90ms; }
 .door.is-dim { opacity: .2; }
 .door__link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
@@ -179,6 +196,15 @@
 .home-invite__text h2 { font-family: var(--font-story); font-size: clamp(1.625rem, 2.6vw, 2.25rem); line-height: 1.3; text-wrap: balance; }
 .home-invite__text p { margin-top: 8px; color: var(--color-text-2); font-size: var(--text-md); max-width: 34em; text-wrap: pretty; }
 .home-invite__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+/* A returning traveller's doors, each with where it stands now */
+.home-invite__doors { margin-top: var(--space-4); display: grid; gap: 2px; max-width: 40em; }
+.home-invite__doors a { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-line); color: var(--color-text-2); transition: color var(--dur) var(--ease-out); }
+.home-invite__doors a:hover { color: var(--color-text); }
+.home-invite__doors .num { font-size: var(--text-xs); letter-spacing: .08em; color: var(--color-text-3); }
+.home-invite__doors b { font-family: var(--font-story); font-weight: 700; font-size: var(--text-lg); color: var(--color-text); }
+.home-invite__doors span:last-child { font-size: var(--text-sm); text-align: right; }
+.home-invite__doors a.is-open span:last-child { color: var(--color-text); }
+.home-invite__doors a.is-open span:last-child::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--lamp-open); box-shadow: 0 0 8px color-mix(in oklab, var(--lamp-open) 60%, transparent); }
 @media (max-width: 960px) {
   .home-invite { grid-template-columns: auto minmax(0, 1fr); }
   .home-invite__actions { grid-column: 1 / -1; justify-content: flex-start; }

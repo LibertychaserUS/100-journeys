@@ -40,6 +40,19 @@ test.describe('Home Page', () => {
     await expect(page.locator('.journey-card[data-slug]')).toHaveCount(Math.min(total, 12));
   });
 
+  // E2E-HOME-009: the example in the search box finds several doors, in both languages
+  test('the search example finds doors', async ({ page, browser }) => {
+    const example = async (p) => /[「“]([^」”]+)[」”]/.exec(await p.locator('#atlas-q').getAttribute('placeholder'))[1];
+    const zh = await example(page);
+    expect((await (await page.request.get(`/api/journeys?q=${encodeURIComponent(zh)}&lang=zh`)).json()).total).toBeGreaterThanOrEqual(3);
+    const context = await browser.newContext({ locale: 'en-US' });
+    const en = await context.newPage();
+    await en.goto('/#/');
+    const word = await example(en);
+    expect((await (await en.request.get(`/api/journeys?q=${encodeURIComponent(word)}&lang=en`)).json()).total).toBeGreaterThanOrEqual(3);
+    await context.close();
+  });
+
   // E2E-HOME-004: featured card opens its detail page
   test('featured card click navigates to journey detail', async ({ page }) => {
     const card = page.locator('#featured-grid .feature-card[data-slug]').first();
@@ -78,6 +91,7 @@ test.describe('Home Page', () => {
     await expect(page.locator('body')).toHaveAttribute('data-scrolled', '');
     const door = page.locator('#atlas-grid .door.is-found a').nth(6);
     const no = await door.getAttribute('data-no');
+    await door.scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
     const y = await page.evaluate(() => window.scrollY);
     await door.click();

@@ -39,7 +39,7 @@ test.describe('Mobile', () => {
     await page.goto('/#/explore');
     await page.locator('#nav-menu').click();
     await page.locator('#nav-drawer a[href="#/space"]').click();
-    await expect(page.locator('.space__head h1')).toContainText('ESFP');
+    await expect(page.locator('.space__head h1')).toContainText('篝火边唱歌的人');
   });
 
   // E2E-MOBILE-003: the filter panel opens as a sheet and applies filters

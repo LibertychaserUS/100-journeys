@@ -76,6 +76,8 @@ Pages.Home = {
     this._userPaused = false;
     this._held = false;
     this._doors = new Map();
+    this._counted = false;
+    this._countPending = false;
     this._cleanups = [];
     const doors = (window.APP_CONFIG && APP_CONFIG.doors) || 48;
     const bootT = Math.round(performance.now());
@@ -101,6 +103,7 @@ Pages.Home = {
             <button type="button" class="home-hero__pause" id="hero-pause" aria-pressed="false" aria-label="${esc(t('home.scenes.pause'))}" hidden>${UI.icon('pause', 'icon--sm')}</button>
             <div class="home-hero__dots" id="hero-dots" role="group" aria-label="${esc(t('home.scenes.label'))}">
               <button type="button" class="home-hero__dot" data-go="0" aria-label="${esc(`${t('home.scenes.prologue')} ${t('home.scene.taoyuan.title')}`)}" aria-current="true"><i></i><span class="num">${esc(t('home.scenes.prologue'))}</span></button>
+              ${'<span class="home-hero__dot is-placeholder" aria-hidden="true"><i></i><span class="num">000</span></span>'.repeat(3)}
             </div>
             <a class="home-hero__now" id="hero-now" href="#atlas" data-to-atlas data-now hidden></a>
           </div>
@@ -110,7 +113,7 @@ Pages.Home = {
       <section class="home-atlas" id="atlas" tabindex="-1" aria-labelledby="atlas-title">
         <div class="container">
           <header class="home-atlas__head">
-            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${doors}</b><span>/ 100</span></p>
+            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() ? 0 : doors}</b><span>/ 100</span></p>
             <div class="home-atlas__intro">
               <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title', { n: doors }))}</h2>
               <p class="home-atlas__legend"><i aria-hidden="true"></i>${esc(t('home.atlas.legend'))}</p>
@@ -265,6 +268,25 @@ Pages.Home = {
     if (nowChip) nowChip.textContent = open;
     if (this._selected) this._renderDoorBody(this._doors.get(this._selected));
     this._renderClose(journeys);
+    this._renderInviteDoors(journeys);
+  },
+
+  /** A returning traveller's three doors: the best matches for their kind of traveller, with
+   *  where each one stands right now. */
+  _renderInviteDoors(journeys) {
+    const list = document.getElementById('invite-doors');
+    const code = Guest.mbti();
+    if (!list || !code) return;
+    const score = (j) => ((j.mbti_types || []).find((m) => m.mbti_type && m.mbti_type.code === code) || {}).compatibility_score || 0;
+    const picks = journeys.filter((j) => score(j) > 0)
+      .map((j) => ({ j, s: this._state.get(j.entrance.no) }))
+      .sort((a, b) => score(b.j) - score(a.j) || (b.s.open - a.s.open) || a.j.entrance.no - b.j.entrance.no)
+      .slice(0, 3);
+    list.innerHTML = picks.map(({ j, s }) => {
+      const [name] = UI.titleParts(j.title);
+      return `<li><a href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${UI.esc(j.slug)}"${s.open ? ' class="is-open"' : ''}>
+        <span class="num">No.${String(j.entrance.no).padStart(3, '0')}</span><b>${UI.esc(name)}</b><span>${UI.esc(DoorClock.when(s))}</span></a></li>`;
+    }).join('');
   },
 
   // --- The opening -----------------------------------------------------------------------------
@@ -344,6 +366,7 @@ Pages.Home = {
     const picks = journeys.filter((j) => j.entrance && j.hero_url).sort((a, b) => rank(a) - rank(b)).slice(0, 3);
     const slides = hero.querySelector('.home-hero__slides');
     const dots = hero.querySelector('#hero-dots');
+    dots.querySelectorAll('.is-placeholder').forEach((n) => n.remove());
     picks.forEach((j) => {
       const i = this._scenes.length;
       this._scenes.push({ key: 'door', j });
@@ -518,6 +541,13 @@ Pages.Home = {
     section.querySelector('#door-card').addEventListener('click', () => this._closePeek());
     if ('IntersectionObserver' in window) {
       grid.classList.add('will-light');
+      // The count climbs when the number itself comes into view, from 0, never from its final value.
+      const counter = section.querySelector('.home-atlas__count');
+      const count = new IntersectionObserver((entries) => {
+        if (entries.some((en) => en.isIntersecting)) { count.disconnect(); this._countUp(); }
+      }, { rootMargin: '0px 0px -15% 0px' });
+      count.observe(counter);
+      this._cleanups.push(() => count.disconnect());
       const io = new IntersectionObserver((entries) => {
         entries.forEach((en) => {
           if (en.target === grid && en.isIntersecting && !grid.classList.contains('is-lit')) this._lightUp(grid);
@@ -541,12 +571,21 @@ Pages.Home = {
     this._cleanups.push(() => window.removeEventListener('scroll', onScroll));
   },
 
-  // The wall lights door by door the first time it is seen, and the count climbs with it; the
-  // doors open right now light last, with a flare.
+  // The wall lights door by door the first time it is seen; the doors open right now light last,
+  // with a flare.
   _lightUp(grid) {
     grid.classList.add('is-lit');
+    // reached without passing the number (a jump to the doors): count now
+    if (!this._counted && !this._countPending) this._countUp();
+  },
+
+  _countUp() {
     const out = document.getElementById('atlas-found');
-    const target = this._doors.size || Number(out.textContent) || 0;
+    if (!out) return;
+    // seen before the doors arrive: count once they do
+    if (!this._doors.size) { this._countPending = true; return; }
+    this._counted = true;
+    const target = this._doors.size;
     if (this._reduce() || !target) { out.textContent = target; return; }
     const t0 = performance.now();
     const dur = 900;
@@ -585,7 +624,8 @@ Pages.Home = {
     }).join('');
     grid.setAttribute('aria-busy', 'false');
     const n = found.length;
-    if (grid.classList.contains('is-lit') || !grid.classList.contains('will-light')) document.getElementById('atlas-found').textContent = n;
+    if (this._countPending) { this._countPending = false; this._countUp(); }
+    else if (this._counted || !grid.classList.contains('will-light')) document.getElementById('atlas-found').textContent = n;
     document.getElementById('atlas-title').textContent = t('home.atlas.title', { n });
     const count = (f) => found.filter((j) => f(j.entrance)).length;
     const chip = (key, label, c) => `<button type="button" class="home-atlas__chip" data-filter="${key}" aria-pressed="${key === this._filter}"${key && key !== 'now' ? ` style="--lamp:var(--realm-${key})"` : ''}>${key ? '<i aria-hidden="true"></i>' : ''}<span>${esc(label)}</span><span class="num">${c}</span></button>`;
@@ -767,7 +807,10 @@ Pages.Home = {
       return `
         <div class="home-invite home-invite--back">
           ${face}
-          <div class="home-invite__text"><h2 id="home-invite-title">${esc(t('invite.welcome', { code }))}</h2></div>
+          <div class="home-invite__text">
+            <h2 id="home-invite-title">${esc(t('invite.welcome'))}</h2>
+            <ul class="home-invite__doors" id="invite-doors" aria-live="off"></ul>
+          </div>
           <div class="home-invite__actions"><a class="btn btn--primary" id="invite-space" href="#/space">${esc(t('invite.back'))}</a></div>
         </div>`;
     }

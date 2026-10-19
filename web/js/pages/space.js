@@ -70,7 +70,7 @@ Pages.Space = {
     const esc = UI.esc;
     const found = this._found();
     const formSize = window.matchMedia('(max-width: 760px)').matches ? 88 : 128;
-    const formLabel = `${code} · ${MBTI.name(code)}`;
+    const formLabel = MBTI.name(code);
     const guest = !API.isLoggedIn();
     const compose = window.Pages && Pages.Compose ? `
       <section class="space__compose" aria-labelledby="space-compose-title">
@@ -95,7 +95,7 @@ Pages.Space = {
           <header class="space__head">
             <div class="space__form" id="space-form">${reveal ? '' : Lumi.svg(code, { size: formSize, label: formLabel })}</div>
             <p class="eyebrow">${esc(t('space.eyebrow'))}</p>
-            <h1><span class="tag-code space__code">${esc(code)}</span>${esc(t('space.title', { name: MBTI.name(code) }))}</h1>
+            <h1>${esc(t('space.title', { name: MBTI.name(code, true) }))}</h1>
             <div class="space__found">
               <span class="space__meter" role="img" aria-label="${esc(t('space.foundAria', { n: found }))}"><b style="width:${Math.min(100, found)}%"></b></span>
               <span class="num">${esc(t('space.found', { n: found }))}</span>

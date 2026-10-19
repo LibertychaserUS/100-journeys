@@ -232,29 +232,35 @@ const UI = (() => {
   };
 })();
 
-/** MBTI reference data (names and traits) in both languages. */
+/** The sixteen kinds of traveller, by the four letters a visitor may know themselves by. The names
+ *  and lines are this world's own; the letters appear only where a visitor picks one. */
 const MBTI = (() => {
   const groups = { nt: ['INTJ', 'INTP', 'ENTJ', 'ENTP'], nf: ['INFJ', 'INFP', 'ENFJ', 'ENFP'], sj: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'], sp: ['ISTP', 'ISFP', 'ESTP', 'ESFP'] };
   const data = {
-    INTJ: ['建筑师', 'Architect', '策略型探索者，偏爱计划和深度。', 'A strategic explorer who loves a plan with depth.'],
-    INTP: ['逻辑学家', 'Logician', '好奇的分析者，追求知识与新奇。', 'A curious analyst chasing knowledge and novelty.'],
-    ENTJ: ['指挥官', 'Commander', '果断的领队，追求效率与目标。', 'A decisive leader who travels with a goal.'],
-    ENTP: ['辩论家', 'Debater', '爱挑战的发明家，越陌生越兴奋。', 'An inventive challenger who gets excited by the unfamiliar.'],
-    INFJ: ['提倡者', 'Advocate', '安静的理想主义者，寻求深层连接。', 'A quiet idealist looking for deep connection.'],
-    INFP: ['调停者', 'Mediator', '理想主义的旅行家，追求意义和内在体验。', 'An idealistic traveller after meaning and inner experience.'],
-    ENFJ: ['主人公', 'Protagonist', '有感染力的同行者，关注身边的人。', 'A warm companion who brings people along.'],
-    ENFP: ['竞选者', 'Campaigner', '热情的冒险家，渴望新鲜体验。', 'An enthusiastic adventurer hungry for new experiences.'],
-    ISTJ: ['物流师', 'Logistician', '务实的组织者，偏爱结构清晰的行程。', 'A practical organiser who likes a clear itinerary.'],
-    ISFJ: ['守卫者', 'Defender', '细致体贴的旅行者，注重安全和舒适。', 'A thoughtful traveller who values safety and comfort.'],
-    ESTJ: ['总经理', 'Executive', '务实的管理者，重视秩序与传统。', 'A practical manager who respects order and tradition.'],
-    ESFJ: ['执政官', 'Consul', '热心的合作者，关注和谐与关怀。', 'A caring collaborator who keeps the group happy.'],
-    ISTP: ['鉴赏家', 'Virtuoso', '冷静的实验者，擅长动手和观察。', 'A calm experimenter, good with hands and eyes.'],
-    ISFP: ['探险家', 'Adventurer', '灵活的艺术家，享受当下的感官体验。', 'A flexible artist living in the senses.'],
-    ESTP: ['企业家', 'Entrepreneur', '活力四射的实干家，活在当下。', 'An energetic doer who lives in the moment.'],
-    ESFP: ['表演者', 'Entertainer', '自在的表演者，热爱社交和乐趣。', 'A spontaneous entertainer who loves people and fun.'],
+    INTJ: ['画路线的人', 'The Route-Drawer', '出发前就把回程画好了，路上只是核对。', 'Has the way back drawn before leaving; the road only checks it.'],
+    INTP: ['拆钟表的人', 'The Clock-Opener', '看见一座钟，先想知道它里面是怎么走的。', 'Sees a clock and first wants to know how it runs inside.'],
+    ENTJ: ['走在最前面的人', 'The One Up Front', '天没亮就把大家叫起来，因为最好的光只有一刻。', 'Wakes everyone before dawn, because the best light lasts a moment.'],
+    ENTP: ['偏走岔路的人', 'The Side-Path Taker', '路牌指向东，就想看看西边有什么。', 'When the sign points east, wants to see what is to the west.'],
+    INFJ: ['守灯的人', 'The Lamp-Keeper', '记得每一个路过的人，替他们留着灯。', 'Remembers everyone who passed, and keeps a lamp lit for them.'],
+    INFP: ['写信的人', 'The Letter-Writer', '走到哪里都写信，大多没有寄出去。', 'Writes letters wherever they go; most are never sent.'],
+    ENFJ: ['回头等人的人', 'The One Who Waits', '走到一半回过头，等后面的人跟上来。', 'Turns round halfway to wait for the ones behind.'],
+    ENFP: ['追萤火的人', 'The Firefly-Chaser', '看见一点亮就跟过去，常常走得比计划远。', 'Follows any small light, and often goes further than planned.'],
+    ISTJ: ['对时刻表的人', 'The Timetable-Keeper', '车票、时间、回程，都在本子上对过两遍。', 'Tickets, times, the way back: checked twice in the notebook.'],
+    ISFJ: ['多带一件外套的人', 'The Spare-Coat Carrier', '出门前替同伴多带一件外套。', 'Packs a spare coat for whoever comes along.'],
+    ESTJ: ['守渡口的人', 'The Ferry-Keeper', '知道最后一班船几点开，也让每个人都知道。', 'Knows when the last boat leaves, and makes sure everyone does.'],
+    ESFJ: ['摆好碗筷的人', 'The Table-Setter', '到了一个地方，先让一桌人都坐下来。', 'Wherever they arrive, first gets everyone seated.'],
+    ISTP: ['修船的人', 'The Boat-Mender', '船漏了不慌，先去找工具。', 'When the boat leaks, does not panic; goes for the tools.'],
+    ISFP: ['收集颜色的人', 'The Colour-Gatherer', '记不住地名，记得那里的颜色。', 'Forgets the names of places, remembers their colours.'],
+    ESTP: ['第一个下水的人', 'The First Into the Water', '别人还在看告示牌，已经下水了。', 'Already in the water while the others read the sign.'],
+    ESFP: ['篝火边唱歌的人', 'The Fireside Singer', '篝火一点起来，第一个开口唱的就是他。', 'When the fire is lit, the first one singing.'],
   };
   const codes = Object.keys(data);
-  const name = (code) => (data[code] ? data[code][I18n.lang === 'zh' ? 0 : 1] : code);
+  // inline: inside an English sentence the article goes lower case ('Doors for the Letter-Writer')
+  const name = (code, inline = false) => {
+    if (!data[code]) return code;
+    const v = data[code][I18n.lang === 'zh' ? 0 : 1];
+    return inline && I18n.lang !== 'zh' ? v.replace(/^The /, 'the ') : v;
+  };
   const trait = (code) => (data[code] ? data[code][I18n.lang === 'zh' ? 2 : 3] : '');
   return { groups, codes, name, trait, valid: (code) => !!data[code] };
 })();
