@@ -34,6 +34,7 @@ Pages.Station = {
     main.innerHTML = `
       <div class="page station" data-hour="${esc(this._filters.hour || hour)}">
         <header class="station__hall">
+          <div class="station__art" id="station-art" aria-hidden="true"></div>
           <div class="container station__hall-inner">
             <div class="flapboard" role="img" aria-label="${esc(t('station.clockAria', { time: `${hhmm.slice(0, 2)}:${hhmm.slice(2)}`, hour: t(`entrance.time.${hour}`) }))}">
               <span class="flapboard__time">${[...hhmm].map((d, i) => `${i === 2 ? '<i class="flapboard__colon">:</i>' : ''}<span class="flap" style="--k:${i}"><span>${d}</span></span>`).join('')}</span>
@@ -67,6 +68,7 @@ Pages.Station = {
         </div>
       </div>`;
     API.track('station_enter', '', { hour });
+    this._hallArt();
     this._renderSigns(); // platforms and the order board need no data: no jump when the racks arrive
     Promise.all([Compose.fragments(), Road.vocab()])
       .then(([list, vocab]) => {
@@ -98,6 +100,31 @@ Pages.Station = {
   _teardown() {
     this._cleanup.forEach((fn) => fn());
     this._cleanup = [];
+  },
+
+  /** The empty concourse at night behind the hall's header (a phone crop on narrow screens). By
+   *  day the hall stays painted in CSS, so the photograph is only fetched in the dark theme. */
+  _hallArt() {
+    const put = () => {
+      const box = document.getElementById('station-art');
+      if (!box) return;
+      const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+      if (!dark) { box.innerHTML = ''; return; }
+      if (box.firstChild) return;
+      const src = (name) => API.mediaUrl(`generated/road/${name}`);
+      const esc = UI.esc;
+      box.innerHTML = `
+        <picture>
+          <source media="(max-width: 760px)" type="image/avif" srcset="${esc(src('station-hall-night-phone.600.avif'))} 600w, ${esc(src('station-hall-night-phone.1024.avif'))} 1024w" sizes="100vw">
+          <source media="(max-width: 760px)" srcset="${esc(src('station-hall-night-phone.jpg'))}">
+          <source type="image/avif" srcset="${esc(src('station-hall-night.960.avif'))} 960w, ${esc(src('station-hall-night.1536.avif'))} 1536w" sizes="100vw">
+          <img src="${esc(src('station-hall-night.jpg'))}" alt="" width="960" height="300" decoding="async" fetchpriority="high">
+        </picture>`;
+    };
+    put();
+    const watch = new MutationObserver(put);
+    watch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    this._cleanup.push(() => watch.disconnect());
   },
 
   _read(query) {

@@ -3,7 +3,9 @@
 Travellers rub slips from the doors they walk, piece tickets from them, hang them at the Night
 Station and by the doors they borrowed from, and light each other's tickets and the authored
 journeys. Local dev data (seeded travellers, aged accounts), Chromium 1440×900 and 390×844,
-reduced motion on for the captures.
+reduced motion on for the captures. The night hall, the realm strips on the stubs and the carved
+stone under the rubbing are the images in `web/assets/images/generated/road/`; by day the hall
+stays painted in CSS.
 
 | | Dark · 中文 | Light · English |
 |---|---|---|

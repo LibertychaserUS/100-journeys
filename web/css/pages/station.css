@@ -38,6 +38,18 @@
 }
 [data-theme="light"] .station__hall::after { opacity: .25; }
 .station__hall-inner { position: relative; z-index: 1; display: grid; justify-items: start; gap: 12px; }
+/* The night concourse sits under the hall's light: the hour still tints the room, the title side
+   stays dark enough to read, and the picture fades into the page below. */
+.station__art { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.station__art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; display: block; }
+.station__art::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(70% 120% at 50% -10%, var(--hall-glow), transparent 60%),
+    linear-gradient(90deg, rgba(5, 7, 11, .9) 0, rgba(5, 7, 11, .62) 42%, rgba(5, 7, 11, .18) 78%, rgba(5, 7, 11, .1)),
+    linear-gradient(0deg, var(--station-bg) 0, transparent 38%);
+}
+.station__art:empty { display: none; }
 .station__title { font-family: var(--font-story); font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.25rem); font-weight: 700; line-height: 1.05; letter-spacing: .04em; color: var(--color-text); }
 :lang(en) .station__title { letter-spacing: -.015em; }
 .station__lead { max-width: 30em; font-family: var(--font-story); font-size: var(--text-lg); line-height: 1.6; color: var(--color-text-2); }
@@ -152,6 +164,8 @@
 }
 @media (max-width: 760px) {
   .station__hall { padding: var(--space-6) 0 var(--space-5); }
+  .station__art img { object-position: 50% 40%; }
+  .station__art::after { background: radial-gradient(90% 80% at 50% -10%, var(--hall-glow), transparent 60%), linear-gradient(0deg, var(--station-bg) 0, rgba(5, 7, 11, .7) 45%, rgba(5, 7, 11, .45)); }
   .flap { min-width: 24px; height: 34px; font-size: 20px; }
   .flap--word { font-size: 15px; }
   .station__bar { grid-template-columns: minmax(0, 1fr) auto; }
