@@ -22,6 +22,10 @@ const Road = (() => {
   const HOURS = ['predawn', 'dawn', 'morning', 'noon', 'afternoon', 'dusk', 'blue-hour', 'night', 'midnight'];
   const SEASONS = ['spring', 'summer', 'autumn', 'winter', 'rainy', 'dry', 'polar-night', 'midnight-sun'];
   const platform = (realm) => REALMS.indexOf(realm) + 1;
+  /** The realm's sky across the top of a stub (an AVIF strip; the CSS gradient shows until it loads). */
+  const bandArt = (realm) => (REALMS.includes(realm)
+    ? UI.picture(API.mediaUrl(`generated/road/realm-band-${realm}.jpg`), { sizes: '(max-width: 760px) 92vw, 320px', cls: 'stub__art', width: 600, height: 130 })
+    : '');
   const realmLabel = (realm) => (realm ? t(`entrance.realm.${realm}`) : '');
 
   /** The hour bucket of the viewer's own clock. Only the bucket ever leaves the device. */
@@ -272,6 +276,7 @@ const Road = (() => {
     return `
       <article class="stub${mini ? ' stub--mini' : ''}" data-code="${esc(v.code)}" ${realm ? `data-realm="${esc(realm)}"` : ''}>
         <span class="stub__band" aria-hidden="true">
+          ${bandArt(realm)}
           <span class="stub__platform num">${realm ? esc(t('station.platform.no', { n: platform(realm) })) : ''}</span>
           <span class="stub__realm">${esc(realmLabel(realm))}</span>
         </span>
@@ -313,7 +318,7 @@ const Road = (() => {
           <div class="ticket-open__card">
             <div class="ticket-open__face ticket-open__front" aria-hidden="true">
               <div class="stub stub--static" data-realm="${esc(v.realm || '')}">
-                <span class="stub__band"><span class="stub__platform num">${v.realm ? esc(t('station.platform.no', { n: platform(v.realm) })) : ''}</span><span class="stub__realm">${esc(realmLabel(v.realm))}</span></span>
+                <span class="stub__band">${bandArt(v.realm)}<span class="stub__platform num">${v.realm ? esc(t('station.platform.no', { n: platform(v.realm) })) : ''}</span><span class="stub__realm">${esc(realmLabel(v.realm))}</span></span>
                 <span class="stub__body"><span class="stub__title">${s.title}</span>${s.story ? `<span class="stub__story">${s.story}</span>` : ''}</span>
                 ${v.picks && v.picks.hour ? `<span class="stub__hole">${punch(v.picks.hour)}</span>` : ''}
               </div>

@@ -49,6 +49,7 @@ const Rubbing = (() => {
           ${already ? '' : `<p class="sr-only" id="rub-lead">${esc(t(motion() ? 'rub.lead' : 'rub.leadHold'))}</p>`}
           <div class="rubbing__stone" data-realm="${esc(journey.entrance.realm)}">
             <div class="rubbing__relief">
+              ${UI.picture(API.mediaUrl('generated/road/rubbing-stone.jpg'), { sizes: '480px', cls: 'rubbing__texture', width: 960, height: 360 })}
               <p class="rubbing__no num"><span>№</span>${no}</p>
               <p class="rubbing__line">${esc(journey.content.role)}</p>
               <ul class="rubbing__slips">
