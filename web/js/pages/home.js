@@ -1024,13 +1024,16 @@ Pages.Home = {
       const update = () => {
         queued = false;
         const span = Math.max(1, th.offsetHeight - window.innerHeight);
-        const p = ease(-th.getBoundingClientRect().top / span);
+        const rect = th.getBoundingClientRect();
+        const p = ease(-rect.top / span);
+        // once the stage starts to leave, the last line goes before it rises to the bar
+        const leaving = ease((window.innerHeight - rect.bottom) / (window.innerHeight * 0.3));
         th.style.setProperty('--p', p.toFixed(3));
         beats.forEach((b, i) => {
           const a = i / 3;
           const z = (i + 1) / 3;
           const fadeIn = i === 0 ? 1 : ease((p - a) / 0.08);
-          const fadeOut = i === beats.length - 1 ? 1 : ease((z - p) / 0.08);
+          const fadeOut = i === beats.length - 1 ? 1 - leaving : ease((z - p) / 0.08);
           b.style.setProperty('--o', Math.min(fadeIn, fadeOut).toFixed(3));
         });
       };

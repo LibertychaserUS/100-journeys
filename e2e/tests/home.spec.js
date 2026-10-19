@@ -58,6 +58,32 @@ test.describe('Home Page', () => {
     }
   });
 
+  // E2E-HOME-011: scrolling from the opening through the threshold, no visible words pass under the
+  // bar while it is still clear
+  test('nothing visible slides under a clear bar', async ({ page }) => {
+    await page.waitForTimeout(2000); // the opening has arrived
+    const end = await page.evaluate(() => { const th = document.getElementById('home-threshold'); return th.offsetTop + th.offsetHeight; });
+    const bad = [];
+    for (let y = 0; y < end; y += 40) {
+      await page.evaluate((v) => window.scrollTo(0, v), y);
+      await page.waitForTimeout(50);
+      const hit = await page.evaluate(() => {
+        const scrim = parseFloat(getComputedStyle(document.body).getPropertyValue('--nav-scrim') || '0');
+        if ('scrolled' in document.body.dataset || scrim >= 0.9) return null;
+        const bar = document.getElementById('main-nav').getBoundingClientRect().bottom;
+        for (const el of document.querySelectorAll('.home-hero__copy, .home-hero__actions, .home-hero__foot, .home-threshold__beat')) {
+          const b = el.getBoundingClientRect();
+          let o = 1;
+          for (let e = el; e && e !== document.body; e = e.parentElement) o *= parseFloat(getComputedStyle(e).opacity);
+          if (b.top < bar && b.bottom > 0 && o > 0.05) return `${el.className.split(' ')[0]} at opacity ${o.toFixed(2)}`;
+        }
+        return null;
+      });
+      if (hit) bad.push(`${y}px: ${hit}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
   // E2E-HOME-009: the example in the search box finds several doors, in both languages
   test('the search example finds doors', async ({ page, browser }) => {
     const example = async (p) => /[「“]([^」”]+)[」”]/.exec(await p.locator('#atlas-q').getAttribute('placeholder'))[1];
