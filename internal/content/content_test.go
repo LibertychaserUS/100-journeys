@@ -281,7 +281,7 @@ func TestImages_HaveDerivatives(t *testing.T) {
 		case strings.HasPrefix(rel, "road/realm-band-"):
 			return []int{600, 1200}
 		case base == "hero-taoyuan.jpg":
-			return []int{960, 1600}
+			return []int{960, 1600, 1900}
 		}
 		return nil
 	}

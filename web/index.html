@@ -28,7 +28,7 @@
         var hp = document.createElement('link');
         hp.rel = 'preload'; hp.as = 'image'; hp.type = 'image/avif'; hp.setAttribute('fetchpriority', 'high');
         hp.href = '/static/assets/images/generated/hero-taoyuan.1600.avif';
-        hp.setAttribute('imagesrcset', '/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w');
+        hp.setAttribute('imagesrcset', '/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w, /static/assets/images/generated/hero-taoyuan.1900.avif 1900w');
         hp.setAttribute('imagesizes', 'max(100vw, 177.8svh)');
         document.head.appendChild(hp);
         // The static opening below shows at once, in the reader's language, until the app takes over.
@@ -53,7 +53,7 @@
           if (!src) return;
           var l = document.createElement('link');
           l.rel = 'preload'; l.as = 'image'; l.setAttribute('fetchpriority', 'high');
-          var m = /\/generated\/[^/]+\/cover\.jpg$/.test(src) ? [480, 720, 1120] : /\/generated\/card-[^/]+\.jpg$/.test(src) ? [480, 720] : /\/generated\/[^/]+\/hero\.jpg$/.test(src) ? [960, 1600] : null;
+          var m = /\/generated\/[^/]+\/cover\.jpg$/.test(src) ? [480, 720, 1120] : /\/generated\/card-[^/]+\.jpg$/.test(src) ? [480, 720] : /\/generated\/[^/]+\/hero\.jpg$/.test(src) ? [960, 1536] : null;
           if (m) {
             // A typed preload is skipped by browsers that can't decode AVIF (they use the JPEG).
             l.type = 'image/avif';
@@ -108,7 +108,7 @@
     <main id="main-content" tabindex="-1">
       <section class="home-hero scene-taoyuan is-booting boot-shell" style="--boot-t:0ms" aria-hidden="true">
         <div class="home-hero__slides">
-          <picture><source type="image/avif" srcset="/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w" sizes="max(100vw, 177.8svh)"><img class="home-hero__img is-active" src="/static/assets/images/generated/hero-taoyuan.jpg" alt="" fetchpriority="high" decoding="async"></picture>
+          <picture><source type="image/avif" srcset="/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w, /static/assets/images/generated/hero-taoyuan.1900.avif 1900w" sizes="max(100vw, 177.8svh)"><img class="home-hero__img is-active" src="/static/assets/images/generated/hero-taoyuan.jpg" alt="" fetchpriority="high" decoding="async"></picture>
         </div>
         <div class="home-hero__shade"></div>
         <div class="container home-hero__content">

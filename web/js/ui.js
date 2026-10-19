@@ -69,7 +69,7 @@ const UI = (() => {
     [/\/generated\/road\/station-hall-(night|dawn)-phone\.jpg$/, [600, 1024]],
     [/\/generated\/road\/realm-band-[a-z-]+\.jpg$/, [600, 1200]],
     [/\/generated\/road\/rubbing-stone\.jpg$/, [960, 1536]],
-    [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600]],
+    [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600, 1900]],
   ];
   function picture(src, { sizes = '100vw', alt = '', cls = '', eager = false, width, height, attrs = '' } = {}) {
     const rule = DERIVED.find(([re]) => re.test(String(src || '')));

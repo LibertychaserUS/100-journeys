@@ -30,10 +30,11 @@ WIDTHS = {
     'scene-3': [600, 960],
     'fork': [600, 1024],
     'ending': [600],
-    'home': [960, 1600],
+    'home': [960, 1600, 1900],  # 1900: the full master, for large and dense screens
 }
 AVIF_Q = 52
 AVIF_Q_LARGE = 46  # 1000px and wider: the openings, where bytes matter most for LCP
+AVIF_Q_XL = 54  # 1800px and wider: only large or dense screens load these, and fine detail shows there
 
 
 def kind_of(name):
@@ -52,7 +53,8 @@ def save(img, path_base, width):
     h = round(img.height * w / img.width)
     out = img if w == img.width else img.resize((w, h), Image.LANCZOS)
     # (scene slots keep a small JPEG fallback; their large AVIFs come from the originals via ingest.py)
-    out.save(f'{path_base}.{width}.avif', 'AVIF', quality=AVIF_Q_LARGE if width >= 1000 else AVIF_Q)
+    q = AVIF_Q_XL if width >= 1800 else AVIF_Q_LARGE if width >= 1000 else AVIF_Q
+    out.save(f'{path_base}.{width}.avif', 'AVIF', quality=q)
 
 
 def match_grade(master, graded):
