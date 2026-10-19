@@ -225,6 +225,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-LUMI-001..002` | `e2e/tests/space.spec.js` | 16 张类型牌各带灯灵形态；选定类型后小旅凝聚成该形态（空间头部、向导窗口同步）；减少动态效果时直接出现 | 通过 |
 | `E2E-ADMIN-FUNNEL-001` | `e2e/tests/space.spec.js` | 后台漏斗面板六个步骤、访客数与比例 | 通过 |
 | `E2E-MOBILE-005` | `e2e/tests/mobile.spec.js` | 手机两次点击进入空间，无横向滚动，抽屉菜单有“我的空间” | 通过 |
+| `E2E-MOBILE-006` | `e2e/tests/mobile.spec.js` | 手机上点一扇门在底部面板里预览；面板开着时点另一扇门，面板换成那扇门，不跳转；同一扇门再点一次才进门 | 通过 |
 | `E2E-SCENES-001..002` | `e2e/tests/detail.spec.js` | 详情页按旅程自己的美术数据挂载标志动作、质感、节拍，向下滚动光线弧变化，场景里没有导游式标签；减少动态效果时所有场景立即可读 | 通过 |
 | `E2E-SEO-001` | `e2e/tests/detail.spec.js` | robots.txt 有效并指向 sitemap，sitemap 列出每段旅程的分享页 | 通过 |
 | `E2E-SHARE-001` | `e2e/tests/detail.spec.js` | /j/:slug 带该旅程的分享标签且只有一组，打开后进入旅程详情，页面标题为旅程名 | 通过 |

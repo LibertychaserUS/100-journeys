@@ -29,6 +29,15 @@ const UI = (() => {
     pin: '<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
   };
 
+  /** The brand mark: the mountain with a lit doorway and the path in. It takes the text colour, so
+   *  it reads over the night photograph, on paper and on the night page alike. */
+  function mark(size = 28) {
+    return `<svg class="brand-mark" viewBox="0 0 32 32" width="${size}" height="${size}" aria-hidden="true" focusable="false">`
+      + '<path fill="currentColor" fill-rule="evenodd" d="M1.5 28.5 L8.6 15.2 C9.6 13.4 10.8 13.6 11.6 15.4 L12.3 16.8 L14.1 9.6 C14.9 6.4 15.6 4.6 16.8 4.6 C18 4.6 18.8 6.6 19.7 9.8 L22.6 19.6 C23.5 17.9 24.9 17.9 25.9 19.8 L30.5 28.5 Z M13.3 28.5 V21.2 A3.5 3.5 0 0 1 20.3 21.2 V28.5 Z"/>'
+      + '<path fill="#f2c46d" d="M16.8 18.9 c1.1 1.3 1.7 2.4 1.7 3.4 a1.7 1.7 0 0 1 -3.4 0 c0 -1 .6 -2.1 1.7 -3.4 z"/>'
+      + '<path fill="none" stroke="#f2c46d" stroke-width="1.3" stroke-linecap="round" d="M8.5 31.4 C11.8 31.2 14 30.3 16.8 28.7"/></svg>';
+  }
+
   function icon(name, cls = '') {
     return `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${ICONS[name] || ''}</svg>`;
   }
@@ -227,7 +236,7 @@ const UI = (() => {
   }
 
   return {
-    icon, esc, fantasyTypes, fantasyLabel, tagLabel, region, topMbti, coins, meter, titleParts, titleHTML,
+    icon, mark, esc, fantasyTypes, fantasyLabel, tagLabel, region, topMbti, coins, meter, titleParts, titleHTML,
     journeyCard, skeletonCards, trackCardClicks, toast, sheet, setMeta, picture,
   };
 })();

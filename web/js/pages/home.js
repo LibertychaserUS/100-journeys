@@ -507,7 +507,8 @@ Pages.Home = {
       if (!a) return;
       const no = Number(a.dataset.no);
       if (pointer === 'touch' || coarse) {
-        if (this._selected !== no || !this._peek) {
+        // (the tap's focus has already selected the door, so ask what the sheet is showing)
+        if (!this._peek || this._peekNo !== no) {
           e.preventDefault();
           this._select(no, { pin: true, peek: true });
         }
@@ -538,6 +539,27 @@ Pages.Home = {
       if (b) this._filterDoors(b.dataset.filter);
     });
     section.querySelector('#atlas-peek-close').addEventListener('click', () => this._closePeek());
+    // The sheet follows a finger down and lets go past a short pull or a quick flick.
+    const panel = section.querySelector('#atlas-panel');
+    let drag = null;
+    panel.addEventListener('touchstart', (e) => {
+      if (!this._peek || e.touches.length !== 1) return;
+      drag = { y: e.touches[0].clientY, t: performance.now(), dy: 0 };
+      panel.style.transition = 'none';
+    }, { passive: true });
+    panel.addEventListener('touchmove', (e) => {
+      if (!drag) return;
+      drag.dy = Math.max(0, e.touches[0].clientY - drag.y);
+      panel.style.transform = `translate3d(0, ${drag.dy}px, 0)`;
+    }, { passive: true });
+    panel.addEventListener('touchend', () => {
+      if (!drag) return;
+      const speed = drag.dy / Math.max(1, performance.now() - drag.t);
+      panel.style.transition = '';
+      panel.style.transform = '';
+      if (drag.dy > 64 || speed > 0.6) this._closePeek();
+      drag = null;
+    });
     section.querySelector('#door-card').addEventListener('click', () => this._closePeek());
     if ('IntersectionObserver' in window) {
       grid.classList.add('will-light');
@@ -729,11 +751,13 @@ Pages.Home = {
     const panel = document.getElementById('atlas-panel');
     if (!panel || !window.matchMedia('(max-width: 960px)').matches) return;
     this._peek = true;
+    this._peekNo = this._selected;
     panel.classList.add('is-peek');
   },
 
   _closePeek() {
     this._peek = false;
+    this._peekNo = 0;
     const panel = document.getElementById('atlas-panel');
     if (panel) panel.classList.remove('is-peek');
   },

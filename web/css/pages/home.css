@@ -167,10 +167,17 @@
     transform: translate3d(0, calc(100% + 32px), 0); visibility: hidden; transition: transform .28s var(--ease-out), visibility 0s linear .28s;
   }
   .home-atlas__panel.is-peek { transform: none; visibility: visible; transition: transform .28s var(--ease-out); }
+  /* a handle to pull it down by, and a soft shade above it so it reads as a layer (taps still reach
+     the doors, so another door simply takes its place) */
+  .home-atlas__panel { padding-top: 22px; touch-action: pan-x; }
+  .home-atlas__panel::before { content: ""; position: absolute; top: 8px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--color-line-strong); }
+  .home-atlas__panel.is-peek::after { content: ""; position: absolute; left: -12px; right: -12px; bottom: calc(100% - 1px); height: 30vh; background: linear-gradient(to top, rgba(5, 6, 8, .32), rgba(5, 6, 8, 0)); pointer-events: none; }
   .home-atlas__peek-close { display: grid; place-items: center; position: absolute; top: 8px; right: 8px; z-index: 1; width: 36px; height: 36px; border-radius: 50%; color: var(--color-text-2); }
   .door-card { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: start; padding-right: 32px; }
   .door-card__media { border-radius: 10px; box-shadow: none; }
-  .door-card__hook, .door-card__opens { display: none; }
+  .door-card__hook { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: var(--text-sm); line-height: 1.5; }
+  .door-card__opens { display: block; font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .door-card__opens b { display: inline; margin-right: 6px; }
   .door-card__title { font-size: var(--text-lg); }
   .door-card__go { display: inline-flex; min-height: 40px; padding: 0 16px; border-radius: 999px; background: #f2c46d; color: #1d1405; text-decoration: none; font-weight: var(--weight-semibold); }
 }
