@@ -79,7 +79,7 @@
 .home-atlas__grid.is-near .door__arch { background-image: var(--thumb); }
 .door__link::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(5, 6, 8, .72)); }
 .door__no { position: absolute; top: 18%; left: 0; right: 0; z-index: 1; text-align: center; font-size: .6875rem; letter-spacing: .06em; color: rgba(255, 255, 255, .78); }
-.door__word { position: absolute; left: 4px; right: 4px; bottom: 9px; z-index: 1; text-align: center; font-family: var(--font-story); font-size: clamp(.6875rem, .78vw, .8125rem); line-height: 1.25; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); word-break: keep-all; overflow-wrap: anywhere; }
+.door__word { position: absolute; left: 4px; right: 4px; bottom: 9px; z-index: 1; text-align: center; font-family: var(--font-ui); font-weight: 500; font-size: clamp(.6875rem, .78vw, .8125rem); line-height: 1.25; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); word-break: keep-all; overflow-wrap: anywhere; }
 .door[data-open="true"] .door__link { box-shadow: inset 0 0 0 1.5px var(--lamp-open), inset 0 -22px 30px -14px color-mix(in oklab, var(--lamp-open) 70%, transparent), 0 0 22px -6px color-mix(in oklab, var(--lamp-open) 70%, transparent); }
 .door[data-open="true"] .door__arch { filter: none; mix-blend-mode: normal; opacity: .9; }
 .door.is-found:hover .door__link, .door.is-selected .door__link { transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--lamp), 0 16px 30px -18px rgba(0, 0, 0, .8); }

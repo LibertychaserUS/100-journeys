@@ -153,6 +153,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `UT-CONTENT-IMG-001` | 响应式图片 | generated 下每张封面、场景图 | AVIF 各宽度齐全 |
 | `UT-WEB-005` | 资源打包 | index.html 列出的 CSS/JS | 合并成一个样式表和一个脚本，顺序不变，gzip 一致，拒绝 css/ js/ 之外的路径 |
 | `UT-WEB-006` | 分享页预加载 | 生成封面 vs 无衍生图的图片 | 生成封面带 AVIF 类型预加载，其他不加 |
+| `UT-WEB-007` | 故事字体 | web/css/fonts.css 与 web/assets/fonts | 每个字体面指向存在的文件、按 unicode-range 切片、font-display: swap；没有未被引用的字体文件；两份 OFL 许可证在；首页预加载的文件存在 |
 | `UT-WEB-004` | 分享页 | /j/:slug 的 Open Graph 标签 | 标题、描述替换并转义，默认分享标签移除，只剩一组 |
 | `UT-ANALYTICS-002` | 漏斗事件类型 | 每个漏斗步骤都是已登记事件，未知类型被丢弃 | 后台漏斗不会因为事件被拒而缺步 |
 | `UT-REPO-MIGRATE-001` | `Migrate` | 旧库的 analytics_events CHECK 只有 5 种类型 | 重建表后接受新类型，旧数据与 4 个索引保留，再次迁移不变 |
@@ -214,6 +215,8 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-HOME-006` | `e2e/tests/home.spec.js` | 门墙：找到的门链接到旅程，其余收进「雾里」一行；指针停在门上时卡片换成这扇门（名称、地点、当地时间）；境界筛选只亮该境界；方向键在门之间移动、整面墙只占一个 Tab；开场在序幕后加 3 扇门、有暂停键和访客时间 | 通过 |
 | `E2E-HOME-007` | `e2e/tests/home.spec.js` | 「跳到正文」把焦点移到正文，路由不变、不出现 404 | 通过 |
 | `E2E-HOME-008` | `e2e/tests/home.spec.js` | 滚过开场后导航变成实底；进门再返回，回到原来的滚动位置并选中原来那扇门 | 通过 |
+| `E2E-FONT-001` | `e2e/tests/fonts.spec.js` | 中文首页和旅程页的故事文字用自带的宋体切片，没有加载失败的字体文件 | 通过 |
+| `E2E-FONT-002` | `e2e/tests/fonts.spec.js` | 英文页面加载 Newsreader 的 400 和 700 两档，没有失败 | 通过 |
 | `E2E-EXPLORE-001..008` | `e2e/tests/explore.spec.js` | 首屏卡片数 = min(API total, 每页 12)；幻想类型筛选后结果数与 API 一致（旧版停在骨架屏）；搜索框可点击、输入时保持焦点（旧版被导航遮住）；筛选面板组合与移除；空状态清除；卡片跳转；从导航重新进入不残留筛选；带参链接还原 | 通过 |
 | `E2E-SPACE-001..005` | `e2e/tests/space.spec.js` | 首页邀请 → 类型牌 → 你的空间；小旅六步对话（刷新后续上、上一步）→ 揭晓 → 空间；“不确定”转交小旅、空空间不断路；访客类型与岔路选择注册后并入账户；英文全程 | 通过 |
 | `E2E-LUMI-001..002` | `e2e/tests/space.spec.js` | 16 张类型牌各带灯灵形态；选定类型后小旅凝聚成该形态（空间头部、向导窗口同步）；减少动态效果时直接出现 | 通过 |
