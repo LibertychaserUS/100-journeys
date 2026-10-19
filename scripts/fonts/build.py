@@ -66,14 +66,18 @@ def ranges(chars):
 
 
 def page_usage(entrance_names):
-    """{page: {weight: set(chars)}} from usage.json. The home page shows a different door in its
-    card on every hover, so it is widened to every door's name at the title weight."""
+    """{page: {weight: set(chars)}} from usage.json. The home page changes with the hour (the doors
+    in its opening, the next door to open and when) and with every door hovered, so it is widened to
+    every door's name and every way of saying when a door opens, at both weights."""
     raw = json.load(open(USAGE, encoding='utf-8'))
     pages = {key: {w: set(v.get(str(w), '')) for w in WEIGHTS} for key, v in raw.items()}
+    i18n = open(os.path.join(ROOT, 'web', 'js', 'i18n.js'), encoding='utf-8').read()
+    when = ''.join(re.findall(r"'home\.(?:door\.(?:open|in|inMin|month)|close\.next)': '([^']*)'", i18n))
     for key in pages:
         lang, route = key.split(' ', 1)
         if route == '#/':
-            pages[key][700] |= set(''.join(entrance_names[lang]))
+            for w in WEIGHTS:
+                pages[key][w] |= set(''.join(entrance_names[lang]) + when + '0123456789')
     return pages
 
 

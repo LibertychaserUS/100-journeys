@@ -31,15 +31,21 @@ the font's copyright and licence records, and the licence texts ship next to the
 
 | Page | Chinese | English |
 |---|---|---|
-| Home | about 56 KB (8 files) | 28–41 KB |
-| Explore, About, Find | 31–41 KB | 28 KB |
-| Compose | about 95 KB | 28 KB |
-| A journey | 110–140 KB | 28 KB |
-| Night Station | about 116 KB | 28 KB |
+| Home | 71–82 KB (9–11 files) | 28 KB |
+| Explore, About, Find | 40–49 KB | 28 KB |
+| Compose | about 98 KB | 28 KB |
+| A journey | 127–142 KB | 28 KB |
+| Night Station | about 120 KB | 28 KB |
+
+The home page shows different doors at different hours, and a door's card on hover. Its slices are
+built to hold every door's name and every way of saying when a door opens, at both weights, so the
+hour never pulls in a large slice. The range above was measured at nine times across the day and the
+year, with four doors hovered. English pages load only the two Latin files. The page's language is set
+before the first paint, so the static opening never borrows the Chinese font for English text.
 
 Fonts are cached across pages, so a journey opened from the home page reuses what the home page loaded.
 
-Budget: home at most 80 KB, any page at most 160 KB, no render-blocking font, and no layout shift
+Budget: home at most 90 KB, any page at most 160 KB, no render-blocking font, and no layout shift
 from a font swap.
 
 ## Rebuilding

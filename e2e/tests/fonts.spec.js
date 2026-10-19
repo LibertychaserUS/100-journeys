@@ -30,16 +30,22 @@ test.describe('Story fonts', () => {
     expect(failed).toEqual([]);
   });
 
-  // E2E-FONT-002: English pages use the Latin serif in both weights
+  // E2E-FONT-002: English pages use the Latin serif in both weights, and never fetch the Chinese slices
   test('english story text uses the latin serif', async ({ browser }) => {
     const context = await browser.newContext({ locale: 'en-US' });
     const page = await context.newPage();
     const failed = await watchFonts(page);
+    const fetched = [];
+    page.on('request', (req) => { if (req.url().endsWith('.woff2')) fetched.push(req.url().split('/').pop()); });
+    await page.goto('/#/');
+    await expect(page.locator('#hero-title')).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
     await page.goto('/#/journey/antarctica-port-lockroy');
     await expect(page.locator('.detail-hero__title')).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     const faces = await page.evaluate(() => [...document.fonts].filter((f) => f.family === 'Story Serif Latin' && f.status === 'loaded').map((f) => f.weight).sort());
     expect(faces).toEqual(['400', '700']);
+    expect(fetched.filter((f) => !f.startsWith('story-serif-latin-'))).toEqual([]);
     expect(failed).toEqual([]);
     await context.close();
   });
