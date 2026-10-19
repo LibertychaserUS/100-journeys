@@ -30,6 +30,7 @@
 .site-footer { border-top: 1px solid var(--color-line); padding-block: var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom, 0px)); color: var(--color-text-3); font-size: var(--text-sm); }
 .site-footer .container { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
 .site-footer nav { display: flex; gap: var(--space-5); flex-wrap: wrap; }
+.site-footer nav a { display: inline-block; padding-block: 12px; margin-block: -12px; } /* a finger-sized target without moving the line */
 .site-footer__line { flex: 1 1 100%; display: flex; align-items: baseline; gap: var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-5); margin-bottom: var(--space-2); border-bottom: 1px solid var(--color-line); }
 .site-footer__line span { font-family: var(--font-story); font-size: clamp(1.25rem, 2.6vw, 1.75rem); color: var(--color-text-2); }
 .site-footer__line small { font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-text-3); }

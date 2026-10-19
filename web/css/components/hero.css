@@ -116,6 +116,7 @@
 .home-hero__now:hover span { border-color: currentColor; }
 @media (prefers-reduced-motion: no-preference) { .home-hero__now time i { animation: hero-colon 2s steps(1, end) infinite; } }
 @keyframes hero-colon { 50% { opacity: .25; } }
+.home-hero.is-stopped .home-hero__now time i { animation: none; }
 .home-hero :focus-visible { outline-color: #f2c46d; }
 
 /* The prologue's traveller stands just right of centre. On wide screens show more of the picture's

@@ -227,7 +227,7 @@ Pages.Home = {
             <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() && !this._swap ? 0 : doors}</b><span>/ 100</span></p>
             <div class="home-atlas__intro">
               <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title', { n: doors }))}</h2>
-              <p class="home-atlas__legend"><i aria-hidden="true"></i>${esc(t('home.atlas.legend'))}</p>
+              <p class="home-atlas__legend"><i aria-hidden="true"></i><span id="atlas-legend">${esc(t('home.atlas.legend'))}</span></p>
             </div>
             <form class="home-atlas__search" id="atlas-search" role="search">
               ${UI.icon('search', 'icon--sm')}
@@ -247,7 +247,7 @@ Pages.Home = {
             </div>
             <div class="home-atlas__panel" id="atlas-panel" role="region" aria-label="${esc(t('home.atlas.panelLabel'))}">
               <button type="button" class="home-atlas__peek-close" id="atlas-peek-close" aria-label="${esc(t('home.atlas.close'))}">${UI.icon('close', 'icon--sm')}</button>
-              <a class="door-card" id="door-card" href="#/explore">
+              <a class="door-card" id="door-card" href="#/explore" tabindex="-1">
                 <span class="door-card__media" id="door-media"></span>
                 <span class="door-card__body" id="door-body"></span>
               </a>
@@ -401,6 +401,8 @@ Pages.Home = {
     });
     const nowChip = document.querySelector('#atlas-filters [data-filter="now"] .num');
     if (nowChip) nowChip.textContent = open;
+    const legend = document.getElementById('atlas-legend');
+    if (legend) legend.textContent = t(open ? 'home.atlas.legendN' : 'home.atlas.legendNone', { n: open });
     if (this._selected) this._renderDoorBody(this._doors.get(this._selected));
     this._renderClose(journeys);
     this._renderInviteDoors(journeys);
@@ -444,6 +446,9 @@ Pages.Home = {
       pause.setAttribute('aria-label', t(this._userPaused ? 'home.scenes.play' : 'home.scenes.pause'));
       pause.innerHTML = UI.icon(this._userPaused ? 'play' : 'pause', 'icon--sm');
       hero.classList.toggle('is-held', this._userPaused);
+      // pausing stops everything that moves on its own: the scenes, the drifting light, the clock
+      hero.classList.toggle('is-stopped', this._userPaused);
+      if (this._particles) this._particles[this._userPaused || this._offscreen ? 'pause' : 'resume']();
       this._schedule(hero);
     });
     // Only the copy and its controls hold the scene (reading, aiming at a dot), not the photo.
@@ -474,7 +479,7 @@ Pages.Home = {
       io = new IntersectionObserver(([en]) => {
         this._offscreen = en.intersectionRatio < 0.3;
         hero.classList.toggle('is-offscreen', this._offscreen);
-        if (this._particles) this._particles[this._offscreen ? 'pause' : 'resume']();
+        if (this._particles) this._particles[this._offscreen || this._userPaused ? 'pause' : 'resume']();
         this._schedule(hero);
       }, { threshold: [0, 0.3, 0.6] });
       io.observe(hero);
@@ -621,11 +626,22 @@ Pages.Home = {
         else this._select(Number(a.dataset.no));
       }, 120);
     };
+    const warmed = new Set();
     grid.addEventListener('pointerover', (e) => {
       const a = doorOf(e.target);
       if (!a || e.pointerType !== 'mouse') return;
       over = a;
       rest(a);
+      // start its picture now, so it is ready when the pointer comes to rest
+      const no = Number(a.dataset.no);
+      const j = this._doors.get(no);
+      if (j && !warmed.has(no)) {
+        warmed.add(no);
+        const warm = document.createElement('div'); // detached, but its picture loads
+        warm.innerHTML = UI.picture(j.image_url, { sizes: '(max-width: 960px) 40vw, 320px', width: 720, height: 900 });
+        const img = warm.querySelector('img');
+        if (img && img.decode) { img.loading = 'eager'; img.decode().catch(() => {}); }
+      }
     });
     grid.addEventListener('pointerleave', (e) => {
       if (e.pointerType !== 'mouse') return;
@@ -673,6 +689,9 @@ Pages.Home = {
       e.preventDefault();
       this._rove(next);
       next.focus();
+    });
+    section.querySelector('#atlas-filters').addEventListener('focusin', (e) => {
+      if (e.target.matches('button')) e.target.scrollIntoView({ inline: 'nearest', block: 'nearest' });
     });
     section.querySelector('#atlas-filters').addEventListener('click', (e) => {
       const b = e.target.closest('[data-filter]');
@@ -790,7 +809,8 @@ Pages.Home = {
       const no = String(e.no).padStart(3, '0');
       const s = DoorClock.state(e, now);
       const [name, place] = UI.titleParts(j.title);
-      const label = `No.${no} ${t(`entrance.realm.${e.realm}`)} · ${name}${place ? ` · ${place}` : ''}${s.open ? ` · ${t('home.door.open')}` : ''}`;
+      // the spoken name starts with what the tile shows (number, then name)
+      const label = `${no} ${name} · ${t(`entrance.realm.${e.realm}`)}${place ? ` · ${place}` : ''}${s.open ? ` · ${t('home.door.open')}` : ''}`;
       return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${s.open}">
         <a class="door__link" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-no="${e.no}" data-quiet data-vt-self tabindex="-1" aria-label="${esc(label)}">
           <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>
@@ -855,15 +875,15 @@ Pages.Home = {
     card.href = `#/journey/${encodeURIComponent(j.slug)}`;
     card.dataset.slug = j.slug;
     card.style.setProperty('--lamp', `var(--realm-${j.entrance.realm})`);
-    this._swapImage(j, quiet);
-    this._renderDoorBody(j);
+    // the words change with their picture, not before it
+    this._swapImage(j, quiet, () => this._renderDoorBody(j));
   },
 
   // Double-buffered: the next cover loads off screen and cross-fades in over a blurred thumbnail,
   // so a grey slab never shows between doors.
-  _swapImage(j, instant) {
+  _swapImage(j, instant, withImage = () => {}) {
     const media = document.getElementById('door-media');
-    if (!media) return;
+    if (!media) { withImage(); return; }
     media.style.backgroundImage = `url('${this._thumb(j)}')`;
     const holder = document.createElement('span');
     holder.className = 'door-card__layer';
@@ -871,7 +891,13 @@ Pages.Home = {
     const img = holder.querySelector('img');
     img.loading = 'eager';
     media.appendChild(holder);
+    let told = false;
+    const tell = () => { if (!told && this._selected === Number(j.entrance.no)) { told = true; withImage(); } };
+    // a slow picture never holds the words for more than a moment
+    const late = setTimeout(tell, instant ? 0 : 250);
     const show = () => {
+      clearTimeout(late);
+      tell();
       if (!holder.isConnected) return;
       holder.classList.add('is-shown');
       [...media.querySelectorAll('.door-card__layer')].filter((l) => l !== holder).forEach((l) => {
@@ -922,7 +948,12 @@ Pages.Home = {
   async _renderBehind(journeys) {
     const band = document.getElementById('home-behind');
     if (!band) return;
-    const pick = this._soonest(journeys).find(({ j }) => j.content);
+    // a door open right now if there is one (its words are what you would hear inside), else one
+    // past the five opening next
+    const list = this._soonest(journeys).filter(({ j }) => j.content);
+    const open = list.filter(({ s }) => s.open);
+    const day = Math.floor(Date.now() / 864e5);
+    const pick = open.length ? open[day % open.length] : list[5] || list[0];
     if (!pick) return;
     try {
       const { data: j } = await API.getJourney(pick.j.slug);
@@ -936,6 +967,7 @@ Pages.Home = {
           <span class="num">No.${String(j.entrance.no).padStart(3, '0')}</span><b>${UI.esc(name)}</b><span>${UI.esc(DoorClock.when(s))}</span>${UI.icon('arrow', 'icon--sm')}
         </a>`;
       band.hidden = false;
+      this._renderClose(this._journeys || []);
     } catch (e) { /* the band stays away */ }
   },
 
@@ -1003,7 +1035,9 @@ Pages.Home = {
   _renderClose(journeys) {
     const out = document.getElementById('close-next');
     if (!out) return;
-    const next = this._soonest(journeys)[0];
+    // the page ends on a door it has not shown yet (the five opening next are above it)
+    const shown = new Set([...document.querySelectorAll('#featured-grid [data-slug], #home-behind [data-slug]')].map((el) => el.dataset.slug));
+    const next = this._soonest(journeys).find(({ j }) => !shown.has(j.slug)) || this._soonest(journeys)[0];
     if (!next) { out.textContent = ''; return; }
     const { j, s } = next;
     const [name] = UI.titleParts(j.title);

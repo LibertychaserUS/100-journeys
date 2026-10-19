@@ -83,6 +83,8 @@
       try { saved = localStorage.getItem('theme'); } catch (e) {}
       var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
       document.documentElement.setAttribute('data-theme', saved === 'light' || saved === 'dark' ? saved : (prefersLight ? 'light' : 'dark'));
+      var tc = document.querySelector('meta[name="theme-color"]');
+      if (tc) tc.setAttribute('content', document.documentElement.getAttribute('data-theme') === 'light' ? '#f3f3f1' : '#0d0f13');
     })();
   </script>
 
@@ -131,7 +133,7 @@
           <div class="home-hero__copy is-in">
             <p class="home-hero__eyebrow"><span class="home-hero__line"><span lang="zh-CN">渔人出桃源时，一路做了记号。</span><span lang="en">Leaving the peach-blossom land, the fisherman marked the way.</span></span></p>
             <p class="home-hero__title"><span class="home-hero__line"><span lang="zh-CN">桃源百旅</span><span lang="en">100 Journeys</span></span></p>
-            <p class="home-hero__lead"><span class="home-hero__line"><span lang="zh-CN">一百扇门藏在真实的地方，各自只在自己的季节和时辰打开。</span><span lang="en">A hundred doors hidden in real places, each opening only in its own season and hour.</span></span></p>
+            <p class="home-hero__lead"><span class="home-hero__line"><span lang="zh-CN">一百扇门，藏在真实的地方；每一扇只在自己的季节、自己的时辰打开。</span><span lang="en">A hundred doors hidden in real places, each opening only in its own season and hour.</span></span></p>
           </div>
           <div class="home-hero__actions"><span class="btn btn--primary home-hero__step"><span lang="zh-CN">推门</span><span lang="en">Step in</span></span></div>
           <div class="home-hero__foot"></div>
