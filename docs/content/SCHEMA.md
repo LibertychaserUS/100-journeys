@@ -36,7 +36,9 @@ journeys and analytics reference it, so **never rename an existing slug** (the 1
     "seasons": ["rainy"],          // 1+ of the season vocabulary
     "time": "predawn",             // one of the time vocabulary
     "tz": "America/La_Paz",        // the place's IANA time zone
-    "months": [12, 1, 2, 3]        // the months it opens in (local calendar, 1–12)
+    "months": [12, 1, 2, 3],       // the months it opens in (local calendar, 1–12)
+    "lat": -20.13, "lon": -67.49,  // where the door is, for its sun and moon
+    "window": { "sun": "rise", "from": -30, "to": 0 }  // when it opens on those days (below)
   },
   "journey": {
     "fantasy_type": "solitude",    // extreme | solitude | visual | culture | spiritual | night
@@ -57,6 +59,27 @@ journeys and analytics reference it, so **never rename an existing slug** (the 1
   "en": { /* Text, same shape, same choice keys */ }
 }
 ```
+
+### When a door opens: `window`
+
+"Open now" is judged on the door's own clock, never the visitor's: inside its `months`, on its days,
+inside its window. A window is exactly one of:
+
+| Kind | Example | Meaning |
+|---|---|---|
+| Fixed local span | `{ "at": "19:45", "until": "20:00" }` | Local wall-clock times; `until` before `at` runs past midnight, `"24:00"` is the end of the day. |
+| Around the sun | `{ "sun": "set", "from": -30, "to": 15 }` | Minutes from that day's sunrise (`rise`), solar noon (`noon`) or sunset (`set`), worked out from `lat`/`lon`. No window on days the sun does not rise or set (polar night and day); `noon` needs the sun to be up. |
+| Dark of the moon | `{ "moon": "dark" }` | The night hours (from 80 minutes after sunset to 80 before sunrise) while the moon is below the horizon, by an approximation of moonset and moonrise from its age. |
+
+Optional on any window:
+
+- `days`: ISO weekdays it opens on, `1` (Monday) to `7` (Sunday), e.g. `[5]` for a Friday market.
+- `except`: dates it never opens, `"MM-DD"`, e.g. `["12-25"]`.
+- `moon_age`: `[min, max]` days since new moon, e.g. `[16, 20.5]` for a few nights after full.
+- `needs`: a condition the site cannot see, said next to the door's hour instead of claimed:
+  `rain`, `calm`, `low-tide`, `high-tide`, `mist`, `clear`, `cloud-sea`, `dawn-cloud`, `drift-ice`.
+
+The window follows the entrance's own `opens` line; the bucket in `time` stays for filters.
 
 ### Text (per language)
 

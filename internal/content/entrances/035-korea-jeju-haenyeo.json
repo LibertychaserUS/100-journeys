@@ -1,6 +1,6 @@
 {
   "slug": "korea-jeju-haenyeo",
-  "entrance": { "no": 35, "realm": "water-deep", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "afternoon", "tz": "Asia/Seoul", "months": [3, 4, 5] },
+  "entrance": { "no": 35, "realm": "water-deep", "pace": "day", "scale": "near", "seasons": ["spring"], "time": "afternoon", "tz": "Asia/Seoul", "months": [3, 4, 5], "lat": 33.46, "lon": 126.94, "window": { "at": "13:00", "until": "15:30" } },
   "journey": {
     "fantasy_type": "culture", "visual_style": "raw",
     "adventure_index": 3, "obscurity_level": 5, "risk_level": 1, "price": 5999,

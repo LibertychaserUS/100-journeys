@@ -1,6 +1,6 @@
 {
   "slug": "inner-mongolia-badain-jaran",
-  "entrance": { "no": 26, "realm": "sand-stars", "pace": "multi-day", "scale": "near", "seasons": ["autumn"], "time": "night", "tz": "Asia/Shanghai", "months": [9, 10, 11] },
+  "entrance": { "no": 26, "realm": "sand-stars", "pace": "multi-day", "scale": "near", "seasons": ["autumn"], "time": "night", "tz": "Asia/Shanghai", "months": [9, 10, 11], "lat": 39.8, "lon": 102.4, "window": { "sun": "set", "from": 80, "to": 300, "needs": "calm" } },
   "journey": {
     "fantasy_type": "solitude", "visual_style": "surreal",
     "adventure_index": 6, "obscurity_level": 7, "risk_level": 3, "price": 7999,

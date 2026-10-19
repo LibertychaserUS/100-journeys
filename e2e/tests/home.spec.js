@@ -40,6 +40,24 @@ test.describe('Home Page', () => {
     await expect(page.locator('.journey-card[data-slug]')).toHaveCount(Math.min(total, 12));
   });
 
+  // E2E-HOME-010: doors keep their own hours to the minute: Edinburgh's gun is lit at 13:05 on a
+  // Monday and dark on a Sunday, when the card gives the next opening in local time
+  test('a door keeps its own hours', async ({ browser }) => {
+    for (const [iso, open] of [['2026-10-19T12:05:00Z', true], ['2026-10-18T12:05:00Z', false]]) {
+      const context = await browser.newContext({ locale: 'zh-CN' });
+      const page = await context.newPage();
+      await page.clock.setFixedTime(new Date(iso));
+      await page.goto('/#/');
+      const door = page.locator('#atlas-grid .door[data-no="47"]');
+      await expect(door).toHaveAttribute('data-open', String(open));
+      await door.locator('a').focus();
+      await expect(page.locator('#door-body .door-card__clock')).toContainText('当地 13:05');
+      if (open) await expect(page.locator('#door-body .door-card__clock')).toContainText('此刻开着');
+      else await expect(page.locator('#door-body .door-card__clock')).toContainText('当地 13:00');
+      await context.close();
+    }
+  });
+
   // E2E-HOME-009: the example in the search box finds several doors, in both languages
   test('the search example finds doors', async ({ page, browser }) => {
     const example = async (p) => /[「“]([^」”]+)[」”]/.exec(await p.locator('#atlas-q').getAttribute('placeholder'))[1];

@@ -1,6 +1,6 @@
 {
   "slug": "morocco-sahara-camel-camp",
-  "entrance": { "no": 4, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["autumn", "spring"], "time": "night", "tz": "Africa/Casablanca", "months": [3, 4, 5, 9, 10, 11] },
+  "entrance": { "no": 4, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["autumn", "spring"], "time": "night", "tz": "Africa/Casablanca", "months": [3, 4, 5, 9, 10, 11], "lat": 31.15, "lon": -3.98, "window": { "sun": "set", "from": 30, "to": 240 } },
   "journey": {
     "fantasy_type": "night", "visual_style": "dramatic",
     "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 12999,

@@ -11,6 +11,9 @@
 .detail-crumbs { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: var(--text-sm); color: rgba(246, 241, 232, .78); }
 .detail-crumbs a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .detail-hero__no { font-size: var(--text-xs); letter-spacing: .2em; color: rgba(246, 241, 232, .8); }
+.detail-hero__state.is-open { color: #f6f1e8; }
+.detail-hero__state.is-open::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #f2c46d; box-shadow: 0 0 10px rgba(242, 196, 109, .6); vertical-align: 1px; }
+.detail-hero__closed { margin-top: 10px; max-width: 34em; font-size: var(--text-sm); line-height: 1.6; color: rgba(246, 241, 232, .78); }
 .detail-hero__title { margin-top: 12px; font-family: var(--font-story); font-weight: 700; font-size: clamp(2.75rem, 7.2vw, 6.5rem); line-height: 1.04; letter-spacing: -.01em; max-width: min(11em, 100%); text-wrap: balance; }
 :lang(en) .detail-hero__title { line-height: .98; max-width: min(13em, 100%); overflow-wrap: anywhere; }
 .detail-hero__title .nowrap { display: inline-block; max-width: 100%; } /* break between the parts, inside one only if it can't fit */

@@ -7,53 +7,154 @@
  */
 var Pages = window.Pages || {};
 
-/** Each door's local time and whether it is open now, or how long until it opens. */
+/**
+ * Each door's own clock: its local time, whether it is open now, when it opens next (local time
+ * and how long from now), and what it waits on that the site cannot see. A door opens in its
+ * months, on its weekdays, never on its skipped dates, inside its window: a fixed local span, a
+ * span around its sunrise, solar noon or sunset (worked out from where it is), or the dark hours
+ * with the moon below the horizon.
+ */
 const DoorClock = (() => {
-  const WINDOWS = { midnight: [0, 3], predawn: [3, 5], dawn: [5, 7], morning: [7, 11], noon: [11, 14], afternoon: [13, 17], dusk: [17, 19], 'blue-hour': [18, 20], night: [19, 24], any: [0, 24] };
+  const BUCKETS = { midnight: [0, 180], predawn: [180, 300], dawn: [300, 420], morning: [420, 660], noon: [660, 840], afternoon: [780, 1020], dusk: [1020, 1140], 'blue-hour': [1080, 1200], night: [1140, 1440], any: [0, 1440] };
   const ALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const DAY = 1440;
   const formats = new Map();
+  const rad = Math.PI / 180;
 
-  function local(tz, now) {
+  // The door's wall clock: calendar date, weekday (ISO 1-7) and minute of the day.
+  function wall(tz, date) {
     if (!formats.has(tz)) {
       let f = null;
-      try { f = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }); } catch (e) { f = null; }
+      try { f = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', weekday: 'short', hourCycle: 'h23' }); } catch (e) { f = null; }
       formats.set(tz, f);
     }
     const f = formats.get(tz);
-    if (!f) return { month: now.getMonth() + 1, hour: now.getHours(), minute: now.getMinutes() };
+    if (!f) return { y: date.getFullYear(), m: date.getMonth() + 1, d: date.getDate(), wd: ((date.getDay() + 6) % 7) + 1, min: date.getHours() * 60 + date.getMinutes() };
     const p = {};
-    f.formatToParts(now).forEach((x) => { p[x.type] = x.value; });
-    return { month: Number(p.month), hour: Number(p.hour) % 24, minute: Number(p.minute) };
+    f.formatToParts(date).forEach((x) => { p[x.type] = x.value; });
+    const wd = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 }[p.weekday] || 1;
+    return { y: Number(p.year), m: Number(p.month), d: Number(p.day), wd, min: (Number(p.hour) % 24) * 60 + Number(p.minute) };
   }
 
-  /** { open, hh, mm, minutes (until it opens, same month), month (next month it opens) } */
+  // Minutes the door's clock runs ahead of UTC at a given instant.
+  function offset(tz, date) {
+    const w = wall(tz, date);
+    const asUTC = Date.UTC(w.y, w.m - 1, w.d, Math.floor(w.min / 60), w.min % 60);
+    return Math.round((asUTC - Math.floor(date.getTime() / 60000) * 60000) / 60000);
+  }
+
+  // Sunrise, solar noon and sunset, in minutes after 00:00 UTC of that date (NOAA's approximation,
+  // good to a minute or two). rise/set are null when the sun stays down (or up) all day.
+  function sun(lat, lon, y, m, d) {
+    const n = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 0)) / 864e5);
+    const g = (2 * Math.PI / 365) * (n - 1);
+    const eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+    const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+    const noon = 720 - 4 * lon - eq;
+    const c = Math.cos(90.833 * rad) / (Math.cos(lat * rad) * Math.cos(decl)) - Math.tan(lat * rad) * Math.tan(decl);
+    if (c > 1) return { noon, rise: null, set: null, up: false };
+    if (c < -1) return { noon, rise: null, set: null, up: true };
+    const ha = Math.acos(c) / rad;
+    return { noon, rise: noon - 4 * ha, set: noon + 4 * ha, up: true };
+  }
+
+  // Days since the last new moon at an instant.
+  const SYNODIC = 29.530588853;
+  const moonAge = (ms) => (((ms - Date.UTC(2000, 0, 6, 18, 14)) / 864e5) % SYNODIC + SYNODIC) % SYNODIC;
+
+  const hm = (x) => { const [h, m] = x.split(':').map(Number); return h * 60 + m; };
+
+  // The door's open spans on one of its days, in minutes from that day's local midnight.
+  function spans(e, y, m, d, off) {
+    const w = e.window;
+    if (!w) { const b = BUCKETS[e.time] || BUCKETS.any; return [b]; }
+    if (w.at) { const a = hm(w.at); let u = hm(w.until); if (u <= a) u += DAY; return [[a, u]]; }
+    const s = sun(e.lat, e.lon, y, m, d);
+    const midnightUTC = Date.UTC(y, m - 1, d) - off * 60000;
+    if (w.moon_age) {
+      const age = moonAge(midnightUTC + ((s.set != null ? s.set : s.noon) + off) * 60000);
+      if (age < w.moon_age[0] || age > w.moon_age[1]) return [];
+    }
+    if (w.sun) {
+      const base = w.sun === 'noon' ? (s.up ? s.noon : null) : s[w.sun];
+      return base == null ? [] : [[base + off + w.from, base + off + w.to]];
+    }
+    if (w.moon === 'dark') {
+      if (s.set == null || s.rise == null) return [];
+      const age = moonAge(Date.UTC(y, m - 1, d) + s.set * 60000);
+      const dusk = s.set + 80;
+      const dawn = s.rise + DAY - 80;
+      // the moon sets about 49 minutes later each night after new, and rises that much later after full
+      const [a, b] = age < 14.77 ? [Math.max(dusk, s.set + age * 48.8), dawn] : [dusk, Math.min(dawn, s.set + (age - 14.77) * 48.8)];
+      return b - a >= 30 ? [[a + off, b + off]] : [];
+    }
+    return [];
+  }
+
+  function allowed(e, y, m, d, wd) {
+    const months = e.months && e.months.length ? e.months : ALL;
+    if (!months.includes(m)) return false;
+    const w = e.window || {};
+    if (w.days && w.days.length && !w.days.includes(wd)) return false;
+    if (w.except && w.except.includes(`${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`)) return false;
+    return true;
+  }
+
+  const clock = (min) => { const x = ((Math.round(min) % DAY) + DAY) % DAY; return `${String(Math.floor(x / 60)).padStart(2, '0')}:${String(x % 60).padStart(2, '0')}`; };
+
+  /** { open, hh, mm, at (local opening time), minutes (until it opens), days, month, closes, needs } */
   function state(e, now = new Date()) {
     if (!e) return { open: false };
-    const l = local(e.tz || 'UTC', now);
-    const months = e.months && e.months.length ? e.months : ALL;
-    const [start, end] = WINDOWS[e.time] || WINDOWS.any;
-    const at = l.hour * 60 + l.minute;
-    const out = { hh: String(l.hour).padStart(2, '0'), mm: String(l.minute).padStart(2, '0') };
-    if (!months.includes(l.month)) {
-      out.open = false;
-      out.month = months.map((m) => [m, (m - l.month + 12) % 12]).sort((a, b) => a[1] - b[1])[0][0];
-      return out;
+    const tz = e.tz || 'UTC';
+    const here = wall(tz, now);
+    const off = offset(tz, now);
+    const out = { hh: String(Math.floor(here.min / 60)).padStart(2, '0'), mm: String(here.min % 60).padStart(2, '0'), needs: (e.window && e.window.needs) || '' };
+    for (let k = -1; k < 400; k += 1) {
+      const t0 = new Date(Date.UTC(here.y, here.m - 1, here.d + k));
+      const y = t0.getUTCFullYear(); const m = t0.getUTCMonth() + 1; const d = t0.getUTCDate(); const wd = ((t0.getUTCDay() + 6) % 7) + 1;
+      if (!allowed(e, y, m, d, wd)) continue;
+      for (const [a, b] of spans(e, y, m, d, off)) {
+        const start = k * DAY + a - here.min;
+        const end = k * DAY + b - here.min;
+        if (end <= 0) continue;
+        out.at = clock(a);
+        if (start <= 0) { out.open = true; out.closes = Math.round(end); return out; }
+        out.open = false;
+        out.minutes = Math.round(start);
+        if (start > 2 * DAY) {
+          // out of its season: name the month it comes back; in season: count the days
+          const months = e.months && e.months.length ? e.months : ALL;
+          if (!months.includes(here.m) || start > 31 * DAY) out.month = m;
+          else out.days = Math.round(start / DAY);
+        }
+        return out;
+      }
     }
-    out.open = at >= start * 60 && at < end * 60;
-    if (!out.open) out.minutes = at < start * 60 ? start * 60 - at : 24 * 60 - at + start * 60;
+    out.open = false;
+    out.month = (e.months && e.months[0]) || here.m;
     return out;
   }
 
-  /** "此刻开着" / "2 小时 10 分后开" / "12 月才开" */
+  /** The short form: "此刻开着" / "2 小时 10 分后开" / "3 天后开" / "12 月才开" */
   function when(s) {
     if (s.open) return t('home.door.open');
     if (s.month) return t('home.door.month', { m: I18n.lang === 'en' ? new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(2020, s.month - 1, 1)) : s.month });
+    if (s.days) return t('home.door.inDays', { n: s.days });
     const h = Math.floor(s.minutes / 60);
     const m = s.minutes % 60;
     return h ? t('home.door.in', { h, m }) : t('home.door.inMin', { m });
   }
 
-  return { state, when };
+  /** The long form, with the door's own opening time: "当地 07:00 开 · 还有 43 分钟" */
+  function whenAt(s) {
+    if (s.open || s.month || !s.at) return when(s);
+    return t('home.door.atIn', { at: s.at, rest: when(s) });
+  }
+
+  /** What the door waits on that the site cannot see, or '' */
+  const needs = (s) => (s && s.needs ? t(`home.door.needs.${s.needs}`) : '');
+
+  return { state, when, whenAt, needs, sun };
 })();
 
 Pages.Home = {
@@ -432,11 +533,16 @@ Pages.Home = {
     if (token !== this._showToken || !hero.isConnected) return;
     const j = sc.j;
     const e = j && j.entrance;
-    copy.querySelector('#hero-eyebrow').textContent = e ? `No.${String(e.no).padStart(3, '0')} · ${t(`entrance.realm.${e.realm}`)}` : t('home.myth');
+    // a door's scene tells its own hour: its number and realm, its local time, and whether it is open
+    const ds = e && ((this._state && this._state.get(e.no)) || DoorClock.state(e));
+    copy.querySelector('#hero-eyebrow').textContent = e
+      ? [`No.${String(e.no).padStart(3, '0')}`, t(`entrance.realm.${e.realm}`), t('home.door.local', { time: `${ds.hh}:${ds.mm}` }), DoorClock.when(ds)].join(' · ')
+      : t('home.myth');
     copy.querySelector('.home-hero__title .home-hero__line').innerHTML = j ? UI.titleHTML(j.title) : UI.esc(t('home.scene.taoyuan.title'));
     copy.querySelector('#hero-lead').textContent = j ? (j.story_hook || j.subtitle || '') : t('home.scene.taoyuan.lead');
     const enter = hero.querySelector('#hero-enter');
-    enter.querySelector('#hero-enter-label').textContent = t(j ? 'home.stepDoor' : 'home.step');
+    // an open door is pushed open; a closed one can still be looked into
+    enter.querySelector('#hero-enter-label').textContent = t(j ? (ds.open ? 'home.stepDoor' : 'home.peekDoor') : 'home.step');
     if (j) {
       enter.href = `#/journey/${encodeURIComponent(j.slug)}`;
       enter.dataset.slug = j.slug;
@@ -743,8 +849,9 @@ Pages.Home = {
       <strong class="door-card__title">${UI.titleHTML(j.title)}</strong>
       ${j.story_hook ? `<span class="door-card__hook">${esc(j.story_hook)}</span>` : ''}
       ${opens ? `<span class="door-card__opens"><b>${esc(t('detail.facts.opens'))}</b>${esc(opens)}</span>` : ''}
-      <span class="door-card__clock${s.open ? ' is-open' : ''}"><span class="num">${esc(t('home.door.local', { time: `${s.hh}:${s.mm}` }))}</span><span>${esc(DoorClock.when(s))}</span></span>
-      <span class="door-card__go">${esc(t('home.stepDoor'))} ${UI.icon('arrow', 'icon--sm')}</span>`;
+      <span class="door-card__clock${s.open ? ' is-open' : ''}"><span class="num">${esc(t('home.door.local', { time: `${s.hh}:${s.mm}` }))}</span><span>${esc(DoorClock.whenAt(s))}</span></span>
+      ${s.needs ? `<span class="door-card__needs">${esc(DoorClock.needs(s))}</span>` : ''}
+      <span class="door-card__go">${esc(t(s.open ? 'home.stepDoor' : 'home.peekDoor'))} ${UI.icon('arrow', 'icon--sm')}</span>`;
   },
 
   _openPeek() {

@@ -304,6 +304,8 @@ Pages.Detail = {
     const user = Session.user;
     const role = c ? c.role : this._role(j);
     const ticketNo = String(e ? e.no : (j.id || 0)).padStart(3, '0');
+    // the door's own hour, as on the home page; a closed door's page is a look through the keyhole
+    const door = e && e.tz && typeof DoorClock !== 'undefined' ? DoorClock.state(e) : null;
     const realmKey = e ? `entrance.realm.${e.realm}` : '';
     const realm = e && t(realmKey) !== realmKey ? t(realmKey) : '';
     const pick = c ? this._choiceFor(j) : '';
@@ -333,7 +335,8 @@ Pages.Detail = {
           </div>
           <div class="container scene__inner scene__inner--hero on-media">
             <div class="detail-hero__text">
-              ${e ? `<p class="detail-hero__no num" data-reveal>${esc(t('entrance.no', { n: String(e.no).padStart(3, '0') }))}${realm ? ` · ${esc(realm)}` : ''}</p>` : ''}
+              ${e ? `<p class="detail-hero__no num" data-reveal>${esc(t('entrance.no', { n: String(e.no).padStart(3, '0') }))}${realm ? ` · ${esc(realm)}` : ''}${door ? ` · ${esc(t('home.door.local', { time: `${door.hh}:${door.mm}` }))} · <span class="detail-hero__state${door.open ? ' is-open' : ''}">${esc(DoorClock.when(door))}</span>` : ''}</p>` : ''}
+              ${door && !door.open ? `<p class="detail-hero__closed" data-reveal>${esc(t('detail.closedNote', { when: DoorClock.whenAt(door) }))}</p>` : ''}
               <h1 class="detail-hero__title" data-reveal>${String(j.title).split(' · ').map((part, i, all) => `<span class="nowrap">${esc(part)}${i < all.length - 1 ? '<span class="detail-hero__dot"> ·</span>' : ''}</span>`).join(' ')}</h1>
               ${j.story_hook ? `<p class="detail-hero__hook" data-reveal>${esc(I18n.lang === 'zh' ? `「${j.story_hook}」` : `“${j.story_hook}”`)}</p>` : ''}
               <ul class="detail-hero__moods" data-reveal>${(j.mood_keywords || []).map((m) => `<li class="chip chip--sm">#${esc(m)}</li>`).join('')}</ul>

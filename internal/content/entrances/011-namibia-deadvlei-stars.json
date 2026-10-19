@@ -1,6 +1,6 @@
 {
   "slug": "namibia-deadvlei-stars",
-  "entrance": { "no": 11, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["dry"], "time": "night", "tz": "Africa/Windhoek", "months": [5, 6, 7, 8, 9, 10] },
+  "entrance": { "no": 11, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["dry"], "time": "night", "tz": "Africa/Windhoek", "months": [5, 6, 7, 8, 9, 10], "lat": -24.76, "lon": 15.29, "window": { "moon": "dark" } },
   "journey": {
     "fantasy_type": "night", "visual_style": "surreal",
     "adventure_index": 5, "obscurity_level": 5, "risk_level": 2, "price": 19999,

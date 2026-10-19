@@ -82,18 +82,39 @@ type JourneyTranslation struct {
 	MoodKeywords []string
 }
 
+// DoorWindow is when a door opens on its own clock. Either a fixed local span (At–Until, "HH:MM",
+// which may run past midnight) or a span around the sun (Sun "rise", "set" or "noon", From–To in
+// minutes), or Moon "dark": the night hours with the moon below the horizon. Days limits it to ISO
+// weekdays (1 Monday – 7 Sunday), Except skips dates ("MM-DD"), MoonAge to days since new moon.
+// Needs names a condition the site cannot see (rain, tide, mist…): it is said, not claimed.
+type DoorWindow struct {
+	At      string    `json:"at,omitempty"`
+	Until   string    `json:"until,omitempty"`
+	Sun     string    `json:"sun,omitempty"`
+	From    int       `json:"from,omitempty"`
+	To      int       `json:"to,omitempty"`
+	Moon    string    `json:"moon,omitempty"`
+	MoonAge []float64 `json:"moon_age,omitempty"`
+	Days    []int     `json:"days,omitempty"`
+	Except  []string  `json:"except,omitempty"`
+	Needs   string    `json:"needs,omitempty"`
+}
+
 // JourneyEntrance is the language-independent world data of an authored journey.
 type JourneyEntrance struct {
-	No           int      `json:"no"`
-	Realm        string   `json:"realm"`
-	Pace         string   `json:"pace"`
-	Scale        string   `json:"scale"`
-	Seasons      []string `json:"seasons"`
-	Time         string   `json:"time"`
-	TZ           string   `json:"tz,omitempty"`     // the place's IANA time zone
-	Months       []int    `json:"months,omitempty"` // months it opens in, 1–12
-	CoverLicense string   `json:"cover_license,omitempty"`
-	CoverSource  string   `json:"cover_source,omitempty"`
+	No           int         `json:"no"`
+	Realm        string      `json:"realm"`
+	Pace         string      `json:"pace"`
+	Scale        string      `json:"scale"`
+	Seasons      []string    `json:"seasons"`
+	Time         string      `json:"time"`
+	TZ           string      `json:"tz,omitempty"`     // the place's IANA time zone
+	Months       []int       `json:"months,omitempty"` // months it opens in, 1–12
+	Lat          *float64    `json:"lat,omitempty"`    // where the door is, for its sun and moon
+	Lon          *float64    `json:"lon,omitempty"`
+	Window       *DoorWindow `json:"window,omitempty"` // when it opens on those days
+	CoverLicense string      `json:"cover_license,omitempty"`
+	CoverSource  string      `json:"cover_source,omitempty"`
 }
 
 // JourneyContent is the localized, structured narrative of an authored journey.

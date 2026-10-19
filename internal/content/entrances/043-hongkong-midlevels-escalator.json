@@ -1,6 +1,6 @@
 {
   "slug": "hongkong-midlevels-escalator",
-  "entrance": { "no": 43, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "morning", "tz": "Asia/Hong_Kong", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  "entrance": { "no": 43, "realm": "city-rules", "pace": "hour", "scale": "near", "seasons": ["any"], "time": "morning", "tz": "Asia/Hong_Kong", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": 22.28, "lon": 114.15, "window": { "at": "09:50", "until": "10:20" } },
   "journey": {
     "fantasy_type": "culture", "visual_style": "minimal",
     "adventure_index": 1, "obscurity_level": 4, "risk_level": 1, "price": 2999,

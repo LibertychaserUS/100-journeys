@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/100-journeys/app/internal/model"
 	"github.com/100-journeys/app/internal/repository"
 	_ "modernc.org/sqlite"
 )
@@ -172,7 +173,7 @@ func validSample() Entrance {
 	}
 	return Entrance{
 		Slug:     "sample",
-		Entrance: Meta{No: 99, Realm: "mirror-salt", Pace: "day", Scale: "far", Seasons: []string{"rainy"}, Time: "predawn", TZ: "America/La_Paz", Months: []int{12, 1, 2, 3}},
+		Entrance: Meta{No: 99, Realm: "mirror-salt", Pace: "day", Scale: "far", Seasons: []string{"rainy"}, Time: "predawn", TZ: "America/La_Paz", Months: []int{12, 1, 2, 3}, Lat: ptr(-20.13), Lon: ptr(-67.49), Window: &model.DoorWindow{Sun: "rise", From: -30, To: 0}},
 		Journey:  Base{FantasyType: "solitude", VisualStyle: "surreal", Adventure: 4, Obscurity: 7, Risk: 2, Price: 100, Tags: []string{"solitude"}, MBTI: map[string]int{"INFP": 5, "INFJ": 4}},
 		Cover:    Cover{Path: "generated/card-salt-mirror.jpg", License: "self-generated", Source: "recorded in docs/content/IMAGE_SOURCES.md"},
 		ZH:       text("zh"),
@@ -302,5 +303,37 @@ func TestImages_HaveDerivatives(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func ptr(f float64) *float64 { return &f }
+
+// UT-CONTENT-CLOCK-001: every door's opening window is one well-formed kind, with what it needs
+func TestValidate_Window(t *testing.T) {
+	cases := map[string]func(e *Entrance){
+		"missing":         func(e *Entrance) { e.Entrance.Window = nil },
+		"two kinds":       func(e *Entrance) { e.Entrance.Window.At, e.Entrance.Window.Until = "06:00", "07:00" },
+		"bad time":        func(e *Entrance) { e.Entrance.Window = &model.DoorWindow{At: "6:00", Until: "07:00"} },
+		"unknown sun":     func(e *Entrance) { e.Entrance.Window.Sun = "zenith" },
+		"empty span":      func(e *Entrance) { e.Entrance.Window.From, e.Entrance.Window.To = 10, 10 },
+		"sun without lat": func(e *Entrance) { e.Entrance.Lat = nil },
+		"bad weekday":     func(e *Entrance) { e.Entrance.Window.Days = []int{0} },
+		"bad date":        func(e *Entrance) { e.Entrance.Window.Except = []string{"25-12"} },
+		"bad moon age":    func(e *Entrance) { e.Entrance.Window.MoonAge = []float64{20, 10} },
+		"unknown need":    func(e *Entrance) { e.Entrance.Window.Needs = "luck" },
+	}
+	for name, mutate := range cases {
+		e := validSample()
+		w := *e.Entrance.Window
+		e.Entrance.Window = &w
+		mutate(&e)
+		if len(Validate(e)) == 0 {
+			t.Errorf("%s: expected a problem", name)
+		}
+	}
+	e := validSample()
+	e.Entrance.Window = &model.DoorWindow{At: "23:00", Until: "01:00", Days: []int{1, 6}, Except: []string{"12-25"}, Needs: "high-tide"}
+	if p := Validate(e); len(p) != 0 {
+		t.Errorf("a window across midnight with days and dates should pass, got %v", p)
 	}
 }

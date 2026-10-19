@@ -1,6 +1,6 @@
 {
   "slug": "japan-shiretoko-drift-ice",
-  "entrance": { "no": 31, "realm": "ice-night", "pace": "hour", "scale": "near", "seasons": ["winter"], "time": "morning", "tz": "Asia/Tokyo", "months": [1, 2, 3] },
+  "entrance": { "no": 31, "realm": "ice-night", "pace": "hour", "scale": "near", "seasons": ["winter"], "time": "morning", "tz": "Asia/Tokyo", "months": [1, 2, 3], "lat": 44.07, "lon": 144.99, "window": { "at": "06:00", "until": "10:00", "needs": "drift-ice" } },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "raw",
     "adventure_index": 6, "obscurity_level": 5, "risk_level": 3, "price": 7999,

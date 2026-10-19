@@ -1,6 +1,6 @@
 {
   "slug": "patagonia-torres-del-paine-trek",
-  "entrance": { "no": 8, "realm": "fire-stone", "pace": "multi-day", "scale": "far", "seasons": ["summer"], "time": "dawn", "tz": "America/Punta_Arenas", "months": [12, 1, 2] },
+  "entrance": { "no": 8, "realm": "fire-stone", "pace": "multi-day", "scale": "far", "seasons": ["summer"], "time": "dawn", "tz": "America/Punta_Arenas", "months": [12, 1, 2], "lat": -50.94, "lon": -72.98, "window": { "sun": "rise", "from": -30, "to": 15 } },
   "journey": {
     "fantasy_type": "extreme", "visual_style": "dramatic",
     "adventure_index": 8, "obscurity_level": 5, "risk_level": 3, "price": 24999,

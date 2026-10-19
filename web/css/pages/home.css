@@ -151,6 +151,8 @@
 .door-card__opens b { font-weight: var(--weight-semibold); font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-text-3); }
 .door-card__clock { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: var(--text-sm); color: var(--color-text-2); }
 .door-card__clock.is-open span:last-child { color: var(--color-text); }
+.door-card__needs { font-size: var(--text-sm); color: var(--color-text-3); font-style: italic; }
+.door-card__needs::before { content: ""; display: inline-block; width: 12px; height: 1px; margin-right: 8px; vertical-align: middle; background: currentColor; opacity: .6; }
 .door-card__clock.is-open span:last-child::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--lamp-open); box-shadow: 0 0 10px color-mix(in oklab, var(--lamp-open) 60%, transparent); }
 .door-card__go { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: var(--text-sm); color: var(--color-text); text-decoration: underline; text-decoration-color: var(--color-line-strong); text-underline-offset: 4px; }
 .door-card:hover .door-card__go { text-decoration-color: currentColor; }
@@ -281,3 +283,4 @@ body[data-page="home"] .site-footer__line { display: none; }
 @media (max-width: 760px) {
   .home-close__inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
 }
+:root:lang(zh-CN) .door-card__needs { font-style: normal; }

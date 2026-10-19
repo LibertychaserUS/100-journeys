@@ -84,6 +84,7 @@ func withClock(j *model.Journey) {
 	if e, ok := content.EntranceFor(j.Slug); ok {
 		j.Entrance.TZ = e.Entrance.TZ
 		j.Entrance.Months = e.Entrance.Months
+		j.Entrance.Lat, j.Entrance.Lon, j.Entrance.Window = e.Entrance.Lat, e.Entrance.Lon, e.Entrance.Window
 	}
 }
 
