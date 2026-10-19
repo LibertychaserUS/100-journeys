@@ -35,10 +35,14 @@
     "vast"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/gansu-dunhuang-library-cave/hero.jpg",
+    "scenes": [
+      "",
+      "",
+      "generated/gansu-dunhuang-library-cave/scene-3.jpg"
+    ],
+    "fork": "generated/gansu-dunhuang-library-cave/fork.jpg",
+    "ending": "generated/gansu-dunhuang-library-cave/ending.jpg",
+    "texture": "generated/gansu-dunhuang-library-cave/texture.jpg"
   }
 }

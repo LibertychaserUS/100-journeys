@@ -36,10 +36,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/australia-reef-coral-spawning/hero.jpg",
+    "scenes": [
+      "generated/australia-reef-coral-spawning/scene-1.jpg",
+      "",
+      "generated/australia-reef-coral-spawning/scene-3.jpg"
+    ],
+    "fork": "generated/australia-reef-coral-spawning/fork.jpg",
+    "ending": "generated/australia-reef-coral-spawning/ending.jpg",
+    "texture": "generated/australia-reef-coral-spawning/texture.jpg"
   }
 }

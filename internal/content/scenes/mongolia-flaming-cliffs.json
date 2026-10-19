@@ -31,10 +31,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/mongolia-flaming-cliffs/hero.jpg",
+    "scenes": [
+      "generated/mongolia-flaming-cliffs/scene-1.jpg",
+      "generated/mongolia-flaming-cliffs/scene-2.jpg",
+      "generated/mongolia-flaming-cliffs/scene-3.jpg"
+    ],
+    "fork": "generated/mongolia-flaming-cliffs/fork.jpg",
+    "ending": "generated/mongolia-flaming-cliffs/ending.jpg",
+    "texture": "generated/mongolia-flaming-cliffs/texture.jpg"
   }
 }

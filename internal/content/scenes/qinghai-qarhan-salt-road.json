@@ -32,10 +32,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/qinghai-qarhan-salt-road/hero.jpg",
+    "scenes": [
+      "generated/qinghai-qarhan-salt-road/scene-1.jpg",
+      "",
+      "generated/qinghai-qarhan-salt-road/scene-3.jpg"
+    ],
+    "fork": "generated/qinghai-qarhan-salt-road/fork.jpg",
+    "ending": "generated/qinghai-qarhan-salt-road/ending.jpg",
+    "texture": "generated/qinghai-qarhan-salt-road/texture.jpg"
   }
 }

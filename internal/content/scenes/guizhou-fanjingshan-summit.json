@@ -32,10 +32,14 @@
     ""
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/guizhou-fanjingshan-summit/hero.jpg",
+    "scenes": [
+      "",
+      "",
+      "generated/guizhou-fanjingshan-summit/scene-3.jpg"
+    ],
+    "fork": "generated/guizhou-fanjingshan-summit/fork.jpg",
+    "ending": "generated/guizhou-fanjingshan-summit/ending.jpg",
+    "texture": "generated/guizhou-fanjingshan-summit/texture.jpg"
   }
 }

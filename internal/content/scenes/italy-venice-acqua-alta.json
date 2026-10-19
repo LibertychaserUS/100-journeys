@@ -31,10 +31,13 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/italy-venice-acqua-alta/hero.jpg",
+    "scenes": [
+      "generated/italy-venice-acqua-alta/scene-1.jpg",
+      "generated/italy-venice-acqua-alta/scene-2.jpg"
+    ],
+    "fork": "generated/italy-venice-acqua-alta/fork.jpg",
+    "ending": "generated/italy-venice-acqua-alta/ending.jpg",
+    "texture": "generated/italy-venice-acqua-alta/texture.jpg"
   }
 }

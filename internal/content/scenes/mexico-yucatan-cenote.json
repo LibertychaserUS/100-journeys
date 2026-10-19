@@ -30,10 +30,14 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
+    "hero": "generated/mexico-yucatan-cenote/hero.jpg",
+    "scenes": [
+      "generated/mexico-yucatan-cenote/scene-1.jpg",
+      "generated/mexico-yucatan-cenote/scene-2.jpg",
+      "generated/mexico-yucatan-cenote/scene-3.jpg"
+    ],
+    "fork": "generated/mexico-yucatan-cenote/fork.jpg",
+    "ending": "generated/mexico-yucatan-cenote/ending.jpg",
     "texture": ""
   }
 }

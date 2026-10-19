@@ -32,10 +32,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/usa-bonneville-salt-flats/hero.jpg",
+    "scenes": [
+      "generated/usa-bonneville-salt-flats/scene-1.jpg",
+      "generated/usa-bonneville-salt-flats/scene-2.jpg",
+      "generated/usa-bonneville-salt-flats/scene-3.jpg"
+    ],
+    "fork": "generated/usa-bonneville-salt-flats/fork.jpg",
+    "ending": "generated/usa-bonneville-salt-flats/ending.jpg",
+    "texture": "generated/usa-bonneville-salt-flats/texture.jpg"
   }
 }

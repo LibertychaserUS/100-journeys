@@ -32,10 +32,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
+    "hero": "generated/antarctica-port-lockroy/hero.jpg",
+    "scenes": [
+      "generated/antarctica-port-lockroy/scene-1.jpg",
+      "",
+      "generated/antarctica-port-lockroy/scene-3.jpg"
+    ],
     "fork": "",
-    "ending": "",
-    "texture": ""
+    "ending": "generated/antarctica-port-lockroy/ending.jpg",
+    "texture": "generated/antarctica-port-lockroy/texture.jpg"
   }
 }

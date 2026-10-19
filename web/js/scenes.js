@@ -188,6 +188,7 @@ var Scenes = (() => {
           if (!queued) { queued = true; requestAnimationFrame(apply); }
         };
         apply();
+        root.classList.toggle('lamp-wide', ctx.reduce || !window.matchMedia('(pointer: fine)').matches);
         if (!ctx.reduce) {
           window.addEventListener('pointermove', onMove, { passive: true });
           ctx.cleanups.push(() => window.removeEventListener('pointermove', onMove));

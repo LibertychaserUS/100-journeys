@@ -266,10 +266,20 @@ func TestImages_HaveDerivatives(t *testing.T) {
 			return []int{480, 720}
 		case base == "cover.jpg":
 			return []int{480, 720, 1120}
-		case base == "hero.jpg" || strings.HasPrefix(base, "scene-") || base == "ending.jpg":
-			return []int{960, 1600}
-		case base == "fork.jpg" || base == "texture.jpg":
+		case base == "hero.jpg" || base == "scene-1.jpg" || base == "scene-2.jpg":
+			return []int{960, 1536}
+		case base == "scene-3.jpg":
+			return []int{600, 960}
+		case base == "fork.jpg":
 			return []int{600, 1024}
+		case base == "ending.jpg":
+			return []int{600}
+		case strings.HasPrefix(rel, "road/station-hall-") && strings.HasSuffix(base, "-phone.jpg"):
+			return []int{600, 1024}
+		case strings.HasPrefix(rel, "road/station-hall-") || rel == "road/rubbing-stone.jpg":
+			return []int{960, 1536}
+		case strings.HasPrefix(rel, "road/realm-band-"):
+			return []int{600, 1200}
 		case base == "hero-taoyuan.jpg":
 			return []int{960, 1600}
 		}

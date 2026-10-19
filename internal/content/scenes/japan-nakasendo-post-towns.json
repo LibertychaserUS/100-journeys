@@ -31,10 +31,14 @@
     ""
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/japan-nakasendo-post-towns/hero.jpg",
+    "scenes": [
+      "",
+      "generated/japan-nakasendo-post-towns/scene-2.jpg",
+      "generated/japan-nakasendo-post-towns/scene-3.jpg"
+    ],
+    "fork": "generated/japan-nakasendo-post-towns/fork.jpg",
+    "ending": "generated/japan-nakasendo-post-towns/ending.jpg",
+    "texture": "generated/japan-nakasendo-post-towns/texture.jpg"
   }
 }

@@ -32,9 +32,13 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "scenes": [
+      "generated/jordan-petra-by-night/scene-1.jpg",
+      "generated/jordan-petra-by-night/scene-2.jpg",
+      "generated/jordan-petra-by-night/scene-3.jpg"
+    ],
+    "fork": "generated/jordan-petra-by-night/fork.jpg",
+    "ending": "generated/jordan-petra-by-night/ending.jpg",
+    "texture": "generated/jordan-petra-by-night/texture.jpg"
   }
 }

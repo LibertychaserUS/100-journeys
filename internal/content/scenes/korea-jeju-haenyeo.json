@@ -32,10 +32,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/korea-jeju-haenyeo/hero.jpg",
+    "scenes": [
+      "generated/korea-jeju-haenyeo/scene-1.jpg",
+      "generated/korea-jeju-haenyeo/scene-2.jpg",
+      "generated/korea-jeju-haenyeo/scene-3.jpg"
+    ],
+    "fork": "generated/korea-jeju-haenyeo/fork.jpg",
+    "ending": "generated/korea-jeju-haenyeo/ending.jpg",
+    "texture": "generated/korea-jeju-haenyeo/texture.jpg"
   }
 }

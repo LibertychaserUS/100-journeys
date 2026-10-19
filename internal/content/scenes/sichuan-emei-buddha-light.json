@@ -36,9 +36,12 @@
   ],
   "images": {
     "hero": "",
-    "scenes": [],
-    "fork": "",
+    "scenes": [
+      "",
+      "generated/sichuan-emei-buddha-light/scene-2.jpg"
+    ],
+    "fork": "generated/sichuan-emei-buddha-light/fork.jpg",
     "ending": "",
-    "texture": ""
+    "texture": "generated/sichuan-emei-buddha-light/texture.jpg"
   }
 }

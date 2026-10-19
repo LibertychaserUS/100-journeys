@@ -37,9 +37,13 @@
     "flare"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
+    "hero": "generated/chongqing-liziba-monorail/hero.jpg",
+    "scenes": [
+      "generated/chongqing-liziba-monorail/scene-1.jpg",
+      "generated/chongqing-liziba-monorail/scene-2.jpg",
+      "generated/chongqing-liziba-monorail/scene-3.jpg"
+    ],
+    "fork": "generated/chongqing-liziba-monorail/fork.jpg",
     "ending": "",
     "texture": ""
   }

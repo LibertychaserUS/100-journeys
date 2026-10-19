@@ -59,8 +59,14 @@ const UI = (() => {
   const DERIVED = [
     [/\/generated\/[^/]+\/cover\.jpg$/, [480, 720, 1120]],
     [/\/generated\/card-[^/]+\.jpg$/, [480, 720]],
-    [/\/generated\/[^/]+\/(hero|scene-\d|ending)\.jpg$/, [960, 1600]],
-    [/\/generated\/[^/]+\/(fork|texture)\.jpg$/, [600, 1024]],
+    [/\/generated\/[^/]+\/(hero|scene-1|scene-2)\.jpg$/, [960, 1536]],
+    [/\/generated\/[^/]+\/scene-3\.jpg$/, [600, 960]],
+    [/\/generated\/[^/]+\/fork\.jpg$/, [600, 1024]],
+    [/\/generated\/[^/]+\/ending\.jpg$/, [600]],
+    [/\/generated\/road\/station-hall-(night|dawn)\.jpg$/, [960, 1536]],
+    [/\/generated\/road\/station-hall-(night|dawn)-phone\.jpg$/, [600, 1024]],
+    [/\/generated\/road\/realm-band-[a-z-]+\.jpg$/, [600, 1200]],
+    [/\/generated\/road\/rubbing-stone\.jpg$/, [960, 1536]],
     [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600]],
   ];
   function picture(src, { sizes = '100vw', alt = '', cls = '', eager = false, width, height, attrs = '' } = {}) {

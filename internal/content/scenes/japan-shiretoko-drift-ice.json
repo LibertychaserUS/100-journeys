@@ -31,10 +31,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/japan-shiretoko-drift-ice/hero.jpg",
+    "scenes": [
+      "generated/japan-shiretoko-drift-ice/scene-1.jpg",
+      "generated/japan-shiretoko-drift-ice/scene-2.jpg",
+      "generated/japan-shiretoko-drift-ice/scene-3.jpg"
+    ],
+    "fork": "generated/japan-shiretoko-drift-ice/fork.jpg",
+    "ending": "generated/japan-shiretoko-drift-ice/ending.jpg",
+    "texture": "generated/japan-shiretoko-drift-ice/texture.jpg"
   }
 }

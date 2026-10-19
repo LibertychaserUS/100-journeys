@@ -31,10 +31,14 @@
     "still"
   ],
   "images": {
-    "hero": "",
-    "scenes": [],
-    "fork": "",
-    "ending": "",
-    "texture": ""
+    "hero": "generated/japan-sakurajima-ash-city/hero.jpg",
+    "scenes": [
+      "generated/japan-sakurajima-ash-city/scene-1.jpg",
+      "generated/japan-sakurajima-ash-city/scene-2.jpg",
+      "generated/japan-sakurajima-ash-city/scene-3.jpg"
+    ],
+    "fork": "generated/japan-sakurajima-ash-city/fork.jpg",
+    "ending": "generated/japan-sakurajima-ash-city/ending.jpg",
+    "texture": "generated/japan-sakurajima-ash-city/texture.jpg"
   }
 }
