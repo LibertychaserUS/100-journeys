@@ -69,7 +69,9 @@
 .door[data-realm="mist-temple"] { --lamp: var(--realm-mist-temple); }
 .door[data-realm="city-rules"] { --lamp: var(--realm-city-rules); }
 .door__link {
-  position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 999px 999px 8px 8px;
+  position: absolute; inset: 0; overflow: hidden; border-radius: 999px 999px 8px 8px;
+  /* the number and the name are two rows in the flow, so a long name can never cover the number */
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16% 4px 8px;
   background: color-mix(in oklab, var(--lamp) 34%, #0b0c10);
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 50%, transparent);
   transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), opacity .3s var(--ease-out);
@@ -78,8 +80,19 @@
 .door__arch { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(1) contrast(1.1); mix-blend-mode: luminosity; opacity: .62; }
 .home-atlas__grid.is-near .door__arch { background-image: var(--thumb); }
 .door__link::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(5, 6, 8, .72)); }
-.door__no { position: absolute; top: 18%; left: 0; right: 0; z-index: 1; text-align: center; font-size: .6875rem; letter-spacing: .06em; color: rgba(255, 255, 255, .78); }
-.door__word { position: absolute; left: 4px; right: 4px; bottom: 9px; z-index: 1; text-align: center; font-family: var(--font-ui); font-weight: 500; font-size: clamp(.6875rem, .78vw, .8125rem); line-height: 1.25; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); word-break: keep-all; overflow-wrap: anywhere; }
+.door__no { position: relative; z-index: 1; text-align: center; font-size: .6875rem; letter-spacing: .06em; color: rgba(255, 255, 255, .78); }
+.door__word {
+  position: relative; z-index: 1; max-width: 100%; text-align: center; font-family: var(--font-ui); font-weight: 500;
+  font-size: clamp(.6875rem, .78vw, .8125rem); line-height: 1.25; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
+  overflow-wrap: normal; hyphens: manual; text-wrap: balance;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+}
+/* English names run to two or three words and long single words, more than a 50-60px arch holds at a
+   readable size. The tile carries the door's number as a plate; the name is in the card beside it
+   (hover, focus or tap) and in the door's label. */
+:root:lang(en) .door__link { justify-content: flex-end; padding-bottom: 10px; }
+:root:lang(en) .door__word { display: none; }
+:root:lang(en) .door__no { font-family: var(--font-story); font-size: clamp(.875rem, 1vw, 1rem); font-weight: 700; letter-spacing: .04em; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); }
 .door[data-open="true"] .door__link { box-shadow: inset 0 0 0 1.5px var(--lamp-open), inset 0 -22px 30px -14px color-mix(in oklab, var(--lamp-open) 70%, transparent), 0 0 22px -6px color-mix(in oklab, var(--lamp-open) 70%, transparent); }
 .door[data-open="true"] .door__arch { filter: none; mix-blend-mode: normal; opacity: .9; }
 .door.is-found:hover .door__link, .door.is-selected .door__link { transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--lamp), 0 16px 30px -18px rgba(0, 0, 0, .8); }
@@ -151,8 +164,10 @@
   .home-atlas__head { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
   .home-atlas__filters { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
   .home-atlas__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 8px; }
-  .door__word { font-size: .6875rem; bottom: 6px; }
-  .door__no { font-size: .625rem; top: 16%; }
+  .door__link { padding: 14% 3px 6px; }
+  .door__word { font-size: .6875rem; }
+  .door__no { font-size: .625rem; }
+  :root:lang(en) .door__no { font-size: .8125rem; }
   .home-atlas__mist { flex-wrap: wrap; gap: 6px 12px; }
   .home-atlas__mist i { flex-basis: 100%; }
 }
@@ -217,6 +232,14 @@
 .home-close__quote figcaption { font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-text-3); }
 :root:lang(zh-CN) .home-close__quote figcaption { writing-mode: vertical-rl; }
 .home-close__side { display: grid; gap: var(--space-4); padding-bottom: 10px; }
+/* English sets the quote across the line, so its credit sits under it and the side column keeps a
+   readable width instead of taking what is left. */
+:root:lang(en) .home-close__inner { grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem); }
+:root:lang(en) .home-close__quote { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+@media (max-width: 960px) { :root:lang(en) .home-close__inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); } }
+:root:lang(en) .home-close__next a { display: block; }
+:root:lang(en) .home-close__next a .num { display: block; margin-bottom: 8px; }
+:root:lang(en) .home-close__next a .icon { display: inline-block; vertical-align: -1px; margin-left: 4px; }
 .home-close__next a { display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 10px; font-family: var(--font-story); font-size: clamp(1.25rem, 2vw, 1.625rem); color: var(--color-text); border-bottom: 1px solid var(--color-line-strong); padding-bottom: 6px; }
 .home-close__next a .num { font-family: var(--font-ui); font-size: var(--text-sm); letter-spacing: .08em; color: var(--color-text-3); }
 .home-close__next a:hover { border-color: currentColor; }
