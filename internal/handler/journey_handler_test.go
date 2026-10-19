@@ -117,6 +117,29 @@ func TestHandler_ListJourneys_Filtered(t *testing.T) {
 	}
 }
 
+// IT-API-002b: GET /api/journeys?realm= keeps only the doors of that realm
+func TestHandler_ListJourneys_Realm(t *testing.T) {
+	r := setupTestRouter(t)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/journeys?realm=ice-night&limit=100", nil)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+	var resp map[string]interface{}
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	data := resp["data"].([]interface{})
+	if len(data) == 0 {
+		t.Fatal("expected doors in ice-night")
+	}
+	for _, item := range data {
+		e, _ := item.(map[string]interface{})["entrance"].(map[string]interface{})
+		if e == nil || e["realm"] != "ice-night" {
+			t.Errorf("expected realm ice-night, got %v", e)
+		}
+	}
+}
+
 // IT-API-003: GET /api/journeys/:slug
 func TestHandler_GetJourney(t *testing.T) {
 	r := setupTestRouter(t)

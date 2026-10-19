@@ -101,24 +101,29 @@ const UI = (() => {
     return `<span class="t-name">${esc(name)}</span>${place ? `<span class="t-place">${esc(place)}</span>` : ''}`;
   }
 
+  /** A journey as a door: its picture under an arch, its realm and place, its number and whether it
+   *  is open now on its own clock. (Coins and difficulty belong to the journey's own page.) */
   function journeyCard(j, { eager = false } = {}) {
-    const mood = (j.mood_keywords || [])[0];
+    const e = j.entrance;
+    const realmKey = e ? `entrance.realm.${e.realm}` : '';
+    const realm = e && t(realmKey) !== realmKey ? t(realmKey) : '';
+    const s = e && e.tz && typeof DoorClock !== 'undefined' ? DoorClock.state(e) : null;
     return `
-      <a class="journey-card" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-testid="journey-card">
+      <a class="journey-card" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-testid="journey-card"${e ? ` data-realm="${esc(e.realm)}"` : ''}>
         <div class="journey-card__media">
           ${picture(j.image_url, { sizes: '(max-width: 760px) 50vw, (max-width: 1200px) 33vw, 300px', width: 720, height: 900, eager })}
         </div>
         <div class="journey-card__body">
           <div class="journey-card__meta">
-            ${mood ? `<span class="tag-mood">${esc(mood)}</span>` : ''}
+            ${realm ? `<span class="journey-card__realm"><i aria-hidden="true"></i>${esc(realm)}</span>` : ''}
             <span class="region">${esc(region(j))}</span>
           </div>
           <h3 class="journey-card__title">${esc(j.title)}</h3>
           ${j.story_hook ? `<p class="journey-card__hook">${esc(j.story_hook)}</p>` : ''}
-          <div class="journey-card__foot">
-            <span class="price">${I18n.num(j.price)}<small>${esc(t('common.coins'))}</small></span>
-            ${meter(j.adventure_index)}
-          </div>
+          ${e ? `<div class="journey-card__foot">
+            <span class="num">No.${String(e.no).padStart(3, '0')}</span>
+            ${s ? `<span class="journey-card__state${s.open ? ' is-open' : ''}">${esc(DoorClock.when(s))}</span>` : ''}
+          </div>` : ''}
         </div>
       </a>`;
   }

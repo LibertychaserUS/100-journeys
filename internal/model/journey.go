@@ -60,6 +60,7 @@ type JourneyFilter struct {
 	TagSlug      string  `form:"tag"`
 	VisualStyle  string  `form:"visual_style"`
 	FantasyType  string  `form:"fantasy_type"`
+	Realm        string  `form:"realm"` // the entrance's realm (mirror-salt, fire-stone, ...)
 	AdventureMin int     `form:"adventure_min"`
 	AdventureMax int     `form:"adventure_max"`
 	ObscurityMin int     `form:"obscurity_min"`

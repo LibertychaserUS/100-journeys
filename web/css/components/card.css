@@ -4,13 +4,21 @@
    The lantern glow follows the pointer (--mx/--my set in ui.js).
    ============================================================= */
 
+/* A journey card is a door: its picture under an arch with its realm's line, then its name, its
+   number and whether it is open now. */
 .journey-card {
+  --lamp: var(--realm-mirror-salt);
   position: relative; display: flex; flex-direction: column; min-width: 0;
-  border-radius: var(--radius-card); overflow: hidden;
-  background: var(--color-surface); border: 1px solid var(--color-line);
-  transition: transform var(--dur) var(--ease), border-color var(--dur);
+  transition: transform var(--dur) var(--ease);
 }
-.journey-card:hover { transform: translateY(-3px); border-color: var(--color-line-strong); }
+.journey-card[data-realm="fire-stone"] { --lamp: var(--realm-fire-stone); }
+.journey-card[data-realm="sand-stars"] { --lamp: var(--realm-sand-stars); }
+.journey-card[data-realm="old-roads"] { --lamp: var(--realm-old-roads); }
+.journey-card[data-realm="ice-night"] { --lamp: var(--realm-ice-night); }
+.journey-card[data-realm="water-deep"] { --lamp: var(--realm-water-deep); }
+.journey-card[data-realm="mist-temple"] { --lamp: var(--realm-mist-temple); }
+.journey-card[data-realm="city-rules"] { --lamp: var(--realm-city-rules); }
+.journey-card:hover { transform: translateY(-3px); }
 .journey-card::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity var(--dur-slow);
   background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), rgba(242, 196, 109, .16), transparent 60%);
@@ -18,15 +26,22 @@
 .journey-card:hover::after { opacity: 1; }
 [data-theme="light"] .journey-card::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), rgba(168, 106, 18, .10), transparent 60%); }
 
-.journey-card__media { aspect-ratio: 4 / 5; overflow: hidden; background: var(--color-surface-2); }
+.journey-card__media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 50% 50% 14px 14px / 40% 40% 14px 14px; background: var(--color-surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 45%, transparent); }
+.journey-card__media::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 45%, transparent); pointer-events: none; }
 .journey-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease); }
 .journey-card:hover .journey-card__media img { transform: scale(1.03); }
-.journey-card__body { display: grid; gap: 8px; padding: 14px 16px 16px; }
+.journey-card__body { display: grid; gap: 6px; padding: 14px 4px 4px; }
 .journey-card__meta { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: var(--text-xs); color: var(--color-text-3); }
 .journey-card__meta span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.journey-card__title { font-size: var(--text-md); font-weight: var(--weight-semibold); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.journey-card__realm { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-2); white-space: nowrap; }
+.journey-card__realm i { width: 7px; height: 7px; border-radius: 50%; background: var(--lamp); }
+.journey-card__title { font-family: var(--font-story); font-size: var(--text-lg); font-weight: 700; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .journey-card__hook { font-size: var(--text-sm); color: var(--color-text-2); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.journey-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; font-size: var(--text-sm); }
+.journey-card__foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 2px; font-size: var(--text-sm); color: var(--color-text-3); }
+.journey-card__foot .num { font-size: var(--text-xs); letter-spacing: .08em; }
+.journey-card__state { text-align: right; }
+.journey-card__state.is-open { color: var(--color-text); }
+.journey-card__state.is-open::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--lamp-open); box-shadow: 0 0 8px color-mix(in oklab, var(--lamp-open) 60%, transparent); }
 .price { font-weight: var(--weight-semibold); color: var(--color-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .price small { font-size: .85em; font-weight: var(--weight-normal); color: var(--color-text-3); margin-left: 2px; }
 

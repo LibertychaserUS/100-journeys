@@ -327,7 +327,7 @@ Pages.Detail = {
               <button class="detail-hero__back" type="button" id="detail-back" aria-label="${esc(t('detail.backLabel'))}">${UI.icon('back')}<span>${esc(t('common.back'))}</span></button>
               <nav class="detail-crumbs" aria-label="${esc(t('detail.breadcrumb'))}">
                 <a href="#/explore">${esc(t('nav.explore'))}</a><span aria-hidden="true">/</span>
-                <a href="#/explore?fantasy_type=${esc(j.fantasy_type)}" class="detail-hero__badge">${esc(fantasy)}</a><span aria-hidden="true">/</span>
+                ${e && realm ? `<a href="#/explore?realm=${esc(e.realm)}" class="detail-hero__badge">${esc(realm)}</a>` : `<a href="#/explore?fantasy_type=${esc(j.fantasy_type)}" class="detail-hero__badge">${esc(fantasy)}</a>`}<span aria-hidden="true">/</span>
                 <span>${esc(UI.region(j))}</span>
               </nav>
               <button class="detail-hero__share" type="button" id="detail-share-top" aria-label="${esc(t('detail.share'))}">${UI.icon('share')}</button>

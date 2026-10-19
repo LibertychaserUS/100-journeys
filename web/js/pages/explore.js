@@ -7,6 +7,7 @@ var Pages = window.Pages || {};
 
 Pages.Explore = {
   PAGE_SIZE: 12,
+  REALMS: ['mirror-salt', 'fire-stone', 'ice-night', 'sand-stars', 'mist-temple', 'water-deep', 'city-rules', 'old-roads'],
   _filter: {},
   _page: 1,
   _total: 0,
@@ -30,9 +31,9 @@ Pages.Explore = {
     const main = document.getElementById('main-content');
     main.innerHTML = `
       <div class="page explore">
-        <header class="container page__head">
+        <header class="container page__head explore__head">
           <h1>${esc(t('explore.title'))}</h1>
-          <p>${esc(t('explore.sub'))}</p>
+          <p>${esc(t('explore.sub', { n: (window.APP_CONFIG && APP_CONFIG.doors) || 48 }))}</p>
         </header>
         <div class="explore-toolbar" id="explore-toolbar">
           <div class="container">
@@ -42,9 +43,10 @@ Pages.Explore = {
                 <span class="sr-only">${esc(t('explore.searchLabel'))}</span>
                 <input type="search" id="explore-search" autocomplete="off" placeholder="${esc(t('explore.searchPlaceholder'))}">
               </label>
-              <div class="explore-facets" role="group" aria-label="${esc(t('explore.fantasyLabel'))}" id="filter-fantasy">
-                <button class="chip explore-chip" type="button" data-key="fantasy_type" data-value="">${esc(t('explore.all'))}</button>
-                ${UI.fantasyTypes.map((f) => `<button class="chip explore-chip" type="button" data-key="fantasy_type" data-value="${f}">${esc(t(`fantasy.${f}`))}</button>`).join('')}
+              <div class="explore-facets" role="group" aria-label="${esc(t('explore.realmLabel'))}" id="filter-realm">
+                <button class="chip explore-chip" type="button" data-key="realm" data-value="">${esc(t('explore.all'))}</button>
+                <button class="chip explore-chip explore-chip--now" type="button" data-key="now" data-value="1"><i aria-hidden="true"></i>${esc(t('home.atlas.now'))}</button>
+                ${this.REALMS.map((r) => `<button class="chip explore-chip" type="button" data-key="realm" data-value="${r}" style="--lamp:var(--realm-${r})"><i aria-hidden="true"></i>${esc(t(`entrance.realm.${r}`))}</button>`).join('')}
               </div>
               <div class="explore-filter">
                 <button class="btn btn--ghost explore-filter__btn" id="explore-filter-btn" type="button" aria-expanded="false" aria-controls="explore-panel">
@@ -130,7 +132,7 @@ Pages.Explore = {
   // ---------- state ----------
   _fromQuery(query) {
     const f = {};
-    ['q', 'fantasy_type', 'mbti', 'tag', 'visual_style'].forEach((k) => {
+    ['q', 'realm', 'now', 'fantasy_type', 'mbti', 'tag', 'visual_style'].forEach((k) => {
       const v = query.get(k);
       if (v) f[k] = v;
     });
@@ -147,7 +149,7 @@ Pages.Explore = {
 
   _params() {
     const p = {};
-    ['q', 'fantasy_type', 'mbti', 'tag', 'visual_style'].forEach((k) => { if (this._filter[k]) p[k] = this._filter[k]; });
+    ['q', 'realm', 'now', 'fantasy_type', 'mbti', 'tag', 'visual_style'].forEach((k) => { if (this._filter[k]) p[k] = this._filter[k]; });
     const adv = this._adventure[this._filter.adventure];
     if (adv) { p.adventure_min = adv.min; p.adventure_max = adv.max; }
     return p;
@@ -177,8 +179,8 @@ Pages.Explore = {
     if (chip) {
       const { key, value } = chip.dataset;
       const current = this._filter[key] || '';
-      // fantasy facet row behaves like tabs (All + one); panel choices toggle.
-      const next = key === 'fantasy_type' && chip.closest('#filter-fantasy') ? value : (current === value ? '' : value);
+      // the realm row behaves like tabs (All + one); "open now" and panel choices toggle.
+      const next = key === 'realm' ? value : (current === value ? '' : value);
       this._set(key, next);
       return;
     }
@@ -216,6 +218,10 @@ Pages.Explore = {
     };
     panel.innerHTML = `
       <div class="explore-panel__section">
+        <h3>${esc(t('explore.mood'))}</h3>
+        <div class="explore-panel__chips" id="filter-fantasy">${UI.fantasyTypes.map((f) => choice('fantasy_type', f, t(`fantasy.${f}`))).join('')}</div>
+      </div>
+      <div class="explore-panel__section">
         <h3>${esc(t('explore.mbti'))}<em>${esc(t('explore.mbtiHint'))}</em></h3>
         <div class="explore-panel__mbti" id="filter-mbti">${MBTI.codes.map((c) => choice('mbti', c, c)).join('')}</div>
       </div>
@@ -244,6 +250,8 @@ Pages.Explore = {
     const list = [];
     const f = this._filter;
     if (f.q) list.push(['q', `“${f.q}”`]);
+    if (f.realm) list.push(['realm', t(`entrance.realm.${f.realm}`)]);
+    if (f.now) list.push(['now', t('home.atlas.now')]);
     if (f.fantasy_type) list.push(['fantasy_type', UI.fantasyLabel(f.fantasy_type)]);
     if (f.mbti) list.push(['mbti', f.mbti]);
     if (f.adventure && this._adventure[f.adventure]) list.push(['adventure', t(this._adventure[f.adventure].key)]);
@@ -257,12 +265,12 @@ Pages.Explore = {
 
   _sync() {
     const esc = UI.esc;
-    document.querySelectorAll('#filter-fantasy [data-key="fantasy_type"]').forEach((chip) => {
-      const on = (this._filter.fantasy_type || '') === chip.dataset.value;
+    document.querySelectorAll('#filter-realm [data-key]').forEach((chip) => {
+      const on = (this._filter[chip.dataset.key] || '') === chip.dataset.value;
       chip.setAttribute('aria-pressed', String(on));
       chip.classList.toggle('explore-chip--active', on);
     });
-    const panelCount = ['mbti', 'tag', 'visual_style', 'adventure'].filter((k) => this._filter[k]).length;
+    const panelCount = ['fantasy_type', 'mbti', 'tag', 'visual_style', 'adventure'].filter((k) => this._filter[k]).length;
     const badge = document.getElementById('explore-filter-count');
     if (badge) { badge.hidden = !panelCount; badge.textContent = panelCount || ''; }
 
@@ -317,10 +325,18 @@ Pages.Explore = {
     }
 
     try {
-      const res = await API.getJourneys({ ...this._params(), page: this._page, limit: this.PAGE_SIZE });
+      const { now, ...params } = this._params();
+      // "open now" is judged on each door's own clock, so it looks at every door at once
+      const res = now
+        ? await API.getJourneys({ ...params, page: 1, limit: 100 })
+        : await API.getJourneys({ ...params, page: this._page, limit: this.PAGE_SIZE });
       if (seq !== this._seq || !grid.isConnected) return; // a newer request owns the grid
-      const journeys = res.data || [];
+      let journeys = res.data || [];
       this._total = res.total || 0;
+      if (now) {
+        journeys = journeys.filter((j) => j.entrance && DoorClock.state(j.entrance).open);
+        this._total = journeys.length;
+      }
       if (reset) {
         this._loaded = journeys.length;
         grid.innerHTML = journeys.length

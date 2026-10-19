@@ -169,3 +169,21 @@
 @media (max-width: 760px) {
   :root { --nav-h: 56px; }
 }
+
+/* Eight realms, spaced around the hue circle at one lightness per theme; lantern amber is kept for
+   "open right now". Used by the doors on the home page, Explore and the journeys. */
+:root {
+  --realm-fire-stone: oklch(.72 .14 32); --realm-sand-stars: oklch(.8 .11 85); --realm-old-roads: oklch(.76 .1 125);
+  --realm-ice-night: oklch(.8 .09 180); --realm-water-deep: oklch(.72 .12 245); --realm-mirror-salt: oklch(.86 .025 260);
+  --realm-mist-temple: oklch(.74 .1 305); --realm-city-rules: oklch(.72 .14 358);
+  --lamp-open: #f2c46d;
+}
+[data-theme="light"] {
+  --realm-fire-stone: oklch(.52 .15 32); --realm-sand-stars: oklch(.56 .11 85); --realm-old-roads: oklch(.52 .1 125);
+  --realm-ice-night: oklch(.53 .09 180); --realm-water-deep: oklch(.5 .13 245); --realm-mirror-salt: oklch(.5 .03 260);
+  --realm-mist-temple: oklch(.5 .11 305); --realm-city-rules: oklch(.52 .15 358);
+  --lamp-open: #b8690f;
+}
+/* the opening and the threshold are night in both themes */
+.home-hero, .home-threshold { --lamp-open: #f2c46d; }
+
