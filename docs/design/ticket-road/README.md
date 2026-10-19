@@ -10,6 +10,7 @@ stays painted in CSS.
 | | Dark · 中文 | Light · English |
 |---|---|---|
 | The Night Station (`#/station`) | ![](station-dark-zh.jpg) | ![](station-light-en.jpg) |
+| A new station: the tickets it hangs itself, signed 夜站 / The Night Station | ![](station-fresh-dark-zh.jpg) | ![](station-fresh-light-en.jpg) |
 | Timetable: station clock, season ring, destination, luggage tags | ![](station-timetable-dark-zh.jpg) | ![](station-timetable-light-en.jpg) |
 | A ticket’s back after lighting it (doors it borrowed from, the lantern) | ![](ticket-lit-dark-zh.jpg) | ![](ticket-lit-light-en.jpg) |
 | The end of a door: the rubbing (lamp ash at night, charcoal by day) | ![](rubbing-done-dark-zh.jpg) | ![](rubbing-done-light-en.jpg) |

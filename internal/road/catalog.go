@@ -25,6 +25,10 @@ type Catalog struct {
 	byNo    map[int]content.Entrance
 	reading map[string][2]int // slug -> zh characters, en words of the story
 	key     []byte            // HMAC key for author hashes
+
+	curated         []CuratedTicket // the station's own tickets (curated.json)
+	curatedByCode   map[string]int
+	curatedProblems []string
 }
 
 // NewCatalog indexes the built slips and the entrances. key keeps author hashes unlinkable to ids.
@@ -38,6 +42,7 @@ func NewCatalog(slips []compose.Fragment, entrances []content.Entrance, vocab *V
 		c.byNo[e.Entrance.No] = e
 		c.reading[e.Slug] = [2]int{zhChars(e.ZH), enWords(e.EN)}
 	}
+	c.loadCurated()
 	return c
 }
 

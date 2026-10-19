@@ -388,6 +388,7 @@ type PostRow struct {
 	Tags       []string
 	Totals     light.Totals
 	Lit        bool // lamp_totals has a row
+	Curated    bool // one of the station's own tickets (content, not a table row)
 }
 
 const postColumns = `p.code, p.user_id, p.author_hash, p.alias_slug, p.alias_no, p.status, p.realm, p.marks, p.transfer, p.borrowed, p.posted_at,
@@ -835,6 +836,34 @@ func recomputeWork(ctx context.Context, q execQuerier, kind, id string, m float6
 		  updated_at = excluded.updated_at`,
 		kind, id, t.N, t.WSum, t.RealM, t.MovedM, t.FitM, t.Bright, t.Lower, t.TopAxis, light.JoinKeys(t.TopStamps), sqlTime(now))
 	return t, err
+}
+
+// TotalsMany reads the aggregates of several works of one kind; works nobody lit are missing.
+func (r *RoadRepository) TotalsMany(ctx context.Context, kind string, ids []string) (map[string]light.Totals, error) {
+	out := map[string]light.Totals{}
+	if len(ids) == 0 {
+		return out, nil
+	}
+	args := []interface{}{kind}
+	for _, id := range ids {
+		args = append(args, id)
+	}
+	rows, err := r.db.QueryContext(ctx, `SELECT work_id, n, w_sum, real_m, moved_m, fit_m, bright, lower, top_axis, top_stamps FROM lamp_totals
+		WHERE work_kind = ? AND work_id IN (`+placeholders(len(ids))+`)`, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id, stamps string
+		var t light.Totals
+		if err := rows.Scan(&id, &t.N, &t.WSum, &t.RealM, &t.MovedM, &t.FitM, &t.Bright, &t.Lower, &t.TopAxis, &stamps); err != nil {
+			return nil, err
+		}
+		t.TopStamps = light.SplitKeys(stamps)
+		out[id] = t
+	}
+	return out, rows.Err()
 }
 
 // Totals reads a work's aggregate (zero Totals when nobody lit it).

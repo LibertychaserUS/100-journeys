@@ -216,6 +216,16 @@ So `keeps` should read as a thing you leave with, and changing an option key ren
 tickets may already hold. Near places (no entrance) are held from the first visit; slips no door
 hands out (stays, rituals, plain keepsakes, a season no door opens in) are open to everyone.
 
+## The station's own tickets
+
+`internal/road/curated.json` holds 8–16 tickets the Night Station hangs itself, so its board is
+never empty: `{ code, day, tags, picks }`. Picks are slip keys (place, hour, season, stay, ritual,
+keepsake) exactly as a traveller's ticket stores them; postmarks and the realm are worked out the
+same way (an hour or a season takes the place's own door when it opens then). Rules checked at
+start: at least three slips, printed tags only (at most five), every platform covered, and a code of
+twelve letters or digits that contains a 0 or a 1 (share codes never do). Prefer keepsakes whose
+text does not end in a full stop or closing quote, so the ticket sentence reads cleanly.
+
 ## Funnel events
 
 Sent with `API.track(type, slug, meta)`; `meta` is stored as JSON together with an anonymous
