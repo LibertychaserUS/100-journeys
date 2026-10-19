@@ -1,6 +1,6 @@
 {
   "slug": "turkey-cappadocia-balloon",
-  "entrance": { "no": 9, "realm": "fire-stone", "pace": "hour", "scale": "far", "seasons": ["spring", "autumn"], "time": "dawn" },
+  "entrance": { "no": 9, "realm": "fire-stone", "pace": "hour", "scale": "far", "seasons": ["spring", "autumn"], "time": "dawn", "tz": "Europe/Istanbul", "months": [3, 4, 5, 9, 10, 11] },
   "journey": {
     "fantasy_type": "visual", "visual_style": "surreal",
     "adventure_index": 3, "obscurity_level": 2, "risk_level": 2, "price": 16999,

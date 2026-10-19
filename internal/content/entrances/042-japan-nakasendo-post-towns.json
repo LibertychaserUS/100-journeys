@@ -1,6 +1,6 @@
 {
   "slug": "japan-nakasendo-post-towns",
-  "entrance": { "no": 42, "realm": "old-roads", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "morning" },
+  "entrance": { "no": 42, "realm": "old-roads", "pace": "day", "scale": "near", "seasons": ["autumn"], "time": "morning", "tz": "Asia/Tokyo", "months": [9, 10, 11] },
   "journey": {
     "fantasy_type": "culture", "visual_style": "minimal",
     "adventure_index": 3, "obscurity_level": 4, "risk_level": 1, "price": 6999,

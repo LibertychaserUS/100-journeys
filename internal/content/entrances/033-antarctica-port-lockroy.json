@@ -1,6 +1,6 @@
 {
   "slug": "antarctica-port-lockroy",
-  "entrance": { "no": 33, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["summer"], "time": "midnight" },
+  "entrance": { "no": 33, "realm": "ice-night", "pace": "multi-day", "scale": "polar", "seasons": ["summer"], "time": "midnight", "tz": "Antarctica/Palmer", "months": [11, 12, 1, 2, 3] },
   "journey": {
     "fantasy_type": "culture", "visual_style": "minimal",
     "adventure_index": 6, "obscurity_level": 8, "risk_level": 3, "price": 39999,

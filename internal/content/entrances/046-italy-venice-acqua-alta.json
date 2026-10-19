@@ -1,6 +1,6 @@
 {
   "slug": "italy-venice-acqua-alta",
-  "entrance": { "no": 46, "realm": "city-rules", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "night" },
+  "entrance": { "no": 46, "realm": "city-rules", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "night", "tz": "Europe/Rome", "months": [10, 11] },
   "journey": {
     "fantasy_type": "culture", "visual_style": "dramatic",
     "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 13999,

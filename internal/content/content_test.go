@@ -172,7 +172,7 @@ func validSample() Entrance {
 	}
 	return Entrance{
 		Slug:     "sample",
-		Entrance: Meta{No: 99, Realm: "mirror-salt", Pace: "day", Scale: "far", Seasons: []string{"rainy"}, Time: "predawn"},
+		Entrance: Meta{No: 99, Realm: "mirror-salt", Pace: "day", Scale: "far", Seasons: []string{"rainy"}, Time: "predawn", TZ: "America/La_Paz", Months: []int{12, 1, 2, 3}},
 		Journey:  Base{FantasyType: "solitude", VisualStyle: "surreal", Adventure: 4, Obscurity: 7, Risk: 2, Price: 100, Tags: []string{"solitude"}, MBTI: map[string]int{"INFP": 5, "INFJ": 4}},
 		Cover:    Cover{Path: "generated/card-salt-mirror.jpg", License: "self-generated", Source: "recorded in docs/content/IMAGE_SOURCES.md"},
 		ZH:       text("zh"),
@@ -263,9 +263,9 @@ func TestImages_HaveDerivatives(t *testing.T) {
 		base := filepath.Base(rel)
 		switch {
 		case strings.HasPrefix(base, "card-"):
-			return []int{480, 720}
+			return []int{120, 480, 720}
 		case base == "cover.jpg":
-			return []int{480, 720, 1120}
+			return []int{120, 480, 720, 1120}
 		case base == "hero.jpg" || base == "scene-1.jpg" || base == "scene-2.jpg":
 			return []int{960, 1536}
 		case base == "scene-3.jpg":

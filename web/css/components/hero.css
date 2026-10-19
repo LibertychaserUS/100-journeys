@@ -1,87 +1,126 @@
 /* =============================================================
    HOME HERO — image-led, stays dark in both themes (it is a photo).
+   One beat per scene: pictures cross while the old copy leaves, the new copy arrives on its
+   decoded picture. On the first load the same entrance runs from the static shell into the app
+   (--boot-t carries the time already spent), so nothing jumps.
    ============================================================= */
 
 .home-hero {
+  --exit: 0;
   position: relative; isolation: isolate; overflow: hidden;
-  min-height: min(92vh, 880px); display: flex; align-items: flex-end;
-  color: var(--color-on-media); background: #07080b;
+  min-height: max(640px, 100svh); display: flex; align-items: flex-end;
+  color: var(--color-on-media); background: #07080b; touch-action: pan-y;
 }
-.home-hero__slides { position: absolute; inset: 0; z-index: -3; overflow: hidden; }
-.home-hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; opacity: 0; transform: scale(1.02); transition: opacity 1.4s var(--ease-in-out); }
+.home-hero__slides {
+  position: absolute; inset: 0; z-index: -3; overflow: hidden; transform-origin: 50% 40%;
+  transform: scale(calc(1 + var(--exit) * .06)); filter: brightness(calc(1 - var(--exit) * .5));
+}
+.home-hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 38%; opacity: 0; transform: scale(1.02); transition: opacity var(--dur-scene, 1100ms) var(--ease-in-out); }
 .home-hero__img.is-active { opacity: 1; }
+.home-hero__img.is-leaving { animation: none !important; }
 @media (prefers-reduced-motion: no-preference) {
   .home-hero.is-playing .home-hero__img.is-active { animation: hero-push 7.4s linear forwards; }
-  .home-hero.is-held .home-hero__img.is-active { animation-play-state: paused; }
+  .home-hero.is-held .home-hero__img.is-active, .home-hero.is-offscreen .home-hero__img.is-active { animation-play-state: paused; }
 }
 @keyframes hero-push { from { transform: scale(1.02); } to { transform: scale(1.1); } }
-.home-hero__copy { min-height: 0; }
-.home-hero__line { display: inline-block; }
-@media (prefers-reduced-motion: no-preference) {
-  .home-hero__copy.is-in .home-hero__line { animation: hero-line .9s var(--ease-out) both; }
-  .home-hero__copy.is-in .home-hero__lead .home-hero__line { animation-delay: .12s; }
-  .home-hero__copy.is-in .home-hero__enter { animation: hero-line .9s .22s var(--ease-out) both; }
-}
-@keyframes hero-line { from { opacity: 0; transform: translate3d(0, 28px, 0); filter: blur(6px); } }
-.home-hero__enter { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-base); color: #f6f1e8; text-decoration: underline; text-decoration-color: rgba(246, 241, 232, .4); text-underline-offset: 5px; }
-.home-hero__enter:hover { text-decoration-color: currentColor; }
-.home-hero__foot { margin-top: var(--space-5); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-5); flex-wrap: wrap; }
-.home-hero__dots { display: flex; gap: 10px; }
-.home-hero__dot { width: 56px; min-height: 32px; display: grid; align-content: center; gap: 7px; }
-.home-hero__dot span { font-size: 11px; letter-spacing: .08em; text-align: left; color: rgba(246, 241, 232, .5); transition: color var(--dur) var(--ease-out); }
-.home-hero__dot[aria-current="true"] span, .home-hero__dot:hover span { color: #f6f1e8; }
-/* The visitor's own hour, and how many doors are open in it */
-.home-hero__now { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: var(--text-sm); color: rgba(246, 241, 232, .7); }
-.home-hero__now time { font-size: var(--text-lg); letter-spacing: .06em; color: #f6f1e8; }
-.home-hero__now span + span::before { content: "·"; margin-right: 12px; color: rgba(246, 241, 232, .4); }
-@media (prefers-reduced-motion: no-preference) { .home-hero__now time i { animation: hero-colon 2s steps(1, end) infinite; } }
-@keyframes hero-colon { 50% { opacity: .25; } }
-.home-hero__dot i { display: block; height: 2px; border-radius: 1px; background: rgba(246, 241, 232, .28); overflow: hidden; position: relative; }
-.home-hero__dot i::after { content: ""; position: absolute; inset: 0; background: #f6f1e8; transform: scaleX(0); transform-origin: left; }
-.home-hero__dot[aria-current="true"] i::after { transform: scaleX(1); }
-@media (prefers-reduced-motion: no-preference) {
-  .home-hero.is-playing:not(.is-held) .home-hero__dot[aria-current="true"] i::after { animation: hero-dot 6.8s linear both; }
-}
-@keyframes hero-dot { from { transform: scaleX(0); } }
+
 .home-hero__particles { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
-/* Photo dissolves into the page instead of ending on a hard edge (matters most in the light theme). */
-.home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 72px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--color-bg)); }
 .home-hero__shade {
   position: absolute; inset: 0; z-index: -2;
   background:
-    linear-gradient(90deg, rgba(6, 7, 10, .86) 0%, rgba(6, 7, 10, .52) 45%, rgba(6, 7, 10, .06) 78%),
-    linear-gradient(0deg, rgba(6, 7, 10, .9) 0%, rgba(6, 7, 10, 0) 42%);
+    linear-gradient(90deg, rgba(6, 7, 10, .82) 0%, rgba(6, 7, 10, .5) 42%, rgba(6, 7, 10, .06) 76%),
+    linear-gradient(0deg, rgba(6, 7, 10, .9) 0%, rgba(6, 7, 10, 0) 46%),
+    linear-gradient(180deg, rgba(6, 7, 10, .5) 0%, rgba(6, 7, 10, 0) 18%);
 }
-.home-hero__content { padding-block: calc(var(--nav-h) + var(--space-7)) clamp(48px, 10vh, 112px); }
-.home-hero__eyebrow { font-size: var(--text-sm); letter-spacing: .14em; color: rgba(246, 241, 232, .72); }
-.home-hero__title { margin-top: 14px; max-width: 11em; font-family: var(--font-story); font-weight: 700; font-size: clamp(3rem, 8vw, 6.25rem); line-height: 1.02; letter-spacing: .04em; text-wrap: balance; }
-.home-hero.scene-door .home-hero__title { font-size: clamp(2.5rem, 6.4vw, 5.25rem); line-height: 1.08; letter-spacing: .02em; }
-:lang(en) .home-hero__title { letter-spacing: 0; }
-.home-hero__lead { margin-top: 18px; max-width: 26em; font-size: clamp(1.125rem, 2.1vw, 1.5rem); line-height: 1.5; color: rgba(246, 241, 232, .92); text-wrap: balance; }
-
-.home-hero__search {
-  margin-top: var(--space-6); display: flex; align-items: center; gap: var(--space-2); max-width: 580px; min-height: 60px;
-  padding: 6px 6px 6px 20px; border-radius: 16px;
-  background: rgba(20, 22, 28, .62); border: 1px solid rgba(255, 255, 255, .18);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+/* A little film grain keeps large photos from looking smeared on dense screens. */
+.home-hero__grain {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .09; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.home-hero__search:focus-within { border-color: #f2c46d; box-shadow: 0 0 0 3px rgba(242, 196, 109, .25); }
-.home-hero__search .icon { color: rgba(246, 241, 232, .6); }
-.home-hero__search input { flex: 1; min-width: 0; height: 46px; background: transparent; border: 0; outline: 0; font-size: var(--text-md); color: #f6f1e8; }
-.home-hero__search input::placeholder { color: rgba(246, 241, 232, .58); }
-.home-hero__search input::-webkit-search-cancel-button { filter: invert(1); }
-.home-hero__search .btn { min-height: 48px; border-radius: 12px; background: #f2c46d; color: #1d1405; }
-.home-hero__search .btn:hover { background: #f7d48c; }
+/* Dark theme: the photo dissolves into the page. Light theme: a deliberate edge instead of a grey band. */
+.home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 96px; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--color-bg)); }
+[data-theme="light"] .home-hero { border-radius: 0 0 28px 28px; box-shadow: 0 40px 80px -64px rgba(20, 22, 28, .6); }
+[data-theme="light"] .home-hero::after { display: none; }
 
-.home-hero__moods { margin-top: var(--space-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.home-hero__moods span { font-size: var(--text-sm); color: rgba(246, 241, 232, .66); margin-right: 4px; }
-.home-hero__moods .chip { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .2); color: #f6f1e8; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.home-hero__moods .chip:hover { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .34); }
+.home-hero__content { padding-block: calc(var(--nav-h) + var(--space-7)) clamp(36px, 7vh, 80px); }
+.home-hero__copy { min-height: 0; transform: translate3d(0, calc(var(--exit) * -40px), 0); opacity: calc(1 - var(--exit) * 1.6); }
+.home-hero__line { display: inline-block; }
+.home-hero__eyebrow { font-size: var(--text-sm); letter-spacing: .14em; color: rgba(246, 241, 232, .76); }
+:lang(en) .home-hero__eyebrow { letter-spacing: .02em; }
+.home-hero__title {
+  margin-top: 14px; max-width: 11em; font-family: var(--font-story); font-weight: 700;
+  font-size: clamp(3.25rem, 7.2vw, 7.5rem); line-height: 1.02; letter-spacing: .04em; text-wrap: balance; word-break: keep-all;
+}
+:lang(en) .home-hero__title { letter-spacing: 0; word-break: normal; }
+.home-hero.scene-door .home-hero__title { font-size: clamp(2.75rem, 6vw, 6.25rem); line-height: 1.06; letter-spacing: .02em; }
+.home-hero__title .t-place { display: block; margin-top: .5em; font-family: var(--font-ui); font-weight: 500; font-size: max(.3em, 1rem); letter-spacing: .14em; color: rgba(246, 241, 232, .74); }
+:lang(en) .home-hero__title .t-place { letter-spacing: .02em; }
+.home-hero__lead { margin-top: 18px; max-width: 30em; font-size: clamp(1.0625rem, 1.7vw, 1.375rem); line-height: 1.65; color: rgba(246, 241, 232, .92); text-wrap: pretty; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero__copy.is-out .home-hero__line { opacity: 0; transform: translate3d(0, -8px, 0); transition: opacity .3s cubic-bezier(.4, 0, 1, 1), transform .3s cubic-bezier(.4, 0, 1, 1); }
+  .home-hero__copy.is-in .home-hero__line { animation: hero-line .9s var(--ease-out) both; }
+  .home-hero__copy.is-in .home-hero__title .home-hero__line { animation-delay: .08s; }
+  .home-hero__copy.is-in .home-hero__lead .home-hero__line { animation-delay: .16s; }
+  /* First load: the photo fades in, then the lines, the action and the controls, in one sequence. */
+  .home-hero.is-booting .home-hero__slides { animation: hero-fade .9s var(--ease-out) both; animation-delay: calc(100ms + var(--boot-t, 0ms)); }
+  .home-hero.is-booting .home-hero__copy.is-in .home-hero__line { animation-delay: calc(360ms + var(--boot-t, 0ms)); }
+  .home-hero.is-booting .home-hero__copy.is-in .home-hero__title .home-hero__line { animation-delay: calc(440ms + var(--boot-t, 0ms)); }
+  .home-hero.is-booting .home-hero__copy.is-in .home-hero__lead .home-hero__line { animation-delay: calc(520ms + var(--boot-t, 0ms)); }
+  .home-hero.is-booting .home-hero__actions { animation: hero-line .9s var(--ease-out) both; animation-delay: calc(640ms + var(--boot-t, 0ms)); }
+  .home-hero.is-booting .home-hero__foot { animation: hero-fade .9s var(--ease-out) both; animation-delay: calc(760ms + var(--boot-t, 0ms)); }
+}
+@keyframes hero-line { from { opacity: 0; transform: translate3d(0, 28px, 0); filter: blur(6px); } }
+@keyframes hero-fade { from { opacity: 0; } }
+
+.home-hero__actions { margin-top: var(--space-6); display: flex; gap: 12px; flex-wrap: wrap; }
+.home-hero__step { min-height: 48px; padding: 0 22px; border-radius: 999px; gap: 10px; background: #f2c46d; color: #1d1405; font-weight: var(--weight-semibold); box-shadow: 0 10px 30px -12px rgba(242, 196, 109, .6); }
+.home-hero__step:hover { background: #f7d48c; }
+.home-hero__step .icon { transition: transform var(--dur) var(--ease-out); }
+.home-hero__step:hover .icon { transform: translateX(3px); }
+
+.home-hero__foot { margin-top: var(--space-6); min-height: 40px; display: flex; align-items: center; gap: var(--space-3) var(--space-5); flex-wrap: wrap; }
+.home-hero__pause { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, .28); color: #f6f1e8; background: rgba(255, 255, 255, .06); }
+.home-hero__pause:hover { background: rgba(255, 255, 255, .14); }
+.home-hero__dots { display: flex; gap: 10px; align-items: flex-start; }
+.home-hero__dot { position: relative; width: 56px; min-height: 36px; display: grid; align-content: start; gap: 8px; padding-top: 8px; }
+.home-hero__dot i { display: block; height: 2px; border-radius: 1px; background: rgba(246, 241, 232, .28); overflow: hidden; position: relative; }
+.home-hero__dot i::after { content: ""; position: absolute; inset: 0; background: #f6f1e8; transform: scaleX(0); transform-origin: left; }
+.home-hero__dot[aria-current="true"] i::after { transform: scaleX(1); }
+.home-hero__dot span { font-size: .6875rem; letter-spacing: .08em; text-align: left; color: rgba(246, 241, 232, .55); transition: color var(--dur) var(--ease-out); }
+.home-hero__dot[aria-current="true"] span, .home-hero__dot:hover span { color: #f6f1e8; }
+/* The place behind each dot, on hover or focus */
+.home-hero__dot[data-label]:hover::before, .home-hero__dot[data-label]:focus-visible::before {
+  content: attr(data-label); position: absolute; left: 0; bottom: calc(100% + 6px); white-space: nowrap; pointer-events: none;
+  padding: 6px 10px; border-radius: 8px; font-size: var(--text-xs); color: #f6f1e8; background: rgba(10, 11, 14, .82);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero.is-playing:not(.is-held):not(.is-offscreen) .home-hero__dot[aria-current="true"] i::after { animation: hero-dot 6.8s linear both; }
+}
+@keyframes hero-dot { from { transform: scaleX(0); } }
+/* The visitor's time, and a way straight to the doors open right now */
+.home-hero__now { margin-left: auto; display: inline-flex; align-items: baseline; gap: 12px; font-size: var(--text-sm); color: rgba(246, 241, 232, .8); }
+.home-hero__now time { font-size: var(--text-lg); letter-spacing: .06em; color: #f6f1e8; }
+.home-hero__now span { border-bottom: 1px solid rgba(246, 241, 232, .32); padding-bottom: 2px; transition: border-color var(--dur); }
+.home-hero__now:hover span { border-color: currentColor; }
+@media (prefers-reduced-motion: no-preference) { .home-hero__now time i { animation: hero-colon 2s steps(1, end) infinite; } }
+@keyframes hero-colon { 50% { opacity: .25; } }
 .home-hero :focus-visible { outline-color: #f2c46d; }
 
 @media (max-width: 760px) {
-  .home-hero { min-height: 88vh; }
-  .home-hero__shade { background: linear-gradient(0deg, rgba(6, 7, 10, .95) 0%, rgba(6, 7, 10, .55) 55%, rgba(6, 7, 10, .2) 100%); }
-  .home-hero__search { min-height: 54px; padding-left: 14px; }
-  .home-hero__search .btn { min-height: 42px; padding: 0 14px; }
+  .home-hero__shade { background: linear-gradient(0deg, rgba(6, 7, 10, .95) 0%, rgba(6, 7, 10, .6) 42%, rgba(6, 7, 10, .05) 70%), linear-gradient(180deg, rgba(6, 7, 10, .55) 0%, rgba(6, 7, 10, 0) 22%); }
+  .home-hero__img { object-position: 50% 30%; }
+  .home-hero__content { padding-bottom: 28px; }
+  .home-hero__title { font-size: clamp(2.75rem, 13vw, 3.75rem); }
+  .home-hero.scene-door .home-hero__title { font-size: clamp(2.25rem, 10vw, 3.125rem); }
+  .home-hero__lead { font-size: var(--text-md); line-height: 1.6; }
+  .home-hero__actions { margin-top: var(--space-5); }
+  .home-hero__foot { margin-top: var(--space-5); min-height: 76px; }
+  .home-hero__now { margin-left: 0; flex-basis: 100%; }
 }
+
+/* The static opening in index.html: shown only on the home route, in one language, until the
+   app renders the real one in its place. */
+.boot-shell { display: none; }
+html[data-boot="home"] .boot-shell { display: flex; }
+html[data-boot-lang="en"] .boot-shell [lang="zh-CN"], html[data-boot-lang="zh"] .boot-shell [lang="en"] { display: none; }

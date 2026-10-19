@@ -46,6 +46,9 @@ Pages.Detail = {
           Router.replaceQuery({});
           Checkout.resume(orderId, res.data, { onPaid: () => this._refreshBalance() });
         }
+        // Let a route transition land on the decoded opening image (never wait long for it).
+        const img = main.querySelector('.scene__media--hero img');
+        return img && img.decode ? Promise.race([img.decode().catch(() => {}), new Promise((r) => setTimeout(r, 300))]) : undefined;
       })
       .catch((err) => {
         if (seq !== this._seq) return;

@@ -1,6 +1,6 @@
 {
   "slug": "norway-aurora-hunt",
-  "entrance": { "no": 6, "realm": "ice-night", "pace": "day", "scale": "far", "seasons": ["polar-night"], "time": "night" },
+  "entrance": { "no": 6, "realm": "ice-night", "pace": "day", "scale": "far", "seasons": ["polar-night"], "time": "night", "tz": "Europe/Oslo", "months": [11, 12, 1] },
   "journey": {
     "fantasy_type": "night", "visual_style": "dramatic",
     "adventure_index": 4, "obscurity_level": 3, "risk_level": 2, "price": 18999,

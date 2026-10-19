@@ -1,6 +1,6 @@
 {
   "slug": "sichuan-emei-buddha-light",
-  "entrance": { "no": 21, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["autumn", "winter"], "time": "afternoon" },
+  "entrance": { "no": 21, "realm": "mist-temple", "pace": "day", "scale": "near", "seasons": ["autumn", "winter"], "time": "afternoon", "tz": "Asia/Shanghai", "months": [9, 10, 11, 12, 1, 2] },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "dramatic",
     "adventure_index": 4, "obscurity_level": 3, "risk_level": 1, "price": 5999,

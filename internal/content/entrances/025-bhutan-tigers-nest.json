@@ -1,6 +1,6 @@
 {
   "slug": "bhutan-tigers-nest",
-  "entrance": { "no": 25, "realm": "mist-temple", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "morning" },
+  "entrance": { "no": 25, "realm": "mist-temple", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "morning", "tz": "Asia/Thimphu", "months": [9, 10, 11] },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "dramatic",
     "adventure_index": 4, "obscurity_level": 4, "risk_level": 2, "price": 19999,

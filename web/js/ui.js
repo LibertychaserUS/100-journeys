@@ -9,6 +9,8 @@ const UI = (() => {
     moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
     close: '<path d="M6 6l12 12M18 6 6 18"/>',
+    pause: '<path d="M9 6v12M15 6v12"/>',
+    play: '<path d="M8 5.5v13l10-6.5z"/>',
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
     heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>',
@@ -79,6 +81,17 @@ const UI = (() => {
     return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}">${img}</picture>`;
   }
 
+  /** A journey title as its name and its place ("封上的小屋 · 敦煌藏经洞"), so lines break between
+   *  the two and never inside a name, and the separator never starts a line. */
+  function titleParts(title) {
+    const i = String(title || '').indexOf(' · ');
+    return i < 0 ? [String(title || ''), ''] : [title.slice(0, i), title.slice(i + 3)];
+  }
+  function titleHTML(title) {
+    const [name, place] = titleParts(title);
+    return `<span class="t-name">${esc(name)}</span>${place ? `<span class="t-place">${esc(place)}</span>` : ''}`;
+  }
+
   function journeyCard(j, { eager = false } = {}) {
     const mood = (j.mood_keywords || [])[0];
     return `
@@ -138,7 +151,10 @@ const UI = (() => {
     const a = e.target.closest && e.target.closest(cardSel);
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
     document.querySelectorAll('[style*="view-transition-name"]').forEach((el) => { el.style.viewTransitionName = ''; });
-    const img = a.querySelector('img');
+    // What grows into the journey's opening: a named source (the hero's current photo), the link's
+    // own image, or the link itself (a door).
+    const from = a.dataset.vtFrom ? document.querySelector(a.dataset.vtFrom) : null;
+    const img = from || a.querySelector('img') || (a.hasAttribute('data-vt-self') ? a : null);
     if (img) img.style.viewTransitionName = 'journey-hero';
   });
 
@@ -211,7 +227,7 @@ const UI = (() => {
   }
 
   return {
-    icon, esc, fantasyTypes, fantasyLabel, tagLabel, region, topMbti, coins, meter,
+    icon, esc, fantasyTypes, fantasyLabel, tagLabel, region, topMbti, coins, meter, titleParts, titleHTML,
     journeyCard, skeletonCards, trackCardClicks, toast, sheet, setMeta, picture,
   };
 })();

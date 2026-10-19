@@ -1,6 +1,6 @@
 {
   "slug": "greece-meteora-monasteries",
-  "entrance": { "no": 24, "realm": "mist-temple", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "dawn" },
+  "entrance": { "no": 24, "realm": "mist-temple", "pace": "day", "scale": "far", "seasons": ["autumn"], "time": "dawn", "tz": "Europe/Athens", "months": [9, 10, 11] },
   "journey": {
     "fantasy_type": "spiritual", "visual_style": "dramatic",
     "adventure_index": 3, "obscurity_level": 3, "risk_level": 1, "price": 13999,

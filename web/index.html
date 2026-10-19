@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>桃源百旅 · 一百种不可思议的旅行</title>
-  <meta name="description" content="桃源百旅 · 100 Journeys — 按心情、MBTI 和幻想类型进入的故事化旅行灵感。Story-driven fantasy travel by mood and personality." />
+  <meta name="description" content="一百扇藏在真实地方的门，每一扇只在自己的季节和时辰打开。A hundred doors hidden in real places, each opening only in its own season and hour." />
   <meta name="theme-color" content="#0d0f13" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="桃源百旅 · 100 Journeys" />
@@ -29,8 +29,14 @@
         hp.rel = 'preload'; hp.as = 'image'; hp.type = 'image/avif'; hp.setAttribute('fetchpriority', 'high');
         hp.href = '/static/assets/images/generated/hero-taoyuan.1600.avif';
         hp.setAttribute('imagesrcset', '/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w');
-        hp.setAttribute('imagesizes', '100vw');
+        hp.setAttribute('imagesizes', 'max(100vw, 177.8svh)');
         document.head.appendChild(hp);
+        // The static opening below shows at once, in the reader's language, until the app takes over.
+        var bl = null;
+        try { bl = localStorage.getItem('lang'); } catch (e) {}
+        if (bl !== 'zh' && bl !== 'en') bl = /^zh/i.test((navigator.languages && navigator.languages[0]) || navigator.language || 'zh') ? 'zh' : 'en';
+        document.documentElement.setAttribute('data-boot', 'home');
+        document.documentElement.setAttribute('data-boot-lang', bl);
       }
       // A journey page starts fetching its data before the scripts arrive.
       var deep = /^#\/journey\/([a-z0-9-]+)/.exec(location.hash);
@@ -99,7 +105,23 @@
   <a class="skip-link" href="#main-content" id="skip-link">跳到正文</a>
   <div id="app">
     <header id="main-nav"></header>
-    <main id="main-content" tabindex="-1"></main>
+    <main id="main-content" tabindex="-1">
+      <section class="home-hero scene-taoyuan is-booting boot-shell" style="--boot-t:0ms" aria-hidden="true">
+        <div class="home-hero__slides">
+          <picture><source type="image/avif" srcset="/static/assets/images/generated/hero-taoyuan.960.avif 960w, /static/assets/images/generated/hero-taoyuan.1600.avif 1600w" sizes="max(100vw, 177.8svh)"><img class="home-hero__img is-active" src="/static/assets/images/generated/hero-taoyuan.jpg" alt="" fetchpriority="high" decoding="async"></picture>
+        </div>
+        <div class="home-hero__shade"></div>
+        <div class="container home-hero__content">
+          <div class="home-hero__copy is-in">
+            <p class="home-hero__eyebrow"><span class="home-hero__line"><span lang="zh-CN">渔人出桃源时，一路做了记号。</span><span lang="en">Leaving the peach-blossom land, the fisherman marked the way.</span></span></p>
+            <p class="home-hero__title"><span class="home-hero__line"><span lang="zh-CN">桃源百旅</span><span lang="en">100 Journeys</span></span></p>
+            <p class="home-hero__lead"><span class="home-hero__line"><span lang="zh-CN">一百扇门藏在真实的地方，各自只在自己的季节和时辰打开。</span><span lang="en">A hundred doors hidden in real places, each opening only in its own season and hour.</span></span></p>
+          </div>
+          <div class="home-hero__actions"><span class="btn btn--primary home-hero__step"><span lang="zh-CN">推门</span><span lang="en">Step in</span></span></div>
+          <div class="home-hero__foot"></div>
+        </div>
+      </section>
+    </main>
     <footer id="main-footer" class="site-footer"></footer>
   </div>
 

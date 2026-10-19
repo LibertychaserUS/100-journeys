@@ -1,6 +1,6 @@
 {
   "slug": "japan-sakurajima-ash-city",
-  "entrance": { "no": 19, "realm": "fire-stone", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "morning" },
+  "entrance": { "no": 19, "realm": "fire-stone", "pace": "day", "scale": "near", "seasons": ["summer"], "time": "morning", "tz": "Asia/Tokyo", "months": [6, 7, 8] },
   "journey": {
     "fantasy_type": "culture", "visual_style": "raw",
     "adventure_index": 2, "obscurity_level": 4, "risk_level": 2, "price": 5999,

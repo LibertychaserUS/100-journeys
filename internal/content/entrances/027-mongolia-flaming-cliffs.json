@@ -1,6 +1,6 @@
 {
   "slug": "mongolia-flaming-cliffs",
-  "entrance": { "no": 27, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["summer"], "time": "dusk" },
+  "entrance": { "no": 27, "realm": "sand-stars", "pace": "day", "scale": "far", "seasons": ["summer"], "time": "dusk", "tz": "Asia/Ulaanbaatar", "months": [6, 7, 8] },
   "journey": {
     "fantasy_type": "visual", "visual_style": "raw",
     "adventure_index": 5, "obscurity_level": 7, "risk_level": 2, "price": 14999,

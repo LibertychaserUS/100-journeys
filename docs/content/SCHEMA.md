@@ -34,7 +34,9 @@ journeys and analytics reference it, so **never rename an existing slug** (the 1
     "pace": "day",
     "scale": "far",
     "seasons": ["rainy"],          // 1+ of the season vocabulary
-    "time": "predawn"              // one of the time vocabulary
+    "time": "predawn",             // one of the time vocabulary
+    "tz": "America/La_Paz",        // the place's IANA time zone
+    "months": [12, 1, 2, 3]        // the months it opens in (local calendar, 1–12)
   },
   "journey": {
     "fantasy_type": "solitude",    // extreme | solitude | visual | culture | spiritual | night
@@ -153,6 +155,7 @@ Labels live in `web/js/i18n.js` under `entrance.*`.
 | pace | `hour` · `day` · `multi-day` |
 | scale | `near` · `far` · `polar` |
 | seasons | `spring` `summer` `autumn` `winter` `rainy` `dry` `polar-night` `midnight-sun` `any` |
+| tz, months | the door is open now when its own local month is in `months` and its local hour is in its `time` window (predawn 3–5, dawn 5–7, morning 7–11, noon 11–14, afternoon 13–17, dusk 17–19, blue-hour 18–20, night 19–24, midnight 0–3). `months` is written from the `opens` line, hemisphere included |
 | time | `predawn` `dawn` `morning` `noon` `afternoon` `dusk` `blue-hour` `night` `midnight` `any` |
 | tags | `extreme` `solitude` `visual` `culture` `hidden` `nature` `spiritual` `night` |
 

@@ -224,6 +224,10 @@ func main() {
 		handler.PaymentRoutes(api, paymentH)
 	}
 
+	doors := 0
+	if all, err := content.Load(); err == nil {
+		doors = len(all)
+	}
 	assetVersion := os.Getenv("ASSET_VERSION")
 	// CSS and JS are served as two bundles built from the files index.html lists (BUNDLE_ASSETS=0
 	// serves them one by one, for debugging).
@@ -247,7 +251,7 @@ func main() {
 				return "", err
 			}
 		}
-		return webapp.RenderIndex(page, webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version}), nil
+		return webapp.RenderIndex(page, webapp.Config{APIBase: "/api", MediaBase: mediaBase, AssetVersion: version, Doors: doors}), nil
 	}
 	serveBundle := func(kind string) gin.HandlerFunc {
 		return func(c *gin.Context) {
@@ -284,6 +288,11 @@ func main() {
 		}
 		return scheme + "://" + c.Request.Host
 	}
+	// Browsers and crawlers ask for /favicon.ico whatever the page says: give them the icon.
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		c.Header("Cache-Control", "public, max-age=86400")
+		c.File("./web/assets/icons/favicon-32.png")
+	})
 	r.GET("/robots.txt", func(c *gin.Context) {
 		c.Header("Cache-Control", "public, max-age=3600")
 		c.String(http.StatusOK, "User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: %s/sitemap.xml\n", originOf(c))
@@ -358,6 +367,7 @@ func main() {
 			c.String(http.StatusInternalServerError, "index.html not found")
 			return
 		}
+		html = webapp.HomeMeta(html, originOf(c))
 
 		c.Header("Cache-Control", "no-cache")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))

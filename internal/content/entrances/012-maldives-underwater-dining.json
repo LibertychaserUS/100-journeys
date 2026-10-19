@@ -1,6 +1,6 @@
 {
   "slug": "maldives-underwater-dining",
-  "entrance": { "no": 12, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "noon" },
+  "entrance": { "no": 12, "realm": "water-deep", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "noon", "tz": "Indian/Maldives", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
   "journey": {
     "fantasy_type": "visual", "visual_style": "surreal",
     "adventure_index": 1, "obscurity_level": 3, "risk_level": 1, "price": 35999,
