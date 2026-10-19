@@ -101,3 +101,38 @@ func TestCatalog_Alias(t *testing.T) {
 		t.Errorf("reading floor %s from %d zh chars, %d en words", floor, zh, en)
 	}
 }
+
+// UT-ROAD-005: the station's own tickets are real slips, cover every platform, carry postmarks,
+// and use codes share codes never take.
+func TestCatalog_CuratedTickets(t *testing.T) {
+	c := catalog(t)
+	for _, p := range c.ValidateCurated() {
+		t.Error(p)
+	}
+	list := c.Curated()
+	if n := len(list); n < 8 || n > 16 {
+		t.Fatalf("8-16 curated tickets expected, have %d", n)
+	}
+	transfer := 0
+	for _, ct := range list {
+		if len(ct.Marks) == 0 && ct.Picks.Place != "back-alley" && ct.Picks.Place != "last-train" {
+			t.Errorf("%s has no postmark", ct.Code)
+		}
+		if ct.Transfer {
+			transfer++
+		}
+		if ct.SearchText == "" || ct.Realm == "" {
+			t.Errorf("%s: realm %q, search text empty: %v", ct.Code, ct.Realm, ct.SearchText == "")
+		}
+	}
+	if transfer == 0 {
+		t.Error("some of the station's tickets should borrow from two doors")
+	}
+	uyuni, ok := c.CuratedTicket("road00000001")
+	if !ok || uyuni.Marks["hour"] != 1 || uyuni.Marks["place"] != 1 || uyuni.Transfer {
+		t.Errorf("predawn at Uyuni is postmarked with door 1: %+v", uyuni.Marks)
+	}
+	if !c.WrittenFor("bolivia-salt-flat-trek", "INFP") || c.WrittenFor("bolivia-salt-flat-trek", "ESTJ") {
+		t.Error("door affinity lookup")
+	}
+}

@@ -344,7 +344,7 @@ const Road = (() => {
               </div>
               <footer class="back__foot">
                 <a class="btn btn--primary" href="#/compose?from=${encodeURIComponent(v.code)}" data-depart>${esc(t('back.depart'))}</a>
-                ${v.mine ? '' : `<button class="btn btn--quiet btn--sm" type="button" data-report>${esc(t('back.report'))}</button>
+                ${v.mine || v.curated ? '' : `<button class="btn btn--quiet btn--sm" type="button" data-report>${esc(t('back.report'))}</button>
                 <button class="btn btn--quiet btn--sm" type="button" data-block>${esc(t('back.block'))}</button>`}
               </footer>
             </section>

@@ -99,6 +99,9 @@ func main() {
 		log.Fatalf("ticket road vocabulary is invalid: %s", strings.Join(problems, "; "))
 	}
 	catalog := road.NewCatalog(fragments, entrances, vocab, middleware.DeriveKey("ticket-road/author"))
+	if problems := catalog.ValidateCurated(); len(problems) > 0 {
+		log.Fatalf("the station's own tickets are invalid: %s", strings.Join(problems, "; "))
+	}
 
 	// Event bus subscribers
 	eventbus.Default.Subscribe(eventbus.UserRegistered, func(evt eventbus.Event) {

@@ -125,6 +125,11 @@ test.describe('The Ticket Road', () => {
     await freshPage(page);
     await page.goto('/#/station');
     await expect(page.locator('.station__title')).toHaveText('夜站');
+    await expect(page).toHaveTitle('夜站 · 桃源百旅');
+    await expect(page.locator('#station-q')).toHaveAttribute('placeholder', '赤脚、雨季，或末班车');
+    // Never an empty board: the station hangs tickets of its own, signed by the station.
+    await expect(page.locator('.racks__grid .stub').first()).toBeVisible();
+    await expect(page.locator('.racks__grid .stub', { hasText: '夜站' }).first()).toBeVisible();
     await expect(page.locator('.platform')).toHaveCount(9);
     await page.locator('.platform[data-realm="ice-night"]').click();
     await expect(page).toHaveURL(/realm=ice-night/);
@@ -156,6 +161,23 @@ test.describe('The Ticket Road', () => {
     await page.locator('#station-tt-btn').click();
     await page.locator('#tt-clear').click();
     await expect(page).not.toHaveURL(/hour=|season=|q=/);
+  });
+
+  // E2E-ROAD-004: in English the station's title and enquiry hint are English only, and one of the
+  // station's own tickets turns over without the staff and block buttons.
+  test('the station in English, and the back of one of its own tickets', async ({ page }) => {
+    await freshPage(page);
+    await page.addInitScript(() => localStorage.setItem('lang', 'en'));
+    await page.goto('/#/station?realm=water-deep');
+    await expect(page).toHaveTitle('Night Station · 100 Journeys');
+    await expect(page.locator('#station-q')).toHaveAttribute('placeholder', 'barefoot, rainy season, or last train');
+    const own = page.locator('.racks__grid .stub', { hasText: 'The Night Station' }).first();
+    await expect(own).toBeVisible();
+    await own.locator('.stub__open').click();
+    const back = page.locator('.ticket-open__back');
+    await expect(back).toBeVisible();
+    await expect(back.locator('[data-depart]')).toBeVisible();
+    await expect(back.locator('[data-report], [data-block]')).toHaveCount(0);
   });
 
   // E2E-ROAD-003: an opened ticket (its back, the lantern with cords, stamps and flags) and an

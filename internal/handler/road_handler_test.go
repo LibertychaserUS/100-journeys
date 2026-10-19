@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,6 +25,7 @@ import (
 )
 
 type roadRig struct {
+	db      *sql.DB
 	r       *gin.Engine
 	captcha *service.CaptchaStore
 	road    *RoadHandler
@@ -60,7 +62,7 @@ func setupRoadRig(t *testing.T) *roadRig {
 	rules.PostsPerDay = 100
 	rh := NewRoadHandler(repository.NewRoadRepository(db), comps, cat, rules)
 	rh.bucket = middleware.NewBucket(6000, 1000) // the per-account bucket has its own unit test
-	rig := &roadRig{captcha: captcha, road: rh, clock: time.Now().UTC()}
+	rig := &roadRig{db: db, captcha: captcha, road: rh, clock: time.Now().UTC()}
 	rh.SetClock(func() time.Time { return rig.clock })
 
 	r := gin.New()
@@ -108,12 +110,20 @@ func (g *roadRig) station(t *testing.T, query string) []map[string]interface{} {
 	return out
 }
 
+// codes lists the travellers' tickets in order, leaving out the ones the station hangs itself.
 func codes(items []map[string]interface{}) []string {
 	out := []string{}
 	for _, it := range items {
-		out = append(out, it["code"].(string))
+		if it["curated"] != true {
+			out = append(out, it["code"].(string))
+		}
 	}
 	return out
+}
+
+func curatedCount(t *testing.T, g *roadRig) int {
+	t.Helper()
+	return len(g.road.cat.Curated())
 }
 
 // IT-API-ROAD-001: rubbing a door hands out its place, hour, season and the picked keepsake; a
@@ -177,24 +187,41 @@ func TestRoad_RubPostAndFind(t *testing.T) {
 	assert.Regexp(t, `^The mirror finder · \d{4}$`, resp["data"].(map[string]interface{})["alias"])
 	assert.Nil(t, resp["data"].(map[string]interface{})["mine"])
 
+	onRack := func(items []interface{}) (travellers []map[string]interface{}, station int) {
+		for _, it := range items {
+			m := it.(map[string]interface{})
+			if m["curated"] == true {
+				station++
+			} else {
+				travellers = append(travellers, m)
+			}
+		}
+		return
+	}
 	code, resp = g.do(t, "GET", "/api/entrances/norway-aurora-hunt/rack?hour=night", "", nil)
 	require.Equal(t, http.StatusOK, code)
-	rack := resp["data"].([]interface{})
-	require.Len(t, rack, 1, "both tickets borrowed from door 6, but one author hangs one ticket on a rack")
-	assert.Equal(t, other, rack[0].(map[string]interface{})["code"], "the ticket of the viewer's hour comes first")
-	assert.Equal(t, true, rack[0].(map[string]interface{})["open_now"])
+	ours, station := onRack(resp["data"].([]interface{}))
+	require.Len(t, ours, 1, "both tickets borrowed from door 6, but one author hangs one ticket on a rack")
+	assert.Equal(t, 1, station, "the station hangs one of its own there too")
+	assert.Equal(t, other, ours[0]["code"], "the ticket of the viewer's hour is the one that hangs")
+	assert.Equal(t, true, ours[0]["open_now"])
 	code, resp = g.do(t, "GET", "/api/entrances/norway-aurora-hunt/rack?hour=predawn", "", nil)
 	require.Equal(t, http.StatusOK, code)
-	assert.Equal(t, share, resp["data"].([]interface{})[0].(map[string]interface{})["code"], "another hour, another ticket")
+	ours, _ = onRack(resp["data"].([]interface{}))
+	require.Len(t, ours, 1)
+	assert.Equal(t, share, ours[0]["code"], "another hour, another ticket")
 	code, resp = g.do(t, "GET", "/api/entrances/bolivia-salt-flat-trek/rack", "", nil)
 	require.Equal(t, http.StatusOK, code)
-	assert.Len(t, resp["data"], 1)
-	// Its author always finds both of their tickets on the line, marked as theirs.
+	ours, station = onRack(resp["data"].([]interface{}))
+	assert.Len(t, ours, 1)
+	assert.Equal(t, 1, station)
+	// Its author always finds both of their tickets on the line, marked as theirs, first.
 	code, resp = g.do(t, "GET", "/api/entrances/norway-aurora-hunt/rack?hour=predawn", author, nil)
 	require.Equal(t, http.StatusOK, code)
 	mineOnRack := resp["data"].([]interface{})
-	require.Len(t, mineOnRack, 2)
+	require.Len(t, mineOnRack, 3)
 	assert.Equal(t, true, mineOnRack[0].(map[string]interface{})["mine"])
+	assert.Equal(t, true, mineOnRack[1].(map[string]interface{})["mine"])
 
 	code, resp = g.do(t, "GET", "/api/space/INFP/drifted", "", nil)
 	require.Equal(t, http.StatusOK, code)
@@ -225,19 +252,25 @@ func TestRoad_StationPaging(t *testing.T) {
 		page := resp["data"].(map[string]interface{})
 		first := page["items"].([]interface{})
 		require.Len(t, first, 24, sort)
-		next := page["next"].(string)
-		require.NotEmpty(t, next, sort)
-		code, resp = g.do(t, "GET", "/api/station?sort="+sort+"&cursor="+next, "", nil)
-		require.Equal(t, http.StatusOK, code)
-		page = resp["data"].(map[string]interface{})
-		second := page["items"].([]interface{})
-		require.Len(t, second, 6, sort)
-		assert.Empty(t, page["next"], sort)
+		total := 30 + curatedCount(t, g) // the station's own tickets ride the same carriages
+		var all []interface{}
+		all = append(all, first...)
+		for next := page["next"].(string); next != ""; {
+			code, resp = g.do(t, "GET", "/api/station?sort="+sort+"&cursor="+next, "", nil)
+			require.Equal(t, http.StatusOK, code)
+			page = resp["data"].(map[string]interface{})
+			items := page["items"].([]interface{})
+			require.NotEmpty(t, items, sort)
+			require.LessOrEqual(t, len(items), 24, sort)
+			all = append(all, items...)
+			next = page["next"].(string)
+		}
 		seen := map[string]bool{}
-		for _, it := range append(first, second...) {
+		for _, it := range all {
 			seen[it.(map[string]interface{})["code"].(string)] = true
 		}
-		assert.Len(t, seen, 30, "no ticket twice, none missing (%s)", sort)
+		assert.Len(t, all, total, "every ticket once (%s)", sort)
+		assert.Len(t, seen, total, "no ticket twice, none missing (%s)", sort)
 	}
 	code, _ := g.do(t, "GET", "/api/station?cursor=bogus", "", nil)
 	assert.Equal(t, http.StatusBadRequest, code)
@@ -460,4 +493,53 @@ func TestRoad_Borrowed(t *testing.T) {
 	assert.Equal(t, []interface{}{a, a}, parents)
 	raw, _ := json.Marshal(resp)
 	assert.NotContains(t, string(raw), "author_hash")
+}
+
+// IT-API-ROAD-006: the station hangs tickets of its own, so the board is never empty: one or more
+// on every platform, found by filters and the enquiry desk, signed by the station, open to lamps,
+// and never written to a table that holds travellers' data.
+func TestRoad_StationsOwnTickets(t *testing.T) {
+	g := setupRoadRig(t)
+	code, resp := g.do(t, "GET", "/api/station?sort=new", "", nil)
+	require.Equal(t, http.StatusOK, code)
+	items := resp["data"].(map[string]interface{})["items"].([]interface{})
+	require.Len(t, items, curatedCount(t, g), "an empty station still shows the station's own tickets")
+	for _, realm := range content.Realms {
+		var mine []string
+		for _, it := range g.station(t, "realm="+realm) {
+			assert.Equal(t, true, it["curated"])
+			mine = append(mine, it["code"].(string))
+		}
+		assert.NotEmpty(t, mine, "platform %s", realm)
+	}
+	found := g.station(t, "q="+url.QueryEscape("巴丹吉林"))
+	require.Len(t, found, 1)
+	assert.Equal(t, "road00000007", found[0]["code"])
+	assert.Len(t, g.station(t, "tag=bells"), 1)
+
+	code, resp = g.do(t, "GET", "/api/station/tickets/road00000005?lang=en", "", nil)
+	require.Equal(t, http.StatusOK, code)
+	back := resp["data"].(map[string]interface{})
+	assert.Equal(t, "The Night Station", back["alias"])
+	assert.Equal(t, true, back["curated"])
+	assert.Equal(t, "", back["aid"], "no author behind it")
+
+	// A traveller turns it over and lights it like any ticket; its light is the travellers'.
+	rider, _ := g.register(t, "18+")
+	code, _ = g.do(t, "POST", "/api/auth/arrivals", rider, map[string]string{"kind": "ticket", "id": "road00000005", "step": "view"})
+	require.Equal(t, http.StatusOK, code)
+	g.clock = g.clock.Add(9 * time.Second)
+	code, resp = g.do(t, "POST", "/api/auth/lamps", rider, map[string]interface{}{"kind": "ticket", "id": "road00000005", "moved": 5, "stamp": "stopped"})
+	require.Equal(t, http.StatusOK, code, resp)
+	code, _ = g.do(t, "GET", "/api/auth/ledger/ticket/road00000005", rider, nil)
+	assert.Equal(t, http.StatusForbidden, code, "nobody's ledger")
+	code, _ = g.do(t, "POST", "/api/auth/reports", rider, map[string]string{"kind": "ticket", "id": "road00000005", "reason": "wrong"})
+	assert.Equal(t, http.StatusNotFound, code, "the station's own tickets are not handed to its staff")
+
+	// Nothing of it lives in travellers' tables.
+	var users, comps, posts int
+	require.NoError(t, g.db.QueryRow(`SELECT (SELECT COUNT(*) FROM users), (SELECT COUNT(*) FROM compositions), (SELECT COUNT(*) FROM ticket_posts)`).Scan(&users, &comps, &posts))
+	assert.Equal(t, 1, users, "only the rider who signed up")
+	assert.Equal(t, 0, comps)
+	assert.Equal(t, 0, posts)
 }

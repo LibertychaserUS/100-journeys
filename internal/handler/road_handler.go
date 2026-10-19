@@ -74,14 +74,73 @@ type TicketView struct {
 	OpenNow  bool                   `json:"open_now,omitempty"`
 	Mine     bool                   `json:"mine,omitempty"`
 	Status   string                 `json:"status,omitempty"`
+	Curated  bool                   `json:"curated,omitempty"` // hung by the station itself
 }
 
 func (h *RoadHandler) view(p repository.PostRow, lang string) TicketView {
-	return TicketView{
+	v := TicketView{
 		Code: p.Code, Picks: p.Picks, Realm: p.Realm, Marks: p.Marks, Transfer: p.Transfer,
 		Alias: h.cat.Alias(p.AliasSlug, p.AliasNo, lang), AID: p.AuthorHash, Tags: p.Tags,
 		Day: p.PostedAt.UTC().Format("2006-01-02"), Light: p.Totals.Public(h.rules),
 	}
+	if p.Curated {
+		v.Alias, v.Curated = road.CuratedAlias(lang), true
+	}
+	return v
+}
+
+// ---------- the station's own tickets ----------
+
+// curated returns the station's own tickets that keep(t) accepts, as station rows with their light.
+func (h *RoadHandler) curated(ctx context.Context, keep func(road.CuratedTicket) bool) ([]repository.PostRow, error) {
+	var picked []road.CuratedTicket
+	var codes []string
+	for _, t := range h.cat.Curated() {
+		if keep == nil || keep(t) {
+			picked = append(picked, t)
+			codes = append(codes, t.Code)
+		}
+	}
+	totals, err := h.repo.TotalsMany(ctx, light.KindTicket, codes)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]repository.PostRow, len(picked))
+	for i, t := range picked {
+		tt, lit := totals[t.Code]
+		out[i] = repository.PostRow{Code: t.Code, Status: "live", Realm: t.Realm, Marks: t.Marks, Transfer: t.Transfer,
+			PostedAt: t.PostedAt, Picks: t.Picks, Tags: append([]string{}, t.Tags...), Totals: tt, Lit: lit, Curated: true}
+	}
+	return out, nil
+}
+
+// curatedMatches applies the station's filters and the enquiry to one of its own tickets.
+func curatedMatches(t road.CuratedTicket, q repository.StationQuery) bool {
+	if (q.Realm != "" && t.Realm != q.Realm) || (q.Season != "" && t.Picks.Season != q.Season) ||
+		(q.Hour != "" && t.Picks.Hour != q.Hour) || (q.Place != "" && t.Picks.Place != q.Place) {
+		return false
+	}
+	if q.Tag != "" && !content.Contains(t.Tags, q.Tag) {
+		return false
+	}
+	for _, term := range q.Terms {
+		if !strings.Contains(t.SearchText, term) {
+			return false
+		}
+	}
+	return true
+}
+
+// sortsBefore is the station's order, the same keyset the SQL uses: the sort value, then the
+// posting time, then the code, all descending.
+func sortsBefore(a, b repository.StationCursor, sort string) bool {
+	if sort != "new" && a.Num != b.Num {
+		return a.Num > b.Num
+	}
+	if a.At != b.At {
+		return a.At > b.At
+	}
+	return a.Code > b.Code
 }
 
 func viewer(c *gin.Context) int64 {
@@ -259,6 +318,9 @@ func (h *RoadHandler) Arrive(c *gin.Context) {
 func (h *RoadHandler) liveTicket(ctx context.Context, code string) bool {
 	if !compositionCode.MatchString(code) {
 		return false
+	}
+	if _, ok := h.cat.CuratedTicket(code); ok {
+		return true
 	}
 	p, err := h.repo.Post(ctx, code)
 	return err == nil && p != nil && p.Status == "live"
@@ -523,6 +585,24 @@ func (h *RoadHandler) Station(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load station"))
 		return
 	}
+	// The station's own tickets hang among the travellers', in the same order and on the same
+	// carriages: the board is never empty, and paging stays exact.
+	own, err := h.curated(ctx, func(t road.CuratedTicket) bool { return curatedMatches(t, q) })
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load station"))
+		return
+	}
+	for _, p := range own {
+		if q.After == nil || sortsBefore(*q.After, repository.CursorFor(p, q.Sort, q.Unlit), q.Sort) {
+			rows = append(rows, p)
+		}
+	}
+	sort.SliceStable(rows, func(i, j int) bool {
+		return sortsBefore(repository.CursorFor(rows[i], q.Sort, q.Unlit), repository.CursorFor(rows[j], q.Sort, q.Unlit), q.Sort)
+	})
+	if len(rows) > carriage+1 {
+		rows = rows[:carriage+1]
+	}
 	next := ""
 	if len(rows) > carriage {
 		rows = rows[:carriage]
@@ -577,6 +657,15 @@ func (h *RoadHandler) Ticket(c *gin.Context) {
 		c.JSON(http.StatusNotFound, newErrorEnvelope("ticket not found"))
 		return
 	}
+	if _, ok := h.cat.CuratedTicket(code); ok {
+		own, err := h.curated(c.Request.Context(), func(t road.CuratedTicket) bool { return t.Code == code })
+		if err != nil || len(own) == 0 {
+			c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load ticket"))
+			return
+		}
+		c.JSON(http.StatusOK, newDataEnvelope(h.view(own[0], c.Query("lang"))))
+		return
+	}
 	p, err := h.repo.Post(c.Request.Context(), code)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load ticket"))
@@ -619,6 +708,12 @@ func (h *RoadHandler) Rack(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load rack"))
 			return
 		}
+		own, err := h.curated(c.Request.Context(), func(t road.CuratedTicket) bool { return content.Contains(t.Doors, slug) })
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load rack"))
+			return
+		}
+		rows = append(rows, own...)
 		picked := h.rotate(rows, slug+"|"+day+"|"+hour, hour, 6)
 		items := make([]TicketView, len(picked))
 		for i, p := range picked {
@@ -721,6 +816,19 @@ func (h *RoadHandler) Drifted(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load tickets"))
 		return
 	}
+	own, err := h.curated(c.Request.Context(), func(t road.CuratedTicket) bool {
+		for _, slug := range t.Doors {
+			if h.cat.WrittenFor(slug, code) {
+				return true
+			}
+		}
+		return false
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, newErrorEnvelope("failed to load tickets"))
+		return
+	}
+	rows = append(rows, own...)
 	picked := h.rotate(rows, code+"|"+day, "", 3)
 	items := make([]TicketView, len(picked))
 	for i, p := range picked {
@@ -741,6 +849,9 @@ func (h *RoadHandler) workExists(ctx context.Context, kind, id string) (owner in
 	case light.KindTicket:
 		if !compositionCode.MatchString(id) {
 			return 0, false
+		}
+		if _, ok := h.cat.CuratedTicket(id); ok { // nobody owns the station's own tickets
+			return 0, true
 		}
 		p, err := h.repo.Post(ctx, id)
 		if err != nil || p == nil || p.Status != "live" {
