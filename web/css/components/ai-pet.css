@@ -64,3 +64,16 @@ body.explore-panel-open .ai-pet { display: none; }
   .ai-pet__typing i:nth-child(3) { animation-delay: .3s; }
 }
 @keyframes pet-typing { 50% { opacity: .3; transform: translateY(-2px); } }
+
+/* Lumi floats over the bottom-right corner. Where the page's right edge comes within reach of it
+   (narrower than the container plus Lumi), the rows that end there keep that corner free, and a
+   focused element always scrolls clear of it, and of the bar at the top. */
+html { scroll-padding-block: calc(var(--nav-h) + 16px) 96px; }
+@media (max-width: 1320px) {
+  .site-footer .container, .home-hero__foot, .home-close__inner { padding-right: max(var(--space-5), 96px); }
+}
+@media (max-width: 760px) {
+  .site-footer .container, .home-hero__foot, .home-close__inner { padding-right: max(var(--space-4), env(safe-area-inset-right, 0px)); }
+  .site-footer { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+}
+

@@ -90,6 +90,10 @@
 .home-hero__foot { margin-top: var(--space-6); min-height: 40px; display: flex; align-items: center; gap: var(--space-3) var(--space-5); flex-wrap: wrap; }
 .home-hero__pause { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, .28); color: #f6f1e8; background: rgba(255, 255, 255, .06); }
 .home-hero__pause:hover { background: rgba(255, 255, 255, .14); }
+/* Space for the pause control and the three door scenes is kept from the first frame, so nothing
+   moves when they arrive. */
+.home-hero__pause[hidden] { display: grid; visibility: hidden; }
+.home-hero__dot.is-placeholder { visibility: hidden; }
 .home-hero__dots { display: flex; gap: 10px; align-items: flex-start; }
 .home-hero__dot { position: relative; width: 56px; min-height: 36px; display: grid; align-content: start; gap: 8px; padding-top: 8px; }
 .home-hero__dot i { display: block; height: 2px; border-radius: 1px; background: rgba(246, 241, 232, .28); overflow: hidden; position: relative; }
@@ -114,6 +118,15 @@
 @media (prefers-reduced-motion: no-preference) { .home-hero__now time i { animation: hero-colon 2s steps(1, end) infinite; } }
 @keyframes hero-colon { 50% { opacity: .25; } }
 .home-hero :focus-visible { outline-color: #f2c46d; }
+
+/* The prologue's traveller stands just right of centre. On wide screens show more of the picture's
+   left, and keep the English title a little narrower, so the words end before she begins (the static
+   opening matches, so nothing moves when the app takes over). */
+@media (min-width: 1024px) and (orientation: landscape) {
+  .home-hero__slides > picture:first-child > .home-hero__img { object-position: 6% 38%; }
+  :root:lang(en) .home-hero.scene-taoyuan .home-hero__title { font-size: clamp(3.25rem, 5.6vw, 6.25rem); }
+  :root:lang(en) .home-hero.scene-taoyuan .home-hero__lead { max-width: 25em; }
+}
 
 @media (max-width: 760px) {
   .home-hero__shade { background: linear-gradient(0deg, rgba(6, 7, 10, .95) 0%, rgba(6, 7, 10, .6) 42%, rgba(6, 7, 10, .05) 70%), linear-gradient(180deg, rgba(6, 7, 10, .55) 0%, rgba(6, 7, 10, 0) 22%); }

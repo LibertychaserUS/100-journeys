@@ -82,7 +82,7 @@ const I18n = (() => {
     'home.atlas.panelLabel': '选中的门',
     'home.atlas.mist': '还有 {n} 扇在雾里',
     'home.atlas.searchLabel': '找一扇门',
-    'home.atlas.search': '心情或线索，如「冥想」',
+    'home.atlas.search': '心情或线索，如「安静」',
     'home.atlas.searchCta': '找门',
     'home.atlas.hint': '← → 选门 · Enter 推开',
     'home.atlas.close': '收起',
@@ -705,7 +705,7 @@ const I18n = (() => {
     'home.atlas.panelLabel': 'The chosen door',
     'home.atlas.mist': '{n} more in the mist',
     'home.atlas.searchLabel': 'Find a door',
-    'home.atlas.search': 'A mood or a clue, like “stillness”',
+    'home.atlas.search': 'Try a mood: “quiet”',
     'home.atlas.searchCta': 'Find',
     'home.atlas.hint': '← → to choose · Enter to open',
     'home.atlas.close': 'Close',
@@ -717,6 +717,7 @@ const I18n = (() => {
     'home.close.next': '{title}, {when}',
     'home.close.credit': 'The pictures are generated; the places and the hours are real.',
     'home.now': '{n} doors open right now',
+    'home.now.one': '{n} door open right now',
     'home.atlas.title': 'A hundred doors. {n} found so far.',
     'home.atlas.label': 'By realm',
     'home.atlas.all': 'All',
@@ -743,7 +744,9 @@ const I18n = (() => {
     'explore.remove': 'Remove filter {label}',
     'explore.clearAll': 'Clear all',
     'explore.showN': 'Show {n} journeys',
+    'explore.showN.one': 'Show {n} journey',
     'explore.count': '{n} journeys',
+    'explore.count.one': '{n} journey',
     'explore.loadMore': 'Load more',
     'explore.end': 'That’s every journey',
     'explore.empty.title': 'No journeys match',
@@ -828,6 +831,7 @@ const I18n = (() => {
     'admin.funnel.entrance_open': 'Opened an entrance',
     'admin.funnel.register': 'Signed up',
     'admin.funnel.visitors': '{n} visitors',
+    'admin.funnel.visitors.one': '{n} visitor',
     'nav.space': 'Your space',
     'invite.title': 'Where is your entrance?',
     'invite.text': 'Tell Lumi what kind of traveller you are, and it will watch for the doors about to open.',
@@ -1193,6 +1197,7 @@ const I18n = (() => {
     'admin.noPaid': 'No paid orders yet',
     'admin.noUsers': 'No users yet',
     'admin.times': '{n} clicks',
+    'admin.times.one': '{n} click',
     'admin.role.admin': 'admin',
     'admin.role.user': 'user',
 
@@ -1270,8 +1275,15 @@ const I18n = (() => {
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   }
 
+  const plural = {};
   function t(key, vars) {
     let s = dict[lang][key];
+    // a count of one reads in the singular where the language has one ('1 journey', not '1 journeys')
+    if (vars && vars.n != null && dict[lang][`${key}.one`] != null) {
+      const n = Number(String(vars.n).replace(/[^\d.-]/g, ''));
+      plural[lang] = plural[lang] || new Intl.PluralRules(lang === 'zh' ? 'zh-CN' : 'en');
+      if (plural[lang].select(n) === 'one') s = dict[lang][`${key}.one`];
+    }
     if (s == null) s = zh[key];
     if (s == null) return key;
     if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? vars[k] : ''));

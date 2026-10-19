@@ -124,6 +124,7 @@ const Router = (() => {
       const main = document.getElementById('main-content');
       if (main) main.focus({ preventScroll: true });
     }
+    if (firstRender) document.documentElement.dataset.booted = '';
     firstRender = false;
   }
 
