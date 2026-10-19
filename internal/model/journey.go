@@ -18,9 +18,11 @@ type Journey struct {
 	MoodKeywords   []string `json:"mood_keywords,omitempty"`
 	ImagePath      string   `json:"-"`         // raw DB path, resolved by service layer
 	ImageURL       string   `json:"image_url"` // resolved by service layer (local or CDN)
-	BookingURL     *string  `json:"booking_url,omitempty"`
-	Price          int      `json:"price"`
-	Locale         string   `json:"locale"` // content language actually returned: "zh" (base) or a translation
+	// HeroURL is the journey's own landscape opening image, when it has one (list and detail).
+	HeroURL    string  `json:"hero_url,omitempty"`
+	BookingURL *string `json:"booking_url,omitempty"`
+	Price      int     `json:"price"`
+	Locale     string  `json:"locale"` // content language actually returned: "zh" (base) or a translation
 	// Entrance and Content come from internal/content (authored journeys). Content is complete on
 	// the detail endpoint; list endpoints only carry Content.Opens and Content.Role.
 	Entrance *JourneyEntrance `json:"entrance,omitempty"`

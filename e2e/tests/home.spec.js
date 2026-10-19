@@ -50,3 +50,33 @@ test.describe('Home Page', () => {
     expect(new Set(srcs).size).toBe(srcs.length);
   });
 });
+
+// E2E-HOME-006: the hundred doors: one cell per number, found doors link to their journey, the
+// card follows the pointer, realm filters dim the rest, and the opening adds three entrances.
+test.describe('The hundred doors', () => {
+  test.beforeEach(async ({ page }) => {
+    await freshPage(page);
+  });
+
+  test('doors, card, filters and the opening', async ({ page }) => {
+    const { data, total } = await (await page.request.get('/api/journeys?limit=100')).json();
+    await page.goto('/#/');
+    const grid = page.locator('#atlas-grid');
+    await expect(grid.locator('.door')).toHaveCount(100);
+    await expect(grid.locator('.door.is-found a')).toHaveCount(data.filter((j) => j.entrance).length);
+    await expect(page.locator('#atlas-found')).toHaveText(String(total));
+    // Pointing at a door shows it in the card
+    const pick = data.find((j) => j.entrance && j.entrance.no === 15) || data[1];
+    await grid.locator(`a[data-no="${pick.entrance.no}"]`).hover();
+    await expect(page.locator('#atlas-panel .door-card__title')).toHaveText(pick.title);
+    await expect(page.locator('#atlas-panel a.door-card')).toHaveAttribute('href', `#/journey/${pick.slug}`);
+    // A realm filter dims every other door
+    const realm = pick.entrance.realm;
+    await page.locator(`#atlas-filters [data-filter="${realm}"]`).click();
+    await expect(page.locator(`#atlas-filters [data-filter="${realm}"]`)).toHaveAttribute('aria-pressed', 'true');
+    await expect(grid.locator('.door.is-found:not(.is-dim)')).toHaveCount(data.filter((j) => j.entrance && j.entrance.realm === realm).length);
+    // The opening: the brand scene plus three entrances, each numbered
+    await expect(page.locator('.home-hero__dot')).toHaveCount(4);
+    await expect(page.locator('#hero-now time')).toHaveText(/^\d{2}:\d{2}$/);
+  });
+});

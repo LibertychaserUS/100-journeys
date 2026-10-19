@@ -41,6 +41,7 @@ func (s *JourneyService) ListJourneys(ctx context.Context, filter model.JourneyF
 	}
 	for i := range journeys {
 		journeys[i].ImageURL = s.media.ResolveURL(journeys[i].ImagePath)
+		journeys[i].HeroURL = s.heroURL(journeys[i].Slug)
 	}
 	return journeys, total, nil
 }
@@ -68,8 +69,17 @@ func (s *JourneyService) GetJourneyLocalized(ctx context.Context, slug, lang str
 	}
 	*j = one[0]
 	j.ImageURL = s.media.ResolveURL(j.ImagePath)
+	j.HeroURL = s.heroURL(j.Slug)
 	j.Scene = s.scene(j.Slug)
 	return j, nil
+}
+
+// heroURL is the journey's own opening image from its scene file, or "".
+func (s *JourneyService) heroURL(slug string) string {
+	if sc, ok := content.SceneFor(slug); ok && sc.Images.Hero != "" {
+		return s.media.ResolveURL(sc.Images.Hero)
+	}
+	return ""
 }
 
 // scene returns the journey's art direction with image URLs resolved, or nil.
