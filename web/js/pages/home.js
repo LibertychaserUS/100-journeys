@@ -406,6 +406,16 @@ Pages.Home = {
     if (this._selected) this._renderDoorBody(this._doors.get(this._selected));
     this._renderClose(journeys);
     this._renderInviteDoors(journeys);
+    // the opening-next countdowns keep counting
+    const bySlug = new Map(journeys.map((j) => [j.slug, j]));
+    document.querySelectorAll('#featured-grid .home-card[data-slug]').forEach((card) => {
+      const j = bySlug.get(card.dataset.slug);
+      const b = card.querySelector('.home-card__count b');
+      if (!j || !b) return;
+      const st = this._state.get(j.entrance.no);
+      b.textContent = DoorClock.when(st);
+      card.querySelector('.home-card__count').classList.toggle('is-open', !!st.open);
+    });
   },
 
   /** A returning traveller's three doors: the best matches for their kind of traveller, with
@@ -515,7 +525,10 @@ Pages.Home = {
       const portrait = /\/cover\.jpg$/.test(j.image_url) ? `<source media="(orientation: portrait)" type="image/avif" data-srcset="${cover}.720.avif 720w, ${cover}.1120.avif 1120w" sizes="100vw">` : '';
       slides.insertAdjacentHTML('beforeend', `<picture>${portrait}<source type="image/avif" data-srcset="${wide}.960.avif 960w, ${wide}.1536.avif 1536w" sizes="max(100vw, 177.8svh)"><img class="home-hero__img" data-scene="${i}" data-src="${UI.esc(j.hero_url)}" alt="" decoding="async"></picture>`);
       const no = String(j.entrance.no).padStart(3, '0');
-      dots.insertAdjacentHTML('beforeend', `<button type="button" class="home-hero__dot" data-go="${i}" aria-label="${no} ${UI.esc(j.title)}" aria-current="false" data-label="${UI.esc(j.title)}"><i></i><span class="num">${no}</span></button>`);
+      const [name, place] = UI.titleParts(j.title);
+      // the spoken name starts with what the dot shows: number, then place
+      const label = place ? `${no} ${place} · ${name}` : `${no} ${name}`;
+      dots.insertAdjacentHTML('beforeend', `<button type="button" class="home-hero__dot" data-go="${i}" aria-label="${UI.esc(label)}" aria-current="false" data-label="${UI.esc(j.title)}"><i></i><span class="num">${no}</span> ${place ? `<span class="home-hero__dot-place">${UI.esc(place)}</span>` : ''}</button>`);
     });
     hero.querySelector('#hero-pause').hidden = this._scenes.length < 2 || this._reduce();
     const slide = Number(this._saved.slide) || 0;
@@ -555,10 +568,12 @@ Pages.Home = {
     hero.querySelectorAll('.home-hero__dot').forEach((d) => d.setAttribute('aria-current', String(Number(d.dataset.go) === i)));
     const copy = hero.querySelector('#hero-copy');
     const calm = instant || this._reduce();
-    if (!calm) copy.classList.add('is-out');
+    // one beat: the next photo is ready, then the words leave as the photos cross, and the new words
+    // arrive about halfway through the crossing
     const decoded = incoming && incoming.decode ? incoming.decode().catch(() => {}) : Promise.resolve();
     await Promise.race([decoded, new Promise((r) => setTimeout(r, 900))]);
     if (token !== this._showToken || !hero.isConnected) return;
+    if (!calm) { copy.classList.remove('is-in'); copy.classList.add('is-out'); }
     if (leaving && leaving !== incoming) {
       // The push-in stops where it is instead of snapping back as the photo fades out.
       leaving.style.transform = getComputedStyle(leaving).transform;
@@ -568,7 +583,7 @@ Pages.Home = {
     }
     if (incoming) incoming.classList.add('is-active');
     hero.className = hero.className.replace(/scene-\S+/, `scene-${sc.key}`);
-    if (!calm) await new Promise((r) => setTimeout(r, 380));
+    if (!calm) await new Promise((r) => setTimeout(r, 480));
     if (token !== this._showToken || !hero.isConnected) return;
     const j = sc.j;
     const e = j && j.entrance;
@@ -580,8 +595,12 @@ Pages.Home = {
     copy.querySelector('.home-hero__title .home-hero__line').innerHTML = j ? UI.titleHTML(j.title) : UI.esc(t('home.scene.taoyuan.title'));
     copy.querySelector('#hero-lead').textContent = j ? (j.story_hook || j.subtitle || '') : t('home.scene.taoyuan.lead');
     const enter = hero.querySelector('#hero-enter');
-    // an open door is pushed open; a closed one can still be looked into
+    // an open door is pushed open; a closed one can still be looked into (the button grows or
+    // shrinks to its new words instead of jumping)
+    const w0 = enter.getBoundingClientRect().width;
     enter.querySelector('#hero-enter-label').textContent = t(j ? (ds.open ? 'home.stepDoor' : 'home.peekDoor') : 'home.step');
+    const w1 = enter.getBoundingClientRect().width;
+    if (!calm && enter.animate && Math.abs(w1 - w0) > 1) enter.animate([{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 260, easing: 'cubic-bezier(.22, 1, .36, 1)' });
     if (j) {
       enter.href = `#/journey/${encodeURIComponent(j.slug)}`;
       enter.dataset.slug = j.slug;
@@ -1137,10 +1156,12 @@ Pages.Home = {
       <a class="feature-card home-card ${lead ? 'feature-card--lead' : ''}" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-testid="journey-card" aria-labelledby="fc-title-${i}" aria-describedby="fc-when-${i}${j.story_hook ? ` fc-hook-${i}` : ''}" style="--i:${i};--lamp:var(--realm-${esc(j.entrance.realm)})">
         ${UI.picture(j.image_url, { sizes: lead ? '(max-width: 760px) 100vw, 50vw' : '(max-width: 760px) 100vw, 25vw', width: 720, height: 900 })}
         <div class="feature-card__body">
-          <p class="home-card__stamp" id="fc-when-${i}"><i aria-hidden="true"></i><span class="num">No.${String(j.entrance.no).padStart(3, '0')}</span><span>${esc(DoorClock.when(s))}</span></p>
+          <p class="home-card__count${s.open ? ' is-open' : ''}" id="fc-when-${i}">
+            <span class="home-card__no num"><i aria-hidden="true"></i>No.${String(j.entrance.no).padStart(3, '0')}${s.at && !s.month ? ` · ${esc(t('home.door.local', { time: s.at }))}` : ''}</span>
+            <b>${esc(DoorClock.when(s))}</b>
+          </p>
           <h3 class="feature-card__title" id="fc-title-${i}">${UI.titleHTML(j.title)}</h3>
           ${j.story_hook ? `<p class="feature-card__hook" id="fc-hook-${i}">${esc(j.story_hook)}</p>` : ''}
-          <div class="feature-card__meta"><span class="nowrap">${esc(UI.region(j))}</span></div>
         </div>
       </a>`;
   },

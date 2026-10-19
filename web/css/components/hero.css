@@ -94,7 +94,12 @@
 .home-hero__pause[hidden] { display: grid; visibility: hidden; }
 .home-hero__dot.is-placeholder { visibility: hidden; }
 .home-hero__dots { display: flex; gap: 10px; align-items: flex-start; }
-.home-hero__dot { position: relative; width: 56px; min-height: 36px; display: grid; align-content: start; gap: 8px; padding-top: 8px; }
+.home-hero__dot { position: relative; min-width: 56px; max-width: 11rem; min-height: 36px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "bar bar" "num place"; align-content: start; gap: 8px 6px; padding-top: 8px; text-align: left; }
+.home-hero__dot i { grid-area: bar; }
+.home-hero__dot .num { grid-area: num; }
+/* the place behind the number, so the strip reads as places, not codes */
+.home-hero__dot-place { grid-area: place; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .6875rem; letter-spacing: .04em; color: rgba(246, 241, 232, .5); transition: color var(--dur) var(--ease-out); }
+.home-hero__dot[aria-current="true"] .home-hero__dot-place, .home-hero__dot:hover .home-hero__dot-place { color: rgba(246, 241, 232, .85); }
 .home-hero__dot i { display: block; height: 2px; border-radius: 1px; background: rgba(246, 241, 232, .28); overflow: hidden; position: relative; }
 .home-hero__dot i::after { content: ""; position: absolute; inset: 0; background: #f6f1e8; transform: scaleX(0); transform-origin: left; }
 .home-hero__dot[aria-current="true"] i::after { transform: scaleX(1); }
@@ -138,6 +143,8 @@
   .home-hero__actions { margin-top: var(--space-5); }
   .home-hero__foot { margin-top: var(--space-5); min-height: 76px; }
   .home-hero__now { margin-left: 0; flex-basis: 100%; }
+  .home-hero__dot { max-width: none; }
+  .home-hero__dot-place { display: none; }
 }
 
 /* The static opening in index.html: shown only on the home route, in one language, until the
