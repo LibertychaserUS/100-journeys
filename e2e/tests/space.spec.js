@@ -18,16 +18,21 @@ test.describe('Find your type → your space', () => {
     await page.locator('.type-card[data-code="INFP"]').click();
 
     await expect(page).toHaveURL(/#\/space$/);
-    await expect(page.locator('.space__head h1')).toContainText('INFP');
+    // the space goes by its traveller's name; the four letters stay on the picker
+    await expect(page.locator('.space__head h1')).toContainText('写信的人');
+    await expect(page.locator('.space__head h1')).not.toContainText('INFP');
     await expect(page.locator('#space-form svg[data-lumi="INFP"]')).toBeVisible();
     await expect(page.locator('#space-picks .journey-card').first()).toBeVisible();
     await expect(page.locator('#space-first')).toBeVisible();
     await expect(page.locator('#nav-space')).toHaveAttribute('aria-current', 'page');
 
-    // Coming back home offers the way back instead of the invitation.
+    // Coming back home offers the way back and three doors for this traveller, never the letters.
     await page.goto('/#/');
     await expect(page.locator('#invite-space')).toBeVisible();
     await expect(page.locator('#invite-self')).toHaveCount(0);
+    await expect(page.locator('#invite-doors li a[href^="#/journey/"]')).toHaveCount(3);
+    await expect(page.locator('#home-invite-slot')).not.toContainText('INFP');
+    await expect(page.locator('main')).not.toContainText(/\b[IE][NS][TF][JP]\b/);
   });
 
   // E2E-SPACE-002: the guide's walk shows progress, survives a reload mid-way and ends in a reveal
@@ -47,10 +52,10 @@ test.describe('Find your type → your space', () => {
     await expect(page.locator('.guide__progress')).toHaveAttribute('aria-label', '第 2 步，共 6 步');
     for (const key of ['b', 'b', 'c', 'c', 'a']) await page.locator(`.guide__option[data-key="${key}"]`).click();
 
-    await expect(page.locator('.guide__reveal h1')).toContainText('INFP');
+    await expect(page.locator('.guide__reveal h1')).toContainText('写信的人');
     await page.locator('#guide-enter').click();
     await expect(page).toHaveURL(/#\/space$/);
-    await expect(page.locator('.space__head h1')).toContainText('INFP');
+    await expect(page.locator('.space__head h1')).toContainText('写信的人');
   });
 
   // E2E-SPACE-003: "not sure" on the cards hands over to the guide; an empty space offers both paths
@@ -80,7 +85,7 @@ test.describe('Find your type → your space', () => {
 
     await registerAndLogin(page, { prefix: 'merge', next: '/space' });
     await expect(page.locator('.space__guest')).toHaveCount(0);
-    await expect(page.locator('.space__head h1')).toContainText('ISTJ');
+    await expect(page.locator('.space__head h1')).toContainText('对时刻表的人');
     await expect(page.locator('#space-keeps')).toContainText(option.keeps);
 
     const auth = { headers: { Authorization: `Bearer ${await token(page)}` } };
@@ -104,7 +109,7 @@ test.describe('Find your type → your space', () => {
     await page.locator('#invite-self').click();
     await expect(page.locator('.find__head h1')).toHaveText('What kind of traveller are you?');
     await page.locator('.type-card[data-code="ENTP"]').click();
-    await expect(page.locator('.space__head h1')).toContainText('Entrances for the Debater');
+    await expect(page.locator('.space__head h1')).toHaveText('Doors for the Side-Path Taker');
     await expect(page.locator('#nav-space')).toHaveText('Your space');
     await context.close();
   });
@@ -117,7 +122,7 @@ test.describe('Find your type → your space', () => {
     await page.locator('.type-card[data-code="INTJ"]').click();
     const form = page.locator('#space-form svg[data-lumi="INTJ"]');
     await expect(form).toBeVisible();
-    await expect(form).toHaveAttribute('aria-label', /INTJ/);
+    await expect(form).toHaveAttribute('aria-label', '画路线的人');
     await expect(form).toHaveClass(/lumi--crystal/);
     await expect(page.locator('#space-form .lumi-condense')).toHaveCount(0); // the moment has finished
     await expect(page.locator('#ai-pet-avatar svg.lumi')).toHaveAttribute('data-lumi', 'INTJ');

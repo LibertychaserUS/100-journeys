@@ -10,6 +10,10 @@
   position: relative; isolation: isolate; overflow: hidden;
   min-height: max(640px, 100svh); display: flex; align-items: flex-end;
   color: var(--color-on-media); background: #07080b; touch-action: pan-y;
+  /* The opening is always a dark photograph, so it keeps the night tokens in both themes:
+     the lantern-gold action with dark ink, at rest, on hover and when pressed. */
+  color-scheme: dark;
+  --color-action: #f2c46d; --color-on-action: #1d1405; --color-action-hover: #f7d48c; --color-focus: #f2c46d;
 }
 .home-hero__slides {
   position: absolute; inset: 0; z-index: -3; overflow: hidden; transform-origin: 50% 40%;
@@ -46,6 +50,8 @@
 
 .home-hero__content { padding-block: calc(var(--nav-h) + var(--space-7)) clamp(36px, 7vh, 80px); }
 .home-hero__copy { min-height: 0; transform: translate3d(0, calc(var(--exit) * -40px), 0); opacity: calc(1 - var(--exit) * 1.6); }
+/* The button, the scene strip and the clock leave with the words, before they reach the bar. */
+.home-hero__actions, .home-hero__foot { transform: translate3d(0, calc(var(--exit) * -24px), 0); opacity: calc(1 - var(--exit) * 1.8); }
 .home-hero__line { display: inline-block; }
 .home-hero__eyebrow { font-size: var(--text-sm); letter-spacing: .14em; color: rgba(246, 241, 232, .76); }
 :lang(en) .home-hero__eyebrow { letter-spacing: .02em; }
@@ -76,8 +82,8 @@
 @keyframes hero-fade { from { opacity: 0; } }
 
 .home-hero__actions { margin-top: var(--space-6); display: flex; gap: 12px; flex-wrap: wrap; }
-.home-hero__step { min-height: 48px; padding: 0 22px; border-radius: 999px; gap: 10px; background: #f2c46d; color: #1d1405; font-weight: var(--weight-semibold); box-shadow: 0 10px 30px -12px rgba(242, 196, 109, .6); }
-.home-hero__step:hover { background: #f7d48c; }
+.home-hero__step { min-height: 48px; padding: 0 22px; border-radius: 999px; gap: 10px; font-weight: var(--weight-semibold); box-shadow: 0 10px 30px -12px rgba(242, 196, 109, .6); }
+.home-hero__step:is(:hover, :active, :focus-visible) { background: var(--color-action-hover); color: var(--color-on-action); }
 .home-hero__step .icon { transition: transform var(--dur) var(--ease-out); }
 .home-hero__step:hover .icon { transform: translateX(3px); }
 

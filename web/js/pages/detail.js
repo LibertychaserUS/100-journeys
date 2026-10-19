@@ -238,7 +238,7 @@ Pages.Detail = {
         <div class="clue"><h3>${esc(t('detail.clue.guide'))}</h3><p>${esc(t('detail.clue.guideText', { region: UI.region(j) }))}</p></div>
         <div class="clue"><h3>${esc(t('detail.clue.gear'))}</h3><p>${esc(this._gear(j))}</p></div>
         <div class="clue"><h3>${esc(t('detail.clue.risk', { n: j.risk_level }))}</h3><p>${esc(this._riskText(j.risk_level))}</p></div>
-        <div class="clue"><h3>${esc(t('detail.clue.match'))}</h3><p>${esc(mbti.join(' · '))}</p></div>`;
+        <div class="clue"><h3>${esc(t('detail.clue.match'))}</h3><p>${esc(mbti.map((m) => MBTI.name(m)).join(' · '))}</p></div>`;
     return `
       <div class="detail-story">
         <section class="prep" aria-labelledby="prep-title" ${c ? '' : 'id="clue-card"'}>
@@ -363,7 +363,7 @@ Pages.Detail = {
                 ${stat('detail.stat.obscurity', j.obscurity_level, 10)}
                 ${stat('detail.stat.risk', j.risk_level, 5)}
               </div>
-              ${mbti.length ? `<div class="ticket__match">${(j.mbti_types || []).map((m) => `<span class="tag-code">${esc(m.mbti_type.code)}<i>${esc(t('detail.matchScore', { n: m.compatibility_score }))}</i></span>`).join('')}</div>` : ''}
+              ${mbti.length ? `<div class="ticket__match">${(j.mbti_types || []).map((m) => `<span class="tag-code">${esc(MBTI.name(m.mbti_type.code))}<i>${esc(t('detail.matchScore', { n: m.compatibility_score }))}</i></span>`).join('')}</div>` : ''}
             </div>
             <div class="ticket__perf" aria-hidden="true"></div>
             <div class="ticket__bottom">

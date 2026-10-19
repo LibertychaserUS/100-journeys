@@ -265,6 +265,25 @@ Pages.Home = {
     if (nowChip) nowChip.textContent = open;
     if (this._selected) this._renderDoorBody(this._doors.get(this._selected));
     this._renderClose(journeys);
+    this._renderInviteDoors(journeys);
+  },
+
+  /** A returning traveller's three doors: the best matches for their kind of traveller, with
+   *  where each one stands right now. */
+  _renderInviteDoors(journeys) {
+    const list = document.getElementById('invite-doors');
+    const code = Guest.mbti();
+    if (!list || !code) return;
+    const score = (j) => ((j.mbti_types || []).find((m) => m.mbti_type && m.mbti_type.code === code) || {}).compatibility_score || 0;
+    const picks = journeys.filter((j) => score(j) > 0)
+      .map((j) => ({ j, s: this._state.get(j.entrance.no) }))
+      .sort((a, b) => score(b.j) - score(a.j) || (b.s.open - a.s.open) || a.j.entrance.no - b.j.entrance.no)
+      .slice(0, 3);
+    list.innerHTML = picks.map(({ j, s }) => {
+      const [name] = UI.titleParts(j.title);
+      return `<li><a href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${UI.esc(j.slug)}"${s.open ? ' class="is-open"' : ''}>
+        <span class="num">No.${String(j.entrance.no).padStart(3, '0')}</span><b>${UI.esc(name)}</b><span>${UI.esc(DoorClock.when(s))}</span></a></li>`;
+    }).join('');
   },
 
   // --- The opening -----------------------------------------------------------------------------
@@ -767,7 +786,10 @@ Pages.Home = {
       return `
         <div class="home-invite home-invite--back">
           ${face}
-          <div class="home-invite__text"><h2 id="home-invite-title">${esc(t('invite.welcome', { code }))}</h2></div>
+          <div class="home-invite__text">
+            <h2 id="home-invite-title">${esc(t('invite.welcome'))}</h2>
+            <ul class="home-invite__doors" id="invite-doors" aria-live="off"></ul>
+          </div>
           <div class="home-invite__actions"><a class="btn btn--primary" id="invite-space" href="#/space">${esc(t('invite.back'))}</a></div>
         </div>`;
     }
