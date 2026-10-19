@@ -23,6 +23,12 @@
       // Share links (/j/<slug>) open the journey inside the app.
       var share = /^\/j\/([a-z0-9-]+)\/?$/.exec(location.pathname);
       if (share) history.replaceState(null, '', '/' + location.search + '#/journey/' + share[1]);
+      // The reader's language before the first paint (same rule as i18n.js), so text is set in that
+      // language's fonts from the start.
+      var bl = null;
+      try { bl = localStorage.getItem('lang'); } catch (e) {}
+      if (bl !== 'zh' && bl !== 'en') bl = /^zh/i.test((navigator.languages && navigator.languages[0]) || navigator.language || 'zh') ? 'zh' : 'en';
+      document.documentElement.lang = bl === 'zh' ? 'zh-CN' : 'en';
       // The home opening image starts downloading before anything else (AVIF; others use the JPEG).
       if (!location.hash || location.hash === '#/' || location.hash === '#') {
         var hp = document.createElement('link');
@@ -32,14 +38,11 @@
         hp.setAttribute('imagesizes', 'max(100vw, 177.8svh)');
         document.head.appendChild(hp);
         // The static opening below shows at once, in the reader's language, until the app takes over.
-        var bl = null;
-        try { bl = localStorage.getItem('lang'); } catch (e) {}
-        if (bl !== 'zh' && bl !== 'en') bl = /^zh/i.test((navigator.languages && navigator.languages[0]) || navigator.language || 'zh') ? 'zh' : 'en';
         document.documentElement.setAttribute('data-boot', 'home');
         document.documentElement.setAttribute('data-boot-lang', bl);
         // The opening title's font slices, so the first paint already uses the story serif.
         // fonts:begin (written by scripts/fonts/build.py)
-        var fp = bl === 'zh' ? ["story-serif-700-02.4029c2ddf0.woff2", "story-serif-700-17.477f43758e.woff2"] : ["story-serif-latin-700.93f47e5b9e.woff2"];
+        var fp = bl === 'zh' ? ["story-serif-700-02.49298fa6bf.woff2", "story-serif-700-18.6926b5a54e.woff2"] : ["story-serif-latin-700.fc6385aa1b.woff2"];
         fp.forEach(function (f) { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous'; l.href = '/static/assets/fonts/' + f; document.head.appendChild(l); });
         // fonts:end
       }

@@ -43,19 +43,21 @@ Test,TEST-036,Playwright E2E,explore.spec,File exists and is part of repo,e2e/te
 Test,TEST-037,Playwright E2E,fonts.spec,File exists and is part of repo,e2e/tests/fonts.spec.js,Specified
 Test,TEST-038,Playwright E2E,home.spec,File exists and is part of repo,e2e/tests/home.spec.js,Specified
 Test,TEST-039,Playwright E2E,i18n.spec,File exists and is part of repo,e2e/tests/i18n.spec.js,Specified
-Test,TEST-040,Playwright E2E,mobile.spec,File exists and is part of repo,e2e/tests/mobile.spec.js,Specified
-Test,TEST-041,Playwright E2E,orders.spec,File exists and is part of repo,e2e/tests/orders.spec.js,Specified
-Test,TEST-042,Playwright E2E,persona.spec,File exists and is part of repo,e2e/tests/persona.spec.js,Specified
-Test,TEST-043,Playwright E2E,road.spec,File exists and is part of repo,e2e/tests/road.spec.js,Specified
-Test,TEST-044,Playwright E2E,space.spec,File exists and is part of repo,e2e/tests/space.spec.js,Specified
-Test,TEST-045,Playwright support / E2E 支撑文件,helpers,File exists and is part of repo,e2e/tests/helpers.js,Specified
-Test,TEST-046,Go stress,stress_test,File exists and is part of repo,tests/stress/stress_test.go,Specified
-Test,TEST-047,k6 load / k6 负载,admin-analytics-export.k6,File exists and is part of repo,tests/load/admin-analytics-export.k6.js,Specified
-Test,TEST-048,k6 load / k6 负载,auth-register-login.k6,File exists and is part of repo,tests/load/auth-register-login.k6.js,Specified
-Test,TEST-049,k6 load / k6 负载,image-static-cache.k6,File exists and is part of repo,tests/load/image-static-cache.k6.js,Specified
-Test,TEST-050,k6 load / k6 负载,order-payment-audit.k6,File exists and is part of repo,tests/load/order-payment-audit.k6.js,Specified
-Test,TEST-051,k6 load / k6 负载,pet-chat-analytics.k6,File exists and is part of repo,tests/load/pet-chat-analytics.k6.js,Specified
-Test,TEST-052,k6 load / k6 负载,public-content-flow.k6,File exists and is part of repo,tests/load/public-content-flow.k6.js,Specified
+Test,TEST-040,Playwright E2E,layout.spec,File exists and is part of repo,e2e/tests/layout.spec.js,Specified
+Test,TEST-041,Playwright E2E,mobile.spec,File exists and is part of repo,e2e/tests/mobile.spec.js,Specified
+Test,TEST-042,Playwright E2E,orders.spec,File exists and is part of repo,e2e/tests/orders.spec.js,Specified
+Test,TEST-043,Playwright E2E,persona.spec,File exists and is part of repo,e2e/tests/persona.spec.js,Specified
+Test,TEST-044,Playwright E2E,road.spec,File exists and is part of repo,e2e/tests/road.spec.js,Specified
+Test,TEST-045,Playwright E2E,space.spec,File exists and is part of repo,e2e/tests/space.spec.js,Specified
+Test,TEST-046,Playwright support / E2E 支撑文件,helpers,File exists and is part of repo,e2e/tests/helpers.js,Specified
+Test,TEST-047,Playwright support / E2E 支撑文件,text-layout,File exists and is part of repo,e2e/tests/text-layout.js,Specified
+Test,TEST-048,Go stress,stress_test,File exists and is part of repo,tests/stress/stress_test.go,Specified
+Test,TEST-049,k6 load / k6 负载,admin-analytics-export.k6,File exists and is part of repo,tests/load/admin-analytics-export.k6.js,Specified
+Test,TEST-050,k6 load / k6 负载,auth-register-login.k6,File exists and is part of repo,tests/load/auth-register-login.k6.js,Specified
+Test,TEST-051,k6 load / k6 负载,image-static-cache.k6,File exists and is part of repo,tests/load/image-static-cache.k6.js,Specified
+Test,TEST-052,k6 load / k6 负载,order-payment-audit.k6,File exists and is part of repo,tests/load/order-payment-audit.k6.js,Specified
+Test,TEST-053,k6 load / k6 负载,pet-chat-analytics.k6,File exists and is part of repo,tests/load/pet-chat-analytics.k6.js,Specified
+Test,TEST-054,k6 load / k6 负载,public-content-flow.k6,File exists and is part of repo,tests/load/public-content-flow.k6.js,Specified
 Route,ROUTE-001,Admin,GET /api/admin/export,Route is registered,internal/handler/admin_handler.go,Implemented
 Route,ROUTE-002,Admin,GET /api/admin/stats,Route is registered,internal/handler/admin_handler.go,Implemented
 Route,ROUTE-003,Admin,GET /api/admin/users,Route is registered,internal/handler/admin_handler.go,Implemented

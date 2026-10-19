@@ -447,15 +447,26 @@ Pages.Home = {
     window.addEventListener('scroll', onScroll, { passive: true });
     const doorOf = (el) => el && el.closest && el.closest('a.door__link');
     grid.addEventListener('pointerdown', (e) => { pointer = e.pointerType; }, { passive: true });
-    // Hover shows a door only once the pointer rests on it, and never while the page scrolls.
+    // Hover shows a door only once the pointer rests on it, and never while the page scrolls; a
+    // pointer that comes to rest on a door while the page is still moving shows it once it stops.
+    let over = null;
+    const rest = (a) => {
+      clearTimeout(this._hoverTimer);
+      this._hoverTimer = setTimeout(() => {
+        if (over !== a) return;
+        if (scrolling) rest(a);
+        else this._select(Number(a.dataset.no));
+      }, 120);
+    };
     grid.addEventListener('pointerover', (e) => {
       const a = doorOf(e.target);
       if (!a || e.pointerType !== 'mouse') return;
-      clearTimeout(this._hoverTimer);
-      this._hoverTimer = setTimeout(() => { if (!scrolling) this._select(Number(a.dataset.no)); }, 120);
+      over = a;
+      rest(a);
     });
     grid.addEventListener('pointerleave', (e) => {
       if (e.pointerType !== 'mouse') return;
+      over = null;
       clearTimeout(this._hoverTimer);
       if (this._pinned) this._select(this._pinned);
     });
