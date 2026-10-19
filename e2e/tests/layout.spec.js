@@ -3,7 +3,8 @@ const { textProblems } = require('./text-layout');
 
 const PAGES = ['/#/', '/#/explore', '/#/journey/antarctica-port-lockroy', '/#/station'];
 
-// Walk a page top to bottom (lazy sections render on the way) and collect what reads as broken.
+// Walk a page top to bottom (lazy sections render on the way) and collect what reads as broken,
+// plus any sideways scroll.
 async function sweep(browser, lang, width) {
   const context = await browser.newContext({
     viewport: { width, height: width > 800 ? 900 : 812 }, reducedMotion: 'reduce', locale: lang === 'en' ? 'en-US' : 'zh-CN',
@@ -22,6 +23,9 @@ async function sweep(browser, lang, width) {
       await page.waitForTimeout(150);
       for (const p of await textProblems(page)) found.push(`${url} @${width}: ${p}`);
     }
+    // nothing pushes the page wider than the screen
+    const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    if (over > 1) found.push(`${url} @${width}: page scrolls sideways by ${over}px`);
   }
   await context.close();
   return [...new Set(found)];
@@ -31,17 +35,17 @@ test.describe('Text layout', () => {
   test.describe.configure({ timeout: 120000 });
 
   // E2E-LAYOUT-001: English (longer words, longer lines) never breaks a word, stacks text on text,
-  // or squeezes a column to a word per line, on desktop, tablet and phone
+  // squeezes a column to a word per line or scrolls sideways, on desktop, laptop, tablet and phone
   test('english text is never broken, stacked or squeezed', async ({ browser }) => {
     const problems = [];
-    for (const width of [1440, 768, 375]) problems.push(...await sweep(browser, 'en', width));
+    for (const width of [1440, 1024, 768, 375]) problems.push(...await sweep(browser, 'en', width));
     expect(problems).toEqual([]);
   });
 
-  // E2E-LAYOUT-002: the same for Chinese, on desktop and phone
+  // E2E-LAYOUT-002: the same for Chinese, on desktop, laptop and phone
   test('chinese text is never broken, stacked or squeezed', async ({ browser }) => {
     const problems = [];
-    for (const width of [1440, 375]) problems.push(...await sweep(browser, 'zh', width));
+    for (const width of [1440, 1024, 375]) problems.push(...await sweep(browser, 'zh', width));
     expect(problems).toEqual([]);
   });
 });
