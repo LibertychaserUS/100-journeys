@@ -11,6 +11,9 @@ body[data-bookbar] .ai-pet { bottom: calc(20px + env(safe-area-inset-bottom, 0px
   transition: transform var(--dur) var(--ease);
 }
 .ai-pet__avatar:hover { transform: translateY(-2px); }
+/* over the night photograph (the opening, the threshold, a journey's opening) Lumi is a lantern in
+   the dark, not a white disc, in both themes */
+body[data-media-header]:not([data-scrolled]) .ai-pet__avatar { background: rgba(10, 11, 14, .5); border-color: rgba(242, 196, 109, .38); box-shadow: 0 0 26px -6px rgba(242, 196, 109, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .ai-pet__avatar [data-lumi-slot] { display: grid; place-items: center; }
 .ai-pet__avatar--hint [data-lumi-slot] { animation: lantern 2.4s ease-in-out 3; }
 @keyframes lantern { 50% { transform: translateY(-3px); filter: drop-shadow(0 0 16px rgba(242, 196, 109, .7)); } }
