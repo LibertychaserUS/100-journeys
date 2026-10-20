@@ -11,6 +11,8 @@ body[data-bookbar] .ai-pet { bottom: calc(20px + env(safe-area-inset-bottom, 0px
   transition: transform var(--dur) var(--ease);
 }
 .ai-pet__avatar:hover { transform: translateY(-2px); }
+/* on paper, a cream lantern with a gold ring (never a grey disc that looks switched off) */
+[data-theme="light"] .ai-pet__avatar { background: #fbf3e2; border-color: rgba(184, 105, 15, .42); box-shadow: 0 0 0 4px rgba(242, 196, 109, .16), 0 12px 30px -14px rgba(120, 72, 12, .45); }
 /* over the night photograph (the opening, the threshold, a journey's opening) Lumi is a lantern in
    the dark, not a white disc, in both themes */
 body[data-media-header]:not([data-scrolled]) .ai-pet__avatar { background: rgba(10, 11, 14, .5); border-color: rgba(242, 196, 109, .38); box-shadow: 0 0 26px -6px rgba(242, 196, 109, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
@@ -18,12 +20,30 @@ body[data-media-header]:not([data-scrolled]) .ai-pet__avatar { background: rgba(
 .ai-pet__avatar--hint [data-lumi-slot] { animation: lantern 2.4s ease-in-out 3; }
 @keyframes lantern { 50% { transform: translateY(-3px); filter: drop-shadow(0 0 16px rgba(242, 196, 109, .7)); } }
 
+/* Lumi's note: a lantern-lit slip, not a support widget. On the page it is the tickets' paper with
+   a little grain; over the night photograph, dark glass with a warm rim (and it sits clear of the
+   opening's clock). Lumi's own lines are in the story serif; the suggestions are ticket stubs. */
 .ai-pet__chat {
+  --note-rim: rgba(184, 105, 15, .34);
+  --color-surface: #f8f1e3; --color-surface-2: #efe4cf; --color-bg: #fffaf0;
+  --color-text: #2a2117; --color-text-2: #5c4f40; --color-text-3: #6e604f; --color-line: rgba(60, 40, 10, .16); --color-line-strong: rgba(60, 40, 10, .3);
+  --color-action: #2a2117; --color-on-action: #fbe1a6; --color-focus: #8a5a0f;
   width: min(360px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - var(--nav-h) - 120px));
   display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
-  border-radius: var(--radius-sheet); background: var(--color-surface); border: 1px solid var(--color-line-strong); box-shadow: var(--shadow-float);
+  border-radius: var(--radius-sheet); color: var(--color-text); border: 1px solid var(--note-rim);
+  background: var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  box-shadow: 0 0 0 4px rgba(242, 196, 109, .1), 0 24px 60px -24px rgba(40, 24, 6, .55);
   overflow: hidden; animation: sheet-in var(--dur) var(--ease);
 }
+:root[data-theme="dark"] .ai-pet__chat, body[data-media-header]:not([data-scrolled]) .ai-pet__chat {
+  --note-rim: rgba(242, 196, 109, .34);
+  --color-surface: rgba(14, 15, 19, .86); --color-surface-2: rgba(255, 244, 220, .07); --color-bg: rgba(255, 255, 255, .05);
+  --color-text: #f6f1e8; --color-text-2: rgba(246, 241, 232, .78); --color-text-3: rgba(246, 241, 232, .62); --color-line: rgba(242, 196, 109, .16); --color-line-strong: rgba(242, 196, 109, .3);
+  --color-action: #f2c46d; --color-on-action: #1d1405; --color-focus: #f2c46d;
+  background-color: var(--color-surface); -webkit-backdrop-filter: blur(14px) saturate(120%); backdrop-filter: blur(14px) saturate(120%);
+  box-shadow: 0 0 40px -12px rgba(242, 196, 109, .4), 0 30px 70px -24px rgba(0, 0, 0, .85);
+}
+body[data-media-header]:not([data-scrolled]) .ai-pet__chat { margin-bottom: 116px; }
 .ai-pet__header { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px 16px; border-bottom: 1px solid var(--color-line); }
 .ai-pet__face { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-surface-2); }
 .ai-pet__name { font-size: var(--text-md); }
@@ -31,11 +51,22 @@ body[data-media-header]:not([data-scrolled]) .ai-pet__avatar { background: rgba(
 .ai-pet__close { margin-left: auto; width: 34px; height: 34px; }
 .ai-pet__messages { overflow-y: auto; padding: 14px 16px; display: grid; align-content: start; gap: 10px; min-height: 160px; }
 .ai-pet__msg { max-width: 88%; padding: 10px 12px; border-radius: 14px; font-size: var(--text-base); line-height: 1.55; overflow-wrap: anywhere; }
-.ai-pet__msg--pet { background: var(--color-surface-2); border-top-left-radius: 4px; justify-self: start; }
+.ai-pet__msg--pet { justify-self: start; max-width: 100%; padding: 2px 0 2px 14px; border-radius: 0; border-left: 2px solid var(--note-rim); font-family: var(--font-story); font-size: 1.0625rem; line-height: 1.6; }
+.ai-pet__msg--pet :is(.ai-pet__actions, .ai-pet__quiz, .ai-pet__step) { font-family: var(--font-ui); }
+.ai-pet__name { font-family: var(--font-story); font-weight: 700; }
 .ai-pet__msg--user { background: var(--color-action); color: var(--color-on-action); border-top-right-radius: 4px; justify-self: end; }
 .ai-pet__msg p + p, .ai-pet__msg p + div, .ai-pet__msg p + ul { margin-top: 8px; }
 .ai-pet__step { font-size: var(--text-xs); color: var(--color-text-3); }
-.ai-pet__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.ai-pet__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+/* a suggestion is a ticket stub: paper, a notch at each end */
+.ai-pet__action-btn.chip {
+  height: 30px; padding: 0 14px; border: 0; border-radius: 3px; color: #2a2117; background: #f4ecdc; box-shadow: inset 0 0 0 1px rgba(60, 40, 10, .2);
+  -webkit-mask: radial-gradient(circle 5px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat, radial-gradient(circle 5px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
+  mask: radial-gradient(circle 5px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat, radial-gradient(circle 5px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast);
+}
+.ai-pet__action-btn.chip:hover { color: #2a2117; background: #fbf3e2; transform: translateY(-1px) rotate(-.6deg); }
+.ai-pet__action-btn.chip:active { transform: scale(.97); }
 .ai-pet__links { display: grid; gap: 4px; }
 .ai-pet__links a { text-decoration: underline; text-underline-offset: 3px; }
 .ai-pet__quiz { display: grid; gap: 6px; }
