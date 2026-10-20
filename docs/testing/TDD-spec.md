@@ -219,6 +219,9 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-HOME-009` | `e2e/tests/home.spec.js` | 门墙搜索框里举的例子（中文「安静」、英文 “quiet”）各能搜到至少 3 扇门 | 通过 |
 | `E2E-HOME-010` | `e2e/tests/home.spec.js` | 每扇门按自己的时刻开：时钟定在周一 13:05（爱丁堡）时一点钟礼炮那扇门亮着；周日同一时刻关着，卡片写出当地 13:00 开 | 通过 |
 | `E2E-HOME-011` | `e2e/tests/home.spec.js` | 从开场一路滚过「门槛」：导航栏还没变成夜色实底时，没有任何看得见的文字从它下面穿过 | 通过 |
+| `E2E-HOME-012` | `e2e/tests/home.spec.js` | 「门槛」的每句话都在拱门里、弧顶以下，拱门顶端不碰顶栏（手机和桌面，中英文）；走到尽头门打开，顶栏和浏览器顶栏颜色都换成纸面 | 通过 |
+| `E2E-HOME-013` | `e2e/tests/home.spec.js` | 全年全天开着的那扇门不算「此刻开着」：门墙上单独标出，不计数，不被默认选中，也不进「下一扇要开的门」 | 通过 |
+| `E2E-HOME-014` | `e2e/tests/home.spec.js` | 在开场里用 Tab 走一遍：每个焦点都看得见；桌面上页面一直停在顶部 | 通过 |
 | `E2E-FONT-001` | `e2e/tests/fonts.spec.js` | 中文首页和旅程页的故事文字用自带的宋体切片，没有加载失败的字体文件 | 通过 |
 | `E2E-FONT-002` | `e2e/tests/fonts.spec.js` | 英文首页和旅程页只加载 Newsreader 的 400 和 700 两档，不取任何中文切片，没有失败 | 通过 |
 | `E2E-LAYOUT-001` | `e2e/tests/layout.spec.js` | 英文版首页、探索、旅程页、夜站在 1440、1024、768、375 宽度下从头滚到尾：没有单词被拆到两行，没有文字压在别的文字上，没有被挤成一行一两个词的窄栏，页面不会横向滚动 | 通过 |
@@ -229,6 +232,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-ADMIN-FUNNEL-001` | `e2e/tests/space.spec.js` | 后台漏斗面板六个步骤、访客数与比例 | 通过 |
 | `E2E-MOBILE-005` | `e2e/tests/mobile.spec.js` | 手机两次点击进入空间，无横向滚动，抽屉菜单有“我的空间” | 通过 |
 | `E2E-MOBILE-006` | `e2e/tests/mobile.spec.js` | 手机上点一扇门在底部面板里预览；面板开着时点另一扇门，面板换成那扇门，不跳转；同一扇门再点一次才进门 | 通过 |
+| `E2E-MOBILE-007` | `e2e/tests/mobile.spec.js` | 首屏（顶栏还透明时）打开手机菜单，「注册」按钮保持自己的底色、字看得清；浅色深色都测 | 通过 |
 | `E2E-SCENES-001..002` | `e2e/tests/detail.spec.js` | 详情页按旅程自己的美术数据挂载标志动作、质感、节拍，向下滚动光线弧变化，场景里没有导游式标签；减少动态效果时所有场景立即可读 | 通过 |
 | `E2E-SEO-001` | `e2e/tests/detail.spec.js` | robots.txt 有效并指向 sitemap，sitemap 列出每段旅程的分享页 | 通过 |
 | `E2E-SHARE-001` | `e2e/tests/detail.spec.js` | /j/:slug 带该旅程的分享标签且只有一组，打开后进入旅程详情，页面标题为旅程名 | 通过 |

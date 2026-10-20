@@ -37,17 +37,28 @@ const Router = (() => {
     return true;
   }
 
-  // The nav over a full-bleed opening turns solid once the opening is behind it.
+  // The nav over a full-bleed opening turns solid once the opening is behind it, or once the page
+  // says its picture has given way to the page under the bar (data-media-done).
   function updateScrolled() {
-    if (!('mediaHeader' in document.body.dataset)) return;
-    const end = document.querySelector('[data-media-end]');
-    const limit = end ? end.offsetTop + end.offsetHeight - 80 : 24;
-    if (window.scrollY > limit) document.body.dataset.scrolled = '';
-    else delete document.body.dataset.scrolled;
-    // Over the last stretch of the picture the bar darkens to night, so nothing on the picture
-    // ever slides under a clear bar.
-    const scrim = end ? Math.min(1, Math.max(0, (window.scrollY - (limit - 480)) / 480)) : 0;
-    document.body.style.setProperty('--nav-scrim', scrim.toFixed(3));
+    const media = 'mediaHeader' in document.body.dataset;
+    if (media) {
+      const end = document.querySelector('[data-media-end]');
+      const limit = end ? end.offsetTop + end.offsetHeight - 80 : 24;
+      if (window.scrollY > limit || (end && end.hasAttribute('data-media-done'))) document.body.dataset.scrolled = '';
+      else delete document.body.dataset.scrolled;
+      // Over the last stretch of the picture the bar darkens to night, so nothing on the picture
+      // ever slides under a clear bar; without motion, in one step as soon as the page moves.
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const scrim = !end ? 0 : still ? (window.scrollY > 8 ? 1 : 0) : Math.min(1, Math.max(0, (window.scrollY - (limit - 480)) / 480));
+      document.body.style.setProperty('--nav-scrim', scrim.toFixed(3));
+    }
+    // The browser's own bar matches what is under ours: night over the picture, else the theme.
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      const light = document.documentElement.getAttribute('data-theme') === 'light';
+      const color = media && !('scrolled' in document.body.dataset) ? '#07080b' : light ? '#f4efe6' : '#0d0f13';
+      if (meta.getAttribute('content') !== color) meta.setAttribute('content', color);
+    }
   }
 
   function define(pattern, page) {
@@ -174,6 +185,8 @@ const Router = (() => {
 
   return {
     define, navigate, replaceQuery, safeNext, back, refresh: () => resolve(true), get query() { return parse().query; },
+    /** Re-read what is under the bar (a page changed it without a scroll). */
+    updateHeader: updateScrolled,
     get swapping() { return swapping; },
     /** What the current history entry remembers (e.g. a page's own selection), and how to add to it. */
     state, saveState,

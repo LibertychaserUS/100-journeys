@@ -51,6 +51,10 @@
 .home-hero__copy { min-height: 0; transform: translate3d(0, calc(var(--exit) * -40px), 0); opacity: calc(1 - var(--exit) * 2.4); }
 /* The button, the scene strip and the clock leave with the words, before they reach the bar. */
 .home-hero__actions, .home-hero__foot { transform: translate3d(0, calc(var(--exit) * -24px), 0); opacity: calc(1 - var(--exit) * 2.2); }
+/* whatever has the keyboard's focus is shown, however far the opening has faded */
+.home-hero__copy:focus-within, .home-hero__actions:focus-within, .home-hero__foot:focus-within { opacity: 1; transform: none; }
+/* and focusing the opening's controls never nudges the page: they are already in view */
+.home-hero :is(a, button) { scroll-margin-block: 0 -96px; }
 .home-hero__line { display: inline-block; }
 .home-hero__eyebrow { font-size: var(--text-sm); letter-spacing: .14em; color: rgba(246, 241, 232, .76); }
 :lang(en) .home-hero__eyebrow { letter-spacing: .02em; }
@@ -105,11 +109,17 @@
 .home-hero__dot[aria-current="true"] i::after { transform: scaleX(1); }
 .home-hero__dot span { font-size: .6875rem; letter-spacing: .08em; text-align: left; color: rgba(246, 241, 232, .55); transition: color var(--dur) var(--ease-out); }
 .home-hero__dot[aria-current="true"] span, .home-hero__dot:hover span { color: #f6f1e8; }
-/* The place behind each dot, on hover or focus */
-.home-hero__dot[data-label]:hover::before, .home-hero__dot[data-label]:focus-visible::before {
-  content: attr(data-label); position: absolute; left: 0; bottom: calc(100% + 6px); white-space: nowrap; pointer-events: none;
+/* The place behind each dot, on hover (a real pointer, so it never sticks after a tap) or focus;
+   not for the scene already showing, and never past the screen's edge */
+@media (hover: hover) and (pointer: fine) {
+  .home-hero__dot[data-label]:not([aria-current="true"]):hover::before { content: attr(data-label); }
+}
+.home-hero__dot[data-label]:not([aria-current="true"]):focus-visible::before { content: attr(data-label); }
+.home-hero__dot[data-label]::before {
+  position: absolute; left: 0; bottom: calc(100% + 6px); max-width: min(22rem, calc(100vw - 32px)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none;
   padding: 6px 10px; border-radius: 8px; font-size: var(--text-xs); color: #f6f1e8; background: rgba(10, 11, 14, .82);
 }
+.home-hero__dot[data-label]:nth-last-child(-n + 2)::before { left: auto; right: 0; }
 @media (prefers-reduced-motion: no-preference) {
   .home-hero.is-playing:not(.is-held):not(.is-offscreen) .home-hero__dot[aria-current="true"] i::after { animation: hero-dot 6.8s linear both; }
 }

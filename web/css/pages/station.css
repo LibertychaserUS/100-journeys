@@ -5,7 +5,7 @@
    ============================================================= */
 
 .station { --station-bg: var(--color-bg); --hall-a: #0e1422; --hall-b: #05070b; --hall-glow: rgba(242, 196, 109, .16); background: var(--station-bg); }
-[data-theme="light"] .station { --hall-a: #e9edf1; --hall-b: #f3f3f1; --hall-glow: rgba(214, 150, 60, .14); }
+[data-theme="light"] .station { --hall-a: #e9edf1; --hall-b: #f4efe6; --hall-glow: rgba(214, 150, 60, .14); }
 /* The hour colours the hall. */
 .station[data-hour="predawn"]   { --hall-a: #0d1a33; --hall-glow: rgba(120, 170, 255, .2); }
 .station[data-hour="dawn"]      { --hall-a: #2a1a2e; --hall-glow: rgba(255, 160, 150, .2); }

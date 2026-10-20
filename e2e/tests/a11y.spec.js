@@ -102,7 +102,7 @@ test.describe('Theme', () => {
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg).toBe('rgb(243, 243, 241)');
+    expect(bg).toBe('rgb(244, 239, 230)');
   });
 
   // E2E-A11Y-THEME-001: switching theme at runtime keeps every page readable (not only on first load)
