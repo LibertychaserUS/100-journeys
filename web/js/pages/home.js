@@ -176,6 +176,8 @@ const MARKS = [[180, 0.88, 0], [180, 0.55, 0], [180, 0.2, 0], [160, 0, -4], [136
 
 Pages.Home = {
   SCENE_MS: 6800,
+  FIRST_MS: 10000, // the prologue stays a little longer the first time
+  PICK_MS: 12000, // a scene the visitor picked
   BRAND: { key: 'taoyuan', img: 'generated/hero-taoyuan.jpg' },
   REALMS: ['mirror-salt', 'fire-stone', 'ice-night', 'sand-stars', 'mist-temple', 'water-deep', 'city-rules', 'old-roads'],
 
@@ -190,12 +192,13 @@ Pages.Home = {
     this._selected = 0;
     this._pinned = saved.door || 0;
     this._filter = saved.filter || '';
-    this._paused = false;
-    this._userPaused = false;
     this._held = false;
     this._doors = new Map();
-    // re-rendered in place (a language switch): the page is already here, so nothing arrives again
+    // re-rendered in place (a language switch): the page is already here, so nothing arrives again,
+    // and the visitor's pause is kept
     this._swap = typeof Router !== 'undefined' && Router.swapping;
+    this._userPaused = !!(this._swap && this._keepPaused);
+    this._dwell = this._swap ? this.SCENE_MS : this.FIRST_MS;
     if (this._swap && this._lastSelected) this._pinned = this._lastSelected;
     this._counted = this._swap;
     this._countPending = false;
@@ -212,13 +215,14 @@ Pages.Home = {
         <div class="home-hero__grain" aria-hidden="true"></div>
         <div class="container home-hero__content" id="hero-content">
           <h1 class="sr-only" id="hero-brand">${esc(t('brand'))}</h1>
-          <div class="home-hero__copy is-in" id="hero-copy" role="group" aria-roledescription="${esc(t('home.scenes.slide'))}">
+          <div class="home-hero__copy${this._swap ? '' : ' is-in'}" id="hero-copy" role="group" aria-roledescription="${esc(t('home.scenes.slide'))}">
             <p class="home-hero__eyebrow"><span class="home-hero__line" id="hero-eyebrow">${esc(t('home.myth'))}</span></p>
             <p class="home-hero__title" id="hero-title"><span class="home-hero__line">${esc(t('home.scene.taoyuan.title'))}</span></p>
             <p class="home-hero__lead"><span class="home-hero__line" id="hero-lead">${esc(t('home.scene.taoyuan.lead'))}</span></p>
           </div>
           <div class="home-hero__actions">
             <a class="btn btn--primary home-hero__step" id="hero-enter" href="#atlas" data-to-atlas><span id="hero-enter-label">${esc(t('home.step'))}</span>${UI.icon('arrow', 'icon--sm')}</a>
+            <a class="home-hero__door" id="hero-door" href="#atlas" hidden></a>
           </div>
           <div class="home-hero__foot">
             <button type="button" class="home-hero__pause" id="hero-pause" aria-pressed="false" aria-label="${esc(t('home.scenes.pause'))}" hidden>${UI.icon('pause', 'icon--sm')}</button>
@@ -337,15 +341,25 @@ Pages.Home = {
       API.track('path_pick', '', { path: a.dataset.path, from: 'home' });
       if (a.dataset.path === 'browse') Guest.update((g) => { g.invite = 'dismissed'; });
     });
-    // "Step in" and "open now" glide down to the doors (the second one lights only open doors).
+    // "Step in" and "open now" go straight to the doors (the second one lights only open doors):
+    // an arch of lantern light opens over the opening onto them. The story in between is left for
+    // those who scroll to it, instead of rushing past it.
     main.addEventListener('click', (e) => {
       const a = e.target.closest('[data-to-atlas]');
       if (!a || a.getAttribute('href') !== '#atlas') return;
       e.preventDefault();
-      if (a.hasAttribute('data-now')) this._filterDoors('now');
       const atlas = document.getElementById('atlas');
-      atlas.scrollIntoView({ behavior: this._reduce() ? 'auto' : 'smooth', block: 'start' });
-      atlas.focus({ preventScroll: true });
+      const go = () => {
+        if (a.hasAttribute('data-now')) this._filterDoors('now');
+        atlas.scrollIntoView({ behavior: 'instant', block: 'start' });
+        Router.updateHeader();
+        atlas.focus({ preventScroll: true });
+      };
+      if (this._reduce() || !document.startViewTransition || document.visibilityState !== 'visible') { go(); return; }
+      const html = document.documentElement;
+      html.classList.add('vt-step');
+      const vt = document.startViewTransition(go);
+      vt.finished.finally(() => html.classList.remove('vt-step'));
     });
     UI.trackCardClicks(main.querySelector('#featured-grid'));
     UI.trackCardClicks(main.querySelector('#atlas-grid'));
@@ -354,16 +368,18 @@ Pages.Home = {
     this._setupAtlas(main.querySelector('#atlas'));
     this._setupScroll(main);
     setTimeout(() => hero.classList.remove('is-booting'), Math.max(0, 1900 - bootT));
-    this._load(hero);
+    const loaded = this._load(hero);
+    // in place, the new language is shown once the doors (and the scene the visitor was on) are back
+    return this._swap ? loaded : undefined;
   },
 
   destroy() {
     this._lastSelected = this._selected; // a re-render in place keeps the door being looked at
+    this._keepPaused = this._userPaused; // and the visitor's pause
     if (this._particles) this._particles.stop();
     this._particles = null;
     clearTimeout(this._timer);
     clearTimeout(this._warmTimer);
-    clearTimeout(this._resumeTimer);
     clearTimeout(this._hoverTimer);
     clearInterval(this._clock);
     (this._cleanups || []).forEach((fn) => fn());
@@ -468,24 +484,25 @@ Pages.Home = {
     hero.querySelector('#hero-dots').addEventListener('click', (e) => {
       const b = e.target.closest('[data-go]');
       if (!b) return;
-      this._show(hero, Number(b.dataset.go));
-      // A pick holds the scene for a while, then the slides carry on.
-      this._paused = true;
-      clearTimeout(this._resumeTimer);
-      this._resumeTimer = setTimeout(() => { this._paused = false; this._schedule(hero); }, 12000);
+      // a pick holds its scene for a while (the strip runs that long), then the slides carry on
+      this._show(hero, Number(b.dataset.go), { dwell: this.PICK_MS });
     });
     const pause = hero.querySelector('#hero-pause');
-    pause.addEventListener('click', () => {
-      this._userPaused = !this._userPaused;
+    const applyPause = () => {
       pause.setAttribute('aria-pressed', String(this._userPaused));
       pause.setAttribute('aria-label', t(this._userPaused ? 'home.scenes.play' : 'home.scenes.pause'));
       pause.innerHTML = UI.icon(this._userPaused ? 'play' : 'pause', 'icon--sm');
-      hero.classList.toggle('is-held', this._userPaused);
+      hero.classList.toggle('is-held', this._userPaused || this._held);
       // pausing stops everything that moves on its own: the scenes, the drifting light, the clock
       hero.classList.toggle('is-stopped', this._userPaused);
       if (this._particles) this._particles[this._userPaused || this._offscreen ? 'pause' : 'resume']();
+    };
+    pause.addEventListener('click', () => {
+      this._userPaused = !this._userPaused;
+      applyPause();
       this._schedule(hero);
     });
+    if (this._userPaused) applyPause();
     // Only the copy and its controls hold the scene (reading, aiming at a dot), not the photo.
     const hold = (v) => () => { this._held = v; hero.classList.toggle('is-held', v || this._userPaused); this._schedule(hero); };
     content.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') hold(true)(); });
@@ -528,7 +545,7 @@ Pages.Home = {
   },
 
   _stopped() {
-    return this._paused || this._userPaused || this._held || this._offscreen || this._drawer || document.hidden || this._reduce();
+    return this._userPaused || this._held || this._offscreen || this._drawer || document.hidden || this._reduce();
   },
 
   // Three doors join the opening: open ones first (a different three each day), each with its own
@@ -575,15 +592,18 @@ Pages.Home = {
     clearTimeout(this._timer);
     clearTimeout(this._warmTimer);
     if (!hero.isConnected || this._scenes.length < 2) return;
-    this._warmTimer = setTimeout(() => this._warm(hero, (this._scene + 1) % this._scenes.length), Math.max(0, this.SCENE_MS - 2500));
+    const ms = this._dwell || this.SCENE_MS;
+    hero.style.setProperty('--dwell', `${ms}ms`);
+    this._warmTimer = setTimeout(() => this._warm(hero, (this._scene + 1) % this._scenes.length), Math.max(0, ms - 2500));
     if (this._stopped()) return;
-    this._timer = setTimeout(() => this._show(hero, (this._scene + 1) % this._scenes.length), this.SCENE_MS);
+    this._timer = setTimeout(() => this._show(hero, (this._scene + 1) % this._scenes.length), ms);
   },
 
   // One beat: the old copy leaves while the pictures cross; the new copy arrives once its own
   // picture is decoded, so a place name never sits on the previous place's photo.
-  async _show(hero, i, { instant = false } = {}) {
+  async _show(hero, i, { instant = false, dwell = 0 } = {}) {
     if (!hero.isConnected || !this._scenes[i] || i === this._scene) { this._schedule(hero); return; }
+    this._dwell = dwell || this.SCENE_MS;
     const token = (this._showToken = (this._showToken || 0) + 1);
     const sc = this._scenes[i];
     this._warm(hero, i);
@@ -599,7 +619,7 @@ Pages.Home = {
     const decoded = incoming && incoming.decode ? incoming.decode().catch(() => {}) : Promise.resolve();
     await Promise.race([decoded, new Promise((r) => setTimeout(r, 900))]);
     if (token !== this._showToken || !hero.isConnected) return;
-    if (!calm) { copy.classList.remove('is-in'); copy.classList.add('is-out'); }
+    if (!calm) { copy.classList.remove('is-in'); copy.classList.add('is-out'); hero.querySelector('#hero-door').classList.add('is-out'); }
     if (leaving && leaving !== incoming) {
       // The push-in stops where it is instead of snapping back as the photo fades out.
       leaving.style.transform = getComputedStyle(leaving).transform;
@@ -607,9 +627,10 @@ Pages.Home = {
       leaving.classList.remove('is-active');
       setTimeout(() => { leaving.classList.remove('is-leaving'); leaving.style.transform = ''; }, 1300);
     }
+    if (instant) { hero.classList.add('is-instant'); requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.remove('is-instant'))); }
     if (incoming) incoming.classList.add('is-active');
     hero.className = hero.className.replace(/scene-\S+/, `scene-${sc.key}`);
-    if (!calm) await new Promise((r) => setTimeout(r, 480));
+    if (!calm) await new Promise((r) => setTimeout(r, 200));
     if (token !== this._showToken || !hero.isConnected) return;
     const j = sc.j;
     const e = j && j.entrance;
@@ -620,28 +641,30 @@ Pages.Home = {
       : t('home.myth');
     copy.querySelector('.home-hero__title .home-hero__line').innerHTML = j ? UI.titleHTML(j.title) : UI.esc(t('home.scene.taoyuan.title'));
     copy.querySelector('#hero-lead').textContent = j ? (j.story_hook || j.subtitle || '') : t('home.scene.taoyuan.lead');
-    const enter = hero.querySelector('#hero-enter');
-    // an open door is pushed open; a closed one can still be looked into (the button grows or
-    // shrinks to its new words instead of jumping)
-    const w0 = enter.getBoundingClientRect().width;
-    enter.querySelector('#hero-enter-label').textContent = t(j ? (ds.open ? 'home.stepDoor' : 'home.peekDoor') : 'home.step');
-    const w1 = enter.getBoundingClientRect().width;
-    if (!calm && enter.animate && Math.abs(w1 - w0) > 1) enter.animate([{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 260, easing: 'cubic-bezier(.22, 1, .36, 1)' });
-    if (j) {
-      enter.href = `#/journey/${encodeURIComponent(j.slug)}`;
-      enter.dataset.slug = j.slug;
-      enter.dataset.vtFrom = `.home-hero__img[data-scene="${i}"]`;
-      enter.removeAttribute('data-to-atlas');
-    } else {
-      enter.href = '#atlas';
-      enter.setAttribute('data-to-atlas', '');
-      delete enter.dataset.slug;
-      delete enter.dataset.vtFrom;
-    }
+    this._doorLink(hero, i);
     copy.classList.remove('is-out', 'is-in');
-    void copy.offsetWidth;
-    copy.classList.add('is-in');
+    if (!instant) {
+      void copy.offsetWidth;
+      copy.classList.add('is-in');
+    }
     this._schedule(hero);
+  },
+
+  // "Step in" always goes to the doors; a door's scene adds a way through that door itself (an
+  // open door is pushed open; a closed one can still be looked into), its picture growing into
+  // the journey's opening.
+  _doorLink(hero, i) {
+    const link = hero.querySelector('#hero-door');
+    const j = this._scenes[i] && this._scenes[i].j;
+    if (!link) return;
+    link.classList.remove('is-out');
+    if (!j) { link.hidden = true; return; }
+    const ds = (this._state && this._state.get(j.entrance.no)) || DoorClock.state(j.entrance);
+    link.hidden = false;
+    link.href = `#/journey/${encodeURIComponent(j.slug)}`;
+    link.dataset.slug = j.slug;
+    link.dataset.vtFrom = `.home-hero__img[data-scene="${i}"]`;
+    link.innerHTML = `${UI.esc(t(ds && ds.open ? 'home.stepDoor' : 'home.peekDoor'))}${UI.icon('arrow', 'icon--sm')}`;
   },
 
   // --- The hundred doors -----------------------------------------------------------------------

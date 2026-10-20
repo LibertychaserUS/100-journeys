@@ -10,20 +10,52 @@ const Nav = (() => {
 
   const theme = () => document.documentElement.getAttribute('data-theme') || 'dark';
 
-  function setTheme(next) {
+  function setTheme(next, from) {
     const root = document.documentElement;
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const apply = () => {
+      root.setAttribute('data-theme', next);
+      if (window.Router) Router.updateHeader();
+      try { localStorage.setItem('theme', next); } catch {}
+      const focused = document.activeElement && document.activeElement.id;
+      render();
+      if (focused) document.getElementById(focused)?.focus();
+    };
+    // The new light spreads out from the switch, page and bar together.
+    if (!still && from && document.startViewTransition && document.visibilityState === 'visible') {
+      const r = from.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      root.style.setProperty('--vt-x', `${Math.round(x)}px`);
+      root.style.setProperty('--vt-y', `${Math.round(y)}px`);
+      root.style.setProperty('--vt-r', `${Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)))}px`);
+      root.classList.add('vt-theme');
+      const vt = document.startViewTransition(apply);
+      vt.finished.finally(() => root.classList.remove('vt-theme'));
+      return;
+    }
+    if (!still) {
       root.classList.add('theme-switching');
       clearTimeout(setTheme._t);
       setTheme._t = setTimeout(() => root.classList.remove('theme-switching'), 320);
     }
-    root.setAttribute('data-theme', next);
-    if (window.Router) Router.updateHeader();
-    try { localStorage.setItem('theme', next); } catch {}
-    const focused = document.activeElement && document.activeElement.id;
-    render();
-    if (focused) document.getElementById(focused)?.focus();
+    apply();
   }
+
+  // The other language's first-screen type, fetched when the switch is pointed at or focused, so the
+  // new words arrive in their own face rather than a stand-in.
+  const fontsFor = {};
+  function langFonts(next) {
+    if (!document.fonts || !document.fonts.load) return null;
+    if (!fontsFor[next]) {
+      const face = next === 'zh' ? '"Story Serif"' : '"Story Serif Latin"';
+      const words = ['brand', 'home.scene.taoyuan.title'].map((k) => I18n.peek(next, k)).join('');
+      fontsFor[next] = Promise.all([document.fonts.load(`700 64px ${face}`, words), document.fonts.load(`400 16px ${face}`, words)]).catch(() => {});
+    }
+    return fontsFor[next];
+  }
+  document.addEventListener('pointerover', (e) => { if (e.target.closest && e.target.closest('#nav-lang, [data-action="lang"]')) langFonts(I18n.lang === 'zh' ? 'en' : 'zh'); });
+  document.addEventListener('focusin', (e) => { if (e.target.closest && e.target.closest('#nav-lang, [data-action="lang"]')) langFonts(I18n.lang === 'zh' ? 'en' : 'zh'); });
 
   function activeSection() {
     const path = (window.location.hash.replace(/^#/, '').split('?')[0]) || '/';
@@ -170,12 +202,16 @@ const Nav = (() => {
     if (target.dataset.action === 'close') { closeAll(); document.getElementById('nav-menu')?.focus(); return; }
     if (id === 'nav-theme' || target.dataset.action === 'theme') {
       if (drawerOpen) { drawerOpen = false; render(); document.getElementById('nav-menu')?.focus(); }
-      return setTheme(theme() === 'dark' ? 'light' : 'dark');
+      return setTheme(theme() === 'dark' ? 'light' : 'dark', document.getElementById(id === 'nav-theme' ? 'nav-theme' : 'nav-menu'));
     }
     if (id === 'nav-lang' || target.dataset.action === 'lang') {
-      drawerOpen = false;
-      I18n.setLang(I18n.lang === 'zh' ? 'en' : 'zh');
-      if (id === 'nav-lang') document.getElementById('nav-lang')?.focus();
+      const next = I18n.lang === 'zh' ? 'en' : 'zh';
+      // one transition around the whole change, its old picture taken before anything changes
+      Router.transition(() => {
+        drawerOpen = false;
+        I18n.setLang(next);
+        if (id === 'nav-lang') document.getElementById('nav-lang')?.focus();
+      }, langFonts(next));
       return;
     }
     if (id === 'nav-user') {

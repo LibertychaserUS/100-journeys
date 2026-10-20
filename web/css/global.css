@@ -79,17 +79,19 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
 }
 
-/* Route transitions (View Transitions API): the nav stays put; the old page leaves before the new
-   one arrives (never two pages at once); a clicked journey's image or door grows into the journey's
-   opening, under its own scrim and title. */
+/* Route transitions (View Transitions API): the nav crossfades in place; the old page leaves before
+   the new one arrives (never two pages at once), over the new page's own ground (--vt-bg, set by the
+   router); a clicked journey's image or door grows into the journey's opening, under its own scrim
+   and title. */
 #main-nav { view-transition-name: site-nav; }
 .scene__media--hero img { view-transition-name: journey-hero; }
 .scene__scrim--hero { view-transition-name: journey-scrim; }
 .scene--hero .detail-hero__text { view-transition-name: journey-copy; }
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-group(site-nav) { animation-duration: 0s; }
-  ::view-transition-old(root) { animation: vt-out 200ms cubic-bezier(.4, 0, 1, 1) both; }
-  ::view-transition-new(root) { animation: vt-in 420ms var(--ease-out) 160ms both; }
+  ::view-transition { background: var(--vt-bg, var(--color-bg)); }
+  ::view-transition-group(site-nav) { animation-duration: 180ms; }
+  ::view-transition-old(root) { animation: vt-out 140ms cubic-bezier(.4, 0, 1, 1) both; }
+  ::view-transition-new(root) { animation: vt-in 420ms var(--ease-out) 130ms both; }
   ::view-transition-group(journey-hero) { animation-duration: 640ms; animation-timing-function: var(--ease-out); }
   ::view-transition-old(journey-hero), ::view-transition-new(journey-hero) { animation-duration: 640ms; width: 100%; height: 100%; object-fit: cover; }
   ::view-transition-new(journey-scrim) { animation: vt-fade 420ms var(--ease-out) 220ms both; }
@@ -104,13 +106,29 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
   html.vt-open::view-transition-new(journey-copy) { animation-delay: 460ms; }
   html.vt-arch::view-transition-new(journey-hero) { animation: vt-arch-open 640ms var(--ease-out) both; }
   html.vt-arch::view-transition-old(journey-hero) { animation: vt-arch-open 640ms var(--ease-out) both, vt-out 360ms linear both; }
-  html.vt-swap::view-transition-old(root) { animation: vt-out 140ms ease-out both; }
-  html.vt-swap::view-transition-new(root) { animation: vt-fade 200ms ease-out both; }
+  /* in place (a language switch): the words go, then the new words come, never one over the other */
+  html.vt-swap::view-transition-old(root) { animation: vt-out 120ms ease-out both; }
+  html.vt-swap::view-transition-new(root) { animation: vt-fade 200ms ease-out 100ms both; }
+  /* the theme: the new light spreads out from the switch, over page and bar alike */
+  html.vt-theme::view-transition-group(*), html.vt-theme::view-transition-old(*), html.vt-theme::view-transition-new(*) { animation: none; mix-blend-mode: normal; }
+  html.vt-theme::view-transition-new(root), html.vt-theme::view-transition-new(site-nav) { animation: vt-theme-reveal 560ms var(--ease-in-out) both; }
+  /* "Step in": straight to the doors, through an arch of lantern light that opens over the opening */
+  html.vt-step::view-transition { background: #07080b; }
+  html.vt-step::view-transition-old(root) { animation: vt-step-back 680ms var(--ease-out) both; }
+  html.vt-step::view-transition-new(root) { animation: vt-step-open 680ms var(--ease-out) both; }
+  html.vt-step::view-transition-group(site-nav) { animation-duration: 320ms; }
 }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
 @keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; transform: translate3d(0, 14px, 0); } }
 @keyframes vt-fade { from { opacity: 0; } }
+@keyframes vt-theme-reveal { from { clip-path: circle(0 at var(--vt-x) var(--vt-y)); } to { clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y)); } }
+@keyframes vt-step-back { to { transform: scale(1.05); filter: brightness(.5); } }
+@keyframes vt-step-open {
+  from { clip-path: inset(max(88px, calc(91% - min(38vw, 15rem) * 2.7)) calc(50% - min(38vw, 15rem)) 9% round min(38vw, 15rem) min(38vw, 15rem) 0 0); filter: sepia(.8) saturate(1.5) brightness(1.25); }
+  55% { filter: none; }
+  to { clip-path: inset(0 round 0); filter: none; }
+}
 @keyframes vt-arch-open { from { clip-path: inset(0 round 50% 50% 6% 6% / 36% 36% 4% 4%); } to { clip-path: inset(0 round 0); } }
 
 /* <picture> wrappers (UI.picture) take no box of their own, so image rules apply to the <img>. */
