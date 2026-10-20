@@ -167,7 +167,7 @@
 :root:lang(en) .door__soon { order: 2; }
 :root:lang(en) .door__word { display: none; }
 :root:lang(en) .door__no { font-family: var(--font-story); font-size: clamp(.875rem, 1vw, 1rem); font-weight: 700; letter-spacing: .04em; }
-@container (min-width: 76px) {
+@container (min-width: 84px) {
   :root:lang(en) .door__link { padding-bottom: 8px; }
   :root:lang(en) .door__no { margin-top: 0; }
   :root:lang(en) .door__soon { order: 0; }
@@ -271,8 +271,15 @@
   .home-atlas__head { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
   .home-atlas__filters { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
   .home-atlas__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 8px; }
-  /* English names need a wider arch: four to a row, so every door shows its name */
+  /* English names need a wider arch: four to a row (in the phone's smaller type), so every door
+     shows its name */
   :root:lang(en) .home-atlas__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @container (min-width: 70px) {
+    :root:lang(en) .door__link { padding-bottom: 8px; }
+    :root:lang(en) .door__no { margin-top: 0; font-family: var(--font-ui); font-size: .625rem; font-weight: 400; letter-spacing: .06em; }
+    :root:lang(en) .door__soon { order: 0; }
+    :root:lang(en) .door__word { display: -webkit-box; }
+  }
   .door__link { padding: 14% 3px 6px; }
   .door__word { font-size: .6875rem; }
   .door__no { font-size: .625rem; }
