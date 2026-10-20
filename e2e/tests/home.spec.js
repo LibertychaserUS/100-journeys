@@ -171,7 +171,7 @@ test.describe('The threshold', () => {
           bad.push(...await page.evaluate((p) => {
             const out = [];
             const th = document.getElementById('home-threshold');
-            const arch = th.querySelector('.home-threshold__arch').getBoundingClientRect();
+            const arch = th.querySelector('.home-threshold__frame').getBoundingClientRect();
             const bar = document.getElementById('main-nav').getBoundingClientRect().bottom;
             if (arch.top < bar + 16) out.push(`p${p}: arch top ${Math.round(arch.top)} reaches the bar (${bar})`);
             th.querySelectorAll('.home-threshold__beat').forEach((b) => {
@@ -391,6 +391,56 @@ test('back from a door does not replay the arrival', async ({ page }) => {
   await expect(page.locator('.home-hero')).not.toHaveClass(/is-booting/);
   expect(await page.locator('#atlas-found').textContent()).toBe('48');
   await expect(page.locator('#atlas-grid')).toHaveClass(/is-lit/);
+});
+
+// E2E-HOME-022: the threshold scrolls without shifting the layout, the opening keeps the arch's
+// half-circle top, and when its light has settled the doors' heading is already on screen
+test('the threshold opens onto the doors without a blank screen', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await context.addInitScript(() => { try { localStorage.setItem('ai_pet_profile', JSON.stringify({ firstVisit: false })); } catch (e) {} });
+  const page = await context.newPage();
+  await page.goto('/#/');
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(() => {
+    window.__cls = 0;
+    new PerformanceObserver((list) => { for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: false });
+  });
+  const span = await page.evaluate(() => { const th = document.getElementById('home-threshold'); return [th.offsetTop, th.offsetHeight - window.innerHeight]; });
+  for (let p = 0; p <= 1.0001; p += 0.05) {
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round(span[0] + p * span[1]));
+    await page.waitForTimeout(60);
+  }
+  await page.waitForTimeout(200);
+  expect(await page.evaluate(() => window.__cls)).toBeLessThan(0.02);
+  const look = await page.evaluate(() => {
+    const open = getComputedStyle(document.querySelector('.home-threshold__open'));
+    const r = document.getElementById('atlas-title').getBoundingClientRect();
+    return { radius: open.borderTopLeftRadius, width: parseFloat(open.width), top: r.top, bottom: r.bottom };
+  });
+  expect(Math.abs(parseFloat(look.radius) - look.width / 2)).toBeLessThan(1);
+  expect(look.bottom).toBeLessThan(900);
+  await context.close();
+});
+
+// E2E-HOME-023: an open door keeps its light when it is pointed at or chosen (the hover adds a lift,
+// it never puts the lamp out), and its seam of light shows
+test('an open door keeps its light when pointed at', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'zh-CN' });
+  const page = await context.newPage();
+  await page.clock.setFixedTime(new Date('2026-10-20T06:00:00Z'));
+  await page.goto('/#/');
+  const lit = page.locator('#atlas-grid .door.is-found[data-open="true"]').first();
+  await lit.scrollIntoViewIfNeeded();
+  await expect(page.locator('#atlas-grid')).toHaveClass(/is-lit/);
+  // after the wall's first light has played
+  await lit.locator('.door__link').evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished.catch(() => {}))));
+  const glow = () => lit.locator('.door__link').evaluate((el) => getComputedStyle(el).boxShadow);
+  expect(await glow()).toContain('40px');
+  await lit.hover();
+  await page.waitForTimeout(400);
+  expect(await glow()).toContain('40px');
+  expect(Number(await lit.locator('.door__seam').evaluate((el) => getComputedStyle(el).opacity))).toBeGreaterThan(0.8);
+  await context.close();
 });
 
 // E2E-HOME-006: the hundred doors: one cell per number, found doors link to their journey, the

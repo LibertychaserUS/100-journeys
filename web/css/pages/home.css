@@ -17,67 +17,105 @@
 .will-reveal.is-in { opacity: 1; transform: none; transition: opacity .9s var(--ease-out), transform .9s var(--ease-out); }
 
 /* --- The threshold: the story of the marks, between the opening and the doors ---
-   The arch grows by its real size (its line stays crisp) and never reaches the bar; the lines sit
-   inside it, under its curve, never wider than its opening. The marks are lantern points along the
-   way: they light one by one, go out when the men lose their way, come back, and then the doorway
-   opens into the page itself. Set from the scroll: --p through the section, --t the marks lighting,
-   --m them going out, --r them coming back, --q the door opening. */
-.home-threshold { --p: 0; --t: 0; --m: 0; --r: 0; --q: 0; position: relative; height: 260vh; background: #07080b; color: var(--color-on-media); }
+   The arch keeps one shape (a half-circle on straight sides) and grows by scale, never up to the
+   bar, its line kept thin; the lines sit in a fixed box inside it, below its curve, and never move
+   with it. The marks are lantern points along the way: they light one by one, go out when the men
+   lose their way, come back. Then the doorway opens: the same arch, filled with lantern light,
+   grows past the screen's edges, and the light settles into the lamp-lit ground the doors begin on.
+   Set from the scroll: --p through the section, --s the arch's growth, --S the opening's, --t the
+   marks lighting, --m them going out, --r them coming back, --q the door opening. */
+.home-threshold { --p: 0; --s: 1; --S: 1; --t: 0; --m: 0; --r: 0; --q: 0; position: relative; height: 260vh; background: #07080b; color: var(--color-on-media); }
 .home-threshold__stage {
   position: sticky; top: 0; height: 100svh; overflow: hidden; container-type: size;
   --sill: 9cqh; --gap: clamp(14px, 3.5cqi, 44px);
-  --w0: min(76cqi, 30rem); --w1: min(88cqi, 52rem);
-  --w: calc(var(--w0) + (var(--w1) - var(--w0)) * var(--p));
-  --h: min(calc(var(--w) * 1.35), calc(100cqh - var(--nav-h) - 24px - var(--gap) - var(--sill)));
+  --w0: min(76cqi, 26rem);
+  --h0: min(calc(var(--w0) * 1.35), calc((100cqh - var(--nav-h) - 24px - var(--gap) - var(--sill)) / 1.18));
 }
-.home-threshold__arch {
-  position: absolute; left: 50%; bottom: var(--sill); width: var(--w); height: var(--h); margin-left: calc(var(--w) / -2);
-  border-radius: calc(var(--w) / 2) calc(var(--w) / 2) 0 0;
-  border: 1.5px solid rgba(242, 196, 109, calc(.24 + var(--p) * .5)); border-bottom: 0;
-  box-shadow: 0 0 calc(30px + var(--p) * 110px) calc(var(--p) * 18px) rgba(242, 196, 109, calc(.06 + var(--p) * .2));
+.home-threshold__frame, .home-threshold__open {
+  position: absolute; left: 50%; bottom: var(--sill); width: var(--w0); height: var(--h0); margin-left: calc(var(--w0) / -2);
+  border-radius: calc(var(--w0) / 2) calc(var(--w0) / 2) 0 0; transform-origin: 50% 100%;
 }
-.home-threshold__arch > i { position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(70% 60% at 50% 100%, rgba(242, 196, 109, calc(.08 + var(--p) * .3)), rgba(242, 196, 109, 0) 72%); }
-/* the sill, and the lantern light on the ground in front of it */
-.home-threshold__arch::after { content: ""; position: absolute; left: -18%; right: -18%; bottom: -1px; height: 1.5px; background: linear-gradient(90deg, rgba(242, 196, 109, 0), rgba(242, 196, 109, calc(.3 + var(--p) * .5)) 30% 70%, rgba(242, 196, 109, 0)); }
-.home-threshold__arch::before { content: ""; position: absolute; left: -30%; right: -30%; top: 100%; height: var(--sill); background: radial-gradient(50% 80% at 50% 0, rgba(242, 196, 109, calc(.05 + var(--p) * .18)), rgba(242, 196, 109, 0) 70%); pointer-events: none; }
-/* the lines, inside the opening and below its curve */
-.home-threshold__beats { position: absolute; inset: calc(var(--w) / 2) 24px 9% 24px; display: grid; place-items: center; }
-.home-threshold__beat { grid-area: 1 / 1; z-index: 1; max-inline-size: calc(var(--w) - 48px); margin: 0; text-align: center; font-family: var(--font-story); font-size: clamp(1.5rem, 1rem + 2.2cqi, 2.5rem); line-height: 1.45; letter-spacing: .02em; text-wrap: balance;
+.home-threshold__frame {
+  transform: scale(var(--s));
+  /* the line, as thin at any size (its width shrinks as the arch grows) */
+  box-shadow: inset 0 0 0 calc(1.5px / var(--s)) rgba(242, 196, 109, calc(.26 + var(--p) * .5));
+}
+/* the arch's glow is drawn once, softly, and only brightens */
+.home-threshold__glow, .home-threshold__inner { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.home-threshold__glow { box-shadow: 0 0 120px 14px rgba(242, 196, 109, .26); opacity: calc(.15 + var(--p) * .85); }
+.home-threshold__inner { background: radial-gradient(70% 60% at 50% 100%, rgba(242, 196, 109, .4), rgba(242, 196, 109, 0) 72%); opacity: calc(.2 + var(--p) * .8); }
+/* the sill */
+.home-threshold__frame::after { content: ""; position: absolute; left: -18%; right: -18%; bottom: -1px; height: calc(1.5px / var(--s)); background: linear-gradient(90deg, rgba(242, 196, 109, 0), rgba(242, 196, 109, calc(.3 + var(--p) * .5)) 30% 70%, rgba(242, 196, 109, 0)); }
+/* the ground in front of the door: lantern light on it, and at the end the same lit ground */
+.home-threshold__floor { position: absolute; inset: auto 0 0; height: var(--sill); pointer-events: none;
+  background: radial-gradient(40% 90% at 50% 0, rgba(242, 196, 109, calc(.06 + var(--p) * .16 + var(--q) * .5)), rgba(242, 196, 109, 0) 70%); }
+.home-threshold__floor::before, .home-threshold__floor::after { content: ""; position: absolute; inset: 0; }
+.home-threshold__floor::before { background: linear-gradient(to bottom, #e6a248, #d99a44); opacity: min(1, calc(var(--q) * 3)); }
+.home-threshold__floor::after { background: var(--lit-ground); opacity: clamp(0, calc((var(--q) - .7) * 3.6), 1); }
+/* the lines: a fixed box inside the arch (at its smallest), below its curve, above the light */
+.home-threshold__beats {
+  position: absolute; z-index: 3; left: 50%; width: calc(var(--w0) - 48px); margin-left: calc((var(--w0) - 48px) / -2);
+  bottom: calc(var(--sill) + var(--h0) * .09); height: calc(var(--h0) * .91 - var(--w0) / 2);
+  display: grid; place-items: center;
+}
+.home-threshold__beat { grid-area: 1 / 1; max-inline-size: 100%; margin: 0; text-align: center; font-family: var(--font-story); font-size: clamp(1.5rem, 1rem + 2.2cqi, 2.5rem); line-height: 1.45; letter-spacing: .02em; text-wrap: balance;
   text-shadow: 0 2px 24px rgba(0, 0, 0, .6); opacity: var(--o, 1); transform: translate3d(0, calc((1 - var(--o, 1)) * 14px), 0); }
 :root:lang(en) .home-threshold__beat { letter-spacing: 0; line-height: 1.35; }
 /* Chinese lines break only at their phrase marks, never inside a word */
 :root:lang(zh) .home-threshold__beat { word-break: keep-all; }
 .home-threshold__beat--setup { font-size: clamp(1.25rem, .9rem + 1.5cqi, 1.875rem); line-height: 1.45; }
+/* the last line stays while the light comes, turning to ink on it */
+.home-threshold__beat:last-child {
+  --ink: min(1, calc(var(--q) * 10));
+  color: color-mix(in oklab, var(--color-on-media) calc((1 - var(--ink)) * 100%), #2a1d0c);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, calc(.6 * (1 - var(--ink)))), 0 0 28px rgba(255, 240, 210, calc(.7 * var(--ink)));
+}
 /* the marks along the way: they trace a wider arch around the door, once they are all lit */
 .home-threshold__marks { position: absolute; inset: 0; pointer-events: none; }
 .home-threshold__marks b {
   --on: min(1, max(0, (var(--t) - var(--at)) * 12));
   --out: min(1, max(0, (var(--m) - var(--at)) * 4));
-  --R: calc(var(--w) / 2 + var(--gap) + var(--j));
+  --R: calc(var(--w0) / 2 + var(--gap) + var(--j));
   position: absolute; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #f2c46d;
-  left: calc(50cqi + var(--R) * cos(var(--a)));
-  top: calc(100cqh - var(--sill) - var(--h) + var(--w) / 2 - var(--R) * sin(var(--a)) + var(--d) * (var(--h) - var(--w) / 2));
+  left: calc(50% + var(--R) * cos(var(--a)));
+  top: calc(var(--w0) / 2 - var(--R) * sin(var(--a)) + var(--d) * (var(--h0) - var(--w0) / 2));
   box-shadow: 0 0 10px 3px rgba(242, 196, 109, .55);
   opacity: calc(var(--on) * (1 - var(--out) * (1 - var(--r)) * .9) * (1 - var(--q)));
-  transform: scale(calc(1 + var(--r) * .5));
+  transform: scale(calc((1 + var(--r) * .5) / var(--s)));
 }
-/* the doorway opens: the opening widens from the arch to the whole stage, lantern light first, then
-   the page's own ground, so the doors begin in the light that came through */
+/* the doorway opens: lantern light in the arch's own shape, a hot core at the threshold and a
+   little grain, growing until it fills the screen, then settling into the lit ground */
 .home-threshold__open {
-  --g: calc(1 - var(--q)); --gold: calc(1 - var(--q) * var(--q));
-  position: absolute; inset: 0; pointer-events: none; opacity: min(1, calc(var(--q) * 12));
-  background: radial-gradient(120% 90% at 50% 100%, color-mix(in oklab, #ffe3a3 calc(var(--gold) * 100%), var(--color-bg)), color-mix(in oklab, #d29a4a calc(var(--gold) * 85%), var(--color-bg)));
-  clip-path: inset(calc((100cqh - var(--sill) - var(--h)) * var(--g)) calc((100cqi - var(--w)) / 2 * var(--g)) calc(var(--sill) * var(--g)) calc((100cqi - var(--w)) / 2 * var(--g))
-    round calc(var(--w) / 2 * var(--g)) calc(var(--w) / 2 * var(--g)) 0 0);
+  z-index: 2; pointer-events: none; transform: scale(var(--S)); opacity: min(1, calc(var(--q) * 10));
+  background:
+    radial-gradient(55% 40% at 50% 100%, rgba(255, 250, 235, .95), rgba(255, 250, 235, 0) 70%),
+    radial-gradient(80% 60% at 50% 72%, rgba(255, 228, 160, .9), rgba(255, 228, 160, 0) 75%),
+    linear-gradient(to top, #e6a248 0%, #f2c46d 45%, #f8dea4 100%);
+}
+.home-threshold__open::before { content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* the lit ground closes in from the edges towards the bright core at the threshold, so the light
+   never dims all at once into a brown wash */
+.home-threshold__open::after {
+  --k: clamp(0, calc((var(--q) - .7) / .28), 1);
+  --edge: calc((1 - var(--k)) * 130% - 30%);
+  content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--lit-ground);
+  -webkit-mask-image: radial-gradient(farthest-corner at 50% 88%, transparent var(--edge), #000 calc(var(--edge) + 30%));
+  mask-image: radial-gradient(farthest-corner at 50% 88%, transparent var(--edge), #000 calc(var(--edge) + 30%));
+}
+/* the doors rise into the last of the light, so the page never scrolls through an empty screen */
+@media (prefers-reduced-motion: no-preference) {
+  .home-threshold + .home-atlas { position: relative; z-index: 2; margin-top: -24vh; padding-top: 8vh;
+    background: linear-gradient(to bottom, transparent 24vh, var(--lit-ground) 24vh, var(--color-bg) 94vh); }
 }
 @media (prefers-reduced-motion: reduce) {
   .home-threshold { height: auto; }
   .home-threshold__stage { position: static; height: auto; padding-block: 120px 160px; container-type: normal; }
-  .home-threshold__arch { display: contents; }
-  .home-threshold__arch > i, .home-threshold__arch::before, .home-threshold__arch::after, .home-threshold__marks, .home-threshold__open { display: none; }
-  .home-threshold__beats { position: static; display: grid; gap: var(--space-6); padding-inline: 24px; }
+  .home-threshold__frame, .home-threshold__open, .home-threshold__floor { display: none; }
+  .home-threshold__beats { position: static; width: auto; height: auto; margin: 0; display: grid; gap: var(--space-6); padding-inline: 24px; }
   .home-threshold__beat { grid-area: auto; max-inline-size: 20em; margin-inline: auto; font-size: clamp(1.5rem, 1rem + 2vw, 2.5rem); opacity: 1; transform: none; }
   .home-threshold__beat--setup { font-size: clamp(1.25rem, .9rem + 1.4vw, 1.875rem); }
+  .home-threshold__beat:last-child { color: inherit; }
   .home-threshold::after { content: ""; position: absolute; inset: auto 0 0; height: 32vh; background: linear-gradient(to bottom, rgba(7, 8, 11, 0), var(--color-bg)); pointer-events: none; }
 }
 
@@ -137,13 +175,13 @@
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp) 42%, transparent);
   transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), opacity .3s var(--ease-out);
 }
-.door__arch { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(.8) contrast(1.06); opacity: .6; transition: opacity .4s var(--ease-out), filter .4s var(--ease-out); }
+.door__arch { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(.52) contrast(1.08) saturate(1.1); opacity: .92; transition: opacity .4s var(--ease-out), filter .4s var(--ease-out); }
 /* a closed door: its picture in one colour, its realm's (the picture's light, the realm's hue) */
-.home-atlas__grid.is-near .door__arch { --tint: color-mix(in oklab, var(--lamp) 72%, #7a7a7a); background-image: linear-gradient(var(--tint), var(--tint)), var(--thumb); background-blend-mode: color, normal; }
+.home-atlas__grid.is-near .door__arch { background-image: linear-gradient(var(--lamp), var(--lamp)), var(--thumb); background-blend-mode: color, normal; }
 /* opening within three hours: the picture comes back, in warm lamplight */
 .home-atlas__grid.is-near .door:is([data-soon], [data-open="true"], [data-open="always"]) .door__arch,
 .home-atlas__grid.is-near .door.is-found:is(:hover, .is-selected) .door__arch { background-image: var(--thumb); }
-.door[data-soon] .door__arch { filter: sepia(.7) saturate(1.2) brightness(.86); opacity: .8; }
+.door[data-soon] .door__arch { filter: sepia(.65) saturate(1.2) brightness(.78); opacity: .92; }
 .door[data-soon] .door__link { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp-open) 55%, transparent); }
 /* shade under the number and under the name, so white text holds on any picture */
 .door__link::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 9, 12, .78) 0%, rgba(8, 9, 12, 0) 32%, rgba(8, 9, 12, 0) 44%, rgba(8, 9, 12, .9) 100%); }
@@ -176,11 +214,18 @@
   :root:lang(en) .door__no { font-family: var(--font-ui); font-size: .75rem; font-weight: 400; letter-spacing: .06em; }
 }
 /* A lit door: full colour, a warm light low in the arch, a slow candle breath */
-.door[data-open="true"] .door__arch { filter: none; opacity: .95; }
+.door[data-open="true"] .door__arch { filter: brightness(1.05) saturate(1.05); opacity: 1; }
 /* the door that never closes: a steady light, not a candle in its hour */
 .door[data-open="always"] .door__arch { filter: none; opacity: .85; }
 .door[data-open="always"] .door__link { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--lamp-open) 45%, transparent); }
-.door[data-open="true"] .door__link { box-shadow: inset 0 0 0 1.5px var(--lamp-open), inset 0 -28px 34px -16px color-mix(in oklab, var(--lamp-open) 75%, transparent), 0 0 26px -6px color-mix(in oklab, var(--lamp-open) 75%, transparent); }
+.door[data-open="true"] .door__link { --lit: inset 0 0 0 1.5px var(--lamp-open), inset 0 -28px 34px -16px color-mix(in oklab, var(--lamp-open) 75%, transparent), 0 0 40px -4px color-mix(in oklab, var(--lamp-open) 70%, transparent); box-shadow: var(--lit); }
+/* the seam between the leaves: a line of light from the sill, bright on an open door; on any door
+   the pointer or the keyboard is on it opens a little, in the realm's light */
+.door__seam { position: absolute; z-index: 1; left: 50%; bottom: 0; width: 2px; height: 58%; margin-left: -1px; pointer-events: none; border-radius: 2px;
+  background: linear-gradient(to top, color-mix(in oklab, var(--seam, var(--lamp)) 95%, #fff), transparent); opacity: 0; transform-origin: 50% 100%; transform: scaleY(.4);
+  transition: opacity .3s var(--ease-out), transform .45s var(--ease-out), width .45s var(--ease-out), margin .45s var(--ease-out); }
+.door[data-open="true"] .door__seam { --seam: var(--lamp-open); opacity: .9; transform: none; box-shadow: 0 0 12px 2px color-mix(in oklab, var(--lamp-open) 70%, transparent); }
+.door.is-found:is(:hover, .is-selected, :focus-within) .door__seam { opacity: 1; transform: none; width: 6px; margin-left: -3px; box-shadow: 0 0 18px 4px color-mix(in oklab, var(--seam, var(--lamp)) 70%, transparent); }
 .door[data-open="true"] .door__link::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 45% at 50% 100%, color-mix(in oklab, var(--lamp-open) 55%, transparent), transparent 70%); mix-blend-mode: screen; pointer-events: none; }
 [data-theme="light"] .door[data-open="true"]::before { content: ""; position: absolute; inset: -16px -12px; z-index: -1; border-radius: 999px 999px 24px 24px; background: radial-gradient(closest-side, rgba(242, 196, 109, .55), rgba(242, 196, 109, 0)); pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
@@ -188,7 +233,9 @@
 }
 @keyframes door-candle { 0% { opacity: .7; } 45% { opacity: 1; } 70% { opacity: .82; } 100% { opacity: .95; } }
 .door.is-found:hover .door__link, .door.is-selected .door__link { transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--lamp), 0 16px 30px -18px rgba(0, 0, 0, .8); }
-.door.is-found:not([data-open="true"]):is(:hover, .is-selected) .door__arch { filter: brightness(.92); opacity: .85; }
+.door[data-open="true"]:is(:hover, .is-selected) .door__link { box-shadow: var(--lit), 0 16px 30px -18px rgba(0, 0, 0, .8); }
+.door[data-open="true"]:is(:hover, .is-selected) .door__link::before { opacity: 1; animation: none; }
+.door.is-found:not([data-open="true"]):is(:hover, .is-selected) .door__arch { filter: brightness(.82); opacity: 1; }
 .door.is-found .door__link:active { transform: scale(.96); transition-duration: 90ms; }
 .door.is-dim { opacity: .2; }
 .door__link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
