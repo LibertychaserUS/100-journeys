@@ -266,6 +266,7 @@ Pages.Home = {
             </form>
           </header>
           <div class="home-atlas__filters" id="atlas-filters" role="group" aria-label="${esc(t('home.atlas.label'))}"></div>
+          <p class="sr-only" id="atlas-status" role="status" aria-live="polite"></p>
           <div class="home-atlas__body">
             <div class="home-atlas__wall">
               <ol class="home-atlas__grid" id="atlas-grid" aria-label="${esc(t('home.atlas.gridLabel'))}" aria-busy="true">
@@ -302,7 +303,7 @@ Pages.Home = {
 
       <section class="home-behind" id="home-behind" aria-labelledby="behind-title" data-reading hidden>
         <div class="container home-behind__inner">
-          <p class="eyebrow" id="behind-title">${esc(t('home.behind.eyebrow'))}</p>
+          <h2 class="eyebrow" id="behind-title">${esc(t('home.behind.eyebrow'))}</h2>
           <div id="behind-body"></div>
         </div>
       </section>
@@ -318,7 +319,8 @@ Pages.Home = {
         </div>
       </section>
 
-      <section class="home-close" aria-labelledby="close-quote">
+      <section class="home-close" aria-labelledby="close-title">
+        <h2 class="sr-only" id="close-title">${esc(t('home.close.label'))}</h2>
         <div class="container home-close__inner">
           <figure class="home-close__quote">
             ${I18n.lang === 'en' ? '<p class="home-close__orig" lang="zh-CN">缘溪行，忘路之远近。</p>' : ''}
@@ -897,7 +899,9 @@ Pages.Home = {
     document.querySelectorAll('#atlas-grid a.door__link').forEach((a) => a.setAttribute('tabindex', a === link ? '0' : '-1'));
   },
 
+  // the door's picture on the wall, sharp on dense screens too
   _thumb(j) { return j.image_url.replace(/\.jpg$/, '.120.avif'); },
+  _thumbSet(j) { const b = j.image_url.replace(/\.jpg$/, ''); return `image-set(url('${b}.120.avif') 1x, url('${b}.240.avif') 2x)`; },
 
   _renderAtlas(journeys) {
     const esc = UI.esc;
@@ -918,7 +922,7 @@ Pages.Home = {
       const near = place ? place.split(', ').pop() : '';
       // the spoken name is the visible words in their order (number, name, place), then the rest
       const label = `${no} ${name}${near ? ` ${near}` : ''}, ${t(`entrance.realm.${e.realm}`)}${place !== near ? `, ${place}` : ''}${state ? `, ${state}` : ''}`;
-      return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${always ? 'always' : s.open}">
+      return `<li class="door is-found" style="--i:${k};--thumb:${esc(this._thumbSet(j))}" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${always ? 'always' : s.open}">
         <a class="door__link" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-no="${e.no}" data-quiet data-vt-self tabindex="-1" aria-label="${esc(label)}">
           <span class="door__arch" aria-hidden="true"></span><i class="door__seam" aria-hidden="true"></i><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>${near ? `<span class="door__place" aria-hidden="true">${esc(near)}</span>` : ''}
         </a></li>`;
@@ -960,6 +964,12 @@ Pages.Home = {
       if (on && !first) first = li.querySelector('a');
     });
     grid.dataset.filter = key;
+    // say what the wall now shows, in the world's words (quietly, after a choice)
+    const status = document.getElementById('atlas-status');
+    if (status && !keep) {
+      const n = grid.querySelectorAll('.door.is-found:not(.is-dim)').length;
+      status.textContent = !key ? t('home.atlas.statusAll', { n }) : key === 'now' ? t('home.atlas.statusNow', { n }) : t('home.atlas.statusRealm', { n, realm: t(`entrance.realm.${key}`) });
+    }
     const current = grid.querySelector(`a[data-no="${this._selected}"]`);
     if (first && (!current || current.closest('.door').classList.contains('is-dim'))) {
       this._pinned = Number(first.dataset.no);

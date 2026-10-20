@@ -102,11 +102,12 @@
 .home-hero__step:active { transform: scale(.98); }
 
 .home-hero__foot { margin-top: var(--space-6); min-height: 40px; display: flex; align-items: center; gap: var(--space-3) var(--space-5); flex-wrap: wrap; }
+/* the strip keeps the room of what has not arrived yet (the pause, the clock), so nothing above it moves when they do */
+.home-hero__pause[hidden] { display: grid !important; visibility: hidden; }
+.home-hero__now[hidden] { display: inline-flex !important; visibility: hidden; }
 .home-hero__pause { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, .28); color: #f6f1e8; background: rgba(255, 255, 255, .06); }
 .home-hero__pause:hover { background: rgba(255, 255, 255, .14); }
-/* Space for the pause control and the three door scenes is kept from the first frame, so nothing
-   moves when they arrive. */
-.home-hero__pause[hidden] { display: grid; visibility: hidden; }
+/* Space for the three door scenes is kept from the first frame, so nothing moves when they arrive. */
 .home-hero__dot.is-placeholder { visibility: hidden; }
 .home-hero__dots { display: flex; gap: 10px; align-items: flex-start; }
 .home-hero__dot { position: relative; min-width: 56px; max-width: 11rem; min-height: 36px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "bar bar" "num place"; align-content: start; gap: 8px 6px; padding-top: 8px; text-align: left; }

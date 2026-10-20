@@ -264,9 +264,9 @@ func TestImages_HaveDerivatives(t *testing.T) {
 		base := filepath.Base(rel)
 		switch {
 		case strings.HasPrefix(base, "card-"):
-			return []int{120, 480, 720}
+			return []int{120, 240, 480, 720}
 		case base == "cover.jpg":
-			return []int{120, 480, 720, 1120}
+			return []int{120, 240, 480, 720, 1120}
 		case base == "hero.jpg" || base == "scene-1.jpg" || base == "scene-2.jpg":
 			return []int{960, 1536}
 		case base == "scene-3.jpg":

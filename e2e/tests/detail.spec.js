@@ -78,6 +78,26 @@ test.describe('Detail Page', () => {
     expect(await res.text()).toContain(`/j/${SLUG}</loc>`);
   });
 
+  // E2E-SEO-002: the home page's share card comes in the reader's language (English links get
+  // English tags and lang, with hreflang pairs), and a path that is not a page is a real 404
+  test('the home card speaks both languages; other paths are 404', async ({ page }) => {
+    const en = await (await page.request.get('/?lang=en')).text();
+    expect(en).toContain('<html lang="en">');
+    expect(en).toMatch(/<meta property="og:title" content="100 Journeys · /);
+    expect(en).toContain('hreflang="zh-CN"');
+    expect(en).toContain('og:image:alt');
+    const zh = await (await page.request.get('/')).text();
+    expect(zh).toContain('<html lang="zh-CN">');
+    expect(zh).toContain('hreflang="en"');
+    const missing = await page.request.get('/no-such-page');
+    expect(missing.status()).toBe(404);
+    expect(await missing.text()).toContain('noindex');
+    await page.goto('/no-such-page');
+    await expect(page.locator('body')).toHaveAttribute('data-page', 'notfound');
+    await page.goto('/?lang=en');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
   // E2E-SHARE-001: a journey share link carries its preview tags and opens the journey
   test('share links preview the journey and open it', async ({ page }) => {
     const html = await (await page.request.get(`/j/${SLUG}`)).text();

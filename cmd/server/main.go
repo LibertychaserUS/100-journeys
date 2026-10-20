@@ -370,9 +370,18 @@ func main() {
 			c.String(http.StatusInternalServerError, "index.html not found")
 			return
 		}
-		html = webapp.HomeMeta(html, originOf(c))
-
 		c.Header("Cache-Control", "no-cache")
+		// Only the root is a page (the app's own routes live after the #); any other path is a
+		// real 404, still in the shell so the reader lands on the app's not-found page.
+		if p := c.Request.URL.Path; p != "/" && p != "/index.html" {
+			c.Data(http.StatusNotFound, "text/html; charset=utf-8", []byte(webapp.NotFound(html)))
+			return
+		}
+		lang := "zh"
+		if service.NormalizeLocale(c.Query("lang")) == "en" {
+			lang = "en"
+		}
+		html = webapp.HomeMeta(html, originOf(c), lang)
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
 
