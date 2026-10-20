@@ -76,8 +76,9 @@ test.describe('Mobile', () => {
     await expect(page).toHaveURL(/#\/$/);
     await expect(page.locator('#door-body .door-card__title')).not.toHaveText(titleA);
     await expect(page.locator('#door-body .door-card__hook')).toBeVisible();
+    const slugB = await b.getAttribute('data-slug'); // read before the tap takes the page away
     await b.tap();
-    await expect(page).toHaveURL(new RegExp(`#/journey/${await b.getAttribute('data-slug')}$`));
+    await expect(page).toHaveURL(new RegExp(`#/journey/${slugB}$`));
   });
 
   // E2E-MOBILE-003: the filter panel opens as a sheet and applies filters

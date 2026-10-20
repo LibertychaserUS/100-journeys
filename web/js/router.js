@@ -123,7 +123,7 @@ const Router = (() => {
       // (night where it opens on a picture)
       const onPicture = 'mediaHeader' in document.body.dataset && (back || 0) < window.innerHeight * 0.8;
       document.documentElement.style.setProperty('--vt-bg', onPicture ? '#07080b' : 'var(--color-bg)');
-      if (back) requestAnimationFrame(() => requestAnimationFrame(() => { window.scrollTo(0, back); updateScrolled(); }));
+      if (back) restore(back);
       else requestAnimationFrame(updateScrolled);
       // Wait briefly for an async page (detail) so the transition captures the new state.
       return out && typeof out.then === 'function' ? Promise.race([out, new Promise((r) => setTimeout(r, 700))]) : undefined;
@@ -153,6 +153,26 @@ const Router = (() => {
     }
     if (firstRender) document.documentElement.dataset.booted = '';
     firstRender = false;
+  }
+
+  // Back to a place on a page that is still filling in (its sections arrive with their data): keep
+  // going back to that place for a moment, until the page is long enough to hold it, unless the
+  // reader moves first.
+  function restore(y) {
+    const t0 = performance.now();
+    const events = ['wheel', 'touchstart', 'keydown', 'pointerdown'];
+    let moved = false;
+    const stop = () => { moved = true; };
+    events.forEach((type) => window.addEventListener(type, stop, { passive: true }));
+    const done = () => events.forEach((type) => window.removeEventListener(type, stop));
+    const step = () => {
+      if (moved) { done(); return; }
+      window.scrollTo(0, y);
+      updateScrolled();
+      if (Math.abs(window.scrollY - y) > 2 && performance.now() - t0 < 2000) requestAnimationFrame(step);
+      else done();
+    };
+    requestAnimationFrame(() => requestAnimationFrame(step));
   }
 
   function canAnimate() {
