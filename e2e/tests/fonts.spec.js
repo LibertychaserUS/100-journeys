@@ -45,7 +45,8 @@ test.describe('Story fonts', () => {
     await page.evaluate(() => document.fonts.ready);
     const faces = await page.evaluate(() => [...document.fonts].filter((f) => f.family === 'Story Serif Latin' && f.status === 'loaded').map((f) => f.weight).sort());
     expect(faces).toEqual(['400', '700']);
-    expect(fetched.filter((f) => !f.startsWith('story-serif-latin-'))).toEqual([]);
+    // no Chinese slice: only the Latin cuts, and the few glyphs of the closing line's original
+    expect(fetched.filter((f) => !/^(story-serif-latin-|colophon-serif-)/.test(f))).toEqual([]);
     expect(failed).toEqual([]);
     await context.close();
   });

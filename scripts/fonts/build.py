@@ -43,9 +43,11 @@ LATIN_CUTS = ((400, 18), (700, 48))  # (weight, optical size)
 
 
 def content_files():
+    """Everything that can render: the app's own copy, and every string the server can send (journey
+    content in both languages, the road, the station's ticket fragments, the guide's replies)."""
+    go = [f for f in glob.glob(os.path.join(ROOT, 'internal/**/*.go'), recursive=True) if not f.endswith('_test.go')]
     return (glob.glob(os.path.join(ROOT, 'web/js/**/*.js'), recursive=True) + [INDEX] +
-            glob.glob(os.path.join(ROOT, 'internal/content/**/*.json'), recursive=True) +
-            glob.glob(os.path.join(ROOT, 'internal/road/*.json')) + glob.glob(os.path.join(ROOT, 'internal/road/*.go')))
+            glob.glob(os.path.join(ROOT, 'internal/**/*.json'), recursive=True) + go)
 
 
 def is_cjk(c):
@@ -81,9 +83,10 @@ def page_usage(entrance_names):
     return pages
 
 
-# How much a byte on each page counts: the home page is where most visits start.
-PAGE_WEIGHT = {'#/': 8, '#/station': 3, '#/explore': 2}
-MAX_SLICES = 40
+# How much a byte on each page counts: the home page is where most visits start, so its slices are
+# kept tight (within its budget) even where that costs other pages a few kilobytes.
+PAGE_WEIGHT = {'#/': 32, '#/station': 3, '#/explore': 2}
+MAX_SLICES = 48
 
 
 def slice_weight(chars, pages, weight, freq):
@@ -224,8 +227,18 @@ def main():
             report.append((name, len(chars)))
     # Local Song faces: cover what the subset does not (and stand in while it loads), same metrics
     css.append('')
-    css.append(f'@font-face {{ font-family: "Story Serif Local"; font-weight: 700; src: local("Songti SC Bold"), local("STSongti-SC-Bold"), local("Noto Serif SC Bold"), local("NotoSerifSC-Bold"), local("Noto Serif CJK SC Bold"), local("Source Han Serif SC Bold"), local("SourceHanSerifSC-Bold"); {CJK_METRICS} }}')
-    css.append(f'@font-face {{ font-family: "Story Serif Local"; font-weight: 400; src: local("Songti SC Regular"), local("STSongti-SC-Regular"), local("Noto Serif SC"), local("NotoSerifSC-Regular"), local("Noto Serif CJK SC"), local("Source Han Serif SC"), local("SourceHanSerifSC-Regular"); {CJK_METRICS} }}')
+    # (the same design as the web font first, where the reader has it; Song only after that)
+    css.append(f'@font-face {{ font-family: "Story Serif Local"; font-weight: 700; src: local("Noto Serif SC Bold"), local("NotoSerifSC-Bold"), local("Noto Serif CJK SC Bold"), local("NotoSerifCJKsc-Bold"), local("Source Han Serif SC Bold"), local("SourceHanSerifSC-Bold"), local("Songti SC Bold"), local("STSongti-SC-Bold"); {CJK_METRICS} }}')
+    css.append(f'@font-face {{ font-family: "Story Serif Local"; font-weight: 400; src: local("Noto Serif SC"), local("NotoSerifSC-Regular"), local("Noto Serif CJK SC"), local("NotoSerifCJKsc-Regular"), local("Source Han Serif SC"), local("SourceHanSerifSC-Regular"), local("Songti SC Regular"), local("STSongti-SC-Regular"); {CJK_METRICS} }}')
+
+    # The closing line as Tao Yuanming wrote it, set small beside its translation on the English
+    # home page: its own few glyphs, so an English page never loads a Chinese slice for it
+    colophon = re.search(r"'footer\.line': '([^']*)'", open(os.path.join(ROOT, 'web', 'js', 'i18n.js'), encoding='utf-8').read()).group(1)
+    name = write_font(woff2(instance(args.noto, wght=400), colophon, FEATURES), 'colophon-serif-400')
+    report.append((name, len(set(colophon))))
+    css.append('')
+    css.append(f'@font-face {{ font-family: "Colophon Serif"; font-style: normal; font-weight: 400; font-display: swap; '
+               f'src: url("{URL}{name}") format("woff2"); unicode-range: {ranges(colophon)}; {CJK_METRICS} }}')
 
     # English: two static cuts of the Latin the site uses (text at optical size 18, titles at 48)
     nr_cov = set(chr(c) for c in TTFont(args.newsreader).getBestCmap())

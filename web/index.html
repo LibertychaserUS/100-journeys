@@ -22,7 +22,7 @@
   <style>
     html[data-boot="home"]:not([data-booted]) { background: #07080b; color-scheme: dark; }
     html[data-boot="home"]:not([data-booted]) body { background: #07080b; }
-    html[data-boot="home"]:not([data-booted]) #main-nav { background: linear-gradient(to bottom, rgba(5, 6, 8, .55), rgba(5, 6, 8, 0)); border-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    html[data-boot="home"]:not([data-booted]) #main-nav { background: linear-gradient(to bottom, rgba(5, 6, 8, .55), rgba(5, 6, 8, 0)) no-repeat; border-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
   </style>
   <!-- Theme before first paint: saved choice, else the OS preference. -->
   <script>
@@ -49,7 +49,7 @@
         document.documentElement.setAttribute('data-boot-lang', bl);
         // The opening title's font slices, so the first paint already uses the story serif.
         // fonts:begin (written by scripts/fonts/build.py)
-        var fp = bl === 'zh' ? ["story-serif-700-02.49298fa6bf.woff2", "story-serif-700-18.6926b5a54e.woff2"] : ["story-serif-latin-700.fc6385aa1b.woff2"];
+        var fp = bl === 'zh' ? ["story-serif-700-03.e29aa78cc9.woff2"] : ["story-serif-latin-700.0447282448.woff2"];
         fp.forEach(function (f) { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous'; l.href = '/static/assets/fonts/' + f; document.head.appendChild(l); });
         // fonts:end
       }
@@ -84,7 +84,8 @@
       var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
       document.documentElement.setAttribute('data-theme', saved === 'light' || saved === 'dark' ? saved : (prefersLight ? 'light' : 'dark'));
       var tc = document.querySelector('meta[name="theme-color"]');
-      if (tc) tc.setAttribute('content', document.documentElement.getAttribute('data-theme') === 'light' ? '#f3f3f1' : '#0d0f13');
+      // over the opening's picture the browser's bar is night in either theme
+      if (tc) tc.setAttribute('content', document.documentElement.getAttribute('data-boot') === 'home' ? '#07080b' : document.documentElement.getAttribute('data-theme') === 'light' ? '#f4efe6' : '#0d0f13');
     })();
   </script>
 

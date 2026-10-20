@@ -14,7 +14,9 @@ the font's copyright and licence records, and the licence texts ship next to the
 
 ## What is in the files
 
-- Only the characters the site's own text uses: 1,995 Chinese characters and 122 Latin ones.
+- Only the characters the site can show: 2,000 Chinese characters and 123 Latin ones, from the app's
+  own copy and every string the server can send (journey content in both languages, the road, the
+  Night Station's ticket fragments, the guide's replies).
 - **Chinese**: static 400 and 700 cuts of the variable font, cut into `unicode-range` slices by
   where the characters appear, so a page downloads only the slices its story text needs. Spaces, digits
   and marks are in a small slice of their own, and Latin letters in another.
@@ -24,28 +26,35 @@ the font's copyright and licence records, and the licence texts ship next to the
   related descriptors), the same for the web font and the local Song face, so a swap does not move
   lines. While English loads, Georgia stands in with `size-adjust` set to Newsreader's widths.
 - Text the subset does not cover, such as what travellers write on the Night Station, falls to a local
-  Song face (`Story Serif Local`), then to the UI sans. It never falls to a synthetic bold.
+  face (`Story Serif Local`: Noto Serif SC or Source Han Serif where the reader has one, Song after
+  that), then to the UI sans. It never falls to a synthetic bold.
+- Vertical text (the zh closing line) keeps the `vert`/`vrt2` alternates, so its comma and full stop
+  sit in the top-right of their cells.
+- On the English home page the closing line's original, 缘溪行，忘路之远近。, is set from its own
+  3 KB file (`Colophon Serif`), so an English page never loads a Chinese slice.
 - The home page preloads the slices for its opening title.
 
 ## Weight per page (measured, first visit)
 
 | Page | Chinese | English |
 |---|---|---|
-| Home | 71–82 KB (9–11 files) | 28 KB |
-| Explore, About, Find | 40–49 KB | 28 KB |
-| Compose | about 98 KB | 28 KB |
-| A journey | 127–142 KB | 28 KB |
-| Night Station | about 120 KB | 28 KB |
+| Home | about 102 KB (10 files) | 31 KB |
+| Explore | about 95 KB | 28 KB |
+| About, Find | 62–72 KB | 28 KB |
+| Compose | about 120 KB | 28 KB |
+| A journey | 123–147 KB | 28 KB |
+| Night Station | about 129 KB | 28 KB |
 
 The home page shows different doors at different hours, and a door's card on hover. Its slices are
 built to hold every door's name and every way of saying when a door opens, at both weights, so the
-hour never pulls in a large slice. The range above was measured at nine times across the day and the
-year, with four doors hovered. English pages load only the two Latin files. The page's language is set
+hour never pulls in a large slice. Since the home page also tells the threshold's story and carries a
+passage from behind a door, three Night Station tickets and the invitation in the story serif, its
+slices are weighted most heavily of all pages (see `PAGE_WEIGHT` in the build). English pages load only the two Latin files (and, on the home page, the closing line's original). The page's language is set
 before the first paint, so the static opening never borrows the Chinese font for English text.
 
 Fonts are cached across pages, so a journey opened from the home page reuses what the home page loaded.
 
-Budget: home at most 90 KB, any page at most 160 KB, no render-blocking font, and no layout shift
+Budget: home at most 110 KB, any page at most 160 KB, no render-blocking font, and no layout shift
 from a font swap.
 
 ## Rebuilding
