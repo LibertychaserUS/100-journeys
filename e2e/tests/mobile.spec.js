@@ -57,6 +57,25 @@ test.describe('Mobile', () => {
     expect(shown).toBe(3);
   });
 
+  // E2E-MOBILE-009: a tap that does not focus the door (as on iOS) still shows that door in the
+  // sheet at once, and the next tap on it walks through
+  test('the sheet shows the tapped door and the next tap goes in', async ({ page }) => {
+    await page.goto('/#/');
+    await page.locator('#atlas').scrollIntoViewIfNeeded();
+    const doors = page.locator('#atlas-grid .door.is-found a');
+    await doors.nth(1).dispatchEvent('click');
+    await expect(page.locator('.home-atlas__panel')).toHaveClass(/is-peek/);
+    const b = doors.nth(6);
+    const slug = await b.getAttribute('data-slug');
+    const name = (await b.getAttribute('aria-label')).split(' ').slice(1, 3).join(' ');
+    await b.dispatchEvent('click');
+    // at once: no wait for the picture
+    expect(await page.locator('#door-body .door-card__title').textContent()).toContain(name.split(' ')[0]);
+    await expect(page).toHaveURL(/#\/$/);
+    await b.dispatchEvent('click');
+    await expect(page).toHaveURL(new RegExp(`#/journey/${slug}$`));
+  });
+
   // E2E-MOBILE-002: no page scrolls sideways on a phone
   test('pages fit the phone width', async ({ page }) => {
     for (const url of ['/#/', '/#/explore', '/#/journey/patagonia-torres-del-paine-trek', '/#/journey/bolivia-salt-flat-trek', '/#/compose', '/#/login', '/#/register', '/#/about', '/#/find', '/#/guide', '/#/space']) {

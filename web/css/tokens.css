@@ -134,13 +134,13 @@
   --color-surface-2:    #ebe5da;
   --color-line:         rgba(20, 22, 28, .10);
   --color-line-strong:  rgba(20, 22, 28, .22);
-  --color-text:         #17191e;  /* 15.8:1 */
-  --color-text-2:       #4a4e57;  /*  7.5:1 */
-  --color-text-3:       #62666f;  /*  5.2:1 */
-  --color-action:       #1a1c21;  /* lantern in daylight: ink button */
+  --color-text:         #1f1a14;  /* warm ink on the paper, 15.5:1 */
+  --color-text-2:       #4f463b;  /*  8.2:1 */
+  --color-text-3:       #6b6052;  /*  5.5:1 */
+  --color-action:       #1f1a14;  /* lantern in daylight: ink button */
   --color-on-action:    #fbe1a6;  /* 13.3:1 */
-  --color-action-hover: #2b2e35;
-  --color-action-soft:  rgba(26, 28, 33, .05);
+  --color-action-hover: #3a3128;
+  --color-action-soft:  rgba(31, 26, 20, .05);
   --lumi-glow:      #f7b445;
   --lumi-glow-a:    .32;
   --lumi-ray:       #c4862a;

@@ -56,6 +56,8 @@ p { text-wrap: pretty; }
 
 /* Presses answer at once; the default grey tap flash is replaced by these. */
 html { -webkit-tap-highlight-color: transparent; }
+/* never a slanted or thickened copy of a face the site does not load (the story serif has no italic) */
+html { font-synthesis: none; }
 .btn, .chip, .home-atlas__chip, .home-hero__dot, .home-hero__pause { transition-property: transform, background-color, border-color, color, box-shadow, opacity; }
 .btn:active, .chip:active, .home-atlas__chip:active, .home-hero__pause:active { transform: scale(.97); transition-duration: 90ms; }
 
@@ -106,9 +108,13 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
   html.vt-open::view-transition-new(journey-copy) { animation-delay: 460ms; }
   html.vt-arch::view-transition-new(journey-hero) { animation: vt-arch-open 640ms var(--ease-out) both; }
   html.vt-arch::view-transition-old(journey-hero) { animation: vt-arch-open 640ms var(--ease-out) both, vt-out 360ms linear both; }
-  /* in place (a language switch): the words go, then the new words come, never one over the other */
-  html.vt-swap::view-transition-old(root) { animation: vt-out 120ms ease-out both; }
-  html.vt-swap::view-transition-new(root) { animation: vt-fade 200ms ease-out 100ms both; }
+  /* in place (a language switch): one true cross-fade, so what does not change (the picture) never
+     dims, and the words trade places on a steep curve, so they are hardly ever seen together */
+  html.vt-swap::view-transition-old(root), html.vt-swap::view-transition-new(root) { mix-blend-mode: plus-lighter; animation-duration: 240ms; animation-timing-function: cubic-bezier(.8, 0, .2, 1); animation-fill-mode: both; }
+  html.vt-swap::view-transition-old(root) { animation-name: vt-out; }
+  html.vt-swap::view-transition-new(root) { animation-name: vt-fade; }
+  /* the theme's switch turns as it is pressed (over the night picture the page itself stays night) */
+  html.vt-theme #nav-theme .icon, html.theme-switching #nav-theme .icon { animation: icon-turn .42s var(--ease-out) both; }
   /* the theme: the new light spreads out from the switch, over page and bar alike */
   html.vt-theme::view-transition-group(*), html.vt-theme::view-transition-old(*), html.vt-theme::view-transition-new(*) { animation: none; mix-blend-mode: normal; }
   html.vt-theme::view-transition-new(root), html.vt-theme::view-transition-new(site-nav) { animation: vt-theme-reveal 560ms var(--ease-in-out) both; }
@@ -122,6 +128,7 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
 @keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; transform: translate3d(0, 14px, 0); } }
 @keyframes vt-fade { from { opacity: 0; } }
+@keyframes icon-turn { from { transform: rotate(-120deg) scale(.5); opacity: 0; } }
 @keyframes vt-theme-reveal { from { clip-path: circle(0 at var(--vt-x) var(--vt-y)); } to { clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y)); } }
 @keyframes vt-step-back { to { transform: scale(1.05); filter: brightness(.5); } }
 @keyframes vt-step-open {

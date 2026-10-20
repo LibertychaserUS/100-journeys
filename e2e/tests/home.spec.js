@@ -198,19 +198,91 @@ test.describe('The threshold', () => {
   }
 });
 
-// E2E-HOME-013: the one door that never closes (open all day, all year) is never offered as a door
-// lit in its own hour: not counted as open now, not lit with them, not the door chosen by default
-test('the door that never closes is not one of the lit doors', async ({ page }) => {
+// E2E-HOME-013: "open right now" means one thing everywhere: no door is open around the clock, and
+// the opening's count, the Open-now chip, the lit doors on the wall and the doors the filter keeps
+// are the same doors, each of whose cards says it is open (on a clock where several doors are open)
+test('open right now means the same doors everywhere', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'zh-CN' });
+  const page = await context.newPage();
+  await page.clock.setFixedTime(new Date('2026-10-20T06:00:00Z')); // 08:00 at Wieliczka: the first descent
+  await page.goto('/#/');
+  await expect(page.locator('#hero-now')).toBeVisible();
+  await expect(page.locator('#atlas-grid .door[data-open="always"]')).toHaveCount(0);
+  await expect(page.locator('#atlas-grid .door[data-no="15"]')).toHaveAttribute('data-open', 'true');
+  const lit = await page.locator('#atlas-grid .door.is-found[data-open="true"]').evaluateAll((els) => els.map((el) => el.dataset.no));
+  expect(lit.length).toBeGreaterThan(0);
+  await expect(page.locator('#atlas-filters [data-filter="now"] .num')).toHaveText(String(lit.length));
+  await expect(page.locator('#hero-now > span')).toContainText(String(lit.length));
+  await page.locator('#atlas-filters [data-filter="now"]').click();
+  const kept = await page.locator('#atlas-grid .door.is-found:not(.is-dim)').evaluateAll((els) => els.map((el) => el.dataset.no));
+  expect(kept).toEqual(lit);
+  for (const no of lit.slice(0, 3)) {
+    await page.locator(`#atlas-grid .door[data-no="${no}"] a`).focus();
+    await expect(page.locator('#door-body .door-card__clock')).toHaveClass(/is-open/);
+  }
+  await context.close();
+});
+
+// E2E-HOME-019: after the page has been drawn again (two language switches), Step in still opens the
+// door: one transition, no errors, and the arch (not a plain cross-fade)
+test('step in still opens the door after language switches', async ({ page }) => {
+  await freshPage(page);
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/#/');
+  await expect(page.getByRole('link', { name: '推门' })).toBeVisible();
+  for (const lang of ['en', 'zh']) {
+    await page.locator('#nav-lang').click();
+    await expect(page.locator('html')).toHaveAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    await expect(page.locator('html')).not.toHaveClass(/vt-swap/);
+  }
+  await page.evaluate(() => {
+    window.__vts = 0;
+    const start = document.startViewTransition.bind(document);
+    document.startViewTransition = (cb) => { window.__vts += 1; return start(cb); };
+  });
+  await page.locator('#hero-enter').click();
+  await expect(page.locator('html')).toHaveClass(/vt-step/);
+  await expect.poll(() => page.evaluate(() => document.activeElement && document.activeElement.id)).toBe('atlas');
+  expect(await page.evaluate(() => window.__vts)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+// E2E-HOME-020: the Night Station's ticket labels follow the language, both ways round
+test('ticket labels follow the language after a round trip', async ({ page }) => {
+  await freshPage(page);
+  await page.addInitScript(() => { try { if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'en'); } catch (e) {} });
+  await page.goto('/#/');
+  const racks = page.locator('#home-station-racks');
+  const labels = () => page.locator('#home-station .ltag').allTextContents();
+  await racks.scrollIntoViewIfNeeded();
+  await expect(page.locator('#home-station .ltag').first()).toBeVisible();
+  for (const [lang, bad] of [['zh', /[A-Za-z]{3,}/], ['en', /[\u4e00-\u9fff]/], ['zh', /[A-Za-z]{3,}/]]) {
+    await page.locator('#nav-lang').click();
+    await expect(page.locator('html')).toHaveAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    await racks.scrollIntoViewIfNeeded();
+    await expect(page.locator('#home-station .ltag').first()).toBeVisible();
+    await expect.poll(async () => (await labels()).filter((x) => bad.test(x)), { message: lang }).toEqual([]);
+  }
+});
+
+// E2E-HOME-021: the opening-next cards show their keyboard focus once they have unrolled
+test('opening-next cards show their focus ring', async ({ page }) => {
   await freshPage(page);
   await page.goto('/#/');
-  const door = page.locator('#atlas-grid .door[data-no="15"]');
-  await expect(door).toHaveAttribute('data-open', 'always');
-  await expect(page.locator('#hero-now')).toBeVisible();
-  const lit = await page.locator('#atlas-grid .door.is-found[data-open="true"]').count();
-  await expect(page.locator('#atlas-filters [data-filter="now"] .num')).toHaveText(String(lit));
-  await expect(page.locator('#hero-now > span')).toContainText(String(lit));
-  await expect(page.locator('#atlas-grid .door.is-selected')).not.toHaveAttribute('data-no', '15');
-  await expect(page.locator('#featured-grid [data-slug="poland-wieliczka-salt-chapel"]')).toHaveCount(0);
+  const grid = page.locator('#featured-grid');
+  await grid.scrollIntoViewIfNeeded();
+  await expect(grid).toHaveClass(/is-done/, { timeout: 4000 });
+  await grid.locator('.feature-card[data-slug]').first().focus();
+  await page.keyboard.press('Tab');
+  const look = await page.evaluate(() => {
+    const el = document.activeElement;
+    const cs = getComputedStyle(el);
+    return { card: el.matches('.feature-card'), clip: cs.clipPath, outline: cs.outlineStyle };
+  });
+  expect(look.card).toBe(true);
+  expect(look.clip).toBe('none');
+  expect(look.outline).not.toBe('none');
 });
 
 // E2E-HOME-014: keyboard focus in the opening is always visible and never moves the page: every

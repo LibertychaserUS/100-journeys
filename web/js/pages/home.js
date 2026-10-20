@@ -142,7 +142,7 @@ const DoorClock = (() => {
     if (s.days) return t('home.door.inDays', { n: s.days });
     const h = Math.floor(s.minutes / 60);
     const m = s.minutes % 60;
-    return h ? t('home.door.in', { h, m }) : t('home.door.inMin', { m });
+    return !h ? t('home.door.inMin', { m }) : m ? t('home.door.in', { h, m }) : t('home.door.inH', { h });
   }
 
   /** The long form, with the door's own opening time: "当地 07:00 开 · 还有 43 分钟" */
@@ -346,10 +346,13 @@ Pages.Home = {
     // "Step in" and "open now" go straight to the doors (the second one lights only open doors):
     // an arch of lantern light opens over the opening onto them. The story in between is left for
     // those who scroll to it, instead of rushing past it.
+    // (on the page's lasting <main>, so it goes when the page does: a re-render never adds a second)
+    this._ac = new AbortController();
     main.addEventListener('click', (e) => {
       const a = e.target.closest('[data-to-atlas]');
       if (!a || a.getAttribute('href') !== '#atlas') return;
       e.preventDefault();
+      if (this._stepping) return; // the door is already opening
       const atlas = document.getElementById('atlas');
       const go = () => {
         if (a.hasAttribute('data-now')) this._filterDoors('now');
@@ -360,9 +363,13 @@ Pages.Home = {
       if (this._reduce() || !document.startViewTransition || document.visibilityState !== 'visible') { go(); return; }
       const html = document.documentElement;
       html.classList.add('vt-step');
+      this._stepping = true;
       const vt = document.startViewTransition(go);
-      vt.finished.finally(() => html.classList.remove('vt-step'));
-    });
+      const quiet = () => {};
+      vt.ready.catch(quiet);
+      vt.updateCallbackDone.catch(quiet);
+      vt.finished.catch(quiet).finally(() => { this._stepping = false; html.classList.remove('vt-step'); });
+    }, { signal: this._ac.signal });
     UI.trackCardClicks(main.querySelector('#featured-grid'));
     UI.trackCardClicks(main.querySelector('#atlas-grid'));
     this._particles = HeroParticles.start(hero, main.querySelector('.home-hero__particles'));
@@ -376,6 +383,8 @@ Pages.Home = {
   },
 
   destroy() {
+    if (this._ac) this._ac.abort();
+    this._stepping = false;
     this._lastSelected = this._selected; // a re-render in place keeps the door being looked at
     this._keepPaused = this._userPaused; // and the visitor's pause
     if (this._particles) this._particles.stop();
@@ -636,7 +645,7 @@ Pages.Home = {
     // a door's scene tells its own hour: its number and realm, its local time, and whether it is open
     const ds = e && ((this._state && this._state.get(e.no)) || DoorClock.state(e));
     copy.querySelector('#hero-eyebrow').textContent = e
-      ? [`No.${String(e.no).padStart(3, '0')}`, t(`entrance.realm.${e.realm}`), t('home.door.local', { time: `${ds.hh}:${ds.mm}` }), DoorClock.when(ds)].join(' · ')
+      ? [`No.${String(e.no).padStart(3, '0')}`, t(`entrance.realm.${e.realm}`), t('home.door.localAt', { time: `${ds.hh}:${ds.mm}` }), DoorClock.when(ds), DoorClock.needs(ds)].filter(Boolean).join(' · ')
       : t('home.myth');
     copy.querySelector('.home-hero__title .home-hero__line').innerHTML = j ? UI.titleHTML(j.title) : UI.esc(t('home.scene.taoyuan.title'));
     copy.querySelector('#hero-lead').textContent = j ? (j.story_hook || j.subtitle || '') : t('home.scene.taoyuan.lead');
@@ -903,10 +912,13 @@ Pages.Home = {
       // the spoken name starts with what the tile shows (number, then name)
       const always = DoorClock.always(e);
       const state = always ? t('home.door.always') : s.open ? t('home.door.open') : s.minutes <= 180 && !s.month ? DoorClock.when(s) : '';
-      const label = `${no} ${name} · ${t(`entrance.realm.${e.realm}`)}${place ? ` · ${place}` : ''}${state ? ` · ${state}` : ''}`;
+      // the wall names the broader place (the part after a comma); the full one is in the panel
+      const near = place ? place.split(', ').pop() : '';
+      // the spoken name is the visible words in their order (number, name, place), then the rest
+      const label = `${no} ${name}${near ? ` ${near}` : ''}, ${t(`entrance.realm.${e.realm}`)}${place !== near ? `, ${place}` : ''}${state ? `, ${state}` : ''}`;
       return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${always ? 'always' : s.open}">
         <a class="door__link" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-no="${e.no}" data-quiet data-vt-self tabindex="-1" aria-label="${esc(label)}">
-          <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>${place ? `<span class="door__place" aria-hidden="true">${esc(place)}</span>` : ''}
+          <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>${near ? `<span class="door__place" aria-hidden="true">${esc(near)}</span>` : ''}
         </a></li>`;
     }).join('');
     grid.setAttribute('aria-busy', 'false');
@@ -959,18 +971,24 @@ Pages.Home = {
     const panel = document.getElementById('atlas-panel');
     if (!j || !panel) return;
     if (pin) { this._pinned = no; this._save(); }
-    if (peek) this._openPeek();
-    if (this._selected === no) return;
-    this._selected = no;
-    document.querySelectorAll('#atlas-grid .door.is-selected').forEach((li) => li.classList.remove('is-selected'));
-    const li = document.querySelector(`#atlas-grid .door[data-no="${no}"]`);
-    if (li) li.classList.add('is-selected');
-    const card = document.getElementById('door-card');
-    card.href = `#/journey/${encodeURIComponent(j.slug)}`;
-    card.dataset.slug = j.slug;
-    card.style.setProperty('--lamp', `var(--realm-${j.entrance.realm})`);
-    // the words change with their picture, not before it
-    this._swapImage(j, quiet, () => this._renderDoorBody(j));
+    if (this._selected !== no) {
+      this._selected = no;
+      document.querySelectorAll('#atlas-grid .door.is-selected').forEach((li) => li.classList.remove('is-selected'));
+      const li = document.querySelector(`#atlas-grid .door[data-no="${no}"]`);
+      if (li) li.classList.add('is-selected');
+      const card = document.getElementById('door-card');
+      card.href = `#/journey/${encodeURIComponent(j.slug)}`;
+      card.dataset.slug = j.slug;
+      card.style.setProperty('--lamp', `var(--realm-${j.entrance.realm})`);
+      // beside the wall the words change with their picture; in the sheet a tap brings up, they are
+      // there at once (the tapped door, never the one before it)
+      this._swapImage(j, quiet, peek ? () => {} : () => this._renderDoorBody(j));
+    }
+    // the sheet remembers which door it shows, so the next tap on that same door walks through
+    if (peek) {
+      this._renderDoorBody(j);
+      this._openPeek(no);
+    }
   },
 
   // Double-buffered: the next cover loads off screen and cross-fades in over a blurred thumbnail,
@@ -1014,18 +1032,18 @@ Pages.Home = {
       <span class="door-card__meta num">No.${String(e.no).padStart(3, '0')} <i aria-hidden="true"></i> ${esc(t(`entrance.realm.${e.realm}`))}</span>
       <strong class="door-card__title">${UI.titleHTML(j.title)}</strong>
       ${j.story_hook ? `<span class="door-card__hook">${esc(j.story_hook)}</span>` : ''}
-      ${j.content && j.content.role ? `<span class="door-card__role">${esc(t('home.door.role', { role: I18n.lang === 'zh' ? j.content.role : j.content.role.replace(/^The /, 'the ') }))}</span>` : ''}
+      ${j.content && j.content.role ? `<span class="door-card__role">${esc(t('home.door.role', { role: I18n.lang === 'zh' ? j.content.role : j.content.role.charAt(0).toLowerCase() + j.content.role.slice(1) }))}</span>` : ''}
       ${opens ? `<span class="door-card__opens"><b>${esc(t('detail.facts.opens'))}</b>${esc(opens)}</span>` : ''}
       <span class="door-card__clock${s.open ? ' is-open' : ''}"><span class="num">${esc(t('home.door.local', { time: `${s.hh}:${s.mm}` }))}</span><span>${esc(DoorClock.whenAt(s))}</span></span>
       ${s.needs ? `<span class="door-card__needs">${esc(DoorClock.needs(s))}</span>` : ''}
       <span class="door-card__go">${esc(t(s.open ? 'home.stepDoor' : 'home.peekDoor'))} ${UI.icon('arrow', 'icon--sm')}</span>`;
   },
 
-  _openPeek() {
+  _openPeek(no = this._selected) {
     const panel = document.getElementById('atlas-panel');
     if (!panel || !window.matchMedia('(max-width: 960px)').matches) return;
     this._peek = true;
-    this._peekNo = this._selected;
+    this._peekNo = no;
     panel.classList.add('is-peek');
   },
 
@@ -1075,14 +1093,14 @@ Pages.Home = {
         const [list, , res] = await Promise.all([Compose.fragments(), Road.vocab(), API.station({ limit: 12 })]);
         if (!racks.isConnected) return;
         const by = Compose.index(list);
-        // three tickets from three different places
-        const seen = new Set();
-        const items = ((res && res.data && res.data.items) || []).filter((v) => {
-          const key = v.picks && v.picks.place;
-          if (!key || seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        }).slice(0, 3);
+        // three tickets from three different platforms where the rack allows, never two from one place
+        const pool = ((res && res.data && res.data.items) || []).filter((v) => v.picks && v.picks.place);
+        const items = [];
+        const platforms = new Set();
+        const places = new Set();
+        const take = (v) => { items.push(v); platforms.add(v.realm); places.add(v.picks.place); };
+        pool.forEach((v) => { if (items.length < 3 && !platforms.has(v.realm) && !places.has(v.picks.place)) take(v); });
+        pool.forEach((v) => { if (items.length < 3 && !items.includes(v) && !places.has(v.picks.place)) take(v); });
         if (!items.length) { band.hidden = true; return; }
         racks.innerHTML = items.map((v, i) => `<li style="--i:${i}">${Road.stubHTML(v, by)}</li>`).join('');
         racks.setAttribute('aria-busy', 'false');
@@ -1116,10 +1134,15 @@ Pages.Home = {
     if (!grid) return;
     const picks = this._soonest(journeys).slice(0, 5);
     grid.innerHTML = picks.map(({ j, s }, i) => this._featureCard(j, s, i === 0, i)).join('');
-    if ('IntersectionObserver' in window && !this._reduce()) {
+    if ('IntersectionObserver' in window && !this._reduce() && !this._still) {
       grid.classList.add('will-reveal');
       const io = new IntersectionObserver((entries) => {
-        if (entries.some((en) => en.isIntersecting)) { grid.classList.add('is-in'); io.disconnect(); }
+        if (entries.some((en) => en.isIntersecting)) {
+          grid.classList.add('is-in');
+          io.disconnect();
+          // once the cards have unrolled, they drop the mask (it would cut off their focus ring)
+          setTimeout(() => grid.classList.add('is-done'), 900 + 70 * grid.children.length + 100);
+        }
       }, { threshold: 0.12 });
       io.observe(grid);
       this._cleanups.push(() => io.disconnect());

@@ -10,7 +10,7 @@ I18n.extend('zh', {
   'station.clockAria': '此刻 {time}，{hour}',
   'station.platforms': '站台',
   'station.platform.all': '全部站台',
-  'station.platform.no': '{n} 站台',
+  'station.platform.no': '{n} 号站台',
   'station.timetable': '时刻表',
   'station.timetableN': '时刻表 · {n}',
   'station.clock': '时辰',
