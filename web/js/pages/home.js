@@ -237,14 +237,16 @@ Pages.Home = {
         </div>
       </section>
 
-      <section class="home-threshold" id="home-threshold" data-media-end aria-label="${esc(t('home.threshold.label'))}">
+      <section class="home-threshold" id="home-threshold" data-media-end aria-labelledby="threshold-title">
+        <h2 class="sr-only" id="threshold-title">${esc(t('home.threshold.label'))}</h2>
         <div class="home-threshold__stage" data-layered>
-          <div class="home-threshold__marks" aria-hidden="true">${MARKS.map(([a, d, j], i) => `<b style="--a:${a}deg;--d:${d};--j:${j}px;--at:${(i / MARKS.length).toFixed(3)}"></b>`).join('')}</div>
-          <div class="home-threshold__arch">
-            <i aria-hidden="true"></i>
-            <div class="home-threshold__beats">${this._beats().map((k, i) => `<p class="home-threshold__beat${k === 'b0' ? ' home-threshold__beat--setup' : ''}" style="--o:${i ? 0 : 1}">${esc(t(`home.threshold.${k}`)).replace(/\u200b/g, '<wbr>')}</p>`).join('')}</div>
+          <div class="home-threshold__floor" aria-hidden="true"></div>
+          <div class="home-threshold__frame" aria-hidden="true">
+            <i class="home-threshold__glow"></i><i class="home-threshold__inner"></i>
+            <span class="home-threshold__marks">${MARKS.map(([a, d, j], i) => `<b style="--a:${a}deg;--d:${d};--j:${j}px;--at:${(i / MARKS.length).toFixed(3)}"></b>`).join('')}</span>
           </div>
           <div class="home-threshold__open" aria-hidden="true"></div>
+          <div class="home-threshold__beats">${this._beats().map((k, i) => `<p class="home-threshold__beat${k === 'b0' ? ' home-threshold__beat--setup' : ''}" style="--o:${i ? 0 : 1}">${esc(t(`home.threshold.${k}`)).replace(/\u200b/g, '<wbr>')}</p>`).join('')}</div>
         </div>
       </section>
 
@@ -253,7 +255,7 @@ Pages.Home = {
           <header class="home-atlas__head">
             <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() && !this._still ? 0 : doors}</b><span>/ 100</span></p>
             <div class="home-atlas__intro">
-              <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title', { n: doors }))}</h2>
+              <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title'))}<span class="sr-only" id="atlas-found-line"> ${esc(t('home.atlas.found', { n: doors }))}</span></h2>
               <p class="home-atlas__legend"><i aria-hidden="true"></i><span id="atlas-legend">${esc(t('home.atlas.legend'))}</span></p>
             </div>
             <form class="home-atlas__search" id="atlas-search" role="search">
@@ -918,14 +920,14 @@ Pages.Home = {
       const label = `${no} ${name}${near ? ` ${near}` : ''}, ${t(`entrance.realm.${e.realm}`)}${place !== near ? `, ${place}` : ''}${state ? `, ${state}` : ''}`;
       return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${always ? 'always' : s.open}">
         <a class="door__link" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-no="${e.no}" data-quiet data-vt-self tabindex="-1" aria-label="${esc(label)}">
-          <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>${near ? `<span class="door__place" aria-hidden="true">${esc(near)}</span>` : ''}
+          <span class="door__arch" aria-hidden="true"></span><i class="door__seam" aria-hidden="true"></i><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>${near ? `<span class="door__place" aria-hidden="true">${esc(near)}</span>` : ''}
         </a></li>`;
     }).join('');
     grid.setAttribute('aria-busy', 'false');
     const n = found.length;
     if (this._countPending) { this._countPending = false; this._countUp(); }
     else if (this._counted || !grid.classList.contains('will-light')) document.getElementById('atlas-found').textContent = n;
-    document.getElementById('atlas-title').textContent = t('home.atlas.title', { n });
+    document.getElementById('atlas-found-line').textContent = ` ${t('home.atlas.found', { n })}`;
     const count = (f) => found.filter((j) => f(j.entrance)).length;
     const chip = (key, label, c) => `<button type="button" class="home-atlas__chip" data-filter="${key}" aria-pressed="${key === this._filter}"${key && key !== 'now' ? ` style="--lamp:var(--realm-${key})"` : ''}>${key ? '<i aria-hidden="true"></i>' : ''}<span>${esc(label)}</span><span class="num">${c}</span></button>`;
     document.getElementById('atlas-filters').innerHTML = [
@@ -1170,40 +1172,77 @@ Pages.Home = {
     const th = main.querySelector('#home-threshold');
     if (th && !this._reduce()) {
       const beats = [...th.querySelectorAll('.home-threshold__beat')];
-      const arch = th.querySelector('.home-threshold__arch');
+      const stage = th.querySelector('.home-threshold__stage');
+      const frame = th.querySelector('.home-threshold__frame');
       const bar = document.getElementById('main-nav');
       const n = beats.length;
-      const story = 0.78; // the lines take this much of the way; the door opens over the rest
+      const story = 0.74; // the lines take this much of the way
+      const openFrom = 0.76; // and the door opens over the rest
       const at = (i) => (i * story) / n;
-      let queued = false;
       const ease = (x) => Math.min(1, Math.max(0, x));
+      // The arch keeps one shape and grows by scale, from its own size to as far as the screen
+      // allows (never up to the bar, its marks never off the edge); opening, the same shape grows
+      // on until its straight sides pass the screen's edges and its top is above it.
+      let geo = null;
+      const measure = () => {
+        const W = stage.clientWidth;
+        const H = stage.clientHeight;
+        const w0 = frame.offsetWidth;
+        const h0 = frame.offsetHeight;
+        const sill = H - frame.offsetTop - h0;
+        const gap = Math.min(44, Math.max(14, W * 0.035));
+        const navH = bar ? bar.offsetHeight : 64;
+        const sMax = Math.max(1, Math.min(1.22, (H - sill - navH - 24 - gap) / h0, (W / 2 - 8) / (w0 / 2 + gap)));
+        const sCover = Math.max((W * 1.04) / w0, ((H - sill) * 1.04) / Math.max(1, h0 - w0 / 2));
+        geo = { W, H, w0, h0, sill, navH, sMax, sCover };
+      };
+      // does the opening, at scale S, cover the whole width of the screen at height y?
+      const covers = (S, y) => {
+        const r = (geo.w0 * S) / 2;
+        const yc = geo.H - geo.sill - (geo.h0 - geo.w0 / 2) * S; // the centre of its half-circle
+        if (r < geo.W / 2) return false;
+        if (y >= yc) return y <= geo.H - geo.sill;
+        return Math.sqrt(Math.max(0, r * r - (yc - y) * (yc - y))) >= geo.W / 2;
+      };
+      let queued = false;
       const update = () => {
         queued = false;
+        if (!geo) measure();
         const span = Math.max(1, th.offsetHeight - window.innerHeight);
         const rect = th.getBoundingClientRect();
         const p = ease(-rect.top / span);
-        const archTop = arch.offsetTop;
         // once the stage starts to leave, the last line goes before it rises to the bar
         const leaving = ease((window.innerHeight - rect.bottom) / (window.innerHeight * 0.3));
+        const grow = ease(p / story);
+        const sc = 1 + (geo.sMax - 1) * (1 - (1 - grow) * (1 - grow));
+        const q = ease((p - openFrom) / (1 - openFrom - 0.02));
+        // the gold doorway grows to fill the screen first (by q .7), then its light settles
+        const u = ease(q / 0.7);
+        const S = sc + (geo.sCover - sc) * u * u;
         // the marks light through the first line, go out when the men lose their way, come back
         // with the last line; then the door opens
-        const q = ease((p - story - 0.03) / (1 - story - 0.06));
-        const set = { '--p': p, '--t': ease((p - 0.01) / (at(1) * 0.85)), '--m': ease((p - at(n - 2)) / (at(1) * 0.7)), '--r': ease((p - at(n - 1)) / (at(1) * 0.4)), '--q': q };
+        const set = { '--p': p, '--s': sc, '--S': S, '--t': ease((p - 0.01) / (at(1) * 0.85)), '--m': ease((p - at(n - 2)) / (at(1) * 0.7)), '--r': ease((p - at(n - 1)) / (at(1) * 0.4)), '--q': q };
         for (const k in set) th.style.setProperty(k, set[k].toFixed(3));
         // once the light through the door reaches the middle of the bar, the bar is over the page
-        const done = q > 0 && rect.top <= 0 && archTop * (1 - q) < (bar ? bar.offsetHeight : 64) / 2;
+        const done = q > 0 && rect.top <= 0 && covers(S, geo.navH / 2);
         if (done !== th.hasAttribute('data-media-done')) { th.toggleAttribute('data-media-done', done); Router.updateHeader(); }
+        // each line holds, fully there, for most of its stretch, and crosses over only at its edges;
+        // the last one stays while the light comes, and goes as the light fills the screen
         beats.forEach((b, i) => {
-          const fadeIn = i === 0 ? 1 : ease((p - at(i)) / 0.06);
-          // the last line is read, then goes, and the door opens
-          const fadeOut = i === n - 1 ? Math.min(1 - leaving, ease((story + 0.03 - p) / 0.05)) : ease((at(i + 1) - p) / 0.06);
-          b.style.setProperty('--o', Math.min(fadeIn, fadeOut).toFixed(3));
+          const a = at(i);
+          const z = at(i + 1);
+          const c = (a + z) / 2;
+          let o = ease((1 - Math.abs(p - c) / ((z - a) / 2)) * 3);
+          if (i === 0 && p < c) o = 1;
+          if (i === n - 1 && p > c) o = Math.min(1 - leaving, 1 - ease((q - 0.6) / 0.2));
+          b.style.setProperty('--o', o.toFixed(3));
         });
       };
       const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+      const onResize = () => { geo = null; onScroll(); };
       window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
-      this._cleanups.push(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); });
+      window.addEventListener('resize', onResize);
+      this._cleanups.push(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onResize); });
       update();
     }
     if (!this._reduce()) {
