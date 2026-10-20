@@ -35,6 +35,28 @@ test.describe('Mobile', () => {
     });
   }
 
+  // E2E-MOBILE-008: on a phone what defines a door is shown whole: the tapped door's line and its
+  // hours are not cut off in the sheet, every opening-next card keeps its line, and all three Night
+  // Station tickets hang on a rail
+  test('a door is shown whole on a phone', async ({ page }) => {
+    await page.goto('/#/');
+    await page.locator('#atlas').scrollIntoViewIfNeeded();
+    await page.locator('#atlas-grid .door.is-found a').nth(5).tap();
+    await expect(page.locator('.home-atlas__panel')).toHaveClass(/is-peek/);
+    for (const sel of ['#door-body .door-card__hook', '#door-body .door-card__opens']) {
+      const cut = await page.locator(sel).evaluate((el) => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1);
+      expect(cut, sel).toBe(false);
+    }
+    await page.locator('#door-body .home-atlas__peek-close, .home-atlas__peek-close').first().click();
+    await expect(page.locator('#featured-grid .home-card[data-slug]')).toHaveCount(5);
+    const hidden = await page.locator('#featured-grid .home-card .feature-card__hook').evaluateAll((els) => els.filter((el) => getComputedStyle(el).display === 'none').length);
+    expect(hidden).toBe(0);
+    await page.locator('#home-station-racks').scrollIntoViewIfNeeded();
+    await expect(page.locator('#home-station-racks > li')).toHaveCount(3);
+    const shown = await page.locator('#home-station-racks > li').evaluateAll((els) => els.filter((el) => getComputedStyle(el).display !== 'none').length);
+    expect(shown).toBe(3);
+  });
+
   // E2E-MOBILE-002: no page scrolls sideways on a phone
   test('pages fit the phone width', async ({ page }) => {
     for (const url of ['/#/', '/#/explore', '/#/journey/patagonia-torres-del-paine-trek', '/#/journey/bolivia-salt-flat-trek', '/#/compose', '/#/login', '/#/register', '/#/about', '/#/find', '/#/guide', '/#/space']) {

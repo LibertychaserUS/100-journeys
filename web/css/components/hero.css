@@ -112,12 +112,12 @@
 .home-hero__dot i { grid-area: bar; }
 .home-hero__dot .num { grid-area: num; }
 /* the place behind the number, so the strip reads as places, not codes */
-.home-hero__dot-place { grid-area: place; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .6875rem; letter-spacing: .04em; color: rgba(246, 241, 232, .5); transition: color var(--dur) var(--ease-out); }
+.home-hero__dot-place { grid-area: place; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; letter-spacing: .04em; color: rgba(246, 241, 232, .5); transition: color var(--dur) var(--ease-out); }
 .home-hero__dot[aria-current="true"] .home-hero__dot-place, .home-hero__dot:hover .home-hero__dot-place { color: rgba(246, 241, 232, .85); }
 .home-hero__dot i { display: block; height: 2px; border-radius: 1px; background: rgba(246, 241, 232, .28); overflow: hidden; position: relative; }
 .home-hero__dot i::after { content: ""; position: absolute; inset: 0; background: #f6f1e8; transform: scaleX(0); transform-origin: left; }
 .home-hero__dot[aria-current="true"] i::after { transform: scaleX(1); }
-.home-hero__dot span { font-size: .6875rem; letter-spacing: .08em; text-align: left; color: rgba(246, 241, 232, .55); transition: color var(--dur) var(--ease-out); }
+.home-hero__dot span { font-size: .75rem; letter-spacing: .08em; text-align: left; color: rgba(246, 241, 232, .55); transition: color var(--dur) var(--ease-out); }
 .home-hero__dot[aria-current="true"] span, .home-hero__dot:hover span { color: #f6f1e8; }
 /* The place behind each dot, on hover (a real pointer, so it never sticks after a tap) or focus;
    not for the scene already showing, and never past the screen's edge */
@@ -134,11 +134,18 @@
   .home-hero.is-playing:not(.is-held):not(.is-offscreen) .home-hero__dot[aria-current="true"] i::after { animation: hero-dot var(--dwell, 6.8s) linear both; }
 }
 @keyframes hero-dot { from { transform: scaleX(0); } }
+/* fingers need more room than the strip shows: taller targets, and space between pause and the dots */
+@media (pointer: coarse) {
+  .home-hero__dot { min-height: 44px; }
+  .home-hero__dots { gap: 12px; }
+  .home-hero__pause { width: 40px; height: 40px; margin-right: 4px; }
+}
 /* The visitor's time, and a way straight to the doors open right now */
 .home-hero__now { margin-left: auto; display: inline-flex; align-items: baseline; gap: 12px; font-size: var(--text-sm); color: rgba(246, 241, 232, .8); }
 .home-hero__now time { font-size: var(--text-lg); letter-spacing: .06em; color: #f6f1e8; }
-.home-hero__now span { border-bottom: 1px solid rgba(246, 241, 232, .32); padding-bottom: 2px; transition: border-color var(--dur); }
-.home-hero__now:hover span { border-color: currentColor; }
+.home-hero__now small { font-size: var(--text-xs); letter-spacing: .08em; color: rgba(246, 241, 232, .6); }
+.home-hero__now > span { border-bottom: 1px solid rgba(246, 241, 232, .32); padding-bottom: 2px; transition: border-color var(--dur); }
+.home-hero__now:hover > span { border-color: currentColor; }
 @media (prefers-reduced-motion: no-preference) { .home-hero__now time i { animation: hero-colon 2s steps(1, end) infinite; } }
 @keyframes hero-colon { 50% { opacity: .25; } }
 .home-hero.is-stopped .home-hero__now time i { animation: none; }
@@ -184,6 +191,8 @@
   .home-hero__now { margin-left: 0; flex-basis: 100%; }
   .home-hero__dot { max-width: none; }
   .home-hero__dot-place { display: none; }
+  /* the scene showing names its place under its number */
+  .home-hero__dot[aria-current="true"] .home-hero__dot-place { display: block; }
 }
 
 /* The static opening in index.html: shown only on the home route, in one language, until the

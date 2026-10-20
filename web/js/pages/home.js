@@ -200,13 +200,15 @@ Pages.Home = {
     this._userPaused = !!(this._swap && this._keepPaused);
     this._dwell = this._swap ? this.SCENE_MS : this.FIRST_MS;
     if (this._swap && this._lastSelected) this._pinned = this._lastSelected;
-    this._counted = this._swap;
+    // coming back to the page (Back from a door): it is where it was, so nothing arrives again either
+    this._still = this._swap || typeof Router.state().y === 'number';
+    this._counted = this._still;
     this._countPending = false;
     this._cleanups = [];
     const doors = (window.APP_CONFIG && APP_CONFIG.doors) || 48;
     const bootT = Math.round(performance.now());
     main.innerHTML = `
-      <section class="home-hero scene-taoyuan${this._swap ? '' : ' is-booting'}" aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
+      <section class="home-hero scene-taoyuan${this._still ? '' : ' is-booting'}" aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
         <div class="home-hero__slides" aria-hidden="true">
           ${UI.picture(API.mediaUrl(this.BRAND.img), { sizes: 'max(100vw, 177.8svh)', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"' })}
         </div>
@@ -215,7 +217,7 @@ Pages.Home = {
         <div class="home-hero__grain" aria-hidden="true"></div>
         <div class="container home-hero__content" id="hero-content">
           <h1 class="sr-only" id="hero-brand">${esc(t('brand'))}</h1>
-          <div class="home-hero__copy${this._swap ? '' : ' is-in'}" id="hero-copy" role="group" aria-roledescription="${esc(t('home.scenes.slide'))}">
+          <div class="home-hero__copy${this._still ? '' : ' is-in'}" id="hero-copy" role="group" aria-roledescription="${esc(t('home.scenes.slide'))}">
             <p class="home-hero__eyebrow"><span class="home-hero__line" id="hero-eyebrow">${esc(t('home.myth'))}</span></p>
             <p class="home-hero__title" id="hero-title"><span class="home-hero__line">${esc(t('home.scene.taoyuan.title'))}</span></p>
             <p class="home-hero__lead"><span class="home-hero__line" id="hero-lead">${esc(t('home.scene.taoyuan.lead'))}</span></p>
@@ -249,7 +251,7 @@ Pages.Home = {
       <section class="home-atlas" id="atlas" tabindex="-1" aria-labelledby="atlas-title">
         <div class="container">
           <header class="home-atlas__head">
-            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() && !this._swap ? 0 : doors}</b><span>/ 100</span></p>
+            <p class="home-atlas__count num" aria-hidden="true"><b id="atlas-found">${'IntersectionObserver' in window && !this._reduce() && !this._still ? 0 : doors}</b><span>/ 100</span></p>
             <div class="home-atlas__intro">
               <h2 id="atlas-title" class="reveal">${esc(t('home.atlas.title', { n: doors }))}</h2>
               <p class="home-atlas__legend"><i aria-hidden="true"></i><span id="atlas-legend">${esc(t('home.atlas.legend'))}</span></p>
@@ -296,7 +298,7 @@ Pages.Home = {
         </div>
       </section>
 
-      <section class="home-behind" id="home-behind" aria-labelledby="behind-title" hidden>
+      <section class="home-behind" id="home-behind" aria-labelledby="behind-title" data-reading hidden>
         <div class="container home-behind__inner">
           <p class="eyebrow" id="behind-title">${esc(t('home.behind.eyebrow'))}</p>
           <div id="behind-body"></div>
@@ -432,14 +434,11 @@ Pages.Home = {
     if (nowEl) {
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
-      nowEl.innerHTML = `<time class="num" datetime="${hh}:${mm}">${hh}<i aria-hidden="true">:</i>${mm}</time><span>${UI.esc(t('home.now', { n: open }))}</span>`;
+      // the visitor's own time (the doors' times are theirs), read as a time, not two numbers
+      nowEl.innerHTML = `<small>${UI.esc(t('home.yourTime'))}</small><time class="num" datetime="${hh}:${mm}">${hh}<i>:</i>${mm}</time><span>${UI.esc(t('home.now', { n: open }))}</span>`;
       nowEl.hidden = false;
     }
-    document.querySelectorAll('#atlas-grid .door.is-found').forEach((li) => {
-      const j = this._doors && this._doors.get(Number(li.dataset.no));
-      const s = this._state.get(Number(li.dataset.no));
-      li.dataset.open = j && DoorClock.always(j.entrance) ? 'always' : String(!!(s && s.open));
-    });
+    this._lightDoors();
     const nowChip = document.querySelector('#atlas-filters [data-filter="now"] .num');
     if (nowChip) nowChip.textContent = open;
     const legend = document.getElementById('atlas-legend');
@@ -669,6 +668,30 @@ Pages.Home = {
 
   // --- The hundred doors -----------------------------------------------------------------------
 
+  // The wall's light comes from the doors' own clocks: lit in their hour; warm when they open
+  // within three hours (the five soonest say when); the rest in their realm's colour.
+  _lightDoors() {
+    const grid = document.getElementById('atlas-grid');
+    if (!grid || !this._state) return;
+    const soon = [];
+    grid.querySelectorAll('.door.is-found').forEach((li) => {
+      const no = Number(li.dataset.no);
+      const j = this._doors && this._doors.get(no);
+      const s = this._state.get(no);
+      if (!j || !s) return;
+      li.dataset.open = DoorClock.always(j.entrance) ? 'always' : String(!!s.open);
+      const near = !s.open && !s.month && s.minutes != null && s.minutes <= 180;
+      li.toggleAttribute('data-soon', near);
+      if (near) soon.push([s.minutes, li]);
+      const old = li.querySelector('.door__soon');
+      if (old) old.remove();
+    });
+    soon.sort((a, b) => a[0] - b[0]).slice(0, 5).forEach(([m, li]) => {
+      const text = m < 60 ? t('home.door.soonM', { n: Math.max(1, m) }) : t('home.door.soonH', { n: Math.round(m / 60) });
+      li.querySelector('.door__no').insertAdjacentHTML('afterend', `<span class="door__soon num" aria-hidden="true">${UI.esc(text)}</span>`);
+    });
+  },
+
   _cols() {
     const grid = document.getElementById('atlas-grid');
     return grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').length : 12;
@@ -788,7 +811,7 @@ Pages.Home = {
       drag = null;
     });
     section.querySelector('#door-card').addEventListener('click', () => this._closePeek());
-    if (this._swap) {
+    if (this._still) {
       grid.classList.add('is-lit', 'is-near');
       if ('IntersectionObserver' in window) {
         const io = new IntersectionObserver((entries) => {
@@ -879,10 +902,11 @@ Pages.Home = {
       const [name, place] = UI.titleParts(j.title);
       // the spoken name starts with what the tile shows (number, then name)
       const always = DoorClock.always(e);
-      const label = `${no} ${name} · ${t(`entrance.realm.${e.realm}`)}${place ? ` · ${place}` : ''}${always ? ` · ${t('home.door.always')}` : s.open ? ` · ${t('home.door.open')}` : ''}`;
+      const state = always ? t('home.door.always') : s.open ? t('home.door.open') : s.minutes <= 180 && !s.month ? DoorClock.when(s) : '';
+      const label = `${no} ${name} · ${t(`entrance.realm.${e.realm}`)}${place ? ` · ${place}` : ''}${state ? ` · ${state}` : ''}`;
       return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${always ? 'always' : s.open}">
         <a class="door__link" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-no="${e.no}" data-quiet data-vt-self tabindex="-1" aria-label="${esc(label)}">
-          <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>
+          <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>${place ? `<span class="door__place" aria-hidden="true">${esc(place)}</span>` : ''}
         </a></li>`;
     }).join('');
     grid.setAttribute('aria-busy', 'false');
@@ -1170,7 +1194,17 @@ Pages.Home = {
       window.addEventListener('scroll', onScroll, { passive: true });
       this._cleanups.push(() => window.removeEventListener('scroll', onScroll));
     }
-    if ('IntersectionObserver' in window && !this._reduce() && !this._swap) {
+    // While a passage is being read on a touch screen, Lumi steps aside so it never sits on the words.
+    if ('IntersectionObserver' in window) {
+      const reading = new IntersectionObserver((entries) => {
+        entries.forEach((en) => en.target.toggleAttribute('data-in-view', en.isIntersecting));
+        if (main.querySelector('[data-reading][data-in-view]')) document.body.dataset.readingInView = '';
+        else delete document.body.dataset.readingInView;
+      }, { rootMargin: '0px 0px -20% 0px' });
+      main.querySelectorAll('[data-reading]').forEach((el) => reading.observe(el));
+      this._cleanups.push(() => { reading.disconnect(); delete document.body.dataset.readingInView; });
+    }
+    if ('IntersectionObserver' in window && !this._reduce() && !this._still) {
       const items = main.querySelectorAll('.reveal, .home-close__quote, .home-invite');
       items.forEach((el) => el.classList.add('will-reveal'));
       const io = new IntersectionObserver((entries) => {

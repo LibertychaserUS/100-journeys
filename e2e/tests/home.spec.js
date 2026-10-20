@@ -52,7 +52,7 @@ test.describe('Home Page', () => {
       const door = page.locator('#atlas-grid .door[data-no="47"]');
       await expect(door).toHaveAttribute('data-open', String(open));
       await door.locator('a').focus();
-      await expect(page.locator('#door-body .door-card__clock')).toContainText('当地 13:05');
+      await expect(page.locator('#door-body .door-card__clock')).toContainText('当地此刻 13:05');
       if (open) await expect(page.locator('#door-body .door-card__clock')).toContainText('此刻开着');
       else await expect(page.locator('#door-body .door-card__clock')).toContainText('当地 13:00');
       await context.close();
@@ -208,7 +208,7 @@ test('the door that never closes is not one of the lit doors', async ({ page }) 
   await expect(page.locator('#hero-now')).toBeVisible();
   const lit = await page.locator('#atlas-grid .door.is-found[data-open="true"]').count();
   await expect(page.locator('#atlas-filters [data-filter="now"] .num')).toHaveText(String(lit));
-  await expect(page.locator('#hero-now span')).toContainText(String(lit));
+  await expect(page.locator('#hero-now > span')).toContainText(String(lit));
   await expect(page.locator('#atlas-grid .door.is-selected')).not.toHaveAttribute('data-no', '15');
   await expect(page.locator('#featured-grid [data-slug="poland-wieliczka-salt-chapel"]')).toHaveCount(0);
 });
@@ -283,6 +283,42 @@ test('language switch keeps the pause and the scene', async ({ page }) => {
   await expect(page.locator('.home-hero__img.is-active')).toHaveAttribute('data-scene', '1');
   await page.waitForTimeout(7500);
   await expect(page.locator('.home-hero__img.is-active')).toHaveAttribute('data-scene', '1');
+});
+
+// E2E-HOME-017: the wall's light comes from the doors' clocks: a door opening within three hours is
+// warm and (among the five soonest) says when; closed doors carry their realm's colour, not grey
+test('doors opening soon are warm and say when', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'zh-CN' });
+  const page = await context.newPage();
+  await page.clock.setFixedTime(new Date('2026-10-19T11:05:00Z')); // Edinburgh's gun fires at 13:00 there
+  await page.goto('/#/');
+  const gun = page.locator('#atlas-grid .door[data-no="47"]');
+  await expect(gun).toHaveAttribute('data-soon', '');
+  await expect(gun.locator('.door__soon')).toHaveText('55 分钟后');
+  expect(await page.locator('#atlas-grid .door__soon').count()).toBeLessThanOrEqual(5);
+  await page.locator('#atlas').scrollIntoViewIfNeeded();
+  const closed = page.locator('#atlas-grid .door.is-found[data-open="false"]:not([data-soon]) .door__arch').first();
+  await expect.poll(() => closed.evaluate((el) => getComputedStyle(el).backgroundBlendMode)).toContain('color');
+  await context.close();
+});
+
+// E2E-HOME-018: coming back from a door, the page is where it was: the opening does not arrive
+// again and the count does not climb again
+test('back from a door does not replay the arrival', async ({ page }) => {
+  await freshPage(page);
+  await page.goto('/#/');
+  await page.locator('#atlas').scrollIntoViewIfNeeded();
+  await expect(page.locator('#atlas-found')).toHaveText('48');
+  const door = page.locator('#atlas-grid .door.is-found a').nth(3);
+  await door.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  await door.click();
+  await expect(page.locator('.detail-hero__title')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('#atlas-grid .door.is-found')).not.toHaveCount(0);
+  await expect(page.locator('.home-hero')).not.toHaveClass(/is-booting/);
+  expect(await page.locator('#atlas-found').textContent()).toBe('48');
+  await expect(page.locator('#atlas-grid')).toHaveClass(/is-lit/);
 });
 
 // E2E-HOME-006: the hundred doors: one cell per number, found doors link to their journey, the
