@@ -11,7 +11,7 @@
   transition: background var(--dur), border-color var(--dur);
 }
 body[data-media-header]:not([data-scrolled]) #main-nav {
-  background: linear-gradient(to bottom, rgba(5, 6, 8, .55), rgba(5, 6, 8, 0)), rgba(7, 8, 11, calc(var(--nav-scrim, 0) * .94));
+  background: linear-gradient(to bottom, rgba(5, 6, 8, .55), rgba(5, 6, 8, 0)) no-repeat, rgba(7, 8, 11, calc(var(--nav-scrim, 0) * .94));
   border-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none;
 }
 /* Only the bar itself switches to media-safe colors; the menu and drawer keep the theme. */
@@ -24,10 +24,10 @@ body[data-media-header]:not([data-scrolled]) #main-nav .nav {
 }
 /* Over the picture the opening's own button is the one gold thing; signing in and up stay quiet
    until the bar is solid, where the theme's primary takes over. */
-body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary { background: transparent; color: var(--color-on-media); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .34); }
-body[data-media-header]:not([data-scrolled]) #main-nav .btn--primary:hover { background: rgba(255, 255, 255, .1); }
-body[data-media-header]:not([data-scrolled]) #main-nav #nav-login { border-color: transparent; background: transparent; }
-body[data-media-header]:not([data-scrolled]) #main-nav #nav-login:hover { background: rgba(255, 255, 255, .08); }
+body[data-media-header]:not([data-scrolled]) #main-nav .nav__actions .btn--primary { background: transparent; color: var(--color-on-media); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .34); }
+body[data-media-header]:not([data-scrolled]) #main-nav .nav__actions .btn--primary:hover { background: rgba(255, 255, 255, .1); }
+body[data-media-header]:not([data-scrolled]) #main-nav .nav__actions #nav-login { border-color: transparent; background: transparent; }
+body[data-media-header]:not([data-scrolled]) #main-nav .nav__actions #nav-login:hover { background: rgba(255, 255, 255, .08); }
 
 .nav { height: 100%; display: flex; align-items: center; gap: var(--space-6); }
 .nav__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text); white-space: nowrap; }

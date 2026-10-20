@@ -147,6 +147,104 @@ test.describe('Home Page', () => {
   });
 });
 
+// E2E-HOME-012: the threshold's lines stay inside its arch, under its curve, and the arch never
+// reaches the bar, on a phone and a desktop in both languages; at its end the door opens onto the
+// page, and the bar (and the browser's own) turns to the page with it
+test.describe('The threshold', () => {
+  for (const lang of ['zh', 'en']) {
+    for (const [width, height] of [[375, 812], [1440, 900]]) {
+      test(`lines stay inside the arch (${lang} ${width})`, async ({ browser }) => {
+        const context = await browser.newContext({ viewport: { width, height }, locale: lang === 'en' ? 'en-US' : 'zh-CN' });
+        await context.addInitScript((l) => {
+          try { localStorage.setItem('lang', l); localStorage.setItem('theme', 'light'); localStorage.setItem('ai_pet_profile', JSON.stringify({ firstVisit: false })); } catch (e) {}
+        }, lang);
+        const page = await context.newPage();
+        await page.goto('/#/');
+        await page.evaluate(() => document.fonts.ready);
+        await expect.poll(() => page.evaluate(() => document.querySelector('meta[name="theme-color"]').content)).toBe('#07080b');
+        const at = (p) => page.evaluate((v) => { const th = document.getElementById('home-threshold'); window.scrollTo(0, th.offsetTop + v * (th.offsetHeight - window.innerHeight)); }, p);
+        const bad = [];
+        for (const p of [0.05, 0.2, 0.35, 0.5, 0.65, 0.75, 0.9]) {
+          await at(p);
+          await page.waitForTimeout(150);
+          bad.push(...await page.evaluate((p) => {
+            const out = [];
+            const th = document.getElementById('home-threshold');
+            const arch = th.querySelector('.home-threshold__arch').getBoundingClientRect();
+            const bar = document.getElementById('main-nav').getBoundingClientRect().bottom;
+            if (arch.top < bar + 16) out.push(`p${p}: arch top ${Math.round(arch.top)} reaches the bar (${bar})`);
+            th.querySelectorAll('.home-threshold__beat').forEach((b) => {
+              if (parseFloat(getComputedStyle(b).opacity) < 0.05) return;
+              const r = document.createRange();
+              r.selectNodeContents(b);
+              for (const line of r.getClientRects()) {
+                if (line.left < arch.left + 16 || line.right > arch.right - 16 || line.top < arch.top + arch.width / 2 - 2 || line.bottom > arch.bottom) {
+                  out.push(`p${p}: "${b.textContent.slice(0, 16)}" [${Math.round(line.left)}–${Math.round(line.right)}, ${Math.round(line.top)}] outside the arch [${Math.round(arch.left)}–${Math.round(arch.right)}, ${Math.round(arch.top + arch.width / 2)}]`);
+                }
+              }
+            });
+            return out;
+          }, p));
+        }
+        expect(bad).toEqual([]);
+        await at(1);
+        await expect(page.locator('#home-threshold')).toHaveAttribute('data-media-done', '');
+        await expect(page.locator('body')).toHaveAttribute('data-scrolled', '');
+        await expect.poll(() => page.evaluate(() => document.querySelector('meta[name="theme-color"]').content)).toBe('#f4efe6');
+        await context.close();
+      });
+    }
+  }
+});
+
+// E2E-HOME-013: the one door that never closes (open all day, all year) is never offered as a door
+// lit in its own hour: not counted as open now, not lit with them, not the door chosen by default
+test('the door that never closes is not one of the lit doors', async ({ page }) => {
+  await freshPage(page);
+  await page.goto('/#/');
+  const door = page.locator('#atlas-grid .door[data-no="15"]');
+  await expect(door).toHaveAttribute('data-open', 'always');
+  await expect(page.locator('#hero-now')).toBeVisible();
+  const lit = await page.locator('#atlas-grid .door.is-found[data-open="true"]').count();
+  await expect(page.locator('#atlas-filters [data-filter="now"] .num')).toHaveText(String(lit));
+  await expect(page.locator('#hero-now span')).toContainText(String(lit));
+  await expect(page.locator('#atlas-grid .door.is-selected')).not.toHaveAttribute('data-no', '15');
+  await expect(page.locator('#featured-grid [data-slug="poland-wieliczka-salt-chapel"]')).toHaveCount(0);
+});
+
+// E2E-HOME-014: keyboard focus in the opening is always visible and never moves the page: every
+// stop in the opening keeps the page at the top (desktop), and a focused control is drawn even
+// where the opening has faded (phone)
+test('focus in the opening is seen and keeps the page still', async ({ browser }) => {
+  for (const [width, height] of [[1440, 900], [375, 812]]) {
+    const context = await browser.newContext({ viewport: { width, height } });
+    await context.addInitScript(() => { try { localStorage.setItem('ai_pet_profile', JSON.stringify({ firstVisit: false })); } catch (e) {} });
+    const page = await context.newPage();
+    await page.goto('/#/');
+    await expect(page.locator('#hero-now')).toBeVisible();
+    await page.waitForTimeout(1500);
+    const seen = [];
+    for (let i = 0; i < 30; i++) {
+      await page.keyboard.press('Tab');
+      const stop = await page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || !el.closest('.home-hero')) return null;
+        let o = 1;
+        for (let e = el; e && e !== document.body; e = e.parentElement) o *= parseFloat(getComputedStyle(e).opacity);
+        return { id: el.id || el.className, y: window.scrollY, o };
+      });
+      if (!stop) { if (seen.length) break; continue; }
+      seen.push(stop);
+    }
+    expect(seen.length).toBeGreaterThan(2);
+    for (const s of seen) {
+      expect(s.o, `${width} ${s.id}`).toBeGreaterThan(0.95);
+      if (width > 800) expect(s.y, `${width} ${s.id}`).toBe(0);
+    }
+    await context.close();
+  }
+});
+
 // E2E-HOME-006: the hundred doors: one cell per number, found doors link to their journey, the
 // card follows the pointer, realm filters dim the rest, and the opening adds three entrances.
 test.describe('The hundred doors', () => {

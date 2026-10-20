@@ -17,6 +17,24 @@ test.describe('Mobile', () => {
     await expect(page.locator('#nav-drawer')).toHaveCount(0);
   });
 
+  // E2E-MOBILE-007: opened at the top of the opening (the bar still clear over the picture), the
+  // drawer's sign-up button keeps its own fill and reads, in both themes
+  for (const theme of ['light', 'dark']) {
+    test(`drawer sign-up reads over the opening (${theme})`, async ({ page }) => {
+      await page.addInitScript((t) => { try { localStorage.setItem('theme', t); } catch (e) {} }, theme);
+      await page.goto('/#/');
+      await expect(page.locator('body')).not.toHaveAttribute('data-scrolled', '');
+      await page.locator('#nav-menu').click();
+      const look = await page.locator('#drawer-register').evaluate((el) => {
+        const cs = getComputedStyle(el);
+        return { bg: cs.backgroundColor, fg: cs.color, drawer: getComputedStyle(document.getElementById('nav-drawer')).backgroundColor };
+      });
+      expect(look.bg).not.toBe('rgba(0, 0, 0, 0)');
+      expect(look.bg).not.toBe(look.drawer);
+      expect(look.fg).not.toBe(look.bg);
+    });
+  }
+
   // E2E-MOBILE-002: no page scrolls sideways on a phone
   test('pages fit the phone width', async ({ page }) => {
     for (const url of ['/#/', '/#/explore', '/#/journey/patagonia-torres-del-paine-trek', '/#/journey/bolivia-salt-flat-trek', '/#/compose', '/#/login', '/#/register', '/#/about', '/#/find', '/#/guide', '/#/space']) {

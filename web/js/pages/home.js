@@ -154,8 +154,25 @@ const DoorClock = (() => {
   /** What the door waits on that the site cannot see, or '' */
   const needs = (s) => (s && s.needs ? t(`home.door.needs.${s.needs}`) : '');
 
-  return { state, when, whenAt, needs, sun };
+  /** The door that never closes (open all day, every day of the year): it is open, but it is not
+   *  one of the doors lit in their own hour, so it is never offered as one. */
+  const always = (e) => {
+    const w = e && e.window;
+    return !!w && w.at === '00:00' && w.until === '24:00' && !(w.days && w.days.length) && !(w.except && w.except.length)
+      && !w.needs && (!e.months || !e.months.length || e.months.length === 12);
+  };
+  /** Open in its own hour right now. */
+  const lit = (e, s) => !!(s && s.open) && !always(e);
+
+  return { state, when, whenAt, needs, sun, always, lit };
 })();
+
+/**
+ * The fisherman's marks on the threshold, as lantern points along a wider arch around the door: from
+ * its left foot, over the top, down to its right foot. Each is [angle round the arch's curve, how far
+ * down its side (0 at the curve, 1 at the sill), a small nudge off the line in px].
+ */
+const MARKS = [[180, 0.88, 0], [180, 0.55, 0], [180, 0.2, 0], [160, 0, -4], [136, 0, 5], [109, 0, -3], [84, 0, 6], [60, 0, -5], [33, 0, 4], [0, 0.18, 0], [0, 0.52, 0], [0, 0.9, 0]];
 
 Pages.Home = {
   SCENE_MS: 6800,
@@ -216,8 +233,12 @@ Pages.Home = {
 
       <section class="home-threshold" id="home-threshold" data-media-end aria-label="${esc(t('home.threshold.label'))}">
         <div class="home-threshold__stage" data-layered>
-          <div class="home-threshold__arch" aria-hidden="true"><i></i></div>
-          ${['b1', 'b2', 'b3'].map((k, i) => `<p class="home-threshold__beat" style="--o:${i ? 0 : 1}">${esc(t(`home.threshold.${k}`))}</p>`).join('')}
+          <div class="home-threshold__marks" aria-hidden="true">${MARKS.map(([a, d, j], i) => `<b style="--a:${a}deg;--d:${d};--j:${j}px;--at:${(i / MARKS.length).toFixed(3)}"></b>`).join('')}</div>
+          <div class="home-threshold__arch">
+            <i aria-hidden="true"></i>
+            <div class="home-threshold__beats">${this._beats().map((k, i) => `<p class="home-threshold__beat${k === 'b0' ? ' home-threshold__beat--setup' : ''}" style="--o:${i ? 0 : 1}">${esc(t(`home.threshold.${k}`)).replace(/\u200b/g, '<wbr>')}</p>`).join('')}</div>
+          </div>
+          <div class="home-threshold__open" aria-hidden="true"></div>
         </div>
       </section>
 
@@ -292,6 +313,7 @@ Pages.Home = {
       <section class="home-close" aria-labelledby="close-quote">
         <div class="container home-close__inner">
           <figure class="home-close__quote">
+            ${I18n.lang === 'en' ? '<p class="home-close__orig" lang="zh-CN">缘溪行，忘路之远近。</p>' : ''}
             <blockquote id="close-quote"><p>${t('footer.line').split(/(?<=[，,])\s*/).map((part) => `<span>${esc(part)}</span>`).join(' ')}</p></blockquote>
             <figcaption>${esc(t('footer.lineBy'))}</figcaption>
           </figure>
@@ -350,6 +372,8 @@ Pages.Home = {
   },
 
   _reduce() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; },
+  /** The threshold's lines. In English the tale is not common knowledge, so it is told first. */
+  _beats() { return I18n.lang === 'en' ? ['b0', 'b1', 'b2', 'b3'] : ['b1', 'b2', 'b3']; },
   _save() { Router.saveState({ home: { door: this._pinned, filter: this._filter, slide: this._scene } }); },
 
   async _load(hero) {
@@ -387,7 +411,7 @@ Pages.Home = {
     const now = new Date();
     const journeys = (this._journeys || []).filter((j) => j.entrance);
     this._state = new Map(journeys.map((j) => [j.entrance.no, DoorClock.state(j.entrance, now)]));
-    const open = journeys.filter((j) => this._state.get(j.entrance.no).open).length;
+    const open = journeys.filter((j) => DoorClock.lit(j.entrance, this._state.get(j.entrance.no))).length;
     const nowEl = document.getElementById('hero-now');
     if (nowEl) {
       const hh = String(now.getHours()).padStart(2, '0');
@@ -396,8 +420,9 @@ Pages.Home = {
       nowEl.hidden = false;
     }
     document.querySelectorAll('#atlas-grid .door.is-found').forEach((li) => {
+      const j = this._doors && this._doors.get(Number(li.dataset.no));
       const s = this._state.get(Number(li.dataset.no));
-      li.dataset.open = String(!!(s && s.open));
+      li.dataset.open = j && DoorClock.always(j.entrance) ? 'always' : String(!!(s && s.open));
     });
     const nowChip = document.querySelector('#atlas-filters [data-filter="now"] .num');
     if (nowChip) nowChip.textContent = open;
@@ -512,7 +537,8 @@ Pages.Home = {
     if (!hero.isConnected) return;
     const now = new Date();
     const day = Math.floor(now.getTime() / 864e5);
-    const rank = (j) => (DoorClock.state(j.entrance, now).open ? 0 : 1000) + ((j.entrance.no * 37 + day * 11) % 101);
+    // the door that never closes only if nothing else is open
+    const rank = (j) => (DoorClock.always(j.entrance) ? 500 : DoorClock.state(j.entrance, now).open ? 0 : 1000) + ((j.entrance.no * 37 + day * 11) % 101);
     const picks = journeys.filter((j) => j.entrance && j.hero_url).sort((a, b) => rank(a) - rank(b)).slice(0, 3);
     const slides = hero.querySelector('.home-hero__slides');
     const dots = hero.querySelector('#hero-dots');
@@ -829,8 +855,9 @@ Pages.Home = {
       const s = DoorClock.state(e, now);
       const [name, place] = UI.titleParts(j.title);
       // the spoken name starts with what the tile shows (number, then name)
-      const label = `${no} ${name} · ${t(`entrance.realm.${e.realm}`)}${place ? ` · ${place}` : ''}${s.open ? ` · ${t('home.door.open')}` : ''}`;
-      return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${s.open}">
+      const always = DoorClock.always(e);
+      const label = `${no} ${name} · ${t(`entrance.realm.${e.realm}`)}${place ? ` · ${place}` : ''}${always ? ` · ${t('home.door.always')}` : s.open ? ` · ${t('home.door.open')}` : ''}`;
+      return `<li class="door is-found" style="--i:${k};--thumb:url('${esc(this._thumb(j))}')" data-realm="${esc(e.realm)}" data-no="${e.no}" data-open="${always ? 'always' : s.open}">
         <a class="door__link" href="#/journey/${encodeURIComponent(j.slug)}" data-slug="${esc(j.slug)}" data-no="${e.no}" data-quiet data-vt-self tabindex="-1" aria-label="${esc(label)}">
           <span class="door__arch" aria-hidden="true"></span><span class="door__no num" aria-hidden="true">${no}</span><span class="door__word" aria-hidden="true">${esc(name)}</span>
         </a></li>`;
@@ -844,11 +871,12 @@ Pages.Home = {
     const chip = (key, label, c) => `<button type="button" class="home-atlas__chip" data-filter="${key}" aria-pressed="${key === this._filter}"${key && key !== 'now' ? ` style="--lamp:var(--realm-${key})"` : ''}>${key ? '<i aria-hidden="true"></i>' : ''}<span>${esc(label)}</span><span class="num">${c}</span></button>`;
     document.getElementById('atlas-filters').innerHTML = [
       chip('', t('home.atlas.all'), n),
-      chip('now', t('home.atlas.now'), count((e) => DoorClock.state(e, now).open)),
+      chip('now', t('home.atlas.now'), count((e) => DoorClock.lit(e, DoorClock.state(e, now)))),
       ...this.REALMS.map((r) => chip(r, t(`entrance.realm.${r}`), count((e) => e.realm === r))),
     ].join('');
     if (this._filter) this._filterDoors(this._filter, { keep: true });
-    const first = (this._pinned && this._doors.get(this._pinned)) || found.find((j) => DoorClock.state(j.entrance, now).open) || found[0];
+    const first = (this._pinned && this._doors.get(this._pinned)) || found.find((j) => DoorClock.lit(j.entrance, DoorClock.state(j.entrance, now)))
+      || found.find((j) => !DoorClock.always(j.entrance)) || found[0];
     if (first) {
       this._pinned = first.entrance.no;
       this._select(first.entrance.no, { quiet: true });
@@ -1032,7 +1060,7 @@ Pages.Home = {
   _soonest(journeys) {
     const now = new Date();
     const order = (s) => (s.open ? 1e6 : s.month ? 2e6 + s.month : s.minutes);
-    return journeys.filter((j) => j.entrance).map((j) => ({ j, s: DoorClock.state(j.entrance, now) }))
+    return journeys.filter((j) => j.entrance && !DoorClock.always(j.entrance)).map((j) => ({ j, s: DoorClock.state(j.entrance, now) }))
       .sort((a, b) => order(a.s) - order(b.s) || a.j.entrance.no - b.j.entrance.no);
   },
 
@@ -1072,6 +1100,11 @@ Pages.Home = {
     const th = main.querySelector('#home-threshold');
     if (th && !this._reduce()) {
       const beats = [...th.querySelectorAll('.home-threshold__beat')];
+      const arch = th.querySelector('.home-threshold__arch');
+      const bar = document.getElementById('main-nav');
+      const n = beats.length;
+      const story = 0.78; // the lines take this much of the way; the door opens over the rest
+      const at = (i) => (i * story) / n;
       let queued = false;
       const ease = (x) => Math.min(1, Math.max(0, x));
       const update = () => {
@@ -1079,14 +1112,21 @@ Pages.Home = {
         const span = Math.max(1, th.offsetHeight - window.innerHeight);
         const rect = th.getBoundingClientRect();
         const p = ease(-rect.top / span);
+        const archTop = arch.offsetTop;
         // once the stage starts to leave, the last line goes before it rises to the bar
         const leaving = ease((window.innerHeight - rect.bottom) / (window.innerHeight * 0.3));
-        th.style.setProperty('--p', p.toFixed(3));
+        // the marks light through the first line, go out when the men lose their way, come back
+        // with the last line; then the door opens
+        const q = ease((p - story - 0.03) / (1 - story - 0.06));
+        const set = { '--p': p, '--t': ease((p - 0.01) / (at(1) * 0.85)), '--m': ease((p - at(n - 2)) / (at(1) * 0.7)), '--r': ease((p - at(n - 1)) / (at(1) * 0.4)), '--q': q };
+        for (const k in set) th.style.setProperty(k, set[k].toFixed(3));
+        // once the light through the door reaches the middle of the bar, the bar is over the page
+        const done = q > 0 && rect.top <= 0 && archTop * (1 - q) < (bar ? bar.offsetHeight : 64) / 2;
+        if (done !== th.hasAttribute('data-media-done')) { th.toggleAttribute('data-media-done', done); Router.updateHeader(); }
         beats.forEach((b, i) => {
-          const a = i / 3;
-          const z = (i + 1) / 3;
-          const fadeIn = i === 0 ? 1 : ease((p - a) / 0.08);
-          const fadeOut = i === beats.length - 1 ? 1 - leaving : ease((z - p) / 0.08);
+          const fadeIn = i === 0 ? 1 : ease((p - at(i)) / 0.06);
+          // the last line is read, then goes, and the door opens
+          const fadeOut = i === n - 1 ? Math.min(1 - leaving, ease((story + 0.03 - p) / 0.05)) : ease((at(i + 1) - p) / 0.06);
           b.style.setProperty('--o', Math.min(fadeIn, fadeOut).toFixed(3));
         });
       };

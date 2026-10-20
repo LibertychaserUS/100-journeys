@@ -18,8 +18,7 @@ const Nav = (() => {
       setTheme._t = setTimeout(() => root.classList.remove('theme-switching'), 320);
     }
     root.setAttribute('data-theme', next);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === 'dark' ? '#0d0f13' : '#f3f3f1');
+    if (window.Router) Router.updateHeader();
     try { localStorage.setItem('theme', next); } catch {}
     const focused = document.activeElement && document.activeElement.id;
     render();

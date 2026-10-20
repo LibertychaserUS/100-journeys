@@ -13,3 +13,4 @@
 /* The colophon: how it is made, quietly at the end */
 .about-colophon { margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--color-line); display: grid; gap: 10px; max-width: 44em; font-size: var(--text-sm); color: var(--color-text-3); line-height: 1.7; }
 .about-colophon b { color: var(--color-text-2); font-weight: var(--weight-semibold); margin-right: 6px; }
+.about-tale { margin-top: 14px; max-width: 36em; font-family: var(--font-story); font-size: var(--text-base); line-height: 1.6; color: var(--color-text-2); }

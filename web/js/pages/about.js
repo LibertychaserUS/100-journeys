@@ -13,6 +13,7 @@ Pages.About = {
             <p class="about-kicker">${esc(t('about.kicker'))}</p>
             <h1>${esc(t('about.title'))}</h1>
             <p class="about-lead">${esc(t('about.lead'))}</p>
+            ${I18n.lang === 'en' ? `<p class="about-tale">${esc(t('about.tale'))}</p>` : ''}
           </header>
           <div class="about-grid">
             ${[1, 2, 3].map((n) => `<section><h2>${esc(t(`about.c${n}.title`))}</h2><p>${esc(t(`about.c${n}.text`))}</p></section>`).join('')}
