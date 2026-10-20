@@ -1,6 +1,6 @@
 {
   "slug": "poland-wieliczka-salt-chapel",
-  "entrance": { "no": 15, "realm": "mirror-salt", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "any", "tz": "Europe/Warsaw", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": 49.98, "lon": 20.05, "window": { "at": "00:00", "until": "24:00" } },
+  "entrance": { "no": 15, "realm": "mirror-salt", "pace": "hour", "scale": "far", "seasons": ["any"], "time": "morning", "tz": "Europe/Warsaw", "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "lat": 49.98, "lon": 20.05, "window": { "at": "07:30", "until": "08:30" } },
   "journey": {
     "fantasy_type": "culture", "visual_style": "dramatic",
     "adventure_index": 2, "obscurity_level": 3, "risk_level": 1, "price": 11999,
@@ -14,7 +14,7 @@
     "hook": "四壁是灰色的盐，头顶的灯也是盐",
     "region": "欧洲 · 波兰",
     "moods": ["地下", "手工", "回声", "耐心"],
-    "opens": "全年开放，不分时辰：地下一百米，本来就没有白天和黑夜",
+    "opens": "每天清晨第一趟下井的那一个小时，当地 7:30 到 8:30：铃声一响，升降机的铁门打开。地下一百米本来没有白天和黑夜，这扇门只认这一趟",
     "role": "数凿痕的人",
     "premise": "维利奇卡盐矿从 13 世纪一直开采到 1996 年，1978 年进入第一批《世界遗产名录》。地下 101 米的圣金加礼拜堂 1896 年开始成形，矿工们在里面雕了大约七十年。地面是从一整块盐里刻出来的，吊灯用盐的晶体做成。",
     "mission": "在圣金加礼拜堂里，找一处看得出是一凿一凿刻出来的地方，站在那儿，数完十道凿痕。",
@@ -56,7 +56,7 @@
     "hook": "Grey salt walls, and overhead, chandeliers made of salt",
     "region": "Europe · Poland",
     "moods": ["Underground", "Handmade", "Echo", "Patience"],
-    "opens": "All year, at any hour: a hundred metres down, there's no day or night to speak of",
+    "opens": "Every morning, for the hour of the first descent, 7:30 to 8:30 local: the bell rings once and the lift gate opens. A hundred metres down there is no day or night; this door keeps only that hour",
     "role": "The counter of chisel marks",
     "premise": "Salt was mined at Wieliczka from the 13th century until 1996, and in 1978 it was on UNESCO's very first World Heritage list. St Kinga's Chapel, 101 metres down, took shape in 1896, and miners went on carving it for about seventy years. Its floor was cut from a single block of salt; its chandeliers are made of salt crystals.",
     "mission": "In St Kinga's Chapel, find one spot where you can tell it was cut stroke by stroke, and stay there long enough to count ten chisel marks.",

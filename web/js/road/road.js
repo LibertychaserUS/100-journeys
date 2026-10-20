@@ -44,8 +44,10 @@ const Road = (() => {
   }
 
   // ---------- vocabulary ----------
+  // One vocabulary per language; labels always come from the language on screen now (a switch back
+  // to a language already fetched must not keep the other one's words).
   const vocabCache = {};
-  let vocabNow = null;
+  const vocabByLang = {};
   function vocab() {
     const lang = I18n.apiLang;
     if (!vocabCache[lang]) {
@@ -55,15 +57,16 @@ const Road = (() => {
         v.stamp = Object.fromEntries(v.stamps.map((x) => [x.key, x]));
         v.flag = Object.fromEntries(v.flags.map((x) => [x.key, x]));
         v.reason = Object.fromEntries(v.reasons.map((x) => [x.key, x]));
-        vocabNow = v;
+        vocabByLang[lang] = v;
         return v;
       });
       vocabCache[lang].catch(() => { delete vocabCache[lang]; });
     }
     return vocabCache[lang];
   }
-  const tagLabel = (key) => (vocabNow && vocabNow.tag[key] ? vocabNow.tag[key].label : key);
-  const stampLabel = (key) => (vocabNow && vocabNow.stamp[key] ? vocabNow.stamp[key].label : key);
+  const vocabNowFor = () => vocabByLang[I18n.apiLang] || null;
+  const tagLabel = (key) => { const v = vocabNowFor(); return v && v.tag[key] ? v.tag[key].label : key; };
+  const stampLabel = (key) => { const v = vocabNowFor(); return v && v.stamp[key] ? v.stamp[key].label : key; };
 
   // ---------- slips you hold ----------
   let rubbedCache = null; // account rubbings, { slipId: slug }
@@ -486,10 +489,10 @@ const Road = (() => {
           <h2>${esc(t('ledger.title'))}</h2>
           ${d.ready ? `
             <div class="ledger__glow" style="--glow:${d.glow}" aria-hidden="true"></div>
-            <div class="ledger__axes">${(vocabNow.axes || ['real', 'moved', 'fit']).map(bars).join('')}</div>
+            <div class="ledger__axes">${(vocabNowFor().axes || ['real', 'moved', 'fit']).map(bars).join('')}</div>
             <div class="ledger__cols">
               <div><h3>${esc(t('ledger.stamps'))}</h3>${list(d.ledger.stamps, stampLabel)}</div>
-              <div><h3>${esc(t('ledger.flags'))}</h3>${list(d.ledger.flags, (k) => (vocabNow.flag[k] ? vocabNow.flag[k].label : k))}</div>
+              <div><h3>${esc(t('ledger.flags'))}</h3>${list(d.ledger.flags, (k) => (vocabNowFor().flag[k] ? vocabNowFor().flag[k].label : k))}</div>
             </div>` : `<p class="road-sheet__lead">${esc(t('ledger.notYet', { n: d.needed }))}</p>`}
           <div class="road-sheet__actions"><button type="button" class="btn btn--ghost" data-close data-autofocus>${esc(t('common.close'))}</button></div>
         </div>`,

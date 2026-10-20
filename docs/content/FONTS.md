@@ -38,12 +38,12 @@ the font's copyright and licence records, and the licence texts ship next to the
 
 | Page | Chinese | English |
 |---|---|---|
-| Home | about 102 KB (10 files) | 31 KB |
-| Explore | about 95 KB | 28 KB |
+| Home | about 96 KB (9 files) | 31 KB |
+| Explore | about 101 KB | 28 KB |
 | About, Find | 62–72 KB | 28 KB |
 | Compose | about 120 KB | 28 KB |
-| A journey | 123–147 KB | 28 KB |
-| Night Station | about 129 KB | 28 KB |
+| A journey | 123–152 KB | 28 KB |
+| Night Station | about 126 KB | 28 KB |
 
 The home page shows different doors at different hours, and a door's card on hover. Its slices are
 built to hold every door's name and every way of saying when a door opens, at both weights, so the

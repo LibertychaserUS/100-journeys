@@ -39,6 +39,8 @@
 .link { color: var(--color-text); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; }
 .link-arrow { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-2); font-size: var(--text-base); white-space: nowrap; }
 .link-arrow:hover { color: var(--color-text); }
+/* fingers: a text link is as tall as a button to hit */
+@media (pointer: coarse) { .link-arrow { min-height: 44px; } }
 
 /* --- Chips (filters, choices) --- */
 .chip {

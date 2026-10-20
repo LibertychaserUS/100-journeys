@@ -27,7 +27,7 @@
 .home-hero.is-instant .home-hero__img { transition: none; }
 .home-hero__img.is-leaving { animation: none !important; }
 @media (prefers-reduced-motion: no-preference) {
-  .home-hero.is-playing .home-hero__img.is-active { animation: hero-push 7.4s linear forwards; }
+  .home-hero.is-playing .home-hero__img.is-active { animation: hero-push calc(var(--dwell, 6800ms) + 1100ms) cubic-bezier(.25, .1, .25, 1) forwards; }
   .home-hero.is-held .home-hero__img.is-active, .home-hero.is-offscreen .home-hero__img.is-active { animation-play-state: paused; }
 }
 @keyframes hero-push { from { transform: scale(var(--push-from)); } to { transform: scale(var(--push-to)); } }
@@ -99,6 +99,7 @@
 .home-hero__step:is(:hover, :active, :focus-visible) { background: var(--color-action-hover); color: var(--color-on-action); }
 .home-hero__step .icon { transition: transform var(--dur) var(--ease-out); }
 .home-hero__step:hover .icon { transform: translateX(3px); }
+.home-hero__step:active { transform: scale(.98); }
 
 .home-hero__foot { margin-top: var(--space-6); min-height: 40px; display: flex; align-items: center; gap: var(--space-3) var(--space-5); flex-wrap: wrap; }
 .home-hero__pause { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, .28); color: #f6f1e8; background: rgba(255, 255, 255, .06); }
@@ -141,7 +142,7 @@
   .home-hero__pause { width: 40px; height: 40px; margin-right: 4px; }
 }
 /* The visitor's time, and a way straight to the doors open right now */
-.home-hero__now { margin-left: auto; display: inline-flex; align-items: baseline; gap: 12px; font-size: var(--text-sm); color: rgba(246, 241, 232, .8); }
+.home-hero__now { margin-left: auto; display: inline-flex; align-items: baseline; min-height: 44px; padding-block: 6px; gap: 12px; font-size: var(--text-sm); color: rgba(246, 241, 232, .8); }
 .home-hero__now time { font-size: var(--text-lg); letter-spacing: .06em; color: #f6f1e8; }
 .home-hero__now small { font-size: var(--text-xs); letter-spacing: .08em; color: rgba(246, 241, 232, .6); }
 .home-hero__now > span { border-bottom: 1px solid rgba(246, 241, 232, .32); padding-bottom: 2px; transition: border-color var(--dur); }
