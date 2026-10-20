@@ -12,6 +12,7 @@ const Router = (() => {
   let firstRender = true;
   // True while a page re-renders in place (a language switch, a refresh): pages skip their arrival.
   let swapping = false;
+  let within = null; // a transition a caller started around this update ({ out })
   let depth = 0; // in-app navigations, so "back" knows whether history.back() stays in the app
   let routeHash = window.location.hash.startsWith('#/') ? window.location.hash : '#/';
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -44,7 +45,7 @@ const Router = (() => {
     if (media) {
       const end = document.querySelector('[data-media-end]');
       const limit = end ? end.offsetTop + end.offsetHeight - 80 : 24;
-      if (window.scrollY > limit || (end && end.hasAttribute('data-media-done'))) document.body.dataset.scrolled = '';
+      if (window.scrollY >= limit || (end && end.hasAttribute('data-media-done'))) document.body.dataset.scrolled = '';
       else delete document.body.dataset.scrolled;
       // Over the last stretch of the picture the bar darkens to night, so nothing on the picture
       // ever slides under a clear bar; without motion, in one step as soon as the page moves.
@@ -118,15 +119,21 @@ const Router = (() => {
       try { out = page ? page.render(ctx) : Pages.Error.render(404); } finally { swapping = false; }
       // Coming back to an entry (Back, Forward, a reload, a language switch): return to its place.
       const back = force ? window.scrollY : restoreY;
+      // the ground a transition shows between the old page and the new one: the new page's own
+      // (night where it opens on a picture)
+      const onPicture = 'mediaHeader' in document.body.dataset && (back || 0) < window.innerHeight * 0.8;
+      document.documentElement.style.setProperty('--vt-bg', onPicture ? '#07080b' : 'var(--color-bg)');
       if (back) requestAnimationFrame(() => requestAnimationFrame(() => { window.scrollTo(0, back); updateScrolled(); }));
       else requestAnimationFrame(updateScrolled);
       // Wait briefly for an async page (detail) so the transition captures the new state.
       return out && typeof out.then === 'function' ? Promise.race([out, new Promise((r) => setTimeout(r, 700))]) : undefined;
     };
-    const motion = document.startViewTransition && document.visibilityState === 'visible'
-      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const motion = canAnimate();
     const animate = !firstRender && motion;
-    if (animate) {
+    // inside a transition the caller already started (a language switch), the update is simply
+    // part of it
+    if (within) within.out = run();
+    else if (animate) {
       // re-rendering in place is a quick crossfade of the words, not an arrival
       const html = document.documentElement;
       if (force) html.classList.add('vt-swap');
@@ -146,6 +153,31 @@ const Router = (() => {
     }
     if (firstRender) document.documentElement.dataset.booted = '';
     firstRender = false;
+  }
+
+  function canAnimate() {
+    return !!document.startViewTransition && document.visibilityState === 'visible'
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  /**
+   * Changes the whole page in place (the language) inside one transition, so the old picture is
+   * taken before anything changes. `ready` (fonts for the new words) is waited on briefly first;
+   * the page's own render is waited on briefly after.
+   */
+  function transition(update, ready) {
+    if (!canAnimate()) { update(); return; }
+    const html = document.documentElement;
+    html.classList.add('vt-swap');
+    const wait = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms))]);
+    const vt = document.startViewTransition(async () => {
+      if (ready) await wait(ready, 300);
+      const box = { out: null };
+      within = box;
+      try { update(); } finally { within = null; }
+      if (box.out && typeof box.out.then === 'function') await wait(box.out, 700);
+    });
+    vt.finished.finally(() => html.classList.remove('vt-swap'));
   }
 
   function navigate(path) {
@@ -184,7 +216,7 @@ const Router = (() => {
   }
 
   return {
-    define, navigate, replaceQuery, safeNext, back, refresh: () => resolve(true), get query() { return parse().query; },
+    define, navigate, replaceQuery, safeNext, back, transition, refresh: () => resolve(true), get query() { return parse().query; },
     /** Re-read what is under the bar (a page changed it without a scroll). */
     updateHeader: updateScrolled,
     get swapping() { return swapping; },

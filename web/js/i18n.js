@@ -1402,8 +1402,11 @@ const I18n = (() => {
     return t('err.server');
   }
 
+  /** A string in the other language, without switching (to get its fonts ready first). */
+  function peek(code, key) { return (dict[code] && dict[code][key]) || ''; }
+
   return {
-    t, setLang, onChange, extend, num, date, time, error,
+    t, peek, setLang, onChange, extend, num, date, time, error,
     get lang() { return lang; },
     get apiLang() { return lang; },
   };

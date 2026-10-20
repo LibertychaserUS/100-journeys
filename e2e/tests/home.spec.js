@@ -21,6 +21,7 @@ test.describe('Home Page', () => {
     await page.locator('#hero-enter').click();
     await expect.poll(() => page.evaluate(() => document.activeElement && document.activeElement.id)).toBe('atlas');
     await expect(page).toHaveURL(/#\/$/);
+    await expect(page.locator('html')).not.toHaveClass(/vt-step/); // the door has finished opening
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.locator('#hero-now').click();
     await expect(page.locator('#atlas-filters [data-filter="now"]')).toHaveAttribute('aria-pressed', 'true');
@@ -243,6 +244,45 @@ test('focus in the opening is seen and keeps the page still', async ({ browser }
     }
     await context.close();
   }
+});
+
+// E2E-HOME-015: "Step in" goes straight to the doors (it does not scroll through the story on the
+// way), and the bar is already the page's when it lands; it stays "Step in" on every scene, a door's
+// scene adding a link to that door beside it
+test('step in goes straight to the doors and stays step in', async ({ page }) => {
+  await freshPage(page);
+  await page.goto('/#/');
+  await expect(page.locator('#hero-dots .home-hero__dot[data-go="1"]')).toBeVisible();
+  await page.locator('#hero-dots .home-hero__dot[data-go="1"]').click();
+  await expect(page.locator('#hero-door')).toBeVisible();
+  await expect(page.locator('#hero-door')).toHaveAttribute('href', /#\/journey\//);
+  await expect(page.locator('#hero-enter')).toHaveAttribute('href', '#atlas');
+  await expect(page.locator('#hero-enter')).toHaveText('推门');
+  const seen = [];
+  await page.exposeFunction('seenY', (y) => seen.push(y));
+  await page.evaluate(() => window.addEventListener('scroll', () => window.seenY(window.scrollY), { passive: true }));
+  await page.locator('#hero-enter').click();
+  await expect.poll(() => page.evaluate(() => document.activeElement && document.activeElement.id)).toBe('atlas');
+  await expect(page.locator('body')).toHaveAttribute('data-scrolled', '');
+  const th = await page.evaluate(() => { const el = document.getElementById('home-threshold'); return [el.offsetTop, el.offsetTop + el.offsetHeight - window.innerHeight]; });
+  expect(seen.filter((y) => y > th[0] + 40 && y < th[1] - 40)).toEqual([]);
+});
+
+// E2E-HOME-016: switching language keeps the visitor's pause and the scene they picked
+test('language switch keeps the pause and the scene', async ({ page }) => {
+  await freshPage(page);
+  await page.goto('/#/');
+  await expect(page.locator('#hero-pause')).toBeVisible();
+  await page.locator('#hero-pause').click();
+  await page.locator('#hero-dots .home-hero__dot[data-go="1"]').click();
+  await expect(page.locator('.home-hero__img.is-active')).toHaveAttribute('data-scene', '1');
+  await page.locator('#nav-lang').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('#hero-pause')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#hero-dots .home-hero__dot[data-go="1"]')).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('.home-hero__img.is-active')).toHaveAttribute('data-scene', '1');
+  await page.waitForTimeout(7500);
+  await expect(page.locator('.home-hero__img.is-active')).toHaveAttribute('data-scene', '1');
 });
 
 // E2E-HOME-006: the hundred doors: one cell per number, found doors link to their journey, the
