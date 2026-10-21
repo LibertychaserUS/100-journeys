@@ -155,6 +155,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `UT-WEB-005` | 资源打包 | index.html 列出的 CSS/JS | 合并成一个样式表和一个脚本，顺序不变，gzip 一致，拒绝 css/ js/ 之外的路径 |
 | `UT-WEB-006` | 分享页预加载 | 生成封面 vs 无衍生图的图片 | 生成封面带 AVIF 类型预加载，其他不加 |
 | `UT-WEB-007` | 故事字体 | web/css/fonts.css 与 web/assets/fonts | 每个字体面指向存在的文件、按 unicode-range 切片、font-display: swap；没有未被引用的字体文件；两份 OFL 许可证在；首页预加载的文件存在 |
+| `UT-WEB-008` | 首页分享卡 | internal/webapp/share.go | 首页分享卡跟着读者的语言：英文链接（?lang=en）拿到英文的标题、og/twitter 标签和 html lang，两种语言互相标注 hreflang 和 x-default，图片带尺寸和替代文字；不是页面的路径标成 noindex |
 | `UT-WEB-004` | 分享页 | /j/:slug 的 Open Graph 标签 | 标题、描述替换并转义，默认分享标签移除，只剩一组 |
 | `UT-ANALYTICS-002` | 漏斗事件类型 | 每个漏斗步骤都是已登记事件，未知类型被丢弃 | 后台漏斗不会因为事件被拒而缺步 |
 | `UT-REPO-MIGRATE-001` | `Migrate` | 旧库的 analytics_events CHECK 只有 5 种类型 | 重建表后接受新类型，旧数据与 4 个索引保留，再次迁移不变 |
@@ -246,6 +247,7 @@ curl -fsS http://127.0.0.1:18080/api/health
 | `E2E-MOBILE-009` | `e2e/tests/mobile.spec.js` | 点门时不给它焦点（像 iOS 那样），面板也立刻显示被点的那扇门；再点一下同一扇门就进门 | 通过 |
 | `E2E-SCENES-001..002` | `e2e/tests/detail.spec.js` | 详情页按旅程自己的美术数据挂载标志动作、质感、节拍，向下滚动光线弧变化，场景里没有导游式标签；减少动态效果时所有场景立即可读 | 通过 |
 | `E2E-SEO-001` | `e2e/tests/detail.spec.js` | robots.txt 有效并指向 sitemap，sitemap 列出每段旅程的分享页 | 通过 |
+| `E2E-SEO-002` | `e2e/tests/detail.spec.js` | 首页分享卡有中英两种（英文链接是英文标签和 lang，带 hreflang），不存在的路径返回真正的 404 并显示应用的「找不到」页 | 通过 |
 | `E2E-SHARE-001` | `e2e/tests/detail.spec.js` | /j/:slug 带该旅程的分享标签且只有一组，打开后进入旅程详情，页面标题为旅程名 | 通过 |
 | `E2E-DETAIL-001..008` | `e2e/tests/detail.spec.js` | 入口编号、开放时间、身份/章节/岔路/尾声按 API 渲染，结尾只有「故事情节含虚构」一行小字，场景没有专属图时用色调底板而不重复封面，本地化徽章、匹配度 5/5、章节默认可见；岔路选择写入票面并在刷新后保留；返回；分享写入剪贴板；404；访客收藏提示登录；收藏持久化并出现在「我的」；未知路由 404 | 通过 |
 | `E2E-AUTH-*` | `e2e/tests/auth.spec.js` | 表单与 label；注册跳转；字段级校验；有效登录；错误密码显示中文提示（旧版为 `HTTP 401`）；验证码错误落在验证码字段；账户菜单 Esc 还原焦点；登出；`?next=` 回跳 | 通过 |

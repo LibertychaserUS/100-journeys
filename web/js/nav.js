@@ -121,7 +121,7 @@ const Nav = (() => {
         </div>` : ''}
       ${drawerOpen ? `
         <div class="drawer-scrim" data-action="close" aria-hidden="true"></div>
-        <div class="drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="${esc(t('nav.main'))}">
+        <div class="drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="${esc(t('nav.menuName'))}">
           <div class="container">
             <nav class="drawer__links" aria-label="${esc(t('nav.main'))}">
               ${link('#/explore', 'nav.explore', 'explore')}

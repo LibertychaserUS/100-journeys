@@ -90,7 +90,8 @@ const Router = (() => {
     if (inPageAnchor()) return;
     routeHash = window.location.hash || '#/';
     const { path, query } = parse();
-    const found = match(path);
+    // the app's pages all live at the root, after the #; any other path is not a page
+    const found = /^\/(index\.html)?$/.test(window.location.pathname) ? match(path) : null;
     const ctx = { path, query, params: found ? found.params : {} };
     const key = found ? `${found.route.pattern}:${JSON.stringify(found.params)}` : `404:${path}`;
 

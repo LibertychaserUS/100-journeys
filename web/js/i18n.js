@@ -9,7 +9,7 @@ const I18n = (() => {
   const zh = {
     'brand': '桃源百旅',
     'brand.tagline': '一百种不可思议的旅行',
-    'meta.title': '桃源百旅 · 一百种不可思议的旅行',
+    'meta.title': '桃源百旅 · 一百扇只在自己的时辰打开的门',
     'meta.description': '一百扇藏在真实地方的门，每一扇只在自己的季节和时辰打开。',
     'meta.page.explore': '找到的门',
     'meta.page.find': '你是哪一种旅人',
@@ -38,6 +38,7 @@ const I18n = (() => {
     'skip': '跳到正文',
 
     'nav.main': '主导航',
+    'nav.menuName': '菜单',
     'nav.explore': '探索',
     'nav.me': '我的',
     'nav.about': '关于',
@@ -123,6 +124,10 @@ const I18n = (() => {
     'home.close.credit': '画面是生成的插画，地点和时辰都是真的。',
     'home.now': '此刻开着 {n} 扇门',
     'home.atlas.title': '一百扇门。',
+    'home.atlas.statusAll': '门墙上是全部 {n} 扇门。',
+    'home.atlas.statusNow': '此刻开着 {n} 扇门。',
+    'home.atlas.statusRealm': '{realm}的门，{n} 扇。',
+    'home.close.label': '结尾',
     'home.atlas.found': '找到了 {n} 扇。',
     'home.atlas.label': '按境界看',
     'home.atlas.all': '全部',
@@ -665,7 +670,7 @@ const I18n = (() => {
   const en = {
     'brand': '100 Journeys',
     'brand.tagline': 'One hundred unlikely journeys',
-    'meta.title': '100 Journeys · A hundred doors in real places',
+    'meta.title': '100 Journeys · A hundred doors, each opening only at its own hour',
     'meta.description': 'A hundred doors hidden in real places, each opening only in its own season and hour.',
     'meta.page.explore': 'The doors found so far',
     'meta.page.find': 'What kind of traveller are you?',
@@ -694,6 +699,7 @@ const I18n = (() => {
     'skip': 'Skip to content',
 
     'nav.main': 'Main',
+    'nav.menuName': 'Menu',
     'nav.explore': 'Explore',
     'nav.me': 'My trips',
     'nav.about': 'About',
@@ -783,6 +789,11 @@ const I18n = (() => {
     'home.now': '{n} doors open right now',
     'home.now.one': '{n} door open right now',
     'home.atlas.title': 'A hundred doors.',
+    'home.atlas.statusAll': 'All {n} doors on the wall.',
+    'home.atlas.statusNow': '{n} doors open right now.',
+    'home.atlas.statusNow.one': 'One door open right now.',
+    'home.atlas.statusRealm': '{n} doors of {realm}.',
+    'home.close.label': 'The way back',
     'home.atlas.found': '{n} found so far.',
     'home.atlas.label': 'By realm',
     'home.atlas.all': 'All',
@@ -1330,6 +1341,12 @@ const I18n = (() => {
   const dict = { zh, en };
 
   function detect() {
+    // a link that names its language (?lang=en, as the English share card does) wins, and stays
+    const asked = /[?&]lang=(zh|en)\b/.exec(window.location.search);
+    if (asked) {
+      try { localStorage.setItem(STORAGE_KEY, asked[1]); } catch {}
+      return asked[1];
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === 'zh' || saved === 'en') return saved;

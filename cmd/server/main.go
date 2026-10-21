@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -158,6 +159,8 @@ func main() {
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
+	// "//api/health" is /api/health (a base URL with a trailing slash, joined to a path)
+	r.RemoveExtraSlash = true
 
 	// Middleware stack (order matters)
 	r.Use(middleware.RequestID())       // P1: request tracing
@@ -360,7 +363,7 @@ func main() {
 	// Injects window.APP_CONFIG and versions CSS/JS links (ASSET_VERSION env pins it; otherwise
 	// it is fingerprinted from web/ so edits and deploys bust the immutable /static cache).
 	r.NoRoute(func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
+		if strings.HasPrefix(path.Clean("/"+c.Request.URL.Path), "/api/") {
 			c.JSON(http.StatusNotFound, gin.H{"data": nil, "error": "not found"})
 			return
 		}
@@ -370,9 +373,18 @@ func main() {
 			c.String(http.StatusInternalServerError, "index.html not found")
 			return
 		}
-		html = webapp.HomeMeta(html, originOf(c))
-
 		c.Header("Cache-Control", "no-cache")
+		// Only the root is a page (the app's own routes live after the #); any other path is a
+		// real 404, still in the shell so the reader lands on the app's not-found page.
+		if p := path.Clean("/" + c.Request.URL.Path); p != "/" && p != "/index.html" {
+			c.Data(http.StatusNotFound, "text/html; charset=utf-8", []byte(webapp.NotFound(html)))
+			return
+		}
+		lang := "zh"
+		if service.NormalizeLocale(c.Query("lang")) == "en" {
+			lang = "en"
+		}
+		html = webapp.HomeMeta(html, originOf(c), lang)
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 	})
 

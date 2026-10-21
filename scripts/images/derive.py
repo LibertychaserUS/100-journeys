@@ -22,8 +22,8 @@ ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'web', 'assets', 'ima
 
 # widths per kind of image (keep in step with UI.picture, ingest.py and UT-CONTENT-IMG-001)
 WIDTHS = {
-    'cover': [120, 480, 720],  # 120: the door thumbnails on the home page
-    'card': [120, 480, 720],
+    'cover': [120, 240, 480, 720],  # 120 and 240: the door thumbnails on the home page (1x, 2x)
+    'card': [120, 240, 480, 720],
     'hero': [960, 1536],
     'scene-1': [960, 1536],
     'scene-2': [960, 1536],
