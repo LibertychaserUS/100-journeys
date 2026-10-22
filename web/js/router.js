@@ -24,6 +24,9 @@ const Router = (() => {
     history.replaceState({ ...state(), y: window.scrollY, ...extra }, '');
   }
 
+  // The app's pages all live at the root, after the #; any other path is not a page.
+  const atRoot = () => /^\/(index\.html)?$/.test(window.location.pathname);
+
   // A hash that is not a route (the skip link, an in-page anchor) moves focus and keeps the route.
   function inPageAnchor() {
     const h = window.location.hash;
@@ -90,8 +93,7 @@ const Router = (() => {
     if (inPageAnchor()) return;
     routeHash = window.location.hash || '#/';
     const { path, query } = parse();
-    // the app's pages all live at the root, after the #; any other path is not a page
-    const found = /^\/(index\.html)?$/.test(window.location.pathname) ? match(path) : null;
+    const found = atRoot() ? match(path) : null;
     const ctx = { path, query, params: found ? found.params : {} };
     const key = found ? `${found.route.pattern}:${JSON.stringify(found.params)}` : `404:${path}`;
 
@@ -203,7 +205,8 @@ const Router = (() => {
 
   function navigate(path) {
     const target = path.startsWith('#') ? path : `#${path}`;
-    if (window.location.hash === target) resolve(true);
+    if (!atRoot()) window.location.replace(`/${target}`);
+    else if (window.location.hash === target) resolve(true);
     else window.location.hash = target;
   }
 
@@ -220,7 +223,12 @@ const Router = (() => {
     return value && /^\/[a-z0-9\-/?=&%._]*$/i.test(value) && !value.startsWith('//') ? value : fallback;
   }
 
-  window.addEventListener('hashchange', () => { if (inPageAnchor()) return; depth++; resolve(); });
+  window.addEventListener('hashchange', () => {
+    if (inPageAnchor()) return;
+    // a link on the not-found page (at a path that is not a page) leads back into the app at the root
+    if (!atRoot()) { window.location.replace(`/${window.location.hash}`); return; }
+    depth++; resolve();
+  });
   window.addEventListener('DOMContentLoaded', () => resolve());
   I18n.onChange(() => resolve(true));
 

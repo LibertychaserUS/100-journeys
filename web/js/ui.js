@@ -80,10 +80,10 @@ const UI = (() => {
     [/\/generated\/road\/station-hall-(night|dawn)-phone\.jpg$/, [600, 1024]],
     [/\/generated\/road\/realm-band-[a-z-]+\.jpg$/, [600, 1200]],
     [/\/generated\/road\/rubbing-stone\.jpg$/, [960, 1536]],
-    [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600, 2400, 3200, 3840]],
+    [/\/generated\/hero-taoyuan-v2\.jpg$/, [960, 1600, 2400, 3200, 3840]],
     // the prologue's own crops for upright screens (phones, then tablets)
-    [/\/generated\/hero-taoyuan-phone\.jpg$/, [640, 1000]],
-    [/\/generated\/hero-taoyuan-tablet\.jpg$/, [1200, 1728]],
+    [/\/generated\/hero-taoyuan-v2-phone\.jpg$/, [640, 1000]],
+    [/\/generated\/hero-taoyuan-v2-tablet\.jpg$/, [1200, 1728]],
   ];
   // sources: other pictures for some screens first, e.g. [{ media: '(orientation: portrait)', src, sizes }]
   // fallback: a lighter JPEG for browsers without AVIF, when src is a large master

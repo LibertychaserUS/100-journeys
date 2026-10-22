@@ -92,8 +92,19 @@ test.describe('Detail Page', () => {
     const missing = await page.request.get('/no-such-page');
     expect(missing.status()).toBe(404);
     expect(await missing.text()).toContain('noindex');
-    await page.goto('/no-such-page');
-    await expect(page.locator('body')).toHaveAttribute('data-page', 'notfound');
+    // link checkers ask with HEAD first: the pages and files answer it as they answer GET
+    for (const p of ['/', `/j/${SLUG}`, '/robots.txt', '/sitemap.xml', '/favicon.ico', '/bundle/app.css']) {
+      expect((await page.request.head(p)).status(), p).toBe(200);
+    }
+    expect((await page.request.head('/no-such-page')).status()).toBe(404);
+    // the not-found page's links lead back into the app, not to /no-such-page#/...
+    for (const [link, pageName] of [['.btn--primary', 'home'], ['.btn--ghost', 'explore']]) {
+      await page.goto('/no-such-page');
+      await expect(page.locator('body')).toHaveAttribute('data-page', 'notfound');
+      await page.locator(`.error-page ${link}`).click();
+      await expect(page.locator('body')).toHaveAttribute('data-page', pageName);
+      expect(new URL(page.url()).pathname).toBe('/');
+    }
     await page.goto('/?lang=en');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });

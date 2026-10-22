@@ -30,6 +30,10 @@ run locally), then given the same grade and resized; the home prologue was made 
 3840 × 2160 with a fine film grain and no grade, and a small figure painted out of its cleft. New
 openings need the same step before `derive.py` (the image test asks for every size).
 
+`/static` is cached for 30 days as immutable, so a replaced image needs a new file name, or
+returning readers (and link previews) keep the old one. The prologue is `hero-taoyuan-v2` for
+that reason.
+
 | File | Used by |
 |---|---|
 | `generated/card-salt-mirror.jpg` | 001 bolivia-salt-flat-trek |
@@ -80,7 +84,8 @@ openings need the same step before `derive.py` (the image test asks for every si
 | `generated/italy-venice-acqua-alta/cover.jpg` | 046 italy-venice-acqua-alta |
 | `generated/scotland-edinburgh-one-oclock-gun/cover.jpg` | 047 scotland-edinburgh-one-oclock-gun |
 | `generated/morocco-marrakech-jemaa-el-fna/cover.jpg` | 048 morocco-marrakech-jemaa-el-fna |
-| `generated/hero-taoyuan*.jpg` | home hero (and its upright crops `-phone`, `-tablet`), sign-in |
+| `generated/hero-taoyuan-v2*.jpg` | home hero (and its upright crops `-phone`, `-tablet`), sign-in, share card |
+| `generated/hero-taoyuan.jpg` | not shown; CI and the ops checks fetch it to test static serving |
 | `generated/<slug>/{hero,scene-1,scene-2,scene-3,fork,ending,texture}.jpg` | scroll scenes of entrances 013–048 |
 | `generated/road/*.jpg` | the Ticket Road: station hall, realm bands, rubbing stone |
 | `generated/brand-mark*.png`, `generated/guide-light*.png` | brand mark, guide |

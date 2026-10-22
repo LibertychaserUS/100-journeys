@@ -294,16 +294,19 @@ func main() {
 		}
 		return scheme + "://" + c.Request.Host
 	}
+	// The routes below also answer HEAD (link checkers and unfurlers ask with it first);
+	// net/http drops the body.
+	get := func(p string, h gin.HandlerFunc) { r.GET(p, h); r.HEAD(p, h) }
 	// Browsers and crawlers ask for /favicon.ico whatever the page says: give them the icon.
-	r.GET("/favicon.ico", func(c *gin.Context) {
+	get("/favicon.ico", func(c *gin.Context) {
 		c.Header("Cache-Control", "public, max-age=86400")
 		c.File("./web/assets/icons/favicon-32.png")
 	})
-	r.GET("/robots.txt", func(c *gin.Context) {
+	get("/robots.txt", func(c *gin.Context) {
 		c.Header("Cache-Control", "public, max-age=3600")
 		c.String(http.StatusOK, "User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: %s/sitemap.xml\n", originOf(c))
 	})
-	r.GET("/sitemap.xml", func(c *gin.Context) {
+	get("/sitemap.xml", func(c *gin.Context) {
 		journeys, _, err := svc.ListJourneys(c.Request.Context(), model.JourneyFilter{Page: 1, Limit: 100})
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
@@ -320,12 +323,12 @@ func main() {
 		c.Header("Cache-Control", "public, max-age=3600")
 		c.Data(http.StatusOK, "application/xml; charset=utf-8", []byte(b.String()))
 	})
-	r.GET("/bundle/app.css", serveBundle("css"))
-	r.GET("/bundle/app.js", serveBundle("js"))
+	get("/bundle/app.css", serveBundle("css"))
+	get("/bundle/app.js", serveBundle("js"))
 
 	// Journey share links: the same SPA shell, with the journey's title, hook and cover as
 	// Open Graph tags (crawlers don't run JS); the page itself redirects into #/journey/:slug.
-	r.GET("/j/:slug", func(c *gin.Context) {
+	get("/j/:slug", func(c *gin.Context) {
 		page, err := shell()
 		if err != nil {
 			c.String(http.StatusInternalServerError, "index.html not found")

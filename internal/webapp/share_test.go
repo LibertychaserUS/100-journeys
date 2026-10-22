@@ -44,7 +44,7 @@ func TestPreloadCover(t *testing.T) {
 func TestHomeMeta(t *testing.T) {
 	page := `<html lang="zh-CN"><head><title>x</title><meta name="description" content="x" />` +
 		`<meta property="og:title" content="x" /><meta property="og:description" content="x" />` +
-		`<meta property="og:image" content="/static/assets/images/generated/hero-taoyuan-1600.jpg" /></head><body></body></html>`
+		`<meta property="og:image" content="/static/assets/images/generated/hero-taoyuan-v2-1600.jpg" /></head><body></body></html>`
 	en := HomeMeta(page, "https://example.test", "en")
 	for _, want := range []string{
 		`<html lang="en">`, `<title>100 Journeys · `, `og:locale" content="en_US"`, `og:locale:alternate" content="zh_CN"`,

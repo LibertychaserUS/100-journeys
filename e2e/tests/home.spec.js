@@ -447,7 +447,7 @@ test('an open door keeps its light when pointed at', async ({ browser }) => {
 // picture's sources agree): the landscape prologue on a desktop, its upright crops on a phone and a
 // tablet held upright
 test('the opening loads one picture for the screen', async ({ browser }) => {
-  for (const [width, height, want] of [[1440, 900, /^hero-taoyuan\.\d+\.avif$/], [390, 844, /^hero-taoyuan-phone\.\d+\.avif$/], [768, 1024, /^hero-taoyuan-tablet\.\d+\.avif$/]]) {
+  for (const [width, height, want] of [[1440, 900, /^hero-taoyuan-v2\.\d+\.avif$/], [390, 844, /^hero-taoyuan-v2-phone\.\d+\.avif$/], [768, 1024, /^hero-taoyuan-v2-tablet\.\d+\.avif$/]]) {
     const context = await browser.newContext({ viewport: { width, height } });
     const page = await context.newPage();
     const got = [];

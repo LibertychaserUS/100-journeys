@@ -39,16 +39,21 @@ AVIF_Q_LARGE = 46  # 1000px and wider: the openings, where bytes matter most for
 AVIF_Q_XL = 54  # 1800px and wider: only large or dense screens load these, and fine detail shows there
 
 
+# The home prologue. /static is cached for 30 days as immutable, so a replaced picture takes a new
+# name (here, in UI.picture, index.html and home.js) or returning readers keep the old one.
+PROLOGUE = 'hero-taoyuan-v2'
+
+
 def kind_of(name):
     base = os.path.splitext(name)[0]
     if base.startswith('card-'):
         return 'card'
-    if base == 'hero-taoyuan':
+    if base == PROLOGUE:
         return 'home'
-    if base in ('hero-taoyuan-phone', 'hero-taoyuan-tablet'):
+    if base in (PROLOGUE + '-phone', PROLOGUE + '-tablet'):
         return 'home-' + base.rsplit('-', 1)[1]
     if base.startswith('hero-taoyuan'):
-        return None  # the 960/1600 JPEGs are the fallbacks for the home opening
+        return None  # the prologue's 960/1600 JPEG fallbacks, and hero-taoyuan.jpg (a static-file probe)
     return base if base in WIDTHS else None
 
 
