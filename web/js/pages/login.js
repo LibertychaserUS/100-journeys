@@ -9,7 +9,7 @@ const AuthForm = {
     return `
       <div class="auth ${admin ? 'auth--admin' : ''}">
         <div class="auth__art" aria-hidden="true">
-          <img src="${API.mediaUrl('generated/hero-taoyuan-960.jpg')}" alt="" width="960" height="540">
+          <img src="${API.mediaUrl('generated/hero-taoyuan-v2-960.jpg')}" alt="" width="960" height="540">
           <div class="auth__quote"><p>${esc(t('auth.quote'))}</p><span>${esc(t('auth.quoteBy'))}</span></div>
         </div>
         <div class="auth__panel">${inner}</div>

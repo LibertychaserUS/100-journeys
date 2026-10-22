@@ -178,7 +178,7 @@ Pages.Home = {
   SCENE_MS: 6800,
   FIRST_MS: 10000, // the prologue stays a little longer the first time
   PICK_MS: 12000, // a scene the visitor picked
-  BRAND: { key: 'taoyuan', img: 'generated/hero-taoyuan.jpg', jpeg: 'generated/hero-taoyuan-1600.jpg', phone: 'generated/hero-taoyuan-phone.jpg', tablet: 'generated/hero-taoyuan-tablet.jpg' },
+  BRAND: { key: 'taoyuan', img: 'generated/hero-taoyuan-v2.jpg', jpeg: 'generated/hero-taoyuan-v2-1600.jpg', phone: 'generated/hero-taoyuan-v2-phone.jpg', tablet: 'generated/hero-taoyuan-v2-tablet.jpg' },
   REALMS: ['mirror-salt', 'fire-stone', 'ice-night', 'sand-stars', 'mist-temple', 'water-deep', 'city-rules', 'old-roads'],
 
   render() {
