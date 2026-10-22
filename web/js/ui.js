@@ -70,7 +70,9 @@ const UI = (() => {
   const DERIVED = [
     [/\/generated\/[^/]+\/cover\.jpg$/, [480, 720, 1120]],
     [/\/generated\/card-[^/]+\.jpg$/, [480, 720]],
-    [/\/generated\/[^/]+\/(hero|scene-1|scene-2)\.jpg$/, [960, 1536]],
+    // a journey's opening also fills wide and dense screens (upscaled from the originals)
+    [/\/generated\/[^/]+\/hero\.jpg$/, [960, 1536, 2400, 3072]],
+    [/\/generated\/[^/]+\/(scene-1|scene-2)\.jpg$/, [960, 1536]],
     [/\/generated\/[^/]+\/scene-3\.jpg$/, [600, 960]],
     [/\/generated\/[^/]+\/fork\.jpg$/, [600, 1024]],
     [/\/generated\/[^/]+\/ending\.jpg$/, [600]],
@@ -78,16 +80,22 @@ const UI = (() => {
     [/\/generated\/road\/station-hall-(night|dawn)-phone\.jpg$/, [600, 1024]],
     [/\/generated\/road\/realm-band-[a-z-]+\.jpg$/, [600, 1200]],
     [/\/generated\/road\/rubbing-stone\.jpg$/, [960, 1536]],
-    [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600, 1900]],
+    [/\/generated\/hero-taoyuan\.jpg$/, [960, 1600, 2400, 3200, 3840]],
+    // the prologue's own crops for upright screens (phones, then tablets)
+    [/\/generated\/hero-taoyuan-phone\.jpg$/, [640, 1000]],
+    [/\/generated\/hero-taoyuan-tablet\.jpg$/, [1200, 1728]],
   ];
-  function picture(src, { sizes = '100vw', alt = '', cls = '', eager = false, width, height, attrs = '' } = {}) {
-    const rule = DERIVED.find(([re]) => re.test(String(src || '')));
+  // sources: other pictures for some screens first, e.g. [{ media: '(orientation: portrait)', src, sizes }]
+  // fallback: a lighter JPEG for browsers without AVIF, when src is a large master
+  function picture(src, { sizes = '100vw', alt = '', cls = '', eager = false, width, height, attrs = '', sources = [], fallback = '' } = {}) {
+    const ruleOf = (s) => DERIVED.find(([re]) => re.test(String(s || '')));
+    const rule = ruleOf(src);
     const dims = `${width ? ` width="${width}"` : ''}${height ? ` height="${height}"` : ''}`;
-    const img = `<img src="${esc(src)}" alt="${esc(alt)}"${dims} loading="${eager ? 'eager' : 'lazy'}" decoding="async"${eager ? ' fetchpriority="high"' : ''}${cls ? ` class="${cls}"` : ''} ${attrs}>`;
+    const img = `<img src="${esc(fallback || src)}" alt="${esc(alt)}"${dims} loading="${eager ? 'eager' : 'lazy'}" decoding="async"${eager ? ' fetchpriority="high"' : ''}${cls ? ` class="${cls}"` : ''} ${attrs}>`;
     if (!rule) return img;
-    const base = String(src).replace(/\.jpg$/, '');
-    const set = (ext) => rule[1].map((w) => `${esc(base)}.${w}.${ext} ${w}w`).join(', ');
-    return `<picture><source type="image/avif" srcset="${set('avif')}" sizes="${sizes}">${img}</picture>`;
+    const set = (s, widths) => widths.map((w) => `${esc(String(s).replace(/\.jpg$/, ''))}.${w}.avif ${w}w`).join(', ');
+    const extra = sources.map((o) => { const r = ruleOf(o.src); return r ? `<source media="${esc(o.media)}" type="image/avif" srcset="${set(o.src, r[1])}" sizes="${esc(o.sizes || '100vw')}">` : ''; }).join('');
+    return `<picture>${extra}<source type="image/avif" srcset="${set(src, rule[1])}" sizes="${sizes}">${img}</picture>`;
   }
 
   /** A journey title as its name and its place ("封上的小屋 · 敦煌藏经洞"), so lines break between

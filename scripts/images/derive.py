@@ -24,13 +24,15 @@ ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'web', 'assets', 'ima
 WIDTHS = {
     'cover': [120, 240, 480, 720],  # 120 and 240: the door thumbnails on the home page (1x, 2x)
     'card': [120, 240, 480, 720],
-    'hero': [960, 1536],
+    'hero': [960, 1536, 2400, 3072],  # 2400 and 3072 are made from the upscaled originals
     'scene-1': [960, 1536],
     'scene-2': [960, 1536],
     'scene-3': [600, 960],
     'fork': [600, 1024],
     'ending': [600],
-    'home': [960, 1600, 1900],  # 1900: the full master, for large and dense screens
+    'home': [960, 1600, 2400, 3200, 3840],  # the prologue, from its 3840 master: large and dense screens
+    'home-phone': [640, 1000],  # its upright crops: phones
+    'home-tablet': [1200, 1728],  # and tablets
 }
 AVIF_Q = 52
 AVIF_Q_LARGE = 46  # 1000px and wider: the openings, where bytes matter most for LCP
@@ -43,6 +45,8 @@ def kind_of(name):
         return 'card'
     if base == 'hero-taoyuan':
         return 'home'
+    if base in ('hero-taoyuan-phone', 'hero-taoyuan-tablet'):
+        return 'home-' + base.rsplit('-', 1)[1]
     if base.startswith('hero-taoyuan'):
         return None  # the 960/1600 JPEGs are the fallbacks for the home opening
     return base if base in WIDTHS else None
@@ -103,7 +107,7 @@ def main():
                 covers.append(src)
             img = Image.open(src).convert('RGB')
             for w in WIDTHS[kind]:
-                if kind not in ('cover', 'card', 'home') and w > img.width:
+                if not kind.startswith(('cover', 'card', 'home')) and w > img.width:
                     continue  # made from the original by ingest.py; never from the smaller fallback
                 target = f'{base}.{w}.avif'
                 if not args.force and os.path.exists(target) and os.path.getmtime(target) >= os.path.getmtime(src):

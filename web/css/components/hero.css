@@ -153,11 +153,11 @@
 .home-hero.is-stopped .home-hero__now time i { animation: none; }
 .home-hero :focus-visible { outline-color: #f2c46d; }
 
-/* The prologue's traveller stands just right of centre. On wide screens show more of the picture's
-   left, and keep the English title a little narrower, so the words end before she begins (the static
-   opening matches, so nothing moves when the app takes over). */
+/* The prologue's traveller stands at about two-thirds across, by the lit cleft; the words keep to
+   the left. On wide screens the English title stays a little narrower, so it ends well before the
+   traveller (the static opening matches, so nothing moves when the app takes over). */
 @media (min-width: 1024px) and (orientation: landscape) {
-  .home-hero__slides > picture:first-child > .home-hero__img { object-position: 6% 38%; }
+  .home-hero__slides > picture:first-child > .home-hero__img { object-position: 50% 40%; }
   :root:lang(en) .home-hero.scene-taoyuan .home-hero__title { font-size: clamp(3.25rem, 5.6vw, 6.25rem); }
   :root:lang(en) .home-hero.scene-taoyuan .home-hero__lead { max-width: 25em; }
 }
@@ -172,13 +172,13 @@
   .home-hero.scene-door .home-hero__title { font-size: clamp(48px, 3.4vw + 1rem, 108px); }
   :root:lang(en) .home-hero.scene-taoyuan .home-hero__title { font-size: clamp(56px, 3.8vw + 1rem, 120px); }
 }
-/* Upright screens: the traveller moves into the right third, and on tablets the words keep clear of her */
+/* Upright screens get the prologue's own upright crops (the traveller, the lantern and the cleft all
+   in frame); on tablets the words keep clear of the traveller */
 @media (orientation: portrait) {
-  .home-hero__slides > picture:first-child > .home-hero__img { object-position: 36% 34%; }
+  .home-hero__slides > picture:first-child > .home-hero__img { object-position: 50% 40%; }
 }
 @media (orientation: portrait) and (min-width: 600px) {
-  .home-hero__slides > picture:first-child > .home-hero__img { object-position: 28% 38%; }
-  .home-hero.scene-taoyuan .home-hero__copy { max-width: 62%; }
+  .home-hero.scene-taoyuan .home-hero__copy { max-width: 58%; }
 }
 
 @media (max-width: 760px) {

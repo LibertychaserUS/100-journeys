@@ -78,10 +78,10 @@ type Home struct {
 var HomeCards = map[string]Home{
 	"zh": {Lang: "zh-CN", Title: "桃源百旅 · 一百扇只在自己的时辰打开的门",
 		Description: "一百扇藏在真实地方的门，每一扇只在自己的季节、自己的时辰打开。",
-		ImageAlt:    "桃花林下，一个提着灯笼的旅人背影，望着山谷"},
+		ImageAlt:    "桃花林中的溪边，一个提着纸灯笼的旅人背影，望着山壁上一道透着光的窄缝"},
 	"en": {Lang: "en", Title: "100 Journeys · A hundred doors, each opening only at its own hour",
 		Description: "A hundred doors hidden in real places, each opening only in its own season and hour.",
-		ImageAlt:    "Seen from behind, a traveller with a paper lantern looks over a valley of peach blossom"},
+		ImageAlt:    "Seen from behind, a traveller with a paper lantern stands by a stream among peach blossom, facing a narrow lit cleft in the rock"},
 }
 
 var (

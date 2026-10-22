@@ -267,7 +267,9 @@ func TestImages_HaveDerivatives(t *testing.T) {
 			return []int{120, 240, 480, 720}
 		case base == "cover.jpg":
 			return []int{120, 240, 480, 720, 1120}
-		case base == "hero.jpg" || base == "scene-1.jpg" || base == "scene-2.jpg":
+		case base == "hero.jpg":
+			return []int{960, 1536, 2400, 3072}
+		case base == "scene-1.jpg" || base == "scene-2.jpg":
 			return []int{960, 1536}
 		case base == "scene-3.jpg":
 			return []int{600, 960}
@@ -282,7 +284,11 @@ func TestImages_HaveDerivatives(t *testing.T) {
 		case strings.HasPrefix(rel, "road/realm-band-"):
 			return []int{600, 1200}
 		case base == "hero-taoyuan.jpg":
-			return []int{960, 1600, 1900}
+			return []int{960, 1600, 2400, 3200, 3840}
+		case base == "hero-taoyuan-phone.jpg":
+			return []int{640, 1000}
+		case base == "hero-taoyuan-tablet.jpg":
+			return []int{1200, 1728}
 		}
 		return nil
 	}
