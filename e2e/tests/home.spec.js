@@ -443,6 +443,25 @@ test('an open door keeps its light when pointed at', async ({ browser }) => {
   await context.close();
 });
 
+// E2E-HOME-024: the opening loads one picture, the one for the screen's shape (the preload and the
+// picture's sources agree): the landscape prologue on a desktop, its upright crops on a phone and a
+// tablet held upright
+test('the opening loads one picture for the screen', async ({ browser }) => {
+  for (const [width, height, want] of [[1440, 900, /^hero-taoyuan\.\d+\.avif$/], [390, 844, /^hero-taoyuan-phone\.\d+\.avif$/], [768, 1024, /^hero-taoyuan-tablet\.\d+\.avif$/]]) {
+    const context = await browser.newContext({ viewport: { width, height } });
+    const page = await context.newPage();
+    const got = [];
+    page.on('response', (r) => { if (/hero-taoyuan/.test(r.url())) got.push(r.url().split('/').pop().split('?')[0]); });
+    await page.goto('/');
+    await expect(page.locator('.home-hero__slides img.is-active')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    const shown = await page.evaluate(() => document.querySelector('.home-hero__slides img.is-active').currentSrc.split('/').pop());
+    expect(shown, `${width}`).toMatch(want);
+    expect([...new Set(got)], `${width}`).toEqual([shown]);
+    await context.close();
+  }
+});
+
 // E2E-HOME-006: the hundred doors: one cell per number, found doors link to their journey, the
 // card follows the pointer, realm filters dim the rest, and the opening adds three entrances.
 test.describe('The hundred doors', () => {

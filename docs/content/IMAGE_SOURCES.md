@@ -24,6 +24,12 @@ painted out (a ticket bracket, a stencil on an antenna, thermometer ticks, a dig
 `scripts/images/ingest.py` gives them the covers' grade and writes the JPEG fallback and AVIF
 sizes each slot is shown at.
 
+The openings (`hero`) are also shown full screen on the home page, so they have 2400 and 3072 px
+AVIFs too. Those were made from the 1536 px originals with Real-ESRGAN (`realesrgan-x4plus`, 4×,
+run locally), then given the same grade and resized; the home prologue was made the same way, at
+3840 × 2160 with a fine film grain and no grade, and a small figure painted out of its cleft. New
+openings need the same step before `derive.py` (the image test asks for every size).
+
 | File | Used by |
 |---|---|
 | `generated/card-salt-mirror.jpg` | 001 bolivia-salt-flat-trek |
@@ -74,7 +80,7 @@ sizes each slot is shown at.
 | `generated/italy-venice-acqua-alta/cover.jpg` | 046 italy-venice-acqua-alta |
 | `generated/scotland-edinburgh-one-oclock-gun/cover.jpg` | 047 scotland-edinburgh-one-oclock-gun |
 | `generated/morocco-marrakech-jemaa-el-fna/cover.jpg` | 048 morocco-marrakech-jemaa-el-fna |
-| `generated/hero-taoyuan*.jpg` | home hero, sign-in |
+| `generated/hero-taoyuan*.jpg` | home hero (and its upright crops `-phone`, `-tablet`), sign-in |
 | `generated/<slug>/{hero,scene-1,scene-2,scene-3,fork,ending,texture}.jpg` | scroll scenes of entrances 013–048 |
 | `generated/road/*.jpg` | the Ticket Road: station hall, realm bands, rubbing stone |
 | `generated/brand-mark*.png`, `generated/guide-light*.png` | brand mark, guide |

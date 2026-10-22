@@ -117,6 +117,7 @@ test.describe('Theme', () => {
         await expect(page.locator('html')).toHaveAttribute('data-theme', expected);
         await expect(page.locator('html')).not.toHaveClass(/theme-switching|vt-theme/); // transition finished
         await expect(page.locator('#nav-theme')).toBeFocused(); // focus survives the nav re-render
+        await settle(page); // colour transitions done, so axe reads the final colours
         const results = await new AxeBuilder({ page }).withTags(['wcag2aa']).withRules(['color-contrast']).analyze();
         expect(results.violations.map((v) => v.id), expected).toEqual([]);
       }

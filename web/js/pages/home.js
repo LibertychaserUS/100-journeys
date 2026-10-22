@@ -178,7 +178,7 @@ Pages.Home = {
   SCENE_MS: 6800,
   FIRST_MS: 10000, // the prologue stays a little longer the first time
   PICK_MS: 12000, // a scene the visitor picked
-  BRAND: { key: 'taoyuan', img: 'generated/hero-taoyuan.jpg' },
+  BRAND: { key: 'taoyuan', img: 'generated/hero-taoyuan.jpg', jpeg: 'generated/hero-taoyuan-1600.jpg', phone: 'generated/hero-taoyuan-phone.jpg', tablet: 'generated/hero-taoyuan-tablet.jpg' },
   REALMS: ['mirror-salt', 'fire-stone', 'ice-night', 'sand-stars', 'mist-temple', 'water-deep', 'city-rules', 'old-roads'],
 
   render() {
@@ -210,7 +210,15 @@ Pages.Home = {
     main.innerHTML = `
       <section class="home-hero scene-taoyuan${this._still ? '' : ' is-booting'}" aria-labelledby="hero-brand" style="--boot-t:-${bootT}ms">
         <div class="home-hero__slides" aria-hidden="true">
-          ${UI.picture(API.mediaUrl(this.BRAND.img), { sizes: 'max(100vw, 177.8svh)', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"' })}
+          ${UI.picture(API.mediaUrl(this.BRAND.img), {
+            // (177.7svh: a 16:9 picture filling the height, without asking for a pixel more than it needs)
+            sizes: 'max(100vw, 177.7svh)', eager: true, cls: 'home-hero__img is-active', attrs: 'data-scene="0"',
+            fallback: API.mediaUrl(this.BRAND.jpeg),
+            sources: [
+              { media: '(orientation: portrait) and (max-width: 599px)', src: API.mediaUrl(this.BRAND.phone) },
+              { media: '(orientation: portrait)', src: API.mediaUrl(this.BRAND.tablet) },
+            ],
+          })}
         </div>
         <canvas class="home-hero__particles" aria-hidden="true"></canvas>
         <div class="home-hero__shade" aria-hidden="true"></div>
@@ -578,7 +586,7 @@ Pages.Home = {
       const wide = UI.esc(j.hero_url.replace(/\.jpg$/, ''));
       const cover = UI.esc(j.image_url.replace(/\.jpg$/, ''));
       const portrait = /\/cover\.jpg$/.test(j.image_url) ? `<source media="(orientation: portrait)" type="image/avif" data-srcset="${cover}.720.avif 720w, ${cover}.1120.avif 1120w" sizes="100vw">` : '';
-      slides.insertAdjacentHTML('beforeend', `<picture>${portrait}<source type="image/avif" data-srcset="${wide}.960.avif 960w, ${wide}.1536.avif 1536w" sizes="max(100vw, 177.8svh)"><img class="home-hero__img" data-scene="${i}" data-src="${UI.esc(j.hero_url)}" alt="" decoding="async"></picture>`);
+      slides.insertAdjacentHTML('beforeend', `<picture>${portrait}<source type="image/avif" data-srcset="${wide}.960.avif 960w, ${wide}.1536.avif 1536w, ${wide}.2400.avif 2400w, ${wide}.3072.avif 3072w" sizes="max(100vw, 150svh)"><img class="home-hero__img" data-scene="${i}" data-src="${UI.esc(j.hero_url)}" alt="" decoding="async"></picture>`);
       const no = String(j.entrance.no).padStart(3, '0');
       const [name, place] = UI.titleParts(j.title);
       // the spoken name starts with what the dot shows: number, then place
